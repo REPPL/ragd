@@ -8,7 +8,9 @@ Guides help users accomplish specific tasks. Each guide focuses on a practical g
 
 ## Available Guides
 
-*No guides yet - this project is in early development.*
+| Guide | Description |
+|-------|-------------|
+| [Troubleshooting](./troubleshooting.md) | Common issues and solutions |
 
 ## Guide Guidelines
 

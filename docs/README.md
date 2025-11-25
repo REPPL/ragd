@@ -2,6 +2,16 @@
 
 Welcome to the ragd documentation hub.
 
+## What is ragd?
+
+ragd is a **privacy-first personal knowledge system**. Index your documents and search them using natural language - all running locally on your machine.
+
+**Key Features:**
+- Index PDF, TXT, and Markdown files
+- Semantic search with natural language queries
+- Beautiful CLI with Rich output
+- 100% local processing (no cloud APIs)
+
 ## Documentation Structure
 
 This documentation follows the [Diátaxis](https://diataxis.fr/) framework:
@@ -12,25 +22,28 @@ This documentation follows the [Diátaxis](https://diataxis.fr/) framework:
 | [Guides](./guides/) | Task-oriented how-tos | All users |
 | [Reference](./reference/) | Technical specifications | Developers |
 | [Explanation](./explanation/) | Conceptual understanding | All audiences |
+| [Use Cases](./use-cases/) | What users want to accomplish | Product/Dev |
 | [Development](./development/) | Developer documentation | Contributors |
 
 ## Quick Start
 
 ```bash
-# Clone and set up
-git clone <repository-url>
-cd ragd
-python3.12 -m venv .venv
-source .venv/bin/activate
-pip install -e ".[dev]"
+# Install ragd
+pip install ragd
 
-# Run the CLI
-ragd --help
+# Index your documents
+ragd index ~/Documents/notes/
+
+# Search your knowledge
+ragd search "how does authentication work"
+
+# Check status
+ragd status
 ```
 
 ## For Users
 
-- **New to ragd?** Start with [Tutorials](./tutorials/)
+- **New to ragd?** Start with [Getting Started Tutorial](./tutorials/getting-started.md)
 - **Need to accomplish a task?** Check [Guides](./guides/)
 - **Looking for API details?** See [Reference](./reference/)
 - **Want to understand concepts?** Read [Explanation](./explanation/)
@@ -38,8 +51,21 @@ ragd --help
 ## For Contributors
 
 - [Development Documentation](./development/)
+- [Use Cases](./use-cases/) - What we're building
 - [Feature Roadmap](./development/features/)
 - [Architecture Decisions](./development/decisions/adrs/)
+- [ragged Analysis](./development/lineage/ragged-analysis.md) - Knowledge transfer
+
+## Roadmap Overview
+
+| Version | Focus | Status |
+|---------|-------|--------|
+| v0.1.0 | Core RAG (index, search, status) | 📋 Planned |
+| v0.2.0 | Messy PDFs (killer feature) | 📋 Planned |
+| v0.3.0 | Advanced Search | 📋 Planned |
+| v1.0.0 | Personal Platform + Basic WebUI | 📋 Planned |
+
+See [Milestones](./development/milestones/) for details.
 
 ## AI Transparency
 
@@ -51,3 +77,4 @@ This project is developed with AI assistance. See [AI Contributions](./developme
 
 - [Project README](../README.md)
 - [.claude/ Configuration](../.claude/README.md)
+

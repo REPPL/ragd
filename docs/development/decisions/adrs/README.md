@@ -4,7 +4,12 @@ Lightweight documentation of significant technical decisions.
 
 ## Available ADRs
 
-*No ADRs yet - project initialisation in progress.*
+| ADR | Title | Status |
+|-----|-------|--------|
+| [0001](./0001-use-typer-rich-cli.md) | Use Typer + Rich for CLI | Accepted |
+| [0002](./0002-chromadb-vector-store.md) | Use ChromaDB as Default Vector Store | Accepted |
+| [0003](./0003-privacy-first-architecture.md) | Privacy-First Architecture | Accepted |
+| [0004](./0004-hybrid-specification-approach.md) | Hybrid Specification Approach | Accepted |
 
 ## ADR Template
 
@@ -59,3 +64,4 @@ Files named: `NNNN-title.md` (e.g., `0001-use-typer-for-cli.md`)
 
 - [Decisions Hub](../README.md)
 - [Implementation Records](../../implementation/)
+

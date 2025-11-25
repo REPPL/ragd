@@ -2,28 +2,26 @@
 
 Release planning and milestone tracking.
 
-## Upcoming Milestones
+## Milestone Overview
 
-*No milestones defined yet - project initialisation in progress.*
+| Version | Name | Focus | Status |
+|---------|------|-------|--------|
+| [v0.1.0](./v0.1.0.md) | Core RAG | Index, search, status | 📋 Planned |
+| v0.2.0 | Killer Feature | Messy PDFs, metadata, export | 📋 Planned |
+| v0.3.0 | Advanced Search | Hybrid, reranking, query processing | 📋 Planned |
+| v0.4.0 | Multi-Modal | Vision embeddings, image queries | 📋 Planned |
+| v0.5.0 | Chat | LLM integration, conversation | 📋 Planned |
+| v0.6.0 | Storage | LEANN, backend switching | 📋 Planned |
+| v0.7.0 | Privacy | PII detection, encryption | 📋 Planned |
+| v0.8.0 | Intelligence | Personas, temporal, knowledge graph | 📋 Planned |
+| v1.0.0 | Personal Platform | Basic WebUI, polish, stability | 📋 Planned |
 
-## Milestone Template
+## Milestone Workflow
 
-```markdown
-# Milestone: v0.1.0
-
-## Goal
-What this release achieves.
-
-## Features
-- [ ] Feature 1
-- [ ] Feature 2
-
-## Target
-Target completion criteria (not dates).
-
-## Status
-[Planned/In Progress/Released]
-```
+1. Create milestone document when scope is defined
+2. Reference (don't duplicate) feature specifications
+3. Update status as development progresses
+4. Move to "Released" when shipped
 
 ## What Belongs Here
 
@@ -43,3 +41,4 @@ Target completion criteria (not dates).
 
 - [Development Hub](../README.md)
 - [Feature Roadmap](../features/)
+
