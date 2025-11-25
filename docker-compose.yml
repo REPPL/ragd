@@ -1,0 +1,17 @@
+services:
+  ragd:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./src:/app/src:ro
+      - ./data:/app/data
+    environment:
+      - PYTHONUNBUFFERED=1
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import ragd"]
+      interval: 30s
+      timeout: 10s
+      retries: 3

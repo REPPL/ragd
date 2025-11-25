@@ -205,3 +205,29 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# =============================================
+# Project-Specific (ragd)
+# =============================================
+
+# Working files (NEVER commit)
+.work/
+*.tmp
+*.temp
+.temp/
+
+# Testing virtual environment
+.venv-testing/
+
+# Secrets (NEVER commit)
+*.pem
+*.key
+credentials.json
+secrets.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker local overrides
+docker-compose.override.yml

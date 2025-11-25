@@ -1,0 +1,11 @@
+{
+  "from": [
+    "~/.claude",
+    "~/Development/.claude",
+    "~/Development/Sandboxed/.claude"
+  ],
+  "profiles": [
+    "python",
+    "docker"
+  ]
+}

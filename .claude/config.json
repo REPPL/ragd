@@ -1,0 +1,35 @@
+{
+  "project": {
+    "name": "ragd",
+    "type": "python",
+    "description": "RAG (Retrieval-Augmented Generation) reference implementation"
+  },
+  "python": {
+    "version": "3.12",
+    "package_manager": "pip",
+    "virtual_environments": {
+      "development": ".venv",
+      "testing": ".venv-testing"
+    },
+    "cli_framework": "typer"
+  },
+  "ai_transparency": {
+    "level": "full",
+    "commit_footer": true,
+    "documentation": true
+  },
+  "documentation": {
+    "style": "diataxis",
+    "roadmap_style": "feature-centric",
+    "audience": "mixed"
+  },
+  "working_files": {
+    "directory": ".work",
+    "patterns": ["*.tmp", "*.temp", ".temp/"]
+  },
+  "privacy": {
+    "block_personal_data": true,
+    "block_hardcoded_paths": true,
+    "allowed_email_domains": ["example.com", "example.org", "example.net"]
+  }
+}
