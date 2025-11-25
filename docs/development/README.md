@@ -2,41 +2,72 @@
 
 Documentation for contributors and developers.
 
+## Current Status
+
+| Area | Status |
+|------|--------|
+| Use Cases | 6 P0 briefs defined |
+| Features | 8 v0.1 specs written |
+| Tutorials | Getting Started (draft) |
+| Milestone | v0.1.0 planned |
+| ADRs | 4 foundational decisions |
+
 ## Structure
 
 | Directory | Purpose | Timeline |
 |-----------|---------|----------|
+| [lineage/](./lineage/) | Knowledge transfer from ragged | Reference |
+| [research/](./research/) | State-of-the-art techniques | Reference |
 | [features/](./features/) | Feature-centric roadmap | Current/Future |
 | [milestones/](./milestones/) | Release planning | Future |
 | [implementation/](./implementation/) | What was built | Past |
 | [process/](./process/) | How it was built | Past |
 | [decisions/](./decisions/) | Architecture decisions | All |
 
-## Feature-Centric Roadmap
+## Specification Approach
 
-This project uses a feature-centric approach to planning:
+ragd uses a hybrid specification approach (see [ADR-0004](./decisions/adrs/0004-hybrid-specification-approach.md)):
 
 ```
-features/
-├── active/          # Currently implementing
-├── planned/         # Next up
-└── completed/       # Done (moved here when finished)
+Layer 1: USE CASES (Why)
+    ↓ derive
+Layer 2: FEATURE SPECS (What)
+    ↓ validate
+Layer 3: TUTORIALS (How users experience it)
 ```
 
 ## Quick Links
 
 ### Planning
+- [Use Cases](../use-cases/) - What users want to accomplish
 - [Active Features](./features/active/)
 - [Planned Features](./features/planned/)
 - [Milestones](./milestones/)
+
+### v0.1.0 Scope
+- [v0.1.0 Milestone](./milestones/v0.1.0.md)
+- [F-001: Document Ingestion](./features/planned/F-001-document-ingestion.md)
+- [F-005: Semantic Search](./features/planned/F-005-semantic-search.md)
 
 ### History
 - [Completed Features](./features/completed/)
 - [Implementation Records](./implementation/)
 - [Development Logs](./process/devlogs/)
 
+### Knowledge Transfer
+- [ragged Analysis](./lineage/ragged-analysis.md)
+- [Feature Mapping](./lineage/feature-mapping.md)
+- [Acknowledgements](./lineage/acknowledgements.md)
+
+### Research
+- [State-of-the-Art RAG](./research/state-of-the-art-rag.md)
+- [Privacy-Preserving Architecture](./research/state-of-the-art-privacy.md)
+
 ### Decisions
-- [Architecture Decision Records](./decisions/adrs/)
+- [ADR-0001: Typer + Rich CLI](./decisions/adrs/0001-use-typer-rich-cli.md)
+- [ADR-0002: ChromaDB Vector Store](./decisions/adrs/0002-chromadb-vector-store.md)
+- [ADR-0003: Privacy-First](./decisions/adrs/0003-privacy-first-architecture.md)
+- [ADR-0004: Hybrid Specification](./decisions/adrs/0004-hybrid-specification-approach.md)
 
 ## AI Contributions
 
@@ -48,3 +79,4 @@ This project is developed with AI assistance. See [AI Contributions](./ai-contri
 
 - [Documentation Hub](../README.md)
 - [Project Standards](../../.claude/CLAUDE.md)
+

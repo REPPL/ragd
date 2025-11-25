@@ -25,7 +25,6 @@ This directory documents the knowledge transfer process from ragged to ragd, pre
 | [ragged-analysis.md](./ragged-analysis.md) | Comprehensive research report |
 | [planning-prompt.md](./planning-prompt.md) | Original prompt and Q&A that shaped decisions |
 | [feature-mapping.md](./feature-mapping.md) | ragged → ragd feature traceability |
-| [state-of-the-art-rag.md](./state-of-the-art-rag.md) | Cutting-edge RAG techniques (2024-2025) for roadmap |
 | [acknowledgements.md](./acknowledgements.md) | Research sources and citations |
 
 ## What Transfers
