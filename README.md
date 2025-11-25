@@ -80,10 +80,3 @@ ragd chat              # Interactive chat with context
 
 This project is developed with AI assistance. See [AI Contributions](docs/development/ai-contributions.md) for transparency documentation.
 
-## Licence
-
-[Licence information to be added]
-
----
-
-**Status**: Early development
