@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/assets/img/ragd-logo.png" alt="ragd logo" width="200">
+</p>
+
 # ragd
 
 Local RAG (Retrieval-Augmented Generation) for personal knowledge management.
