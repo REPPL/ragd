@@ -1,7 +1,6 @@
 # Privacy-Preserving Local Personal Assistant - State-of-the-Art
 
-**Research Date**: 2025-11-25
-**Scope**: Security architecture for a local-only personal assistant handling highly sensitive data
+Security architecture for a local-only personal assistant handling highly sensitive data.
 
 ## Executive Summary
 
@@ -361,7 +360,7 @@ security:
 ## Related Documentation
 
 - [State-of-the-Art RAG Techniques](./state-of-the-art-rag.md)
-- [Feature Roadmap](../roadmap/features/)
-- [Security Feature Specs](../roadmap/features/planned/) (when created)
+- [Feature Roadmap](../features/)
+- [Security Feature Specs](../features/planned/) (when created)
 - [ADRs](../decisions/adrs/)
 

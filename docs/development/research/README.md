@@ -23,7 +23,7 @@ This directory contains research on cutting-edge techniques that inform ragd's f
 ## What Doesn't Belong Here
 
 - Internal design decisions → [ADRs](../decisions/adrs/)
-- Feature specifications → [Features](../roadmap/features/)
+- Feature specifications → [Features](../features/)
 - Knowledge transfer from ragged → [Lineage](../lineage/)
 - User-facing explanations → [Explanation](../../explanation/)
 
@@ -33,5 +33,5 @@ This directory contains research on cutting-edge techniques that inform ragd's f
 
 - [Lineage](../lineage/) - Knowledge transfer from ragged predecessor
 - [ADRs](../decisions/adrs/) - Architecture decisions applying this research
-- [Feature Roadmap](../roadmap/features/) - Features informed by this research
+- [Feature Roadmap](../features/) - Features informed by this research
 

@@ -8,7 +8,19 @@ Tutorials help newcomers get started with ragd through hands-on learning experie
 
 ## Available Tutorials
 
-*No tutorials yet - this project is in early development.*
+### Getting Started (v0.1)
+
+| Tutorial | Description | Status |
+|----------|-------------|--------|
+| [Getting Started](./getting-started.md) | Index and search your first documents | 📝 Draft |
+
+### Document Processing (v0.2)
+
+| Tutorial | Description | Status |
+|----------|-------------|--------|
+| Processing Difficult PDFs | Handle scanned and complex PDFs | 📋 Planned |
+| Organising Your Knowledge Base | Use tags and metadata effectively | 📋 Planned |
+| Backing Up Your Data | Export and restore your knowledge base | 📋 Planned |
 
 ## Tutorial Guidelines
 
@@ -30,3 +42,4 @@ When writing tutorials:
 
 - [Documentation Hub](../README.md)
 - [Guides](../guides/)
+

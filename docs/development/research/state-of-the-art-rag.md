@@ -1,7 +1,6 @@
 # State-of-the-Art RAG Techniques for ragd Roadmap
 
-**Research Date**: 2025-11-25
-**Scope**: Cutting-edge techniques not yet in ragged or ragd
+Cutting-edge techniques not yet in ragged or ragd.
 
 ## Executive Summary
 
