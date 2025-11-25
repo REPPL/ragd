@@ -32,21 +32,31 @@ Features are the primary unit of work. Each feature specification describes:
 | [F-006](./planned/F-006-result-formatting.md) | Result Formatting | 📅 Planned | UC-002 |
 | [F-007](./planned/F-007-status-dashboard.md) | Status Dashboard | 📅 Planned | UC-003 |
 | [F-008](./planned/F-008-health-checks.md) | Health Checks | 📅 Planned | UC-003 |
+| [F-009](./planned/F-009-citation-output.md) | Citation Output | 📅 Planned | UC-002 |
 
-### v0.2 Features (Messy PDFs & Metadata)
+### v0.3 Features (Advanced Retrieval)
 
-| ID | Feature | Status | Use Case |
+| ID | Feature | Status | Research |
 |----|---------|--------|----------|
-| F-009 | PDF Quality Detection | 📅 Planned | UC-004 |
-| F-010 | Docling Integration | 📅 Planned | UC-004 |
-| F-011 | OCR Pipeline | 📅 Planned | UC-004 |
-| F-012 | Table Extraction | 📅 Planned | UC-004 |
-| F-013 | Metadata Storage | 📅 Planned | UC-005 |
-| F-014 | Metadata Extraction | 📅 Planned | UC-005 |
-| F-015 | Tag Management | 📅 Planned | UC-005 |
-| F-016 | Export Engine | 📅 Planned | UC-006 |
-| F-017 | Import Engine | 📅 Planned | UC-006 |
-| F-018 | Archive Format | 📅 Planned | UC-006 |
+| [F-010](./planned/F-010-contextual-retrieval.md) | Contextual Retrieval | 📅 Planned | ADR-0007 |
+| [F-011](./planned/F-011-late-chunking.md) | Late Chunking | 📅 Planned | ADR-0007 |
+| [F-012](./planned/F-012-hybrid-search.md) | Hybrid Search | 📅 Planned | ADR-0007 |
+
+### v0.5 Features (Chat & Evaluation)
+
+| ID | Feature | Status | Research |
+|----|---------|--------|----------|
+| [F-013](./planned/F-013-ragas-evaluation.md) | RAGAS Evaluation | 📅 Planned | ADR-0008 |
+| [F-014](./planned/F-014-agentic-rag.md) | Agentic RAG | 📅 Planned | State-of-the-Art |
+
+### v0.7 Features (Privacy & Security)
+
+| ID | Feature | Status | Research |
+|----|---------|--------|----------|
+| [F-015](./planned/F-015-database-encryption.md) | Database Encryption | 📅 Planned | ADR-0009 |
+| [F-016](./planned/F-016-session-management.md) | Session Management | 📅 Planned | ADR-0009 |
+| [F-017](./planned/F-017-secure-deletion.md) | Secure Deletion | 📅 Planned | ADR-0009 |
+| [F-018](./planned/F-018-data-tiers.md) | Data Sensitivity Tiers | 📅 Planned | ADR-0010 |
 
 ## Workflow
 

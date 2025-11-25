@@ -4,12 +4,30 @@ Lightweight documentation of significant technical decisions.
 
 ## Available ADRs
 
+### Foundation (v0.1)
+
 | ADR | Title | Status |
 |-----|-------|--------|
 | [0001](./0001-use-typer-rich-cli.md) | Use Typer + Rich for CLI | Accepted |
 | [0002](./0002-chromadb-vector-store.md) | Use ChromaDB as Default Vector Store | Accepted |
 | [0003](./0003-privacy-first-architecture.md) | Privacy-First Architecture | Accepted |
 | [0004](./0004-hybrid-specification-approach.md) | Hybrid Specification Approach | Accepted |
+| [0005](./0005-cli-design-principles.md) | CLI Design Principles | Accepted |
+| [0006](./0006-citation-system.md) | Citation System Architecture | Accepted |
+
+### Advanced Retrieval (v0.3)
+
+| ADR | Title | Status |
+|-----|-------|--------|
+| [0007](./0007-advanced-retrieval-techniques.md) | Advanced Retrieval Techniques | Accepted |
+| [0008](./0008-evaluation-framework.md) | Evaluation Framework (RAGAS) | Accepted |
+
+### Privacy & Security (v0.7)
+
+| ADR | Title | Status |
+|-----|-------|--------|
+| [0009](./0009-security-architecture.md) | Security Architecture | Accepted |
+| [0010](./0010-vector-database-security.md) | Vector Database Security | Accepted |
 
 ## ADR Template
 

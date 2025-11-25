@@ -8,10 +8,19 @@ This directory contains research on cutting-edge techniques that inform ragd's f
 
 ## Contents
 
+### State-of-the-Art Surveys
+
 | Document | Description |
 |----------|-------------|
-| [state-of-the-art-rag.md](./state-of-the-art-rag.md) | Advanced RAG techniques (2024-2025): Agentic RAG, Contextual Retrieval, GraphRAG, etc. |
+| [state-of-the-art-rag.md](./state-of-the-art-rag.md) | Advanced RAG techniques (2024-2025): Agentic RAG, Contextual Retrieval, GraphRAG |
 | [state-of-the-art-privacy.md](./state-of-the-art-privacy.md) | Privacy-preserving architecture: encryption, embedding security, threat models |
+
+### Implementation Research
+
+| Document | Description |
+|----------|-------------|
+| [cli-best-practices.md](./cli-best-practices.md) | Modern CLI design for non-expert users (clig.dev, Atlassian principles) |
+| [citation-systems.md](./citation-systems.md) | RAG citation formats, academic styles, ALCE benchmark |
 
 ## What Belongs Here
 
