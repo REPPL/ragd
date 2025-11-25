@@ -328,6 +328,6 @@ From the ALCE (Automatic LLM Citation Evaluation) benchmark:
 
 - [ADR-0006: Citation System](../decisions/adrs/0006-citation-system.md)
 - [F-009: Citation Output](../features/planned/F-009-citation-output.md)
-- [F-005: Search & Retrieval](../features/planned/F-005-search-retrieval.md)
+- [F-005: Semantic Search](../features/planned/F-005-semantic-search.md)
 
 ---

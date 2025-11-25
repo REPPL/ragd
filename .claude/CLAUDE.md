@@ -80,6 +80,21 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 
 ---
 
+## British English Exceptions
+
+### --no-color Flag
+
+**Exception:** The `--no-color` CLI flag uses American English spelling.
+
+**Rationale:** Compliance with the [NO_COLOR](https://no-color.org/) environment variable standard, which is universally adopted across CLI tools using American spelling.
+
+**Implementation:**
+- Flag name: `--no-color` (American, for ecosystem compatibility)
+- Descriptions: "colour" (British, for documentation consistency)
+- Environment variable: `NO_COLOR` (standard, American)
+
+---
+
 ## Privacy Requirements
 
 ### Never Commit

@@ -28,7 +28,7 @@ This matrix ensures every use case is:
 |--------|-----------|
 | **Use Case** | [UC-002-search-knowledge.md](./briefs/UC-002-search-knowledge.md) |
 | **Milestone** | v0.1 |
-| **Features** | F-005, F-006 |
+| **Features** | F-005, F-006, F-009 |
 | **Tutorial** | [Getting Started: Search Your Documents](../tutorials/getting-started.md) |
 
 ### UC-003: View System Status
@@ -46,7 +46,7 @@ This matrix ensures every use case is:
 |--------|-----------|
 | **Use Case** | [UC-004-process-messy-pdfs.md](./briefs/UC-004-process-messy-pdfs.md) |
 | **Milestone** | v0.2 |
-| **Features** | F-009, F-010, F-011, F-012 |
+| **Features** | TBD (pending research) |
 | **Tutorial** | [Processing Difficult PDFs](../tutorials/messy-pdfs.md) |
 
 ### UC-005: Manage Metadata
@@ -55,7 +55,7 @@ This matrix ensures every use case is:
 |--------|-----------|
 | **Use Case** | [UC-005-manage-metadata.md](./briefs/UC-005-manage-metadata.md) |
 | **Milestone** | v0.2 |
-| **Features** | F-013, F-014, F-015 |
+| **Features** | TBD (pending research) |
 | **Tutorial** | [Organising Your Knowledge Base](../tutorials/metadata-management.md) |
 
 ### UC-006: Export & Backup
@@ -64,7 +64,7 @@ This matrix ensures every use case is:
 |--------|-----------|
 | **Use Case** | [UC-006-export-backup.md](./briefs/UC-006-export-backup.md) |
 | **Milestone** | v0.2 |
-| **Features** | F-016, F-017, F-018 |
+| **Features** | TBD (pending research) |
 | **Tutorial** | [Backing Up Your Data](../tutorials/backup-restore.md) |
 
 ---
@@ -72,6 +72,8 @@ This matrix ensures every use case is:
 ## Feature Index
 
 Quick reference for all features derived from P0 use cases:
+
+### v0.1 Features (Spec'd)
 
 | ID | Feature | Use Case | Milestone |
 |----|---------|----------|-----------|
@@ -83,16 +85,13 @@ Quick reference for all features derived from P0 use cases:
 | F-006 | Result Formatting | UC-002 | v0.1 |
 | F-007 | Status Dashboard | UC-003 | v0.1 |
 | F-008 | Health Checks | UC-003 | v0.1 |
-| F-009 | PDF Quality Detection | UC-004 | v0.2 |
-| F-010 | Docling Integration | UC-004 | v0.2 |
-| F-011 | OCR Pipeline | UC-004 | v0.2 |
-| F-012 | Table Extraction | UC-004 | v0.2 |
-| F-013 | Metadata Storage | UC-005 | v0.2 |
-| F-014 | Metadata Extraction | UC-005 | v0.2 |
-| F-015 | Tag Management | UC-005 | v0.2 |
-| F-016 | Export Engine | UC-006 | v0.2 |
-| F-017 | Import Engine | UC-006 | v0.2 |
-| F-018 | Archive Format | UC-006 | v0.2 |
+| F-009 | Citation Output | UC-002 | v0.1 |
+
+### v0.2 Features (Pending Research)
+
+Features for UC-004 (Process Messy PDFs), UC-005 (Manage Metadata), and UC-006 (Export & Backup) are pending research. Feature numbers will be assigned once specifications are complete.
+
+See: [State-of-the-Art RAG Research](../development/research/state-of-the-art-rag.md)
 
 ---
 
@@ -100,11 +99,11 @@ Quick reference for all features derived from P0 use cases:
 
 | Use Case | Features Spec'd | Tutorial Written | Acceptance Tests |
 |----------|-----------------|------------------|------------------|
-| UC-001 | ⏳ Pending | ⏳ Pending | ⏳ Pending |
-| UC-002 | ⏳ Pending | ⏳ Pending | ⏳ Pending |
-| UC-003 | ⏳ Pending | ⏳ Pending | ⏳ Pending |
-| UC-004 | ⏳ Pending | ⏳ Pending | ⏳ Pending |
-| UC-005 | ⏳ Pending | ⏳ Pending | ⏳ Pending |
-| UC-006 | ⏳ Pending | ⏳ Pending | ⏳ Pending |
+| UC-001 | ✅ F-001 to F-004 | ⏳ Pending | ⏳ Pending |
+| UC-002 | ✅ F-005, F-006, F-009 | ⏳ Pending | ⏳ Pending |
+| UC-003 | ✅ F-007, F-008 | ⏳ Pending | ⏳ Pending |
+| UC-004 | ⏳ Research needed | ⏳ Pending | ⏳ Pending |
+| UC-005 | ⏳ Research needed | ⏳ Pending | ⏳ Pending |
+| UC-006 | ⏳ Research needed | ⏳ Pending | ⏳ Pending |
 
 ---

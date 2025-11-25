@@ -14,6 +14,9 @@ This directory contains research on cutting-edge techniques that inform ragd's f
 |----------|-------------|
 | [state-of-the-art-rag.md](./state-of-the-art-rag.md) | Advanced RAG techniques (2024-2025): Agentic RAG, Contextual Retrieval, GraphRAG |
 | [state-of-the-art-privacy.md](./state-of-the-art-privacy.md) | Privacy-preserving architecture: encryption, embedding security, threat models |
+| [state-of-the-art-pdf-processing.md](./state-of-the-art-pdf-processing.md) | Messy PDF processing: Docling, ColPali, OCR comparison, OHRBench findings |
+| [state-of-the-art-metadata.md](./state-of-the-art-metadata.md) | Document metadata: extraction, storage, tagging, provenance, Dublin Core |
+| [state-of-the-art-local-rag.md](./state-of-the-art-local-rag.md) | Local RAG: performance, caching, multi-model orchestration, vector/graph storage |
 
 ### Implementation Research
 
