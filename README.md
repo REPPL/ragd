@@ -1,10 +1,14 @@
-<p align="center">
-  <img src="docs/assets/img/ragd-logo.png" alt="ragd logo" width="200">
-</p>
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![Python 3.12](https://img.shields.io/badge/python-3.12-blue.svg)](https://www.python.org/downloads/)
+[![Status: Alpha](https://img.shields.io/badge/status-alpha-red.svg)]()
 
-# ragd
+---
 
-Local RAG (Retrieval-Augmented Generation) for personal knowledge management.
+![ragged logo](docs/assets/img/ragd-logo.png)
+
+## Your Private, Intelligent Document Assistant
+
+`ragd` is a local RAG *(Retrieval-Augmented Generation)* system that lets you ask questions about your documents and get accurate answers with citations -- all while keeping your data completely private and local.
 
 ## Overview
 
