@@ -32,6 +32,7 @@ Lightweight documentation of significant technical decisions.
 | [0014](./0014-daemon-management.md) | Daemon Process Management | Accepted |
 | [0015](./0015-web-archive-processing.md) | Web Archive Processing Architecture | Accepted |
 | [0016](./0016-document-deduplication.md) | Document Deduplication Strategy | Accepted |
+| [0017](./0017-html-to-text-conversion.md) | HTML-to-Text Conversion Strategy | Accepted |
 
 ### Privacy & Security (v0.7)
 

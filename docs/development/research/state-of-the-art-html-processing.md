@@ -690,6 +690,8 @@ selectolax = "^0.3"
 
 ## Related Documentation
 
+- [ADR-0015: Web Archive Processing](../decisions/adrs/0015-web-archive-processing.md) - SingleFile + trafilatura decision
+- [ADR-0017: HTML-to-Text Conversion](../decisions/adrs/0017-html-to-text-conversion.md) - Library selection rationale
 - [State-of-the-Art PDF Processing](./state-of-the-art-pdf-processing.md) - Document extraction
 - [F-002: Text Extraction](../features/planned/F-002-text-extraction.md) - Current text extraction feature
 - [F-001: Document Ingestion](../features/planned/F-001-document-ingestion.md) - Ingestion pipeline
