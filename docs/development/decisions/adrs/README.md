@@ -33,6 +33,8 @@ Lightweight documentation of significant technical decisions.
 | [0015](./0015-web-archive-processing.md) | Web Archive Processing Architecture | Accepted |
 | [0016](./0016-document-deduplication.md) | Document Deduplication Strategy | Accepted |
 | [0017](./0017-html-to-text-conversion.md) | HTML-to-Text Conversion Strategy | Accepted |
+| [0018](./0018-chunking-strategy.md) | Text Chunking Strategy | Accepted |
+| [0019](./0019-pdf-processing.md) | PDF Processing Library Selection | Accepted |
 
 ### Privacy & Security (v0.7)
 
