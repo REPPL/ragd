@@ -11,19 +11,19 @@ The 4 commands you need to be productive with ragd.
 
 | Command | Purpose |
 |---------|---------|
-| `ragd health` | Verify setup works |
+| `ragd doctor` | Run health checks |
 | `ragd index` | Add documents |
 | `ragd search` | Find information |
 | `ragd status` | View statistics |
 
 ---
 
-## 1. ragd health
+## 1. ragd doctor
 
-**Check that ragd is working correctly.**
+**Run health checks on ragd components.**
 
 ```bash
-ragd health
+ragd doctor
 ```
 
 **What it does:**
@@ -82,7 +82,7 @@ Indexing: document.pdf
 ✅ Indexed 1 document (47 chunks)
 ```
 
-**Supported formats:** PDF, Markdown, Plain text
+**Supported formats:** PDF, Markdown, Plain text, HTML
 
 ---
 

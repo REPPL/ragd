@@ -115,7 +115,7 @@ ragd search "machine learning" --format json | jq '.results[0]'
 ### Check system health
 
 ```bash
-ragd health
+ragd doctor
 ```
 
 ### View detailed statistics
@@ -148,7 +148,7 @@ ragd search "authentication" --format json | jq '.results | length'
 
 ```bash
 # Check if ragd is healthy
-if ragd health --format json | jq -e '.status == "healthy"' > /dev/null; then
+if ragd doctor --format json | jq -e '.status == "healthy"' > /dev/null; then
     echo "ragd is ready"
 else
     echo "ragd needs attention"
@@ -194,7 +194,7 @@ ragd search "machine learning" --bibliography bibtex > refs.bib
 | Search with limit | `ragd search "query" --limit 5` |
 | JSON output | `ragd search "query" --format json` |
 | Plain output | `ragd search "query" --plain` |
-| Health check | `ragd health` |
+| Run health checks | `ragd doctor` |
 | Detailed status | `ragd status --verbose` |
 
 ---

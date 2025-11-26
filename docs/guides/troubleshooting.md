@@ -47,6 +47,7 @@ Common issues and solutions for ragd.
 - PDF (`.pdf`)
 - Plain text (`.txt`)
 - Markdown (`.md`)
+- HTML (`.html`, `.htm`)
 
 **Solutions:**
 1. Convert the file to a supported format

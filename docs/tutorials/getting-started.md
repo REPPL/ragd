@@ -43,7 +43,7 @@ Machine learning is a subset of AI that learns from examples." > sample.md
 First, check that ragd is installed correctly:
 
 ```bash
-ragd health
+ragd doctor
 ```
 
 **Expected output:**
@@ -203,7 +203,7 @@ Congratulations! You've completed the getting started tutorial. You now know how
 
 | Task | Command |
 |------|---------|
-| Check system health | `ragd health` |
+| Run health checks | `ragd doctor` |
 | View knowledge base status | `ragd status` |
 | Index a document | `ragd index <path>` |
 | Search your knowledge | `ragd search "<query>"` |

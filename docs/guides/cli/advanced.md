@@ -126,7 +126,7 @@ Shows:
 ### Check health with details
 
 ```bash
-ragd health --verbose
+ragd doctor --verbose
 ```
 
 Shows:
@@ -166,7 +166,7 @@ Only outputs errors.
 | 4 | Storage error |
 
 ```bash
-ragd health
+ragd doctor
 if [ $? -eq 0 ]; then
     echo "System healthy"
 fi
@@ -272,7 +272,7 @@ tar -czf ragd-data.tar.gz ~/.ragd/data
 3. Try resetting:
    ```bash
    rm -rf ~/.ragd/data/chroma
-   ragd health
+   ragd doctor
    ```
 
 ### Slow searches

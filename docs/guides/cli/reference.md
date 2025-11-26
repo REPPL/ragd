@@ -25,14 +25,14 @@ Options available for all commands:
 
 ---
 
-## ragd health
+## ragd doctor
 
-Check system health and component status.
+Run health checks on ragd components.
 
 ### Synopsis
 
 ```
-ragd health [OPTIONS]
+ragd doctor [OPTIONS]
 ```
 
 ### Options
@@ -53,13 +53,13 @@ ragd health [OPTIONS]
 
 ```bash
 # Basic health check
-ragd health
+ragd doctor
 
 # Detailed diagnostics
-ragd health --verbose
+ragd doctor --verbose
 
 # JSON for monitoring
-ragd health --format json
+ragd doctor --format json
 ```
 
 ### JSON Output Schema

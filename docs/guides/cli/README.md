@@ -19,7 +19,7 @@ If you're new to ragd, start here:
 
 ```bash
 # 1. Check everything works
-ragd health
+ragd doctor
 
 # 2. Index some documents
 ragd index ~/Documents/notes/

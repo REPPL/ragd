@@ -34,4 +34,3 @@ When writing reference docs:
 ## Related Documentation
 
 - [Documentation Hub](../README.md)
-- [API Reference](./api/) (when available)
