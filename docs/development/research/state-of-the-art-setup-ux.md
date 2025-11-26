@@ -549,7 +549,7 @@ def run_health_checks() -> list[HealthCheck]:
             "Vector database",
             CheckStatus.WARN,
             "Not initialised",
-            fix_hint="Run 'ragd add <path>' to index documents"
+            fix_hint="Run 'ragd index <path>' to index documents"
         ))
 
     # GPU/Compute

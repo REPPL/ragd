@@ -157,16 +157,16 @@ Rewritten query:
 
 ```bash
 # Default (agentic if configured)
-ragd ask "What is machine learning?"
+ragd search "What is machine learning?"
 
 # Force agentic mode
-ragd ask "..." --agentic
+ragd search "..." --agentic
 
 # Disable agentic (faster, less accurate)
-ragd ask "..." --no-agentic
+ragd search "..." --no-agentic
 
 # Show confidence
-ragd ask "..." --show-confidence
+ragd search "..." --show-confidence
 ```
 
 ## Related Documentation
