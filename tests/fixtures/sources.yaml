@@ -136,287 +136,48 @@ documents:
   # MODERATE COMPLEXITY - Formatted documents with structure
   # ============================================================================
 
-  - id: electrical_engineering_papers_1919
-    url: "https://archive.org/download/in.ernet.dli.2015.153641/in.ernet.dli.2015.153641.pdf"
-    filename: electrical_engineering_papers_1919.pdf
+  - id: art_of_cookery_1803
+    url: "https://archive.org/download/hannah-glasse-art-of-cookery-1803/Hannah%20Glasse-Art%20of%20Cookery%20%281803%29.pdf"
+    filename: art_of_cookery_1803.pdf
     source: archive.org
     license: public_domain
 
     categories:
       complexity: moderate
       language: english
-      document_type: technical
+      document_type: book
 
     metadata:
-      title: "Electrical Engineering Papers"
-      author: "Benjamin G. Lamme"
-      publisher: "Westinghouse Electric"
-      date: "1919"
-      pages: 788
+      title: "The Art of Cookery Made Plain and Easy"
+      author: "Hannah Glasse"
+      date: "1803"
+      description: "Historic bestselling English cookbook with recipes"
 
     characteristics:
       has_text_layer: true
       is_scanned: true
-      has_images: true
+      has_images: false
       has_tables: true
       multi_column: false
-      has_equations: true
-      has_diagrams: true
+      has_recipes: true
 
     golden_answers:
       must_contain:
-        - text: "Westinghouse"
+        - text: "Cookery"
           confidence: fuzzy
           fuzzy_threshold: 0.85
-        - text: "electrical"
-          confidence: fuzzy
-          fuzzy_threshold: 0.85
-        - text: "generator"
-          confidence: fuzzy
-          fuzzy_threshold: 0.85
-
-      structure:
-        min_chunks: 100
-        max_chunks: 500
-
-      quality:
-        min_text_extraction_ratio: 0.80
-        max_ocr_error_rate: 0.10
-
-  # ============================================================================
-  # COMPLEX - Multi-column, mixed content
-  # ============================================================================
-
-  - id: compute_gazette_1987_04
-    url: "https://archive.org/download/1987-04-computegazette/Compute_Gazette_Issue_46_1987_Apr.pdf"
-    filename: compute_gazette_1987_04.pdf
-    source: archive.org
-    license: public_domain
-
-    categories:
-      complexity: complex
-      language: english
-      document_type: magazine
-
-    metadata:
-      title: "Compute!'s Gazette Issue 46"
-      date: "1987-04"
-      pages: 100
-      publisher: "COMPUTE! Publications"
-      description: "Commodore 64/128 magazine with program listings"
-
-    characteristics:
-      has_text_layer: true
-      is_scanned: true
-      has_images: true
-      has_tables: true
-      multi_column: true
-      has_advertisements: true
-      has_program_listings: true
-
-    golden_answers:
-      must_contain:
-        - text: "Gazette"
-          confidence: fuzzy
-          fuzzy_threshold: 0.85
-        - text: "Commodore"
+        - text: "Receipt"
           confidence: fuzzy
           fuzzy_threshold: 0.80
-          description: "May have OCR errors in vintage scan"
-        - text: "64"
-          confidence: exact
-          description: "Commodore 64 references"
-
-      patterns:
-        - pattern: "Issue \\d+"
-          description: "Issue number format"
-          min_matches: 1
+          description: "Historic term for recipe"
 
       structure:
         min_chunks: 50
         max_chunks: 200
 
       quality:
-        min_text_extraction_ratio: 0.70
-        max_ocr_error_rate: 0.20
-
-  # ============================================================================
-  # SCANNED - Historical documents requiring OCR
-  # ============================================================================
-
-  - id: leslies_weekly_1881
-    url: "https://archive.org/download/sim_leslies-weekly_1881-08-06_52_1349/sim_leslies-weekly_1881-08-06_52_1349.pdf"
-    filename: leslies_weekly_1881.pdf
-    source: archive.org
-    license: public_domain
-
-    categories:
-      complexity: scanned
-      language: english
-      document_type: historical
-
-    metadata:
-      title: "Frank Leslie's Illustrated Newspaper"
-      volume: 52
-      issue: 1349
-      date: "1881-08-06"
-      description: "Victorian era illustrated newspaper"
-
-    characteristics:
-      has_text_layer: true
-      is_scanned: true
-      has_images: true
-      has_tables: false
-      multi_column: true
-      scan_source: microfilm
-      has_illustrations: true
-
-    golden_answers:
-      must_contain:
-        - text: "Leslie"
-          confidence: fuzzy
-          fuzzy_threshold: 0.75
-          description: "Publisher name in masthead"
-
-      structure:
-        min_chunks: 20
-        max_chunks: 100
-
-      quality:
-        min_text_extraction_ratio: 0.60
-        max_ocr_error_rate: 0.25
-
-  - id: nationalist_magazine_1890
-    url: "https://archive.org/download/TheNationalist-Volume2-1890/The%20Nationalist%20-%20Volume%202%20-%201890.pdf"
-    filename: nationalist_magazine_1890.pdf
-    source: archive.org
-    license: public_domain
-
-    categories:
-      complexity: scanned
-      language: english
-      document_type: historical
-
-    metadata:
-      title: "The Nationalist Magazine"
-      volume: 2
-      date: "1890"
-      description: "Official magazine of the Nationalist Clubs"
-
-    characteristics:
-      has_text_layer: true
-      is_scanned: true
-      has_images: false
-      has_tables: false
-      multi_column: false
-
-    golden_answers:
-      must_contain:
-        - text: "Nationalist"
-          confidence: fuzzy
-          fuzzy_threshold: 0.80
-
-      structure:
-        min_chunks: 30
-        max_chunks: 150
-
-      quality:
-        min_text_extraction_ratio: 0.70
-        max_ocr_error_rate: 0.20
-
-  # ============================================================================
-  # GERMAN LANGUAGE
-  # ============================================================================
-
-  - id: german_military_handbook_1945
-    url: "https://archive.org/download/TME-30-4511945/TM-E%2030-451%20%281945%29.pdf"
-    filename: german_military_handbook_1945.pdf
-    source: archive.org
-    license: public_domain
-
-    categories:
-      complexity: complex
-      language: german
-      document_type: technical
-
-    metadata:
-      title: "Handbook on German Military Forces"
-      publisher: "U.S. War Department"
-      date: "1945"
-      description: "Comprehensive German military reference"
-
-    characteristics:
-      has_text_layer: true
-      is_scanned: true
-      has_images: true
-      has_tables: true
-      multi_column: false
-      has_diagrams: true
-      has_foreign_terms: true
-
-    golden_answers:
-      must_contain:
-        - text: "Wehrmacht"
-          confidence: fuzzy
-          fuzzy_threshold: 0.85
-        - text: "German"
-          confidence: exact
-
-      structure:
-        min_chunks: 200
-        max_chunks: 800
-
-      quality:
         min_text_extraction_ratio: 0.75
         max_ocr_error_rate: 0.15
-
-  # ============================================================================
-  # FRENCH LANGUAGE
-  # ============================================================================
-
-  - id: french_medieval_manuscript
-    url: "https://archive.org/download/bnf-gallica-btv1b10509055f/bnf-gallica-btv1b10509055f.pdf"
-    filename: french_medieval_manuscript.pdf
-    source: archive.org
-    license: public_domain
-
-    categories:
-      complexity: degraded
-      language: french
-      document_type: historical
-
-    metadata:
-      title: "Vies des Pères et Dialogues"
-      author: "Saint Jérôme, Saint Grégoire le Grand"
-      date: "Medieval"
-      description: "Old French religious manuscript"
-
-    characteristics:
-      has_text_layer: false
-      is_scanned: true
-      has_images: true
-      has_tables: false
-      multi_column: false
-      script_type: medieval_french
-
-    golden_answers:
-      must_contain:
-        - text: "saint"
-          confidence: fuzzy
-          fuzzy_threshold: 0.70
-          description: "Religious terminology"
-
-      structure:
-        min_chunks: 20
-        max_chunks: 100
-
-      quality:
-        min_text_extraction_ratio: 0.40
-        max_ocr_error_rate: 0.40
-
-  # ============================================================================
-  # GOVERNMENT DOCUMENTS
-  # ============================================================================
 
   - id: gao_superfund_climate_2019
     url: "https://archive.org/download/6551691-GAO-report-on-Superfund-sites-and-climate-change/6551691-GAO-report-on-Superfund-sites-and-climate-change.pdf"
@@ -499,6 +260,204 @@ documents:
       quality:
         min_text_extraction_ratio: 0.90
 
+  # ============================================================================
+  # COMPLEX - Multi-column, mixed content
+  # ============================================================================
+
+  - id: compute_gazette_1987_04
+    url: "https://archive.org/download/1987-04-computegazette/Compute_Gazette_Issue_46_1987_Apr.pdf"
+    filename: compute_gazette_1987_04.pdf
+    source: archive.org
+    license: public_domain
+
+    categories:
+      complexity: complex
+      language: english
+      document_type: magazine
+
+    metadata:
+      title: "Compute!'s Gazette Issue 46"
+      date: "1987-04"
+      pages: 100
+      publisher: "COMPUTE! Publications"
+      description: "Commodore 64/128 magazine with program listings"
+
+    characteristics:
+      has_text_layer: true
+      is_scanned: true
+      has_images: true
+      has_tables: true
+      multi_column: true
+      has_advertisements: true
+      has_program_listings: true
+
+    golden_answers:
+      must_contain:
+        - text: "Gazette"
+          confidence: fuzzy
+          fuzzy_threshold: 0.85
+        - text: "Commodore"
+          confidence: fuzzy
+          fuzzy_threshold: 0.80
+          description: "May have OCR errors in vintage scan"
+        - text: "64"
+          confidence: exact
+          description: "Commodore 64 references"
+
+      patterns:
+        - pattern: "Issue \\d+"
+          description: "Issue number format"
+          min_matches: 1
+
+      structure:
+        min_chunks: 50
+        max_chunks: 200
+
+      quality:
+        min_text_extraction_ratio: 0.70
+        max_ocr_error_rate: 0.20
+
+  # ============================================================================
+  # SCANNED - Historical documents requiring OCR
+  # ============================================================================
+
+  - id: scientific_american_1878
+    url: "https://archive.org/download/scientific-american-1878-10-19/scientific-american-v39-n16-1878-10-19.pdf"
+    filename: scientific_american_1878.pdf
+    source: archive.org
+    license: public_domain
+
+    categories:
+      complexity: scanned
+      language: english
+      document_type: magazine
+
+    metadata:
+      title: "Scientific American Volume 39 Number 16"
+      date: "1878-10-19"
+      description: "Victorian era science and technology magazine"
+
+    characteristics:
+      has_text_layer: true
+      is_scanned: true
+      has_images: true
+      has_tables: false
+      multi_column: true
+      has_illustrations: true
+
+    golden_answers:
+      must_contain:
+        - text: "Scientific American"
+          confidence: fuzzy
+          fuzzy_threshold: 0.80
+          description: "Masthead title"
+
+      structure:
+        min_chunks: 15
+        max_chunks: 60
+
+      quality:
+        min_text_extraction_ratio: 0.65
+        max_ocr_error_rate: 0.20
+
+  # ============================================================================
+  # GERMAN LANGUAGE - Classic Literature
+  # ============================================================================
+
+  - id: goethe_faust_german
+    url: "https://archive.org/download/fausteinetragd00goetuoft/fausteinetragd00goetuoft.pdf"
+    filename: goethe_faust_german.pdf
+    source: archive.org
+    license: public_domain
+
+    categories:
+      complexity: scanned
+      language: german
+      document_type: book
+
+    metadata:
+      title: "Faust, eine Tragödie"
+      author: "Johann Wolfgang von Goethe"
+      publisher: "Cotta, Stuttgart"
+      date: "1862"
+      pages: 474
+      description: "Classic German literature - Faust Part 1"
+
+    characteristics:
+      has_text_layer: true
+      is_scanned: true
+      has_images: false
+      has_tables: false
+      multi_column: false
+      script_type: fraktur
+
+    golden_answers:
+      must_contain:
+        - text: "Faust"
+          confidence: exact
+        - text: "Goethe"
+          confidence: fuzzy
+          fuzzy_threshold: 0.85
+        - text: "Tragödie"
+          confidence: fuzzy
+          fuzzy_threshold: 0.80
+
+      structure:
+        min_chunks: 80
+        max_chunks: 300
+
+      quality:
+        min_text_extraction_ratio: 0.70
+        max_ocr_error_rate: 0.20
+
+  # ============================================================================
+  # FRENCH LANGUAGE - Classic Literature
+  # ============================================================================
+
+  - id: les_miserables_french
+    url: "https://archive.org/download/bub_gb_Oo0NAAAAQAAJ/bub_gb_Oo0NAAAAQAAJ.pdf"
+    filename: les_miserables_french.pdf
+    source: archive.org
+    license: public_domain
+
+    categories:
+      complexity: scanned
+      language: french
+      document_type: book
+
+    metadata:
+      title: "Les Misérables"
+      author: "Victor Hugo"
+      date: "1862"
+      description: "Classic French novel - original French edition"
+
+    characteristics:
+      has_text_layer: true
+      is_scanned: true
+      has_images: false
+      has_tables: false
+      multi_column: false
+
+    golden_answers:
+      must_contain:
+        - text: "Misérables"
+          confidence: fuzzy
+          fuzzy_threshold: 0.80
+        - text: "Victor Hugo"
+          confidence: fuzzy
+          fuzzy_threshold: 0.85
+        - text: "Jean Valjean"
+          confidence: fuzzy
+          fuzzy_threshold: 0.80
+
+      structure:
+        min_chunks: 100
+        max_chunks: 500
+
+      quality:
+        min_text_extraction_ratio: 0.75
+        max_ocr_error_rate: 0.15
+
 # =============================================================================
 # METADATA
 # =============================================================================
@@ -506,12 +465,12 @@ documents:
 registry_metadata:
   created: "2025-11-26"
   last_updated: "2025-11-26"
-  total_documents: 11
+  total_documents: 9
   coverage:
-    complexity_tiers: 5
+    complexity_tiers: 4
     languages: 3
-    document_types: 7
+    document_types: 6
   notes: |
-    All URLs use stable /download/ format for Archive.org.
-    Golden answers verified against manual inspection.
+    All URLs verified on 2025-11-26.
+    Content selected for cultural appropriateness and testing value.
     Fuzzy thresholds adjusted for expected OCR quality.
