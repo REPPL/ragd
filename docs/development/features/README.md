@@ -69,6 +69,12 @@ Features are the primary unit of work. Each feature specification describes:
 |----|---------|--------|----------|
 | [F-037](./planned/F-037-watch-folder.md) | Watch Folder Auto-Indexing | 📅 Planned | [State-of-the-Art RAG Landscape](../research/state-of-the-art-rag-landscape.md) |
 
+#### Web Archive
+
+| ID | Feature | Status | Research |
+|----|---------|--------|----------|
+| [F-038](./planned/F-038-web-archive-support.md) | Web Archive Support | 📅 Planned | [State-of-the-Art HTML Processing](../research/state-of-the-art-html-processing.md) |
+
 ### v0.3 Features (Advanced Retrieval)
 
 | ID | Feature | Status | Research |
@@ -132,7 +138,7 @@ Features are numbered sequentially with milestone-based ranges:
 | Range | Milestone | Theme |
 |-------|-----------|-------|
 | F-001 to F-009, F-035-F-036 | v0.1 | Core RAG |
-| F-025 to F-034, F-037 | v0.2 | Killer Feature (PDFs, Metadata, Export, Watch) |
+| F-025 to F-034, F-037-F-038 | v0.2 | Killer Feature (PDFs, Metadata, Export, Watch, Web) |
 | F-010 to F-012 | v0.3 | Advanced Search |
 | F-019 | v0.4 | Multi-Modal |
 | F-013, F-014, F-020 | v0.5 | Chat & Evaluation |
