@@ -42,10 +42,10 @@ v0.2
 
 ## Derives Features
 
-- [F-025: PDF Quality Detection](../../../development/features/planned/F-025-pdf-quality-detection.md)
-- [F-026: Docling Integration](../../../development/features/planned/F-026-docling-integration.md)
-- [F-027: OCR Pipeline](../../../development/features/planned/F-027-ocr-pipeline.md)
-- [F-028: Table Extraction](../../../development/features/planned/F-028-table-extraction.md)
+- [F-025: PDF Quality Detection](../../development/features/planned/F-025-pdf-quality-detection.md)
+- [F-026: Docling Integration](../../development/features/planned/F-026-docling-integration.md)
+- [F-027: OCR Pipeline](../../development/features/planned/F-027-ocr-pipeline.md)
+- [F-028: Table Extraction](../../development/features/planned/F-028-table-extraction.md)
 
 ## Related Use Cases
 

@@ -36,8 +36,8 @@ v0.1
 
 ## Derives Features
 
-- [F-007: Status Dashboard](../../../development/features/planned/F-007-status-dashboard.md)
-- [F-008: Health Checks](../../../development/features/planned/F-008-health-checks.md)
+- [F-007: Status Dashboard](../../development/features/planned/F-007-status-dashboard.md)
+- [F-008: Health Checks](../../development/features/planned/F-008-health-checks.md)
 
 ## Related Use Cases
 

@@ -37,8 +37,8 @@ v0.1
 
 ## Derives Features
 
-- [F-005: Semantic Search](../../../development/features/planned/F-005-semantic-search.md)
-- [F-006: Result Formatting](../../../development/features/planned/F-006-result-formatting.md)
+- [F-005: Semantic Search](../../development/features/planned/F-005-semantic-search.md)
+- [F-006: Result Formatting](../../development/features/planned/F-006-result-formatting.md)
 
 ## Related Use Cases
 
