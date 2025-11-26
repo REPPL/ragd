@@ -2,11 +2,11 @@
 [![Python 3.12](https://img.shields.io/badge/python-3.12-blue.svg)](https://www.python.org/downloads/)
 [![Status: Alpha](https://img.shields.io/badge/status-alpha-red.svg)]()
 
----
 
 ![ragged logo](docs/assets/img/ragd-logo.png)
 
-## Your Private, Intelligent Document Assistant
+
+## Your Private Intelligent Document Assistant
 
 `ragd` is a local RAG *(Retrieval-Augmented Generation)* system that lets you ask questions about your documents and get accurate answers with citations -- all while keeping your data completely private and local.
 
