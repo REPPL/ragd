@@ -512,6 +512,681 @@ Query: "What papers by Smith influenced the transformer architecture?"
 
 ---
 
+## Part 5: Advanced Performance Engineering
+
+This section covers advanced techniques for production-grade local RAG systems.
+
+### Batch Processing Optimisation
+
+#### Document Ingestion at Scale
+
+Sequential document processing creates bottlenecks. Optimise with:
+
+| Approach | Throughput Gain | Complexity |
+|----------|-----------------|------------|
+| Sequential | Baseline | Low |
+| Batch embedding | 5-10x | Low |
+| Async I/O | 2-3x | Medium |
+| Multiprocessing | 3-5x | Medium |
+| Distributed (Ray) | 10-50x | High |
+
+**Batch Embedding Pattern:**
+
+```python
+from sentence_transformers import SentenceTransformer
+
+model = SentenceTransformer('nomic-ai/nomic-embed-text-v1.5')
+
+# BAD: One at a time (slow)
+embeddings = [model.encode(doc) for doc in documents]  # N API calls
+
+# GOOD: Batched (fast)
+embeddings = model.encode(
+    documents,
+    batch_size=32,  # Adjust based on GPU memory
+    show_progress_bar=True,
+    convert_to_numpy=True
+)  # Single optimised operation
+```
+
+**Async Embedding with Rate Limiting:**
+
+```python
+import asyncio
+from collections.abc import Callable
+from dataclasses import dataclass
+
+@dataclass
+class BatchProcessor:
+    embed_fn: Callable
+    batch_size: int = 32
+    max_concurrent: int = 4
+
+    async def process_documents(self, documents: list[str]) -> list:
+        semaphore = asyncio.Semaphore(self.max_concurrent)
+        batches = [
+            documents[i:i + self.batch_size]
+            for i in range(0, len(documents), self.batch_size)
+        ]
+
+        async def process_batch(batch):
+            async with semaphore:
+                return await asyncio.to_thread(self.embed_fn, batch)
+
+        results = await asyncio.gather(*[process_batch(b) for b in batches])
+        return [emb for batch_result in results for emb in batch_result]
+```
+
+**Ray for Large-Scale Ingestion:**
+
+```python
+import ray
+
+@ray.remote
+def embed_batch(documents: list[str], model_name: str) -> list:
+    from sentence_transformers import SentenceTransformer
+    model = SentenceTransformer(model_name)
+    return model.encode(documents).tolist()
+
+# Distribute across available CPUs/GPUs
+ray.init()
+futures = [
+    embed_batch.remote(batch, "nomic-ai/nomic-embed-text-v1.5")
+    for batch in document_batches
+]
+all_embeddings = ray.get(futures)
+```
+
+**Source:** [Building a Scalable RAG Data Ingestion Pipeline](https://medium.com/@pronnoy.goswami/building-a-scalable-rag-data-ingestion-pipeline-for-large-scale-ml-workloads-f6e05d4f8982)
+
+---
+
+### Query Parallelisation
+
+#### Concurrent Retrieval Strategies
+
+| Strategy | Use Case | Implementation |
+|----------|----------|----------------|
+| **Parallel Vector DBs** | Multi-index search | asyncio.gather across indices |
+| **Hybrid Parallel** | Vector + BM25 | Concurrent dense/sparse retrieval |
+| **Multi-Query** | Query expansion | Parallel retrieval for each variant |
+| **Speculative** | Predictive retrieval | Pre-fetch likely follow-up contexts |
+
+**Hybrid Parallel Retrieval:**
+
+```python
+import asyncio
+from typing import NamedTuple
+
+class RetrievalResult(NamedTuple):
+    chunks: list[str]
+    scores: list[float]
+    source: str
+
+async def hybrid_retrieve(
+    query: str,
+    vector_db,
+    bm25_index,
+    top_k: int = 10
+) -> list[RetrievalResult]:
+    """Execute vector and keyword search in parallel."""
+
+    async def vector_search():
+        results = await asyncio.to_thread(
+            vector_db.query, query, n_results=top_k
+        )
+        return RetrievalResult(
+            chunks=results['documents'][0],
+            scores=results['distances'][0],
+            source='vector'
+        )
+
+    async def keyword_search():
+        results = await asyncio.to_thread(
+            bm25_index.search, query, top_k=top_k
+        )
+        return RetrievalResult(
+            chunks=results['documents'],
+            scores=results['scores'],
+            source='bm25'
+        )
+
+    # Execute both searches concurrently
+    vector_result, bm25_result = await asyncio.gather(
+        vector_search(),
+        keyword_search()
+    )
+
+    return [vector_result, bm25_result]
+```
+
+**Multi-Query Parallel Retrieval:**
+
+```python
+async def multi_query_retrieve(
+    queries: list[str],  # Original + expanded queries
+    vector_db,
+    top_k: int = 5
+) -> list[str]:
+    """Retrieve for multiple query variants in parallel."""
+
+    async def single_retrieve(q: str):
+        return await asyncio.to_thread(
+            vector_db.query, q, n_results=top_k
+        )
+
+    results = await asyncio.gather(*[single_retrieve(q) for q in queries])
+
+    # Deduplicate and merge results
+    seen = set()
+    merged = []
+    for result in results:
+        for doc in result['documents'][0]:
+            if doc not in seen:
+                seen.add(doc)
+                merged.append(doc)
+
+    return merged
+```
+
+---
+
+### Memory Profiling
+
+#### Identifying Memory Leaks in RAG Pipelines
+
+Common memory leak sources in RAG systems:
+
+| Source | Cause | Detection |
+|--------|-------|-----------|
+| **Conversation history** | Unbounded accumulation | Growing memory over sessions |
+| **Vector DB connections** | Unclosed connections | Connection pool exhaustion |
+| **Embedding cache** | No eviction policy | Monotonic growth |
+| **LLM KV cache** | Long context accumulation | GPU memory exhaustion |
+| **Agent state** | Accumulated tool outputs | Per-request growth |
+
+**Using tracemalloc:**
+
+```python
+import tracemalloc
+import linecache
+
+def profile_rag_pipeline():
+    tracemalloc.start()
+
+    # Take baseline snapshot
+    snapshot1 = tracemalloc.take_snapshot()
+
+    # Run RAG operations
+    for _ in range(100):
+        result = rag_pipeline.query("test query")
+
+    # Take comparison snapshot
+    snapshot2 = tracemalloc.take_snapshot()
+
+    # Find memory growth
+    top_stats = snapshot2.compare_to(snapshot1, 'lineno')
+
+    print("Top 10 memory increases:")
+    for stat in top_stats[:10]:
+        print(f"{stat.size_diff / 1024:.1f} KB: {stat.traceback}")
+
+def display_top_allocations(snapshot, limit=10):
+    """Show where memory is allocated."""
+    top_stats = snapshot.statistics('traceback')
+
+    for index, stat in enumerate(top_stats[:limit], 1):
+        frame = stat.traceback[0]
+        print(f"#{index}: {frame.filename}:{frame.lineno}")
+        print(f"    Size: {stat.size / 1024:.1f} KB")
+        line = linecache.getline(frame.filename, frame.lineno).strip()
+        if line:
+            print(f"    {line}")
+```
+
+**Memory-Safe Conversation Management:**
+
+```python
+from collections import deque
+from dataclasses import dataclass, field
+
+@dataclass
+class BoundedConversation:
+    """Conversation history with automatic eviction."""
+    max_messages: int = 20
+    max_tokens: int = 4000
+    messages: deque = field(default_factory=deque)
+
+    def add(self, message: dict):
+        self.messages.append(message)
+        self._enforce_limits()
+
+    def _enforce_limits(self):
+        # Remove oldest messages if over count limit
+        while len(self.messages) > self.max_messages:
+            self.messages.popleft()
+
+        # Remove oldest if over token limit
+        while self._total_tokens() > self.max_tokens:
+            self.messages.popleft()
+
+    def _total_tokens(self) -> int:
+        return sum(len(m.get('content', '')) // 4 for m in self.messages)
+```
+
+**Source:** [Memory Profiling in Python with tracemalloc](https://www.red-gate.com/simple-talk/development/python/memory-profiling-in-python-with-tracemalloc/)
+
+---
+
+### Startup Time Optimisation
+
+#### Cold Start vs Warm Start
+
+| Metric | Cold Start | Warm Start | Optimised Cold |
+|--------|------------|------------|----------------|
+| **Model load (7B)** | 30-90s | <1s | 5-10s |
+| **Vector index load** | 5-30s | <100ms | 1-3s |
+| **First query** | 60-120s | 50-200ms | 10-15s |
+
+**Optimisation Strategies:**
+
+1. **Use Safetensors Format:**
+```bash
+# Convert PyTorch to Safetensors (2x faster loading)
+python -c "
+from transformers import AutoModel
+model = AutoModel.from_pretrained('model_name')
+model.save_pretrained('output_dir', safe_serialization=True)
+"
+```
+
+2. **Quantised Models:**
+```python
+# GGUF models load faster and use less memory
+# Q4_K_M: ~4x smaller, ~2x faster load
+ollama_model = "llama3:8b-q4_K_M"  # vs full precision
+```
+
+3. **Lazy Loading Pattern:**
+```python
+from functools import cached_property
+
+class RAGPipeline:
+    """Load models only when first needed."""
+
+    @cached_property
+    def embedding_model(self):
+        from sentence_transformers import SentenceTransformer
+        return SentenceTransformer('nomic-ai/nomic-embed-text-v1.5')
+
+    @cached_property
+    def vector_db(self):
+        import chromadb
+        return chromadb.PersistentClient(path="./chroma_db")
+
+    # Models loaded on first use, not at import
+```
+
+4. **Background Pre-warming:**
+```python
+import threading
+
+def prewarm_models():
+    """Load models in background thread during startup."""
+    # Trigger lazy loading
+    _ = pipeline.embedding_model
+    _ = pipeline.vector_db.get_collection("documents")
+    # Warm the embedding model with dummy query
+    _ = pipeline.embedding_model.encode(["warmup query"])
+
+# Start prewarming immediately, don't block main thread
+threading.Thread(target=prewarm_models, daemon=True).start()
+```
+
+**Source:** [How To Reduce Cold Start Times For LLM Inference](https://scale.com/blog/reduce-cold-start-time-llm-inference)
+
+---
+
+### Index Warming Strategies
+
+#### Pre-loading Frequently Accessed Data
+
+```python
+class WarmableVectorDB:
+    """Vector database with index warming capabilities."""
+
+    def __init__(self, path: str, warm_on_init: bool = True):
+        self.client = chromadb.PersistentClient(path=path)
+        self.collections = {}
+
+        if warm_on_init:
+            self._warm_indices()
+
+    def _warm_indices(self):
+        """Pre-load collection indices into memory."""
+        for name in self._get_collection_names():
+            collection = self.client.get_collection(name)
+            self.collections[name] = collection
+
+            # Trigger index loading with dummy query
+            try:
+                collection.query(
+                    query_texts=["warmup"],
+                    n_results=1
+                )
+            except Exception:
+                pass  # Collection might be empty
+
+    def _get_collection_names(self) -> list[str]:
+        """Get all collection names for warming."""
+        return [c.name for c in self.client.list_collections()]
+```
+
+**Memory-Mapped Index Loading:**
+
+```python
+# Qdrant with memory mapping for large indices
+from qdrant_client import QdrantClient
+from qdrant_client.models import OptimizersConfigDiff
+
+client = QdrantClient(path="./qdrant_data")
+
+# Configure collection for memory mapping
+client.update_collection(
+    collection_name="documents",
+    optimizers_config=OptimizersConfigDiff(
+        memmap_threshold=20000  # Use mmap for vectors > 20K
+    )
+)
+```
+
+**Tiered Warming Strategy:**
+
+```yaml
+# Configuration for tiered index warming
+index_warming:
+  # Hot tier: Always in memory
+  hot_collections:
+    - "recent_documents"
+    - "frequently_accessed"
+
+  # Warm tier: Load on first access, keep cached
+  warm_collections:
+    - "all_documents"
+
+  # Cold tier: Memory-mapped, load on demand
+  cold_collections:
+    - "archived_documents"
+
+  # Warming schedule
+  prewarm_on_startup: true
+  background_refresh_interval: 3600  # seconds
+```
+
+**Source:** [Managing Data in Massive-Scale Vector Database](https://medium.com/vector-database/managing-data-in-massive-scale-vector-search-engine-db2e8941ce2f)
+
+---
+
+### Resource Monitoring
+
+#### Key Metrics to Track
+
+| Metric | Target | Alert Threshold |
+|--------|--------|-----------------|
+| **CPU utilisation** | <70% sustained | >85% for 5min |
+| **Memory usage** | <80% of available | >90% |
+| **GPU memory** | <90% VRAM | >95% |
+| **Query latency (p95)** | <2s | >5s |
+| **Embedding throughput** | >100 docs/sec | <50 docs/sec |
+| **Cache hit rate** | >60% | <40% |
+
+**Simple Resource Monitor:**
+
+```python
+import psutil
+import time
+from dataclasses import dataclass
+from typing import Callable
+
+@dataclass
+class ResourceSnapshot:
+    timestamp: float
+    cpu_percent: float
+    memory_percent: float
+    memory_mb: float
+    gpu_memory_mb: float | None = None
+
+class ResourceMonitor:
+    def __init__(self, interval: float = 1.0):
+        self.interval = interval
+        self.history: list[ResourceSnapshot] = []
+
+    def snapshot(self) -> ResourceSnapshot:
+        process = psutil.Process()
+
+        snap = ResourceSnapshot(
+            timestamp=time.time(),
+            cpu_percent=process.cpu_percent(),
+            memory_percent=process.memory_percent(),
+            memory_mb=process.memory_info().rss / 1024 / 1024
+        )
+
+        # Try to get GPU memory (requires pynvml)
+        try:
+            import pynvml
+            pynvml.nvmlInit()
+            handle = pynvml.nvmlDeviceGetHandleByIndex(0)
+            info = pynvml.nvmlDeviceGetMemoryInfo(handle)
+            snap.gpu_memory_mb = info.used / 1024 / 1024
+        except Exception:
+            pass
+
+        self.history.append(snap)
+        return snap
+
+    def alert_if_critical(
+        self,
+        memory_threshold: float = 90.0,
+        callback: Callable[[str], None] = print
+    ):
+        snap = self.snapshot()
+        if snap.memory_percent > memory_threshold:
+            callback(f"ALERT: Memory at {snap.memory_percent:.1f}%")
+```
+
+**Structured Logging for Observability:**
+
+```python
+import logging
+import json
+from datetime import datetime
+
+class RAGMetricsLogger:
+    def __init__(self, logger_name: str = "rag_metrics"):
+        self.logger = logging.getLogger(logger_name)
+
+    def log_query(
+        self,
+        query: str,
+        retrieval_time_ms: float,
+        generation_time_ms: float,
+        num_chunks: int,
+        cache_hit: bool
+    ):
+        metrics = {
+            "event": "rag_query",
+            "timestamp": datetime.utcnow().isoformat(),
+            "query_length": len(query),
+            "retrieval_time_ms": retrieval_time_ms,
+            "generation_time_ms": generation_time_ms,
+            "total_time_ms": retrieval_time_ms + generation_time_ms,
+            "num_chunks_retrieved": num_chunks,
+            "cache_hit": cache_hit
+        }
+        self.logger.info(json.dumps(metrics))
+```
+
+---
+
+### Degradation Patterns
+
+#### Graceful Degradation Strategy
+
+```
+Resource Pressure Level:
+│
+├─ NORMAL (<70% resources)
+│   └─ Full functionality
+│
+├─ ELEVATED (70-85% resources)
+│   ├─ Reduce batch sizes
+│   ├─ Increase cache TTL
+│   └─ Defer non-critical operations
+│
+├─ HIGH (85-95% resources)
+│   ├─ Switch to smaller models
+│   ├─ Reduce retrieval top_k
+│   ├─ Disable reranking
+│   └─ Aggressive caching
+│
+└─ CRITICAL (>95% resources)
+    ├─ Circuit breaker: reject new requests
+    ├─ Fallback to cached responses only
+    └─ Alert operations team
+```
+
+**Fallback Chain Implementation:**
+
+```python
+from dataclasses import dataclass
+from enum import Enum
+from typing import Protocol
+
+class DegradationLevel(Enum):
+    NORMAL = "normal"
+    ELEVATED = "elevated"
+    HIGH = "high"
+    CRITICAL = "critical"
+
+@dataclass
+class DegradationConfig:
+    level: DegradationLevel
+
+    @property
+    def model_name(self) -> str:
+        return {
+            DegradationLevel.NORMAL: "llama3:8b",
+            DegradationLevel.ELEVATED: "llama3:8b",
+            DegradationLevel.HIGH: "llama3.2:3b",  # Smaller model
+            DegradationLevel.CRITICAL: None  # Cache only
+        }[self.level]
+
+    @property
+    def retrieval_top_k(self) -> int:
+        return {
+            DegradationLevel.NORMAL: 10,
+            DegradationLevel.ELEVATED: 7,
+            DegradationLevel.HIGH: 5,
+            DegradationLevel.CRITICAL: 3
+        }[self.level]
+
+    @property
+    def enable_reranking(self) -> bool:
+        return self.level in (DegradationLevel.NORMAL, DegradationLevel.ELEVATED)
+
+class AdaptiveRAGPipeline:
+    def __init__(self):
+        self.config = DegradationConfig(DegradationLevel.NORMAL)
+        self.monitor = ResourceMonitor()
+
+    def query(self, question: str) -> str:
+        # Check resources and adjust degradation level
+        self._update_degradation_level()
+
+        if self.config.level == DegradationLevel.CRITICAL:
+            return self._cache_only_response(question)
+
+        # Retrieve with adjusted parameters
+        chunks = self.retrieve(
+            question,
+            top_k=self.config.retrieval_top_k
+        )
+
+        # Optional reranking
+        if self.config.enable_reranking:
+            chunks = self.rerank(question, chunks)
+
+        # Generate with appropriate model
+        return self.generate(
+            question,
+            chunks,
+            model=self.config.model_name
+        )
+
+    def _update_degradation_level(self):
+        snap = self.monitor.snapshot()
+
+        if snap.memory_percent > 95:
+            self.config.level = DegradationLevel.CRITICAL
+        elif snap.memory_percent > 85:
+            self.config.level = DegradationLevel.HIGH
+        elif snap.memory_percent > 70:
+            self.config.level = DegradationLevel.ELEVATED
+        else:
+            self.config.level = DegradationLevel.NORMAL
+```
+
+**Circuit Breaker Pattern:**
+
+```python
+import time
+from dataclasses import dataclass, field
+from enum import Enum
+
+class CircuitState(Enum):
+    CLOSED = "closed"      # Normal operation
+    OPEN = "open"          # Failing, reject requests
+    HALF_OPEN = "half_open"  # Testing recovery
+
+@dataclass
+class CircuitBreaker:
+    failure_threshold: int = 5
+    recovery_timeout: float = 30.0
+
+    state: CircuitState = field(default=CircuitState.CLOSED)
+    failure_count: int = field(default=0)
+    last_failure_time: float = field(default=0.0)
+
+    def can_execute(self) -> bool:
+        if self.state == CircuitState.CLOSED:
+            return True
+
+        if self.state == CircuitState.OPEN:
+            # Check if recovery timeout has passed
+            if time.time() - self.last_failure_time > self.recovery_timeout:
+                self.state = CircuitState.HALF_OPEN
+                return True
+            return False
+
+        # HALF_OPEN: Allow one request to test
+        return True
+
+    def record_success(self):
+        self.failure_count = 0
+        self.state = CircuitState.CLOSED
+
+    def record_failure(self):
+        self.failure_count += 1
+        self.last_failure_time = time.time()
+
+        if self.failure_count >= self.failure_threshold:
+            self.state = CircuitState.OPEN
+```
+
+**Source:** [How to Implement Graceful Degradation in LLM Frameworks](https://markaicode.com/implement-graceful-degradation-llm-frameworks/)
+
+---
+
 ## Recommended Architecture for ragd
 
 ### Performance-Optimised Local RAG Pipeline
