@@ -15,9 +15,32 @@ Features planned for future development.
 | [F-007](./F-007-status-dashboard.md) | Status Dashboard | UC-003 |
 | [F-008](./F-008-health-checks.md) | Health Checks | UC-003 |
 
-## v0.2 Features (Planned)
+## v0.2 Features (Killer Feature)
 
-Feature specifications for v0.2 (Messy PDFs, Metadata, Export) will be created after v0.1 implementation begins.
+### PDF Processing (UC-004)
+
+| ID | Feature | Research |
+|----|---------|----------|
+| [F-025](./F-025-pdf-quality-detection.md) | PDF Quality Detection | [State-of-the-Art PDF Processing](../../research/state-of-the-art-pdf-processing.md) |
+| [F-026](./F-026-docling-integration.md) | Docling Integration | [State-of-the-Art PDF Processing](../../research/state-of-the-art-pdf-processing.md) |
+| [F-027](./F-027-ocr-pipeline.md) | OCR Pipeline | [State-of-the-Art PDF Processing](../../research/state-of-the-art-pdf-processing.md) |
+| [F-028](./F-028-table-extraction.md) | Table Extraction | [State-of-the-Art PDF Processing](../../research/state-of-the-art-pdf-processing.md) |
+
+### Metadata Management (UC-005)
+
+| ID | Feature | Research |
+|----|---------|----------|
+| [F-029](./F-029-metadata-storage.md) | Metadata Storage | [State-of-the-Art Metadata](../../research/state-of-the-art-metadata.md) |
+| [F-030](./F-030-metadata-extraction.md) | Metadata Extraction | [State-of-the-Art Metadata](../../research/state-of-the-art-metadata.md) |
+| [F-031](./F-031-tag-management.md) | Tag Management | [State-of-the-Art Metadata](../../research/state-of-the-art-metadata.md) |
+
+### Export & Backup (UC-006)
+
+| ID | Feature | Research |
+|----|---------|----------|
+| [F-032](./F-032-export-engine.md) | Export Engine | - |
+| [F-033](./F-033-import-engine.md) | Import Engine | - |
+| [F-034](./F-034-archive-format.md) | Archive Format | - |
 
 ## Workflow
 

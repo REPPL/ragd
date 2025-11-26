@@ -36,15 +36,30 @@ Features are the primary unit of work. Each feature specification describes:
 
 ### v0.2 Features (Killer Feature)
 
+#### PDF Processing
+
 | ID | Feature | Status | Research |
 |----|---------|--------|----------|
-| TBD | Advanced PDF Processing (Docling) | 📋 To Be Specified | State-of-the-Art PDF Processing |
-| TBD | Table Extraction | 📋 To Be Specified | State-of-the-Art PDF Processing |
-| TBD | OCR Support | 📋 To Be Specified | State-of-the-Art PDF Processing |
-| TBD | Rich Metadata Management | 📋 To Be Specified | State-of-the-Art Metadata |
-| TBD | Export/Backup | 📋 To Be Specified | - |
+| [F-025](./planned/F-025-pdf-quality-detection.md) | PDF Quality Detection | 📅 Planned | [State-of-the-Art PDF Processing](../research/state-of-the-art-pdf-processing.md) |
+| [F-026](./planned/F-026-docling-integration.md) | Docling Integration | 📅 Planned | [State-of-the-Art PDF Processing](../research/state-of-the-art-pdf-processing.md) |
+| [F-027](./planned/F-027-ocr-pipeline.md) | OCR Pipeline | 📅 Planned | [State-of-the-Art PDF Processing](../research/state-of-the-art-pdf-processing.md) |
+| [F-028](./planned/F-028-table-extraction.md) | Table Extraction | 📅 Planned | [State-of-the-Art PDF Processing](../research/state-of-the-art-pdf-processing.md) |
 
-*Feature specifications will be created when v0.2 development begins. See [v0.2.0 Milestone](../milestones/v0.2.0.md) for scope.*
+#### Metadata Management
+
+| ID | Feature | Status | Research |
+|----|---------|--------|----------|
+| [F-029](./planned/F-029-metadata-storage.md) | Metadata Storage | 📅 Planned | [State-of-the-Art Metadata](../research/state-of-the-art-metadata.md) |
+| [F-030](./planned/F-030-metadata-extraction.md) | Metadata Extraction | 📅 Planned | [State-of-the-Art Metadata](../research/state-of-the-art-metadata.md) |
+| [F-031](./planned/F-031-tag-management.md) | Tag Management | 📅 Planned | [State-of-the-Art Metadata](../research/state-of-the-art-metadata.md) |
+
+#### Export & Backup
+
+| ID | Feature | Status | Research |
+|----|---------|--------|----------|
+| [F-032](./planned/F-032-export-engine.md) | Export Engine | 📅 Planned | - |
+| [F-033](./planned/F-033-import-engine.md) | Import Engine | 📅 Planned | - |
+| [F-034](./planned/F-034-archive-format.md) | Archive Format | 📅 Planned | - |
 
 ### v0.3 Features (Advanced Retrieval)
 
@@ -109,7 +124,7 @@ Features are numbered sequentially with milestone-based ranges:
 | Range | Milestone | Theme |
 |-------|-----------|-------|
 | F-001 to F-009 | v0.1 | Core RAG |
-| TBD | v0.2 | Killer Feature (PDFs, Metadata, Export) |
+| F-025 to F-034 | v0.2 | Killer Feature (PDFs, Metadata, Export) |
 | F-010 to F-012 | v0.3 | Advanced Search |
 | F-019 | v0.4 | Multi-Modal |
 | F-013, F-014, F-020 | v0.5 | Chat & Evaluation |

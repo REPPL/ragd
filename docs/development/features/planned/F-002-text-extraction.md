@@ -79,7 +79,7 @@ class ExtractionResult:
 
 ### PDF Extraction Strategy
 
-For v0.1, use simple PyMuPDF text extraction. This works well for clean, text-based PDFs. Messy PDF handling (OCR, Docling) comes in v0.2 via F-010.
+For v0.1, use simple PyMuPDF text extraction. This works well for clean, text-based PDFs. Messy PDF handling (OCR, Docling) comes in v0.2 via F-026.
 
 ### Encoding Handling
 
@@ -105,6 +105,6 @@ If extraction fails:
 
 - [F-001: Document Ingestion](./F-001-document-ingestion.md) - Upstream orchestrator
 - [F-003: Chunking Engine](./F-003-chunking-engine.md) - Downstream consumer
-- [F-010: Docling Integration](./F-010-docling-integration.md) - v0.2 enhancement for messy PDFs
+- [F-026: Docling Integration](./F-026-docling-integration.md) - v0.2 enhancement for messy PDFs
 
 ---

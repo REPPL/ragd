@@ -661,7 +661,7 @@ def calibrate_local_evaluator(
     )
 ```
 
-**Minimum calibration set:** 50-100 human-labeled examples.
+**Minimum calibration set:** 50-100 human-labelled examples.
 
 ---
 
