@@ -57,6 +57,35 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+# v0.2 Feature Extras
+pdf = [
+    # Advanced PDF processing with layout/table detection
+    "docling>=2.0.0",
+    "docling-core>=2.0.0",
+]
+ocr = [
+    # OCR for scanned documents (primary + fallback)
+    "paddleocr>=2.7.0",
+    "paddlepaddle>=2.5.0",
+    "easyocr>=1.7.0",
+    "opencv-python-headless>=4.8.0",
+]
+metadata = [
+    # Metadata extraction (keywords, entities, language)
+    "keybert>=0.8.0",
+    "spacy>=3.7.0",
+    "langdetect>=1.0.9",
+]
+export = [
+    # Export functionality (Parquet for embeddings)
+    "pyarrow>=14.0.0",
+]
+# Meta-extra for all v0.2 features
+v02 = [
+    "ragd[pdf,ocr,metadata,export]",
+]
+
+# Development Extras
 dev = [
     "ruff>=0.1.0",
     "mypy>=1.0.0",
@@ -72,8 +101,9 @@ security = [
     "bandit>=1.7.0",
     "safety>=2.3.0",
 ]
+# Everything (v0.2 features + all dev tools)
 all = [
-    "ragd[dev,test,security]",
+    "ragd[v02,dev,test,security]",
 ]
 
 [project.scripts]

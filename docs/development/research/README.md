@@ -38,6 +38,14 @@ This directory contains research on cutting-edge techniques that inform ragd's f
 | [cli-documentation-standards.md](./cli-documentation-standards.md) | CLI reference documentation: man pages, help text, auto-generation (git, kubectl, docker, gh) |
 | [citation-systems.md](./citation-systems.md) | RAG citation formats, academic styles, ALCE benchmark |
 
+### v0.2 Integration Guides
+
+| Document | Description |
+|----------|-------------|
+| [docling-integration-guide.md](./docling-integration-guide.md) | IBM Docling: API patterns, PipelineOptions, lazy loading, table extraction |
+| [paddleocr-integration-guide.md](./paddleocr-integration-guide.md) | PaddleOCR + EasyOCR: fallback pattern, confidence scoring, batch processing |
+| [nlp-library-integration.md](./nlp-library-integration.md) | KeyBERT, spaCy, langdetect: model sharing, lazy loading, MetadataExtractor design |
+
 ## Research Status
 
 All research documents are complete and inform the roadmap.
@@ -64,6 +72,9 @@ All research documents are complete and inform the roadmap.
 | cli-best-practices.md | ✅ Complete | F-001, F-006 |
 | cli-documentation-standards.md | ✅ Complete | CLI reference docs (v0.2+) |
 | citation-systems.md | ✅ Complete | F-009 |
+| docling-integration-guide.md | ✅ Complete | F-026, F-028 |
+| paddleocr-integration-guide.md | ✅ Complete | F-027 |
+| nlp-library-integration.md | ✅ Complete | F-030 |
 
 ## What Belongs Here
 

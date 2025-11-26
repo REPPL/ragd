@@ -18,9 +18,9 @@ Tutorials help newcomers get started with ragd through hands-on learning experie
 
 | Tutorial | Description | Status |
 |----------|-------------|--------|
-| Processing Difficult PDFs | Handle scanned and complex PDFs | 📋 Planned |
-| Organising Your Knowledge Base | Use tags and metadata effectively | 📋 Planned |
-| Backing Up Your Data | Export and restore your knowledge base | 📋 Planned |
+| [Processing Difficult PDFs](./processing-difficult-pdfs.md) | Handle scanned and complex PDFs | 📝 Draft |
+| [Organising Your Knowledge Base](./organising-knowledge-base.md) | Use tags and metadata effectively | 📝 Draft |
+| [Backing Up Your Data](./backing-up-data.md) | Export and restore your knowledge base | 📝 Draft |
 
 ## Tutorial Guidelines
 

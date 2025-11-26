@@ -35,6 +35,8 @@ Lightweight documentation of significant technical decisions.
 | [0017](./0017-html-to-text-conversion.md) | HTML-to-Text Conversion Strategy | Accepted |
 | [0018](./0018-chunking-strategy.md) | Text Chunking Strategy | Accepted |
 | [0019](./0019-pdf-processing.md) | PDF Processing Library Selection | Accepted |
+| [0023](./0023-metadata-schema-evolution.md) | Metadata Schema Evolution | Accepted |
+| [0024](./0024-optional-dependencies.md) | Optional Dependencies Strategy | Accepted |
 
 ### Privacy & Security (v0.7)
 
