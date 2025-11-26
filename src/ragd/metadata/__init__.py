@@ -3,11 +3,18 @@
 This module provides:
 - DocumentMetadata: Dublin Core-based metadata with RAG extensions
 - MetadataStore: SQLite-backed persistent storage
+- MetadataExtractor: NLP-based metadata extraction
 - Migration utilities for schema evolution
 """
 
 from __future__ import annotations
 
+from ragd.metadata.extractor import (
+    ExtractedEntity,
+    ExtractedKeyword,
+    ExtractedMetadata,
+    MetadataExtractor,
+)
 from ragd.metadata.migration import (
     CURRENT_SCHEMA,
     SCHEMA_V1,
@@ -25,6 +32,11 @@ __all__ = [
     "DocumentMetadata",
     # Store
     "MetadataStore",
+    # Extraction
+    "MetadataExtractor",
+    "ExtractedMetadata",
+    "ExtractedKeyword",
+    "ExtractedEntity",
     # Migration
     "CURRENT_SCHEMA",
     "SCHEMA_V1",
