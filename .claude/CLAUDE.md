@@ -72,6 +72,38 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 ### Documentation
 - AI contributions documented in `docs/development/ai-contributions.md`
 - Significant AI decisions noted in ADRs
+- Milestone retrospectives committed to `docs/development/process/retrospectives/`
+
+---
+
+## Version Numbering Policy
+
+### Semantic Versioning (MAJOR.MINOR.PATCH)
+
+| Version | When to Use | Example |
+|---------|-------------|---------|
+| **0.X.0** | Milestone release (planned features) | v0.1.0, v0.2.0 |
+| **0.X.Y** | Bug fixes after milestone | v0.1.1, v0.1.2 |
+| **X.0.0** | Breaking changes or major milestone | v1.0.0 |
+
+### Rules
+
+1. **pyproject.toml** version = next planned version during development
+2. **Git tag** = version at release moment
+3. **After release**: Bump pyproject.toml to next patch (0.1.0 → 0.1.1)
+4. **Milestone tags**: Use pre-release suffixes during development
+   - `vX.Y.Z-alpha.1` - Foundation complete
+   - `vX.Y.Z-beta.1` - Features complete
+   - `vX.Y.Z` - Release
+
+### Current Status
+
+| Version | Status | Notes |
+|---------|--------|-------|
+| v0.1.0 | ✅ Released | Core RAG pipeline |
+| v0.2.0 | 📋 Planned | Messy PDFs (killer feature) |
+| v0.3.0 | 📋 Planned | Advanced Search |
+| v1.0.0 | 📋 Planned | Personal Platform + WebUI |
 
 ---
 
