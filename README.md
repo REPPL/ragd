@@ -28,7 +28,7 @@ ragd is a reference implementation demonstrating best practices for:
 
 ```bash
 # Clone the repository
-git clone <repository-url>
+git clone git@github.com:REPPL/ragd.git
 cd ragd
 
 # Create virtual environment
