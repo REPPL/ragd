@@ -750,7 +750,6 @@ def main(
 - [CLI Best Practices](./cli-best-practices.md) - General CLI design principles
 - [State-of-the-Art Setup UX](./state-of-the-art-setup-ux.md) - Installation experience
 - [ADR-0005: CLI Design Principles](../decisions/adrs/0005-cli-design-principles.md) - Architecture decision
-- [F-001: CLI Framework](../features/planned/F-001-cli-framework.md) - Feature specification
 
 ---
 

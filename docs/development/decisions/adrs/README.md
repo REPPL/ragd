@@ -22,6 +22,17 @@ Lightweight documentation of significant technical decisions.
 | [0007](./0007-advanced-retrieval-techniques.md) | Advanced Retrieval Techniques | Accepted |
 | [0008](./0008-evaluation-framework.md) | Evaluation Framework (RAGAS) | Accepted |
 
+### Platform & Infrastructure (v0.2)
+
+| ADR | Title | Status |
+|-----|-------|--------|
+| [0011](./0011-hardware-detection.md) | Hardware Detection and Tier-Based Configuration | Accepted |
+| [0012](./0012-distribution-strategy.md) | Package Distribution Strategy | Accepted |
+| [0013](./0013-configuration-schema.md) | Configuration Schema and Management | Accepted |
+| [0014](./0014-daemon-management.md) | Daemon Process Management | Accepted |
+| [0015](./0015-web-archive-processing.md) | Web Archive Processing Architecture | Accepted |
+| [0016](./0016-document-deduplication.md) | Document Deduplication Strategy | Accepted |
+
 ### Privacy & Security (v0.7)
 
 | ADR | Title | Status |

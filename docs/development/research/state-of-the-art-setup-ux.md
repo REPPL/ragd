@@ -835,7 +835,7 @@ ragd config reset            # Reset to defaults
 - [State-of-the-Art Local RAG](./state-of-the-art-local-rag.md) - Performance optimisation
 - [State-of-the-Art CLI Modes](./state-of-the-art-cli-modes.md) - User/expert interface design
 - [CLI Best Practices](./cli-best-practices.md) - General CLI design principles
-- [F-001: CLI Framework](../features/planned/F-001-cli-framework.md) - Feature specification
+- [ADR-0005: CLI Design Principles](../decisions/adrs/0005-cli-design-principles.md) - Architecture decision
 
 ---
 

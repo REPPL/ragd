@@ -671,7 +671,7 @@ multimodal:
 - [State-of-the-Art PDF Processing](./state-of-the-art-pdf-processing.md) - Document extraction
 - [State-of-the-Art Embeddings](./state-of-the-art-embeddings.md) - Text embedding models
 - [State-of-the-Art Local RAG](./state-of-the-art-local-rag.md) - Performance optimisation
-- [v0.4 Milestone](../milestones/v0.4.md) - Multi-modal support milestone
+- [v0.4 Milestone](../milestones/v0.4.0.md) - Multi-modal support milestone
 
 ---
 
