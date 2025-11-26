@@ -331,3 +331,5 @@ From the ALCE (Automatic LLM Citation Evaluation) benchmark:
 - [F-005: Semantic Search](../features/planned/F-005-semantic-search.md)
 
 ---
+
+**Status:** Research complete

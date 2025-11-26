@@ -124,6 +124,7 @@ All embedding generation happens locally. No text is sent to external services.
 
 ## Related Documentation
 
+- [State-of-the-Art Embeddings](../../research/state-of-the-art-embeddings.md) - Research basis for model selection
 - [F-003: Chunking Engine](./F-003-chunking-engine.md) - Upstream provider
 - [F-005: Semantic Search](./F-005-semantic-search.md) - Uses embeddings for retrieval
 - [Acknowledgements](../../lineage/acknowledgements.md) - sentence-transformers citation

@@ -7,14 +7,14 @@ Release planning and milestone tracking.
 | Version | Name | Focus | Status |
 |---------|------|-------|--------|
 | [v0.1.0](./v0.1.0.md) | Core RAG | Index, search, status | 📋 Planned |
-| v0.2.0 | Killer Feature | Messy PDFs, metadata, export | 📋 Planned |
-| v0.3.0 | Advanced Search | Hybrid, reranking, query processing | 📋 Planned |
-| v0.4.0 | Multi-Modal | Vision embeddings, image queries | 📋 Planned |
-| v0.5.0 | Chat | LLM integration, conversation | 📋 Planned |
-| v0.6.0 | Storage | LEANN, backend switching | 📋 Planned |
-| v0.7.0 | Privacy | PII detection, encryption | 📋 Planned |
-| v0.8.0 | Intelligence | Personas, temporal, knowledge graph | 📋 Planned |
-| v1.0.0 | Personal Platform | Basic WebUI, polish, stability | 📋 Planned |
+| [v0.2.0](./v0.2.0.md) | Killer Feature | Messy PDFs, metadata, export | 📋 Planned |
+| [v0.3.0](./v0.3.0.md) | Advanced Search | Hybrid, reranking, query processing | 📋 Planned |
+| [v0.4.0](./v0.4.0.md) | Multi-Modal | Vision embeddings, image queries | 📋 Planned |
+| [v0.5.0](./v0.5.0.md) | Chat | LLM integration, conversation | 📋 Planned |
+| [v0.6.0](./v0.6.0.md) | Storage | LEANN, backend switching | 📋 Planned |
+| [v0.7.0](./v0.7.0.md) | Privacy | PII detection, encryption | 📋 Planned |
+| [v0.8.0](./v0.8.0.md) | Intelligence | Personas, temporal, knowledge graph | 📋 Planned |
+| [v1.0.0](./v1.0.0.md) | Personal Platform | Basic WebUI, polish, stability | 📋 Planned |
 
 ## Milestone Workflow
 

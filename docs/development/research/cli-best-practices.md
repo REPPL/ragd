@@ -290,3 +290,5 @@ ragd [global-options] <command> [command-options] [arguments]
 - [CLI Reference](../../guides/cli/reference.md)
 
 ---
+
+**Status:** Research complete

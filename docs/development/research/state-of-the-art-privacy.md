@@ -364,3 +364,7 @@ security:
 - [Security Feature Specs](../features/planned/) (when created)
 - [ADRs](../decisions/adrs/)
 
+---
+
+**Status:** Research complete
+

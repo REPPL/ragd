@@ -316,4 +316,4 @@ Automated quality metrics for RAG responses.
 
 ---
 
-**State-of-the-Art Analysis Status**: Complete
+**Status:** Research complete

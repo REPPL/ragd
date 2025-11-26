@@ -121,6 +121,7 @@ Each chunk carries:
 
 ## Related Documentation
 
+- [State-of-the-Art Chunking](../../research/state-of-the-art-chunking.md) - Research basis for design decisions
 - [F-002: Text Extraction](./F-002-text-extraction.md) - Upstream provider
 - [F-004: Embedding Generation](./F-004-embedding-generation.md) - Downstream consumer
 - [ragged Analysis](../../lineage/ragged-analysis.md) - Chunking lessons learned

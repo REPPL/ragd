@@ -315,6 +315,356 @@ evaluation_model = "llama3:70b"  # Or API model for evaluation only
 
 ---
 
+## RAGAS Alternatives for Small Local LLMs
+
+### The Small Model Challenge
+
+RAGAS and DeepEval are designed for large models (GPT-4, Claude) that reliably:
+- Output valid JSON
+- Follow complex evaluation prompts
+- Make nuanced judgments
+
+Small local models (7B and under) fail 30-50% of evaluation calls due to:
+- JSON formatting errors
+- Instruction following failures
+- Hallucinated evaluation criteria
+
+**This section provides alternatives optimised for local deployment with small models.**
+
+### Alternative 1: Binary Judgment Evaluation
+
+**Concept:** Replace numerical scores with yes/no decisions.
+
+```python
+BINARY_FAITHFULNESS_PROMPT = """
+Read the context and answer below.
+
+Context: {context}
+Answer: {answer}
+
+Is the answer supported by the context? Reply with ONLY 'YES' or 'NO'.
+"""
+
+def binary_faithfulness(context: str, answer: str, model) -> float:
+    response = model.generate(
+        BINARY_FAITHFULNESS_PROMPT.format(context=context, answer=answer)
+    ).strip().upper()
+
+    if "YES" in response:
+        return 1.0
+    elif "NO" in response:
+        return 0.0
+    else:
+        return 0.5  # Uncertain
+
+# Aggregate over claims for more granularity
+def claim_level_faithfulness(context: str, answer: str, model) -> float:
+    claims = extract_claims(answer)  # Simple sentence splitting
+    supported = sum(
+        binary_faithfulness(context, claim, model)
+        for claim in claims
+    )
+    return supported / len(claims) if claims else 0.0
+```
+
+**Pros:**
+- 90%+ success rate with small models
+- Fast (simple prompts)
+- Easy to debug
+
+**Cons:**
+- Coarse-grained (no nuance)
+- Requires claim extraction for granularity
+
+### Alternative 2: Multiple Choice Evaluation
+
+**Concept:** Frame evaluation as multiple choice questions.
+
+```python
+RELEVANCY_MCQ_PROMPT = """
+Question: {question}
+Answer: {answer}
+
+How relevant is the answer to the question?
+
+A) Directly answers the question
+B) Partially relevant, missing key details
+C) Tangentially related but doesn't answer
+D) Completely off-topic
+
+Reply with ONLY the letter (A, B, C, or D).
+"""
+
+SCORE_MAP = {"A": 1.0, "B": 0.66, "C": 0.33, "D": 0.0}
+
+def mcq_relevancy(question: str, answer: str, model) -> float:
+    response = model.generate(
+        RELEVANCY_MCQ_PROMPT.format(question=question, answer=answer)
+    ).strip().upper()
+
+    # Extract letter from response
+    for letter in ["A", "B", "C", "D"]:
+        if letter in response[:3]:  # Check first 3 chars
+            return SCORE_MAP[letter]
+
+    return 0.5  # Default if parsing fails
+```
+
+**Pros:**
+- More granular than binary
+- Small models handle MCQ well
+- Deterministic mapping to scores
+
+**Cons:**
+- Fixed scale (4 options)
+- Categories may not fit all cases
+
+### Alternative 3: Reference-Free Evaluation
+
+**Concept:** Use embedding similarity instead of LLM judgment.
+
+```python
+from sentence_transformers import SentenceTransformer
+from sklearn.metrics.pairwise import cosine_similarity
+
+embedding_model = SentenceTransformer('nomic-ai/nomic-embed-text-v1.5')
+
+def embedding_relevancy(question: str, answer: str) -> float:
+    """Measure answer relevancy via embedding similarity."""
+    q_emb = embedding_model.encode([f"search_query: {question}"])
+    a_emb = embedding_model.encode([f"search_document: {answer}"])
+    return float(cosine_similarity(q_emb, a_emb)[0][0])
+
+def embedding_faithfulness(context: str, answer: str) -> float:
+    """Measure faithfulness via context-answer similarity."""
+    c_emb = embedding_model.encode([f"search_document: {context}"])
+    a_emb = embedding_model.encode([f"search_document: {answer}"])
+    return float(cosine_similarity(c_emb, a_emb)[0][0])
+```
+
+**Pros:**
+- No LLM required (fast, deterministic)
+- Works offline
+- No parsing failures
+
+**Cons:**
+- Measures semantic similarity, not factual accuracy
+- Can be fooled by paraphrased hallucinations
+- Requires calibration
+
+### Alternative 4: Hybrid LLM + Embedding
+
+**Concept:** Use embeddings for filtering, LLM for final judgment.
+
+```python
+def hybrid_faithfulness(
+    context: str,
+    answer: str,
+    embedding_model,
+    llm_model,
+    embedding_threshold: float = 0.7
+) -> float:
+    # Fast pre-filter with embeddings
+    emb_score = embedding_faithfulness(context, answer)
+
+    if emb_score < embedding_threshold:
+        # Low similarity = likely unfaithful, skip LLM
+        return emb_score * 0.5
+
+    # High similarity = worth LLM verification
+    llm_score = binary_faithfulness(context, answer, llm_model)
+
+    # Combine scores
+    return (emb_score + llm_score) / 2
+```
+
+**Pros:**
+- Reduces LLM calls (saves compute)
+- Combines speed and accuracy
+- Handles failure gracefully
+
+**Cons:**
+- More complex
+- Needs threshold tuning
+
+### Alternative 5: NLI-Based Evaluation
+
+**Concept:** Use Natural Language Inference models instead of LLMs.
+
+```python
+from transformers import pipeline
+
+nli_model = pipeline(
+    "text-classification",
+    model="MoritzLaworski/DeBERTa-v3-base-mnli-fever-anli-ling-wanli"
+)
+
+def nli_faithfulness(context: str, answer: str) -> float:
+    """Check if context entails the answer."""
+    result = nli_model(f"{context} [SEP] {answer}")[0]
+
+    # Map labels to scores
+    label = result["label"].lower()
+    if "entail" in label:
+        return 1.0
+    elif "contradict" in label:
+        return 0.0
+    else:  # neutral
+        return 0.5
+
+def nli_claim_faithfulness(context: str, answer: str) -> float:
+    """Evaluate faithfulness at claim level using NLI."""
+    claims = sent_tokenize(answer)
+    scores = [nli_faithfulness(context, claim) for claim in claims]
+    return sum(scores) / len(scores) if scores else 0.5
+```
+
+**Pros:**
+- No LLM required
+- Fast and deterministic
+- Specifically trained for entailment
+- Works offline
+
+**Cons:**
+- Limited to entailment (not all RAG metrics)
+- Fixed context length (512-1024 tokens)
+- May miss nuanced errors
+
+### Alternative 6: G-Eval Simplification
+
+**Concept:** Use structured scoring with constrained output.
+
+```python
+GEVAL_SIMPLE_PROMPT = """
+Rate the answer on a scale of 1-5.
+
+Question: {question}
+Context: {context}
+Answer: {answer}
+
+Criteria:
+- 5: Perfect, complete, faithful
+- 4: Good, minor issues
+- 3: Acceptable, some gaps
+- 2: Poor, significant issues
+- 1: Wrong or irrelevant
+
+Output ONLY a single number (1, 2, 3, 4, or 5):"""
+
+def geval_simple(question: str, context: str, answer: str, model) -> float:
+    response = model.generate(
+        GEVAL_SIMPLE_PROMPT.format(
+            question=question, context=context, answer=answer
+        )
+    ).strip()
+
+    # Extract number from response
+    for char in response[:5]:
+        if char.isdigit() and 1 <= int(char) <= 5:
+            return (int(char) - 1) / 4  # Normalise to 0-1
+
+    return 0.5  # Default
+```
+
+**Pros:**
+- Single number output (easy to parse)
+- More granular than binary
+- Small models can follow
+
+**Cons:**
+- Less reliable than JSON
+- May need retries
+
+### Comparison: Small Model Evaluation Methods
+
+| Method | Success Rate | Speed | Accuracy | Offline |
+|--------|--------------|-------|----------|---------|
+| RAGAS (7B model) | 30-50% | Slow | High* | Yes |
+| Binary judgment | 90%+ | Fast | Medium | Yes |
+| Multiple choice | 85%+ | Fast | Medium | Yes |
+| Embedding only | 100% | Very fast | Low-medium | Yes |
+| Hybrid | 95%+ | Medium | Medium-high | Yes |
+| NLI-based | 100% | Fast | Medium | Yes |
+| G-Eval simple | 80%+ | Medium | Medium | Yes |
+
+*When it works
+
+### Recommended Strategy for ragd
+
+```yaml
+evaluation:
+  # Strategy based on available resources
+  strategy: adaptive
+
+  # Local-only mode (no API)
+  local:
+    # Primary: NLI for faithfulness (fast, reliable)
+    faithfulness:
+      method: nli
+      model: MoritzLaworski/DeBERTa-v3-base-mnli-fever-anli-ling-wanli
+
+    # Secondary: Embedding similarity for relevancy
+    relevancy:
+      method: embedding
+      model: nomic-ai/nomic-embed-text-v1.5
+
+    # Tertiary: Binary LLM for final check (when model available)
+    llm_verification:
+      enabled: true
+      method: binary
+      model: llama3.2:3b
+
+  # Hybrid mode (local + API fallback)
+  hybrid:
+    # Try local first
+    primary: local
+
+    # Fallback to API for failures
+    fallback:
+      enabled: true
+      provider: openai  # or anthropic
+      threshold: 0.3  # Use API if local confidence < 0.3
+
+  # Thresholds (calibrated for local methods)
+  thresholds:
+    faithfulness:
+      nli_entailment: 0.7
+      binary_positive: 0.8
+    relevancy:
+      embedding_similarity: 0.6
+```
+
+### Calibration Protocol
+
+Before deploying local evaluation, calibrate against human judgments:
+
+```python
+def calibrate_local_evaluator(
+    test_cases: list[TestCase],
+    human_labels: list[float],
+    evaluator: Callable
+) -> CalibrationResult:
+    """Compare local evaluator against human labels."""
+
+    predictions = [evaluator(tc) for tc in test_cases]
+
+    # Compute correlation
+    correlation = pearsonr(predictions, human_labels)[0]
+
+    # Compute threshold for binary decisions
+    optimal_threshold = find_optimal_threshold(predictions, human_labels)
+
+    return CalibrationResult(
+        correlation=correlation,
+        optimal_threshold=optimal_threshold,
+        mean_absolute_error=mae(predictions, human_labels)
+    )
+```
+
+**Minimum calibration set:** 50-100 human-labeled examples.
+
+---
+
 ## BEIR for Retrieval Evaluation
 
 ### Overview

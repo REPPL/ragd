@@ -34,6 +34,18 @@ Features are the primary unit of work. Each feature specification describes:
 | [F-008](./planned/F-008-health-checks.md) | Health Checks | 📅 Planned | UC-003 |
 | [F-009](./planned/F-009-citation-output.md) | Citation Output | 📅 Planned | UC-002 |
 
+### v0.2 Features (Killer Feature)
+
+| ID | Feature | Status | Research |
+|----|---------|--------|----------|
+| TBD | Advanced PDF Processing (Docling) | 📋 To Be Specified | State-of-the-Art PDF Processing |
+| TBD | Table Extraction | 📋 To Be Specified | State-of-the-Art PDF Processing |
+| TBD | OCR Support | 📋 To Be Specified | State-of-the-Art PDF Processing |
+| TBD | Rich Metadata Management | 📋 To Be Specified | State-of-the-Art Metadata |
+| TBD | Export/Backup | 📋 To Be Specified | - |
+
+*Feature specifications will be created when v0.2 development begins. See [v0.2.0 Milestone](../milestones/v0.2.0.md) for scope.*
+
 ### v0.3 Features (Advanced Retrieval)
 
 | ID | Feature | Status | Research |
@@ -42,12 +54,25 @@ Features are the primary unit of work. Each feature specification describes:
 | [F-011](./planned/F-011-late-chunking.md) | Late Chunking | 📅 Planned | ADR-0007 |
 | [F-012](./planned/F-012-hybrid-search.md) | Hybrid Search | 📅 Planned | ADR-0007 |
 
+### v0.4 Features (Multi-Modal)
+
+| ID | Feature | Status | Research |
+|----|---------|--------|----------|
+| [F-019](./planned/F-019-multi-modal-support.md) | Multi-Modal Support | 📅 Planned | State-of-the-Art Multi-Modal |
+
 ### v0.5 Features (Chat & Evaluation)
 
 | ID | Feature | Status | Research |
 |----|---------|--------|----------|
 | [F-013](./planned/F-013-ragas-evaluation.md) | RAGAS Evaluation | 📅 Planned | ADR-0008 |
-| [F-014](./planned/F-014-agentic-rag.md) | Agentic RAG | 📅 Planned | State-of-the-Art |
+| [F-014](./planned/F-014-agentic-rag.md) | Agentic RAG | 📅 Planned | State-of-the-Art RAG |
+| [F-020](./planned/F-020-ollama-llm-integration.md) | Ollama LLM Integration | 📅 Planned | State-of-the-Art Local RAG |
+
+### v0.6 Features (Storage)
+
+| ID | Feature | Status | Research |
+|----|---------|--------|----------|
+| [F-021](./planned/F-021-vector-store-abstraction.md) | Vector Store Abstraction | 📅 Planned | ADR-0002 |
 
 ### v0.7 Features (Privacy & Security)
 
@@ -57,12 +82,47 @@ Features are the primary unit of work. Each feature specification describes:
 | [F-016](./planned/F-016-session-management.md) | Session Management | 📅 Planned | ADR-0009 |
 | [F-017](./planned/F-017-secure-deletion.md) | Secure Deletion | 📅 Planned | ADR-0009 |
 | [F-018](./planned/F-018-data-tiers.md) | Data Sensitivity Tiers | 📅 Planned | ADR-0010 |
+| [F-023](./planned/F-023-pii-detection.md) | PII Detection | 📅 Planned | State-of-the-Art Privacy |
+
+### v0.8 Features (Intelligence)
+
+| ID | Feature | Status | Research |
+|----|---------|--------|----------|
+| [F-022](./planned/F-022-knowledge-graph.md) | Knowledge Graph Integration | 📅 Planned | State-of-the-Art Knowledge Graphs |
+
+### v1.0 Features (Platform)
+
+| ID | Feature | Status | Research |
+|----|---------|--------|----------|
+| [F-024](./planned/F-024-basic-webui.md) | Basic WebUI | 📅 Planned | State-of-the-Art User Interfaces |
 
 ## Workflow
 
 1. **Plan:** Create feature document in `planned/`
 2. **Start:** Move to `active/` when development begins
 3. **Complete:** Move to `completed/` when feature is released
+
+## Feature Numbering Convention
+
+Features are numbered sequentially with milestone-based ranges:
+
+| Range | Milestone | Theme |
+|-------|-----------|-------|
+| F-001 to F-009 | v0.1 | Core RAG |
+| TBD | v0.2 | Killer Feature (PDFs, Metadata, Export) |
+| F-010 to F-012 | v0.3 | Advanced Search |
+| F-019 | v0.4 | Multi-Modal |
+| F-013, F-014, F-020 | v0.5 | Chat & Evaluation |
+| F-021 | v0.6 | Storage |
+| F-015 to F-018, F-023 | v0.7 | Privacy & Security |
+| F-022 | v0.8 | Intelligence |
+| F-024 | v1.0 | Platform |
+
+**Guidelines:**
+- Numbers are assigned sequentially as features are designed
+- A feature keeps its number even if its milestone changes
+- Gaps in numbering (e.g., no F-025) are expected as features are added over time
+- Use the next available number for new features
 
 ## Feature Template
 

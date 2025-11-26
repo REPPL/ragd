@@ -13,6 +13,7 @@ This directory contains research on cutting-edge techniques that inform ragd's f
 | Document | Description |
 |----------|-------------|
 | [state-of-the-art-rag.md](./state-of-the-art-rag.md) | Advanced RAG techniques (2024-2025): Agentic RAG, Contextual Retrieval, GraphRAG |
+| [state-of-the-art-chunking.md](./state-of-the-art-chunking.md) | Text chunking strategies: size optimisation, semantic chunking, overlap, late chunking |
 | [state-of-the-art-privacy.md](./state-of-the-art-privacy.md) | Privacy-preserving architecture: encryption, embedding security, threat models |
 | [state-of-the-art-pdf-processing.md](./state-of-the-art-pdf-processing.md) | Messy PDF processing: Docling, ColPali, OCR comparison, OHRBench findings |
 | [state-of-the-art-metadata.md](./state-of-the-art-metadata.md) | Document metadata: extraction, storage, tagging, provenance, Dublin Core |
@@ -32,6 +33,29 @@ This directory contains research on cutting-edge techniques that inform ragd's f
 |----------|-------------|
 | [cli-best-practices.md](./cli-best-practices.md) | Modern CLI design for non-expert users (clig.dev, Atlassian principles) |
 | [citation-systems.md](./citation-systems.md) | RAG citation formats, academic styles, ALCE benchmark |
+
+## Research Status
+
+All research documents are complete and inform the roadmap.
+
+| Document | Status | Informs Features |
+|----------|--------|------------------|
+| state-of-the-art-rag.md | ✅ Complete | F-010, F-011, F-014 |
+| state-of-the-art-chunking.md | ✅ Complete | F-003, F-011 |
+| state-of-the-art-privacy.md | ✅ Complete | F-015, F-016, F-017, F-018, F-023 |
+| state-of-the-art-pdf-processing.md | ✅ Complete | v0.2 features |
+| state-of-the-art-metadata.md | ✅ Complete | v0.2 features |
+| state-of-the-art-local-rag.md | ✅ Complete | F-020, v0.3+ features |
+| state-of-the-art-embeddings.md | ✅ Complete | F-004 |
+| state-of-the-art-evaluation.md | ✅ Complete | F-013 |
+| state-of-the-art-setup-ux.md | ✅ Complete | F-007, F-008 |
+| state-of-the-art-cli-modes.md | ✅ Complete | F-006 |
+| state-of-the-art-user-interfaces.md | ✅ Complete | F-024 |
+| state-of-the-art-multi-modal.md | ✅ Complete | F-019 |
+| state-of-the-art-knowledge-graphs.md | ✅ Complete | F-022 |
+| state-of-the-art-rag-landscape.md | ✅ Complete | Strategic positioning |
+| cli-best-practices.md | ✅ Complete | F-001, F-006 |
+| citation-systems.md | ✅ Complete | F-009 |
 
 ## What Belongs Here
 

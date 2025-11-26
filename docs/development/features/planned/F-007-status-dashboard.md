@@ -155,6 +155,7 @@ ragd status --format json
 
 ## Related Documentation
 
+- [State-of-the-Art Setup UX](../../research/state-of-the-art-setup-ux.md) - Research basis for dashboard design
 - [F-008: Health Checks](./F-008-health-checks.md) - Component health details
 - [UC-003: View System Status](../../../use-cases/briefs/UC-003-view-system-status.md) - Parent use case
 

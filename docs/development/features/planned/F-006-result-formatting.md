@@ -139,6 +139,7 @@ ragd search "authentication" --format json | jq '.results[0]'
 
 ## Related Documentation
 
+- [State-of-the-Art CLI Modes](../../research/state-of-the-art-cli-modes.md) - Research basis for output format design
 - [F-005: Semantic Search](./F-005-semantic-search.md) - Upstream provider
 - [UC-002: Search Knowledge](../../../use-cases/briefs/UC-002-search-knowledge.md) - Parent use case
 
