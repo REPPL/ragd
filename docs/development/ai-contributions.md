@@ -43,7 +43,7 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 
 ## Human Oversight
 
-If not indicated with a commit message beginning with "manual: ...,: files were AI-generated without human involvement. While final decisions on architecture, features, and releases remain with human maintainers, these were agreed in conversation with an AI agent.
+If not indicated with a commit message beginning with "manual: ...," files were AI-generated without human involvement. While final decisions on architecture, features, and releases remain with human maintainers, these were agreed in conversation with an AI agent.
 
 ## Questions
 
