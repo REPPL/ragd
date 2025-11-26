@@ -26,12 +26,15 @@ from ragd.metadata.migration import (
 )
 from ragd.metadata.schema import DocumentMetadata
 from ragd.metadata.store import MetadataStore
+from ragd.metadata.tags import TagManager
 
 __all__ = [
     # Schema
     "DocumentMetadata",
     # Store
     "MetadataStore",
+    # Tags
+    "TagManager",
     # Extraction
     "MetadataExtractor",
     "ExtractedMetadata",
