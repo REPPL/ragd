@@ -8,7 +8,9 @@ Implementation records capture technical details of completed features. They ans
 
 ## Available Records
 
-*No implementation records yet - project initialisation in progress.*
+| Version | Description | Status |
+|---------|-------------|--------|
+| [v0.1.0](./v0.1.0.md) | Core RAG - Document ingestion, text extraction, chunking, embedding, semantic search | Complete |
 
 ## Record Template
 

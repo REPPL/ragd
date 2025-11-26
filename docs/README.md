@@ -7,9 +7,9 @@ Welcome to the ragd documentation hub.
 ragd is a **privacy-first personal knowledge system**. Index your documents and search them using natural language - all running locally on your machine.
 
 **Key Features:**
-- Index PDF, TXT, and Markdown files
+- Index PDF, TXT, Markdown, and HTML files
 - Semantic search with natural language queries
-- Beautiful CLI with Rich output
+- Beautiful CLI with Rich output and interactive TUI
 - 100% local processing (no cloud APIs)
 
 ## Documentation Structure
@@ -60,7 +60,7 @@ ragd status
 
 | Version | Focus | Status |
 |---------|-------|--------|
-| v0.1.0 | Core RAG (index, search, status) | 📋 Planned |
+| v0.1.0 | Core RAG (index, search, status) | ✅ Released |
 | v0.2.0 | Messy PDFs (killer feature) | 📋 Planned |
 | v0.3.0 | Advanced Search | 📋 Planned |
 | v1.0.0 | Personal Platform + Basic WebUI | 📋 Planned |
@@ -76,5 +76,4 @@ This project is developed with AI assistance. See [AI Contributions](./developme
 ## Related Documentation
 
 - [Project README](../README.md)
-- [.claude/ Configuration](../.claude/README.md)
 

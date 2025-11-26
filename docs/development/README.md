@@ -7,9 +7,9 @@ Documentation for contributors and developers.
 | Area | Status |
 |------|--------|
 | Use Cases | 6 P0 briefs defined |
-| Features | 8 v0.1 specs written |
-| Tutorials | Getting Started (draft) |
-| Milestone | v0.1.0 planned |
+| Features | 10 v0.1 features complete |
+| Tutorials | Getting Started complete |
+| Milestone | v0.1.0 released |
 | ADRs | 4 foundational decisions |
 
 ## Structure
@@ -44,10 +44,11 @@ Layer 3: TUTORIALS (How users experience it)
 - [Planned Features](./features/planned/)
 - [Milestones](./milestones/)
 
-### v0.1.0 Scope
+### v0.1.0 (Released)
 - [v0.1.0 Milestone](./milestones/v0.1.0.md)
-- [F-001: Document Ingestion](./features/planned/F-001-document-ingestion.md)
-- [F-005: Semantic Search](./features/planned/F-005-semantic-search.md)
+- [v0.1.0 Implementation](./implementation/v0.1.0.md)
+- [F-001: Document Ingestion](./features/completed/F-001-document-ingestion.md)
+- [F-005: Semantic Search](./features/completed/F-005-semantic-search.md)
 
 ### History
 - [Completed Features](./features/completed/)
@@ -78,5 +79,4 @@ This project is developed with AI assistance. See [AI Contributions](./ai-contri
 ## Related Documentation
 
 - [Documentation Hub](../README.md)
-- [Project Standards](../../.claude/CLAUDE.md)
 

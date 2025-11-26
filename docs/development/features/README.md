@@ -24,17 +24,17 @@ Features are the primary unit of work. Each feature specification describes:
 
 | ID | Feature | Status | Use Case |
 |----|---------|--------|----------|
-| [F-001](./planned/F-001-document-ingestion.md) | Document Ingestion Pipeline | 📅 Planned | UC-001 |
-| [F-002](./planned/F-002-text-extraction.md) | Text Extraction | 📅 Planned | UC-001 |
-| [F-003](./planned/F-003-chunking-engine.md) | Chunking Engine | 📅 Planned | UC-001 |
-| [F-004](./planned/F-004-embedding-generation.md) | Embedding Generation | 📅 Planned | UC-001 |
-| [F-005](./planned/F-005-semantic-search.md) | Semantic Search | 📅 Planned | UC-002 |
-| [F-006](./planned/F-006-result-formatting.md) | Result Formatting | 📅 Planned | UC-002 |
-| [F-007](./planned/F-007-status-dashboard.md) | Status Dashboard | 📅 Planned | UC-003 |
-| [F-008](./planned/F-008-health-checks.md) | Health Checks | 📅 Planned | UC-003 |
+| [F-001](./completed/F-001-document-ingestion.md) | Document Ingestion Pipeline | ✅ Complete | UC-001 |
+| [F-002](./completed/F-002-text-extraction.md) | Text Extraction | ✅ Complete | UC-001 |
+| [F-003](./completed/F-003-chunking-engine.md) | Chunking Engine | ✅ Complete | UC-001 |
+| [F-004](./completed/F-004-embedding-generation.md) | Embedding Generation | ✅ Complete | UC-001 |
+| [F-005](./completed/F-005-semantic-search.md) | Semantic Search | ✅ Complete | UC-002 |
+| [F-006](./completed/F-006-result-formatting.md) | Result Formatting | ✅ Complete | UC-002 |
+| [F-007](./completed/F-007-status-dashboard.md) | Status Dashboard | ✅ Complete | UC-003 |
+| [F-008](./completed/F-008-health-checks.md) | Health Checks | ✅ Complete | UC-003 |
 | [F-009](./planned/F-009-citation-output.md) | Citation Output | 📅 Planned | UC-002 |
-| [F-035](./planned/F-035-health-check.md) | Health Check Command | 📅 Planned | UC-003 |
-| [F-036](./planned/F-036-guided-setup.md) | Guided Setup | 📅 Planned | - |
+| [F-035](./completed/F-035-health-check.md) | Health Check Command | ✅ Complete | UC-003 |
+| [F-036](./completed/F-036-guided-setup.md) | Guided Setup | ✅ Complete | - |
 
 ### v0.2 Features (Killer Feature)
 

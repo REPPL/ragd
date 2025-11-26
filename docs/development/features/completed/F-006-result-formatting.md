@@ -18,7 +18,8 @@ Search results must be displayed clearly and usefully. Users need to see the mat
 Search Results
     ↓
 Result Formatter
-    ├── Rich Console (default, interactive)
+    ├── TUI Navigator (default when TTY, interactive)
+    ├── Rich Console (--no-interactive)
     ├── Plain Text (piping, scripts)
     └── JSON (programmatic access)
     ↓
@@ -27,6 +28,7 @@ Formatted Output
 
 ### Technologies
 
+- **Textual**: Full-screen TUI with vim-style navigation (j/k)
 - **Rich**: Beautiful terminal output with colours, panels, tables
 - **Typer**: CLI integration with output format options
 
@@ -34,39 +36,67 @@ Formatted Output
 
 | Format | Use Case | Features |
 |--------|----------|----------|
-| **Rich** | Interactive terminal | Colours, panels, highlighting |
+| **TUI** | Interactive terminal (default) | Full-screen navigator, vim keys, status bar |
+| **Rich** | Non-interactive terminal | Colours, panels, highlighting |
 | **Plain** | Piping, scripts | Clean text, no ANSI codes |
 | **JSON** | Programmatic | Structured data, machine-readable |
 
 ## Implementation Tasks
 
-- [ ] Create `ResultFormatter` base class
-- [ ] Implement `RichFormatter` with panels and highlighting
-- [ ] Implement `PlainFormatter` for script-friendly output
-- [ ] Implement `JSONFormatter` for programmatic access
-- [ ] Add query term highlighting in results
-- [ ] Add relevance score visualisation
-- [ ] Add source document path and location
-- [ ] Write unit tests for each formatter
-- [ ] Write integration tests with CLI
+- [x] Create `ResultFormatter` base class
+- [x] Implement `RichFormatter` with panels and highlighting
+- [x] Implement `PlainFormatter` for script-friendly output
+- [x] Implement `JSONFormatter` for programmatic access
+- [x] Implement `SearchNavigator` TUI with Textual
+- [x] Add relevance score visualisation (colour-coded)
+- [x] Add source document path and chunk location
+- [x] Write unit tests for formatters
+- [x] Write integration tests with CLI
 
 ## Success Criteria
 
-- [ ] Results display clearly with source attribution
-- [ ] Relevance scores shown visually
-- [ ] Content snippets highlight matching context
-- [ ] JSON output is valid and complete
-- [ ] Plain output works correctly when piped
-- [ ] Rich output degrades gracefully in non-TTY
+- [x] Results display clearly with source attribution
+- [x] Relevance scores shown visually (red for score in status bar)
+- [x] Content displayed in full-screen panel with navigation
+- [x] JSON output is valid and complete
+- [x] Plain output works correctly when piped
+- [x] TUI activates when TTY detected; `--no-interactive` for non-TTY
 
 ## Dependencies
 
-- Rich
-- Typer
+- Textual (TUI framework)
+- Rich (console formatting)
+- Typer (CLI integration)
 
 ## Technical Notes
 
-### Rich Output Example
+### TUI Navigator (Default)
+
+Full-screen interactive navigator with vim-style keybindings:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  Results for "authentication flow"                          │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  ┌──────────────── auth-design.md ────────────────┐        │
+│  │                                                 │        │
+│  │  The authentication flow begins when the user   │        │
+│  │  submits their credentials. The system          │        │
+│  │  validates against the local database and       │        │
+│  │  returns a session token...                     │        │
+│  │                                                 │        │
+│  └─────────────────────────────────────────────────┘        │
+│  Chunk 3              [1/10]                    0.9200      │
+│                                                             │
+├─────────────────────────────────────────────────────────────┤
+│  j Next  k Previous  q Quit                                 │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Status bar:** Chunk number (left, blue), result count (centre, blue), score (right, red)
+
+### Rich Output Example (--no-interactive)
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -127,8 +157,11 @@ Results for: authentication flow
 ### CLI Integration
 
 ```bash
-# Default rich output
+# Default: TUI navigator (when TTY detected)
 ragd search "authentication"
+
+# Non-interactive rich output
+ragd search "authentication" --no-interactive
 
 # Plain text for piping
 ragd search "authentication" --format plain | head -20
