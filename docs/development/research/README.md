@@ -17,6 +17,7 @@ This directory contains research on cutting-edge techniques that inform ragd's f
 | [state-of-the-art-privacy.md](./state-of-the-art-privacy.md) | Privacy-preserving architecture: encryption, embedding security, threat models |
 | [state-of-the-art-pdf-processing.md](./state-of-the-art-pdf-processing.md) | Messy PDF processing: Docling, ColPali, OCR comparison, OHRBench findings |
 | [state-of-the-art-metadata.md](./state-of-the-art-metadata.md) | Document metadata: extraction, storage, tagging, provenance, Dublin Core |
+| [state-of-the-art-data-schemas.md](./state-of-the-art-data-schemas.md) | RAG data schemas: Pydantic models, ChromaDB patterns, parent-child relationships, citations |
 | [state-of-the-art-local-rag.md](./state-of-the-art-local-rag.md) | Local RAG: performance, caching, multi-model orchestration, vector/graph storage |
 | [state-of-the-art-embeddings.md](./state-of-the-art-embeddings.md) | Embedding model selection: MTEB benchmarks, nomic, BGE-M3, quantisation |
 | [state-of-the-art-evaluation.md](./state-of-the-art-evaluation.md) | RAG evaluation frameworks: RAGAS, DeepEval, BEIR, metrics interpretation |
@@ -26,12 +27,15 @@ This directory contains research on cutting-edge techniques that inform ragd's f
 | [state-of-the-art-multi-modal.md](./state-of-the-art-multi-modal.md) | Multi-modal RAG: ColPali, SigLIP 2, vision retrieval, image understanding |
 | [state-of-the-art-knowledge-graphs.md](./state-of-the-art-knowledge-graphs.md) | Knowledge graph integration: GraphRAG, Kuzu, Leiden, entity extraction |
 | [state-of-the-art-rag-landscape.md](./state-of-the-art-rag-landscape.md) | RAG tool landscape: PrivateGPT, AnythingLLM, Khoj, differentiation strategy |
+| [state-of-the-art-configuration.md](./state-of-the-art-configuration.md) | Configuration management: XDG directories, Pydantic, defaults, schema versioning |
+| [state-of-the-art-personal-rag.md](./state-of-the-art-personal-rag.md) | Personal RAG: memory architectures (Mem0, Letta), PersonaRAG, user context, privacy |
 
 ### Implementation Research
 
 | Document | Description |
 |----------|-------------|
 | [cli-best-practices.md](./cli-best-practices.md) | Modern CLI design for non-expert users (clig.dev, Atlassian principles) |
+| [cli-documentation-standards.md](./cli-documentation-standards.md) | CLI reference documentation: man pages, help text, auto-generation (git, kubectl, docker, gh) |
 | [citation-systems.md](./citation-systems.md) | RAG citation formats, academic styles, ALCE benchmark |
 
 ## Research Status
@@ -45,6 +49,7 @@ All research documents are complete and inform the roadmap.
 | state-of-the-art-privacy.md | ✅ Complete | F-015, F-016, F-017, F-018, F-023 |
 | state-of-the-art-pdf-processing.md | ✅ Complete | v0.2 features |
 | state-of-the-art-metadata.md | ✅ Complete | v0.2 features |
+| state-of-the-art-data-schemas.md | ✅ Complete | F-002, F-003, F-009 |
 | state-of-the-art-local-rag.md | ✅ Complete | F-020, v0.3+ features |
 | state-of-the-art-embeddings.md | ✅ Complete | F-004 |
 | state-of-the-art-evaluation.md | ✅ Complete | F-013 |
@@ -54,7 +59,10 @@ All research documents are complete and inform the roadmap.
 | state-of-the-art-multi-modal.md | ✅ Complete | F-019 |
 | state-of-the-art-knowledge-graphs.md | ✅ Complete | F-022 |
 | state-of-the-art-rag-landscape.md | ✅ Complete | Strategic positioning |
+| state-of-the-art-configuration.md | ✅ Complete | ADR-0013, F-035, F-036 |
+| state-of-the-art-personal-rag.md | ✅ Complete | F-040, F-041, F-042, F-044 (v2.0) |
 | cli-best-practices.md | ✅ Complete | F-001, F-006 |
+| cli-documentation-standards.md | ✅ Complete | CLI reference docs (v0.2+) |
 | citation-systems.md | ✅ Complete | F-009 |
 
 ## What Belongs Here

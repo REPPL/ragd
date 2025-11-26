@@ -125,6 +125,39 @@ Features are the primary unit of work. Each feature specification describes:
 |----|---------|--------|----------|
 | [F-024](./planned/F-024-basic-webui.md) | Basic WebUI | 📅 Planned | State-of-the-Art User Interfaces |
 
+### v2.0 Features (Personal Knowledge Assistant)
+
+v2.0 transforms ragd from a document RAG system into a personal knowledge assistant with persistent memory, user profiles, and a secure personal information vault.
+
+#### Memory Layer (v2.0-alpha)
+
+| ID | Feature | Status | Research |
+|----|---------|--------|----------|
+| [F-040](./planned/F-040-long-term-memory.md) | Long-Term Memory Store | 📅 Planned | [State-of-the-Art Personal RAG](../research/state-of-the-art-personal-rag.md) |
+| F-043 | Memory Consolidation | 📅 Planned | [State-of-the-Art Personal RAG](../research/state-of-the-art-personal-rag.md) |
+
+#### Persona Agents (v2.0-beta)
+
+| ID | Feature | Status | Research |
+|----|---------|--------|----------|
+| [F-041](./planned/F-041-user-profile-management.md) | User Profile Management | 📅 Planned | [State-of-the-Art Personal RAG](../research/state-of-the-art-personal-rag.md) |
+| F-042 | Persona Agent System | 📅 Planned | [State-of-the-Art Personal RAG](../research/state-of-the-art-personal-rag.md) |
+
+#### Personal Vault (v2.0)
+
+| ID | Feature | Status | Research |
+|----|---------|--------|----------|
+| [F-044](./planned/F-044-personal-vault.md) | Personal Information Vault | 📅 Planned | [State-of-the-Art Personal RAG](../research/state-of-the-art-personal-rag.md) |
+
+### v2.x Features (Personal Data Connectors)
+
+| ID | Feature | Status | Research |
+|----|---------|--------|----------|
+| F-045 | Browser History Connector | 📅 Planned | [State-of-the-Art Personal RAG](../research/state-of-the-art-personal-rag.md) |
+| F-046 | Communication Parser | 📅 Planned | [State-of-the-Art Personal RAG](../research/state-of-the-art-personal-rag.md) |
+| F-047 | Health Record Import (FHIR) | 📅 Planned | [State-of-the-Art Personal RAG](../research/state-of-the-art-personal-rag.md) |
+| F-048 | Financial Data Import | 📅 Planned | [State-of-the-Art Personal RAG](../research/state-of-the-art-personal-rag.md) |
+
 ## Workflow
 
 1. **Plan:** Create feature document in `planned/`
@@ -146,6 +179,10 @@ Features are numbered sequentially with milestone-based ranges:
 | F-015 to F-018, F-023 | v0.7 | Privacy & Security |
 | F-022 | v0.8 | Intelligence |
 | F-024 | v1.0 | Platform |
+| F-040, F-043 | v2.0-alpha | Memory Layer |
+| F-041, F-042 | v2.0-beta | Persona Agents |
+| F-044 | v2.0 | Personal Vault |
+| F-045 to F-048 | v2.x | Personal Data Connectors |
 
 **Guidelines:**
 - Numbers are assigned sequentially as features are designed

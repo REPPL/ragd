@@ -1,0 +1,235 @@
+# ragd Configuration Reference
+# =============================
+#
+# Default configuration file location: ~/.config/ragd/config.yaml
+#
+# Configuration precedence (highest to lowest):
+#   1. CLI flags (--config, --verbose, etc.)
+#   2. Environment variables (RAGD_*)
+#   3. Configuration file (this file)
+#   4. Built-in defaults
+#
+# Environment variable format: RAGD_SECTION__KEY (double underscore for nesting)
+# Example: RAGD_EMBEDDING__MODEL=all-MiniLM-L6-v2
+
+# ============================================================================
+# REQUIRED: Schema version for migration support
+# ============================================================================
+version: 1
+
+# ============================================================================
+# Storage Configuration
+# ============================================================================
+# Paths follow XDG Base Directory Specification
+# https://specifications.freedesktop.org/basedir/latest/
+storage:
+  # Configuration directory (XDG_CONFIG_HOME)
+  config_dir: ~/.config/ragd
+
+  # Data directory for database and documents (XDG_DATA_HOME)
+  data_dir: ~/.local/share/ragd
+
+  # Cache directory for embeddings and temp files (XDG_CACHE_HOME)
+  cache_dir: ~/.cache/ragd
+
+  # ChromaDB persistent storage location
+  chroma_db: ~/.local/share/ragd/chroma_db
+
+# ============================================================================
+# Embedding Configuration
+# ============================================================================
+embedding:
+  # Model identifier (Hugging Face model name)
+  # Recommended: BAAI/bge-base-en-v1.5 (best accuracy/speed balance)
+  # Alternative: sentence-transformers/all-MiniLM-L6-v2 (faster, less accurate)
+  model: BAAI/bge-base-en-v1.5
+
+  # Compute device
+  # Options: auto | cpu | cuda | mps | cuda:0
+  # "auto" selects: MPS (Apple Silicon) > CUDA (NVIDIA) > CPU
+  device: auto
+
+  # Normalise embeddings for cosine similarity
+  # IMPORTANT: Must be true for BGE and E5 models
+  normalize: true
+
+  # Batch size for embedding generation
+  # Scale based on available memory:
+  #   - minimal tier: 8
+  #   - standard tier: 16
+  #   - high tier: 32
+  #   - extreme tier: 64
+  batch_size: 32
+
+  # Query prefix (required for BGE models)
+  # Leave empty for models that don't require prefixes
+  query_prefix: "Represent this sentence for searching relevant passages: "
+
+# ============================================================================
+# Chunking Configuration
+# ============================================================================
+chunking:
+  # Chunking strategy
+  # Options: sentence | recursive | fixed
+  #   - sentence: Split on sentence boundaries (recommended for prose)
+  #   - recursive: Split on headers, paragraphs, sentences (for structured docs)
+  #   - fixed: Fixed-size chunks (fallback)
+  strategy: sentence
+
+  # Target chunk size in tokens
+  # Research optimal: 400-512 tokens for general RAG
+  target_tokens: 512
+
+  # Maximum chunk size (hard limit)
+  # Should not exceed embedding model max sequence length
+  max_tokens: 768
+
+  # Minimum chunk size (skip smaller chunks)
+  min_tokens: 50
+
+  # Overlap between consecutive chunks
+  # Recommended: 10-20% of target_tokens
+  # Preserves context at chunk boundaries
+  overlap_tokens: 50
+
+# ============================================================================
+# Document Formats
+# ============================================================================
+formats:
+  # Enable/disable format support
+  pdf: true
+  txt: true
+  markdown: true
+
+  # PDF processing options
+  pdf_options:
+    # Quality routing for complex PDFs (ADR-0019)
+    # Options: auto | fast | quality
+    #   - auto: Detect and route (simple→fast, complex→quality)
+    #   - fast: PyMuPDF4LLM only (faster, less accurate for complex PDFs)
+    #   - quality: Docling always (slower, better for complex layouts)
+    quality_routing: auto
+
+    # Extract images (v0.2+)
+    extract_images: false
+
+# ============================================================================
+# Search Configuration
+# ============================================================================
+search:
+  # Default number of results
+  default_limit: 10
+
+  # Maximum results allowed
+  max_limit: 100
+
+  # Minimum similarity threshold (0.0 - 1.0)
+  # Results below this score are filtered out
+  min_threshold: 0.0
+
+# ============================================================================
+# Output Configuration
+# ============================================================================
+output:
+  # Default output format
+  # Options: rich | plain | json
+  # "rich" auto-detects pipes and switches to "plain"
+  default_format: rich
+
+  # Colour scheme for rich output
+  # Options: auto | dark | light | none
+  color_scheme: auto
+
+  # Respect NO_COLOR environment variable
+  respect_no_color: true
+
+# ============================================================================
+# Logging Configuration
+# ============================================================================
+logging:
+  # Log level
+  # Options: DEBUG | INFO | WARNING | ERROR
+  level: INFO
+
+  # Log file location (null to disable file logging)
+  file: ~/.local/state/ragd/logs/ragd.log
+
+  # Maximum log file size in MB (rotates when exceeded)
+  max_size_mb: 10
+
+  # Number of backup log files to keep
+  backup_count: 5
+
+# ============================================================================
+# Hardware Configuration (auto-detected by ragd init)
+# ============================================================================
+# These values are typically set automatically during ragd init
+# and can be used to override auto-detection
+#
+# hardware:
+#   # Hardware tier affects default settings
+#   # Options: minimal | standard | high | extreme
+#   tier: high
+#
+#   # Compute backend
+#   # Options: cpu | cuda | mps
+#   backend: mps
+#
+#   # Available memory in GB (for batch size tuning)
+#   memory_gb: 32.0
+#
+#   # Timestamp of hardware detection
+#   detected_at: 2025-01-26T10:30:00Z
+
+# ============================================================================
+# Hardware Tier Profiles
+# ============================================================================
+# These presets are applied based on detected hardware tier.
+# You can create custom presets in ~/.config/ragd/presets/
+#
+# Tier: minimal (<8GB RAM, CPU only)
+#   embedding.model: sentence-transformers/all-MiniLM-L6-v2
+#   embedding.batch_size: 8
+#   chunking.target_tokens: 256
+#
+# Tier: standard (8-16GB RAM, integrated GPU)
+#   embedding.model: BAAI/bge-base-en-v1.5
+#   embedding.batch_size: 16
+#   chunking.target_tokens: 400
+#
+# Tier: high (16-64GB RAM, dedicated GPU)
+#   embedding.model: BAAI/bge-base-en-v1.5
+#   embedding.batch_size: 32
+#   chunking.target_tokens: 512
+#
+# Tier: extreme (64GB+ RAM, high-end GPU)
+#   embedding.model: nomic-ai/nomic-embed-text-v1.5
+#   embedding.batch_size: 64
+#   chunking.target_tokens: 512
+#   chunking.strategy: semantic
+
+# ============================================================================
+# Environment Variable Reference
+# ============================================================================
+# All configuration values can be overridden via environment variables:
+#
+# RAGD_VERSION=1
+# RAGD_STORAGE__DATA_DIR=~/.local/share/ragd
+# RAGD_STORAGE__CHROMA_DB=~/.local/share/ragd/chroma_db
+# RAGD_EMBEDDING__MODEL=BAAI/bge-base-en-v1.5
+# RAGD_EMBEDDING__DEVICE=auto
+# RAGD_EMBEDDING__BATCH_SIZE=32
+# RAGD_CHUNKING__STRATEGY=sentence
+# RAGD_CHUNKING__TARGET_TOKENS=512
+# RAGD_CHUNKING__OVERLAP_TOKENS=50
+# RAGD_SEARCH__DEFAULT_LIMIT=10
+# RAGD_OUTPUT__DEFAULT_FORMAT=rich
+# RAGD_LOGGING__LEVEL=INFO
+
+# ============================================================================
+# Related Documentation
+# ============================================================================
+# - State-of-the-Art Configuration: docs/development/research/state-of-the-art-configuration.md
+# - ADR-0013: Configuration Schema: docs/development/decisions/adrs/0013-configuration-schema.md
+# - ADR-0011: Hardware Detection: docs/development/decisions/adrs/0011-hardware-detection.md
+# - CLI Reference: docs/reference/cli-reference.md

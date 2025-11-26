@@ -15,6 +15,7 @@ Release planning and milestone tracking.
 | [v0.7.0](./v0.7.0.md) | Privacy | PII detection, encryption | 📋 Planned |
 | [v0.8.0](./v0.8.0.md) | Intelligence | Personas, temporal, knowledge graph | 📋 Planned |
 | [v1.0.0](./v1.0.0.md) | Personal Platform | Basic WebUI, polish, stability | 📋 Planned |
+| [v2.0.0](./v2.0.0.md) | Personal Knowledge Assistant | Memory, profiles, personal vault | 📋 Planned |
 
 ## Milestone Workflow
 

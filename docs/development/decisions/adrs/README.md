@@ -43,6 +43,14 @@ Lightweight documentation of significant technical decisions.
 | [0009](./0009-security-architecture.md) | Security Architecture | Accepted |
 | [0010](./0010-vector-database-security.md) | Vector Database Security | Accepted |
 
+### Personal Knowledge Assistant (v2.0)
+
+| ADR | Title | Status |
+|-----|-------|--------|
+| 0020 | Memory Storage Architecture | 📋 Planned |
+| 0021 | Persona Agent Framework | 📋 Planned |
+| [0022](./0022-personal-vault-isolation.md) | Personal Vault Isolation | Accepted |
+
 ## ADR Template
 
 ```markdown

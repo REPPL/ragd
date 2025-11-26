@@ -1,6 +1,6 @@
 # Reference
 
-Technical reference documentation.
+Technical reference documentation for ragd v0.1.0.
 
 ## Purpose
 
@@ -8,7 +8,12 @@ Reference documentation provides accurate, complete technical information. It de
 
 ## Available Reference
 
-*No reference documentation yet - this project is in early development.*
+| Document | Description |
+|----------|-------------|
+| [Data Schema](./data-schema.md) | Pydantic models, ChromaDB structure, citation metadata |
+| [CLI Reference](./cli-reference.md) | Command syntax, options, examples, exit codes |
+| [Configuration](./config.example.yaml) | All configuration options with defaults |
+| [Test Fixtures](./test-fixtures.md) | Test document specifications and fixture generators |
 
 ## Reference Guidelines
 
