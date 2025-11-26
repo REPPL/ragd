@@ -33,6 +33,8 @@ Features are the primary unit of work. Each feature specification describes:
 | [F-007](./planned/F-007-status-dashboard.md) | Status Dashboard | 📅 Planned | UC-003 |
 | [F-008](./planned/F-008-health-checks.md) | Health Checks | 📅 Planned | UC-003 |
 | [F-009](./planned/F-009-citation-output.md) | Citation Output | 📅 Planned | UC-002 |
+| [F-035](./planned/F-035-health-check.md) | Health Check Command | 📅 Planned | UC-003 |
+| [F-036](./planned/F-036-guided-setup.md) | Guided Setup | 📅 Planned | - |
 
 ### v0.2 Features (Killer Feature)
 
@@ -60,6 +62,12 @@ Features are the primary unit of work. Each feature specification describes:
 | [F-032](./planned/F-032-export-engine.md) | Export Engine | 📅 Planned | - |
 | [F-033](./planned/F-033-import-engine.md) | Import Engine | 📅 Planned | - |
 | [F-034](./planned/F-034-archive-format.md) | Archive Format | 📅 Planned | - |
+
+#### Watch Folder
+
+| ID | Feature | Status | Research |
+|----|---------|--------|----------|
+| [F-037](./planned/F-037-watch-folder.md) | Watch Folder Auto-Indexing | 📅 Planned | [State-of-the-Art RAG Landscape](../research/state-of-the-art-rag-landscape.md) |
 
 ### v0.3 Features (Advanced Retrieval)
 
@@ -123,8 +131,8 @@ Features are numbered sequentially with milestone-based ranges:
 
 | Range | Milestone | Theme |
 |-------|-----------|-------|
-| F-001 to F-009 | v0.1 | Core RAG |
-| F-025 to F-034 | v0.2 | Killer Feature (PDFs, Metadata, Export) |
+| F-001 to F-009, F-035-F-036 | v0.1 | Core RAG |
+| F-025 to F-034, F-037 | v0.2 | Killer Feature (PDFs, Metadata, Export, Watch) |
 | F-010 to F-012 | v0.3 | Advanced Search |
 | F-019 | v0.4 | Multi-Modal |
 | F-013, F-014, F-020 | v0.5 | Chat & Evaluation |

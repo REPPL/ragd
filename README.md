@@ -13,16 +13,16 @@
 ## Overview
 
 ragd is a reference implementation demonstrating best practices for:
-- Python 3.12 development
-- CLI-first applications with Typer + Rich
-- Docker-based development environments
-- Feature-centric documentation
+- **Local-first, privacy-preserving AI** - All processing happens on your machine
+- **Hardware-aware optimisation** - Automatic tuning for Apple Silicon, CUDA, or CPU
+- **CLI-first applications** with Typer + Rich
+- **Feature-centric documentation**
 
 ## Quick Start
 
 ### Prerequisites
 - Python 3.12
-- Docker and Docker Compose (optional)
+- [Ollama](https://ollama.ai/) (for LLM inference)
 
 ### Installation
 
@@ -38,21 +38,21 @@ source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 # Install dependencies
 pip install -e ".[dev]"
 
+# Run guided setup (detects hardware, recommends models)
+ragd init
+
 # Verify installation
-ragd --help
+ragd doctor
 ```
 
-### Docker Setup
+### Docker Setup (Alternative)
+
+For containerised deployment:
 
 ```bash
-# Start services
-docker-compose up -d
-
-# View logs
-docker-compose logs -f
-
-# Stop services
-docker-compose down
+docker-compose up -d        # Start services
+docker-compose logs -f      # View logs
+docker-compose down         # Stop services
 ```
 
 ## Usage
