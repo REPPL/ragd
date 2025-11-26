@@ -23,14 +23,32 @@
 
 ### Version
 - **Required:** Python 3.12 (NOT 3.9 or earlier)
-- **Virtual environments:**
-  - `.venv/` - Development/release environment
-  - `.venv-testing/` - Test isolation
+
+### Virtual Environment (CRITICAL for Agents)
+
+**All agents MUST use `.venv/` with full dependencies:**
+
+```bash
+# Activate environment
+source .venv/bin/activate
+
+# Verify Python version
+python --version  # Must show 3.12+
+
+# Install all dependencies (dev, test, security)
+pip install -e ".[all]"
+```
+
+**Environment rules:**
+- **Always use `.venv/`** - the canonical development environment
+- **Never create alternative venvs** - consistency is critical
+- **Verify before running commands** - ensure correct Python and deps
+- If `.venv/` doesn't exist: `python3.12 -m venv .venv`
 
 ### Package Management
 - Use `pyproject.toml` for all dependencies
-- Group dependencies: `[project.dependencies]`, `[project.optional-dependencies.dev]`, `[project.optional-dependencies.test]`
-- Pin versions for reproducibility
+- Dependency groups: `dev`, `test`, `security`, `all`
+- Install with `pip install -e ".[all]"` to get everything
 
 ### CLI Framework
 - **Primary:** Typer with Rich for output formatting

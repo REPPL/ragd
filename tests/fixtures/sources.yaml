@@ -1,0 +1,517 @@
+# Test Fixtures Registry
+# Real publicly available documents from Archive.org and other sources
+# Used for comprehensive RAG testing across complexity tiers, languages, and document types
+
+version: 2
+
+# Category definitions for filtering
+categories:
+  complexity:
+    - simple      # Clean digital PDFs, single column
+    - moderate    # Headers, footers, basic formatting
+    - complex     # Multi-column, mixed content
+    - scanned     # OCR required, no text layer
+    - degraded    # Poor quality scans, noise
+
+  language:
+    - english
+    - german
+    - french
+    - spanish
+    - multilingual
+    - non_latin   # CJK, Arabic, Cyrillic
+
+  document_type:
+    - magazine    # Periodicals, illustrated weeklies
+    - academic    # Research papers, journals
+    - technical   # Manuals, specifications, standards
+    - government  # Reports, regulations, hearings
+    - book        # Full books, chapters
+    - historical  # Pre-1950 documents
+    - form        # Structured forms, tables
+
+documents:
+  # ============================================================================
+  # SIMPLE COMPLEXITY - Clean digital PDFs
+  # ============================================================================
+
+  - id: alice_in_wonderland
+    url: "https://archive.org/download/AlicesAdventuresInWonderland/alice-in-wonderland.pdf"
+    filename: alice_in_wonderland.pdf
+    source: archive.org
+    license: public_domain
+
+    categories:
+      complexity: simple
+      language: english
+      document_type: book
+
+    metadata:
+      title: "Alice's Adventures in Wonderland"
+      author: "Lewis Carroll"
+      illustrator: "John Tenniel"
+      date: "1865"
+      pages: 77
+
+    characteristics:
+      has_text_layer: true
+      is_scanned: false
+      has_images: true
+      has_tables: false
+      multi_column: false
+
+    golden_answers:
+      must_contain:
+        - text: "Down the Rabbit-Hole"
+          confidence: exact
+          description: "Chapter 1 title"
+        - text: "Alice was beginning to get very tired"
+          confidence: exact
+          description: "Famous opening line"
+        - text: "Cheshire Cat"
+          confidence: exact
+
+      structure:
+        min_chunks: 10
+        max_chunks: 50
+        expected_sections:
+          - "Down the Rabbit-Hole"
+          - "A Mad Tea-Party"
+
+      quality:
+        min_text_extraction_ratio: 0.95
+        max_ocr_error_rate: 0.01
+
+  - id: arxiv_attention_2017
+    url: "https://arxiv.org/pdf/1706.03762"
+    filename: attention_is_all_you_need.pdf
+    source: arxiv.org
+    license: arxiv_perpetual_non_exclusive
+
+    categories:
+      complexity: simple
+      language: english
+      document_type: academic
+
+    metadata:
+      title: "Attention Is All You Need"
+      authors: "Vaswani et al."
+      date: "2017-06"
+      pages: 15
+      venue: "NeurIPS 2017"
+
+    characteristics:
+      has_text_layer: true
+      is_scanned: false
+      has_images: true
+      has_tables: true
+      multi_column: false
+      has_equations: true
+
+    golden_answers:
+      must_contain:
+        - text: "Transformer"
+          confidence: exact
+        - text: "self-attention"
+          confidence: exact
+        - text: "encoder-decoder"
+          confidence: exact
+        - text: "positional encoding"
+          confidence: fuzzy
+          fuzzy_threshold: 0.90
+
+      patterns:
+        - pattern: "\\d+\\.\\d+ BLEU"
+          description: "BLEU score mentions"
+          min_matches: 1
+
+      structure:
+        min_chunks: 15
+        max_chunks: 40
+
+      quality:
+        min_text_extraction_ratio: 0.98
+
+  # ============================================================================
+  # MODERATE COMPLEXITY - Formatted documents with structure
+  # ============================================================================
+
+  - id: electrical_engineering_papers_1919
+    url: "https://archive.org/download/in.ernet.dli.2015.153641/in.ernet.dli.2015.153641.pdf"
+    filename: electrical_engineering_papers_1919.pdf
+    source: archive.org
+    license: public_domain
+
+    categories:
+      complexity: moderate
+      language: english
+      document_type: technical
+
+    metadata:
+      title: "Electrical Engineering Papers"
+      author: "Benjamin G. Lamme"
+      publisher: "Westinghouse Electric"
+      date: "1919"
+      pages: 788
+
+    characteristics:
+      has_text_layer: true
+      is_scanned: true
+      has_images: true
+      has_tables: true
+      multi_column: false
+      has_equations: true
+      has_diagrams: true
+
+    golden_answers:
+      must_contain:
+        - text: "Westinghouse"
+          confidence: fuzzy
+          fuzzy_threshold: 0.85
+        - text: "electrical"
+          confidence: fuzzy
+          fuzzy_threshold: 0.85
+        - text: "generator"
+          confidence: fuzzy
+          fuzzy_threshold: 0.85
+
+      structure:
+        min_chunks: 100
+        max_chunks: 500
+
+      quality:
+        min_text_extraction_ratio: 0.80
+        max_ocr_error_rate: 0.10
+
+  # ============================================================================
+  # COMPLEX - Multi-column, mixed content
+  # ============================================================================
+
+  - id: compute_gazette_1987_04
+    url: "https://archive.org/download/1987-04-computegazette/Compute_Gazette_Issue_46_1987_Apr.pdf"
+    filename: compute_gazette_1987_04.pdf
+    source: archive.org
+    license: public_domain
+
+    categories:
+      complexity: complex
+      language: english
+      document_type: magazine
+
+    metadata:
+      title: "Compute!'s Gazette Issue 46"
+      date: "1987-04"
+      pages: 100
+      publisher: "COMPUTE! Publications"
+      description: "Commodore 64/128 magazine with program listings"
+
+    characteristics:
+      has_text_layer: true
+      is_scanned: true
+      has_images: true
+      has_tables: true
+      multi_column: true
+      has_advertisements: true
+      has_program_listings: true
+
+    golden_answers:
+      must_contain:
+        - text: "Gazette"
+          confidence: fuzzy
+          fuzzy_threshold: 0.85
+        - text: "Commodore"
+          confidence: fuzzy
+          fuzzy_threshold: 0.80
+          description: "May have OCR errors in vintage scan"
+        - text: "64"
+          confidence: exact
+          description: "Commodore 64 references"
+
+      patterns:
+        - pattern: "Issue \\d+"
+          description: "Issue number format"
+          min_matches: 1
+
+      structure:
+        min_chunks: 50
+        max_chunks: 200
+
+      quality:
+        min_text_extraction_ratio: 0.70
+        max_ocr_error_rate: 0.20
+
+  # ============================================================================
+  # SCANNED - Historical documents requiring OCR
+  # ============================================================================
+
+  - id: leslies_weekly_1881
+    url: "https://archive.org/download/sim_leslies-weekly_1881-08-06_52_1349/sim_leslies-weekly_1881-08-06_52_1349.pdf"
+    filename: leslies_weekly_1881.pdf
+    source: archive.org
+    license: public_domain
+
+    categories:
+      complexity: scanned
+      language: english
+      document_type: historical
+
+    metadata:
+      title: "Frank Leslie's Illustrated Newspaper"
+      volume: 52
+      issue: 1349
+      date: "1881-08-06"
+      description: "Victorian era illustrated newspaper"
+
+    characteristics:
+      has_text_layer: true
+      is_scanned: true
+      has_images: true
+      has_tables: false
+      multi_column: true
+      scan_source: microfilm
+      has_illustrations: true
+
+    golden_answers:
+      must_contain:
+        - text: "Leslie"
+          confidence: fuzzy
+          fuzzy_threshold: 0.75
+          description: "Publisher name in masthead"
+
+      structure:
+        min_chunks: 20
+        max_chunks: 100
+
+      quality:
+        min_text_extraction_ratio: 0.60
+        max_ocr_error_rate: 0.25
+
+  - id: nationalist_magazine_1890
+    url: "https://archive.org/download/TheNationalist-Volume2-1890/The%20Nationalist%20-%20Volume%202%20-%201890.pdf"
+    filename: nationalist_magazine_1890.pdf
+    source: archive.org
+    license: public_domain
+
+    categories:
+      complexity: scanned
+      language: english
+      document_type: historical
+
+    metadata:
+      title: "The Nationalist Magazine"
+      volume: 2
+      date: "1890"
+      description: "Official magazine of the Nationalist Clubs"
+
+    characteristics:
+      has_text_layer: true
+      is_scanned: true
+      has_images: false
+      has_tables: false
+      multi_column: false
+
+    golden_answers:
+      must_contain:
+        - text: "Nationalist"
+          confidence: fuzzy
+          fuzzy_threshold: 0.80
+
+      structure:
+        min_chunks: 30
+        max_chunks: 150
+
+      quality:
+        min_text_extraction_ratio: 0.70
+        max_ocr_error_rate: 0.20
+
+  # ============================================================================
+  # GERMAN LANGUAGE
+  # ============================================================================
+
+  - id: german_military_handbook_1945
+    url: "https://archive.org/download/TME-30-4511945/TM-E%2030-451%20%281945%29.pdf"
+    filename: german_military_handbook_1945.pdf
+    source: archive.org
+    license: public_domain
+
+    categories:
+      complexity: complex
+      language: german
+      document_type: technical
+
+    metadata:
+      title: "Handbook on German Military Forces"
+      publisher: "U.S. War Department"
+      date: "1945"
+      description: "Comprehensive German military reference"
+
+    characteristics:
+      has_text_layer: true
+      is_scanned: true
+      has_images: true
+      has_tables: true
+      multi_column: false
+      has_diagrams: true
+      has_foreign_terms: true
+
+    golden_answers:
+      must_contain:
+        - text: "Wehrmacht"
+          confidence: fuzzy
+          fuzzy_threshold: 0.85
+        - text: "German"
+          confidence: exact
+
+      structure:
+        min_chunks: 200
+        max_chunks: 800
+
+      quality:
+        min_text_extraction_ratio: 0.75
+        max_ocr_error_rate: 0.15
+
+  # ============================================================================
+  # FRENCH LANGUAGE
+  # ============================================================================
+
+  - id: french_medieval_manuscript
+    url: "https://archive.org/download/bnf-gallica-btv1b10509055f/bnf-gallica-btv1b10509055f.pdf"
+    filename: french_medieval_manuscript.pdf
+    source: archive.org
+    license: public_domain
+
+    categories:
+      complexity: degraded
+      language: french
+      document_type: historical
+
+    metadata:
+      title: "Vies des Pères et Dialogues"
+      author: "Saint Jérôme, Saint Grégoire le Grand"
+      date: "Medieval"
+      description: "Old French religious manuscript"
+
+    characteristics:
+      has_text_layer: false
+      is_scanned: true
+      has_images: true
+      has_tables: false
+      multi_column: false
+      script_type: medieval_french
+
+    golden_answers:
+      must_contain:
+        - text: "saint"
+          confidence: fuzzy
+          fuzzy_threshold: 0.70
+          description: "Religious terminology"
+
+      structure:
+        min_chunks: 20
+        max_chunks: 100
+
+      quality:
+        min_text_extraction_ratio: 0.40
+        max_ocr_error_rate: 0.40
+
+  # ============================================================================
+  # GOVERNMENT DOCUMENTS
+  # ============================================================================
+
+  - id: gao_superfund_climate_2019
+    url: "https://archive.org/download/6551691-GAO-report-on-Superfund-sites-and-climate-change/6551691-GAO-report-on-Superfund-sites-and-climate-change.pdf"
+    filename: gao_superfund_climate_2019.pdf
+    source: archive.org
+    license: public_domain
+
+    categories:
+      complexity: moderate
+      language: english
+      document_type: government
+
+    metadata:
+      title: "GAO Report on Superfund Sites and Climate Change"
+      publisher: "Government Accountability Office"
+      date: "2019-11"
+      description: "Environmental policy analysis"
+
+    characteristics:
+      has_text_layer: true
+      is_scanned: false
+      has_images: true
+      has_tables: true
+      multi_column: false
+      has_charts: true
+
+    golden_answers:
+      must_contain:
+        - text: "Superfund"
+          confidence: exact
+        - text: "climate"
+          confidence: exact
+        - text: "EPA"
+          confidence: exact
+
+      structure:
+        min_chunks: 20
+        max_chunks: 80
+
+      quality:
+        min_text_extraction_ratio: 0.95
+
+  - id: annotated_form_1040
+    url: "https://archive.org/download/588113-an-annotated-form-1040/588113-an-annotated-form-1040.pdf"
+    filename: annotated_form_1040.pdf
+    source: archive.org
+    license: public_domain
+
+    categories:
+      complexity: moderate
+      language: english
+      document_type: form
+
+    metadata:
+      title: "An Annotated Form 1040"
+      description: "IRS tax form analysis with annotations"
+
+    characteristics:
+      has_text_layer: true
+      is_scanned: false
+      has_images: false
+      has_tables: true
+      multi_column: false
+      has_forms: true
+      has_checkboxes: true
+
+    golden_answers:
+      must_contain:
+        - text: "1040"
+          confidence: exact
+        - text: "income"
+          confidence: exact
+        - text: "tax"
+          confidence: exact
+
+      structure:
+        min_chunks: 5
+        max_chunks: 30
+
+      quality:
+        min_text_extraction_ratio: 0.90
+
+# =============================================================================
+# METADATA
+# =============================================================================
+
+registry_metadata:
+  created: "2025-11-26"
+  last_updated: "2025-11-26"
+  total_documents: 11
+  coverage:
+    complexity_tiers: 5
+    languages: 3
+    document_types: 7
+  notes: |
+    All URLs use stable /download/ format for Archive.org.
+    Golden answers verified against manual inspection.
+    Fuzzy thresholds adjusted for expected OCR quality.

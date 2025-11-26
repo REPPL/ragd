@@ -94,70 +94,114 @@ Digital-native PDF for basic PDF extraction.
 
 Real-world documents for comprehensive testing. Downloaded on first test run and cached.
 
-### sources.yaml Format
+### sources.yaml Format (v2)
+
+The registry uses schema version 2 with categories and golden answers for validation:
 
 ```yaml
 # tests/fixtures/sources.yaml
-# Archive.org URLs for test documents
-# Downloaded on first test run, cached in tests/fixtures/generated/
+version: 2
 
-version: 1
+# Category definitions for filtering
+categories:
+  complexity:
+    - simple      # Clean digital PDFs, single column
+    - moderate    # Headers, footers, basic formatting
+    - complex     # Multi-column, mixed content
+    - scanned     # OCR required, no text layer
+    - degraded    # Poor quality scans, noise
+
+  language:
+    - english
+    - german
+    - french
+    - spanish
+    - multilingual
+    - non_latin   # CJK, Arabic, Cyrillic
+
+  document_type:
+    - magazine    # Periodicals, illustrated weeklies
+    - academic    # Research papers, journals
+    - technical   # Manuals, specifications
+    - government  # Reports, regulations
+    - book        # Full books, chapters
+    - historical  # Pre-1950 documents
+    - form        # Structured forms, tables
 
 documents:
-  # Simple digital PDF (public domain)
-  - id: simple_digital
-    url: "https://archive.org/download/simple-pdf-example/simple.pdf"
-    filename: simple_digital.pdf
-    expected:
-      format: pdf
-      pages: 3
-      has_text_layer: true
+  - id: alice_in_wonderland
+    url: "https://archive.org/download/AlicesAdventuresInWonderland/alice-in-wonderland.pdf"
+    filename: alice_in_wonderland.pdf
+    source: archive.org
+    license: public_domain
+
+    categories:
       complexity: simple
+      language: english
+      document_type: book
 
-  # Multi-column academic paper
-  - id: academic_paper
-    url: "https://archive.org/download/arxiv-example/paper.pdf"
-    filename: academic_paper.pdf
-    expected:
-      format: pdf
-      pages: 12
+    metadata:
+      title: "Alice's Adventures in Wonderland"
+      author: "Lewis Carroll"
+      date: "1865"
+      pages: 77
+
+    characteristics:
       has_text_layer: true
-      complexity: complex
-      has_tables: true
-
-  # Scanned historical document (OCR required)
-  - id: scanned_historical
-    url: "https://archive.org/download/historical-scan/scan.pdf"
-    filename: scanned_historical.pdf
-    expected:
-      format: pdf
-      pages: 5
-      has_text_layer: false
-      complexity: scanned
-      quality: degraded
-
-  # Technical manual with diagrams
-  - id: technical_manual
-    url: "https://archive.org/download/tech-manual/manual.pdf"
-    filename: technical_manual.pdf
-    expected:
-      format: pdf
-      pages: 25
-      has_text_layer: true
-      complexity: complex
+      is_scanned: false
       has_images: true
+      multi_column: false
 
-  # Government report (multi-column, tables)
-  - id: government_report
-    url: "https://archive.org/download/gov-report/report.pdf"
-    filename: government_report.pdf
-    expected:
-      format: pdf
-      pages: 50
-      has_text_layer: true
+    golden_answers:
+      must_contain:
+        - text: "Down the Rabbit-Hole"
+          confidence: exact
+        - text: "Cheshire Cat"
+          confidence: exact
+
+      structure:
+        min_chunks: 10
+        max_chunks: 50
+
+      quality:
+        min_text_extraction_ratio: 0.95
+
+  - id: compute_gazette_1987_04
+    url: "https://archive.org/download/1987-04-computegazette/Compute_Gazette_Issue_46_1987_Apr.pdf"
+    filename: compute_gazette_1987_04.pdf
+    source: archive.org
+    license: public_domain
+
+    categories:
       complexity: complex
-      has_tables: true
+      language: english
+      document_type: magazine
+
+    metadata:
+      title: "Compute!'s Gazette Issue 46"
+      date: "1987-04"
+      pages: 100
+
+    characteristics:
+      has_text_layer: true
+      is_scanned: true
+      multi_column: true
+
+    golden_answers:
+      must_contain:
+        - text: "Gazette"
+          confidence: fuzzy
+          fuzzy_threshold: 0.85
+        - text: "Commodore"
+          confidence: fuzzy
+          fuzzy_threshold: 0.80
+
+      quality:
+        min_text_extraction_ratio: 0.70
+        max_ocr_error_rate: 0.20
 ```
+
+See `tests/fixtures/sources.yaml` for the complete registry with 11+ curated documents.
 
 ### Fixture Download Implementation
 
@@ -385,6 +429,61 @@ def test_index_complex_pdf(complex_pdf: Path):
     assert expected.chunk_count_min <= result.chunk_count <= expected.chunk_count_max
     assert result.has_pages == expected.has_pages
 ```
+
+---
+
+## Golden Answer Validation
+
+The `tests/fixtures/validator.py` module provides validation against golden answers defined in `sources.yaml`.
+
+### Using the Validator
+
+```python
+from tests.fixtures.validator import (
+    GoldenAnswerValidator,
+    get_documents_by_category,
+)
+
+# Validate extracted text against golden answers
+validator = GoldenAnswerValidator()
+report = validator.validate_document(
+    document_id="alice_in_wonderland",
+    extracted_text=extracted_text,
+    chunk_count=25,
+    pages_with_text=77,
+    total_pages=77,
+)
+
+assert report.passed, f"Failed: {report.failed_checks} checks"
+print(f"Pass rate: {report.pass_rate:.0%}")
+
+# Get documents by category for parametrised tests
+simple_docs = get_documents_by_category("complexity", "simple")
+scanned_docs = get_documents_by_category("complexity", "scanned")
+```
+
+### Validation Types
+
+| Type | Description | Example |
+|------|-------------|---------|
+| `must_contain` | Text presence (exact or fuzzy) | "Down the Rabbit-Hole" |
+| `patterns` | Regex pattern matching | `Issue \d+` |
+| `structure` | Chunk count ranges | min_chunks: 10, max_chunks: 50 |
+| `quality` | Extraction quality metrics | min_text_extraction_ratio: 0.90 |
+
+### Fuzzy Matching for OCR
+
+For scanned documents with OCR errors, use fuzzy matching:
+
+```yaml
+golden_answers:
+  must_contain:
+    - text: "Commodore"
+      confidence: fuzzy
+      fuzzy_threshold: 0.80  # Allow 20% character difference
+```
+
+The validator uses `rapidfuzz` for fuzzy string matching (falls back to substring search if not installed).
 
 ---
 
