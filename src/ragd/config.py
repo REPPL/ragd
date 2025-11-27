@@ -77,6 +77,18 @@ class CacheConfig(BaseModel):
     max_size_mb: int = 100
 
 
+class NormalisationConfig(BaseModel):
+    """Text normalisation configuration."""
+
+    enabled: bool = True
+    fix_spaced_letters: bool = True
+    fix_word_boundaries: bool = True
+    fix_line_breaks: bool = True
+    fix_ocr_spelling: bool = True
+    remove_boilerplate: bool = True
+    boilerplate_mode: str = "aggressive"  # conservative | moderate | aggressive
+
+
 class RagdConfig(BaseModel):
     """Main ragd configuration."""
 
@@ -88,6 +100,7 @@ class RagdConfig(BaseModel):
     retrieval: RetrievalConfig = Field(default_factory=RetrievalConfig)
     chunking: ChunkingConfig = Field(default_factory=ChunkingConfig)
     cache: CacheConfig = Field(default_factory=CacheConfig)
+    normalisation: NormalisationConfig = Field(default_factory=NormalisationConfig)
 
     @property
     def chroma_path(self) -> Path:
