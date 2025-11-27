@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ragd"
-version = "0.2.0"
+version = "0.2.1"
 description = "Local RAG for personal knowledge management"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -94,7 +94,25 @@ web = [
 ]
 # Meta-extra for all v0.2 features
 v02 = [
-    "ragd[pdf,ocr,metadata,export,watch,web]",
+    # PDF (docling)
+    "docling>=2.0.0",
+    "docling-core>=2.0.0",
+    # OCR
+    "paddleocr>=2.7.0",
+    "paddlepaddle>=2.5.0",
+    "easyocr>=1.7.0",
+    "opencv-python-headless>=4.8.0",
+    # Metadata
+    "keybert>=0.8.0",
+    "spacy>=3.7.0",
+    "langdetect>=1.0.9",
+    # Export
+    "pyarrow>=14.0.0",
+    # Watch
+    "watchdog>=3.0.0",
+    # Web
+    "trafilatura>=1.6.0",
+    "selectolax>=0.3.0",
 ]
 
 # Development Extras
@@ -115,7 +133,30 @@ security = [
 ]
 # Everything (v0.2 features + all dev tools)
 all = [
-    "ragd[v02,dev,test,security]",
+    # v0.2 features
+    "docling>=2.0.0",
+    "docling-core>=2.0.0",
+    "paddleocr>=2.7.0",
+    "paddlepaddle>=2.5.0",
+    "easyocr>=1.7.0",
+    "opencv-python-headless>=4.8.0",
+    "keybert>=0.8.0",
+    "spacy>=3.7.0",
+    "langdetect>=1.0.9",
+    "pyarrow>=14.0.0",
+    "watchdog>=3.0.0",
+    "trafilatura>=1.6.0",
+    "selectolax>=0.3.0",
+    # Dev tools
+    "ruff>=0.1.0",
+    "mypy>=1.0.0",
+    "pre-commit>=3.0.0",
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "pytest-asyncio>=0.21.0",
+    "pip-audit>=2.6.0",
+    "bandit>=1.7.0",
+    "safety>=2.3.0",
 ]
 
 [project.scripts]
