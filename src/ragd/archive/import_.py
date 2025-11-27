@@ -19,6 +19,59 @@ from enum import Enum
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
+
+def _safe_extract(tar: tarfile.TarFile, path: Path) -> None:
+    """Safely extract tar contents, preventing path traversal attacks.
+
+    This function validates each archive member to ensure it doesn't escape
+    the target directory via path traversal (../) or absolute paths.
+
+    Args:
+        tar: Open tarfile to extract
+        path: Target directory for extraction
+
+    Raises:
+        ValueError: If path traversal or absolute path detected
+    """
+    path_resolved = path.resolve()
+
+    for member in tar.getmembers():
+        # Check for absolute paths
+        if member.name.startswith("/"):
+            raise ValueError(f"Archive contains absolute path: {member.name}")
+
+        # Check for path traversal
+        if ".." in member.name.split("/"):
+            raise ValueError(f"Archive contains path traversal: {member.name}")
+
+        # Resolve the target path and verify it's within the target directory
+        member_path = (path / member.name).resolve()
+        try:
+            member_path.relative_to(path_resolved)
+        except ValueError:
+            raise ValueError(
+                f"Archive member escapes target directory: {member.name}"
+            ) from None
+
+        # Check for symbolic links pointing outside target
+        if member.issym() or member.islnk():
+            link_target = Path(member.linkname)
+            if link_target.is_absolute():
+                raise ValueError(
+                    f"Archive contains symlink with absolute target: {member.name}"
+                )
+            # Resolve symlink target relative to member's parent
+            member_parent = (path / member.name).parent
+            resolved_link = (member_parent / member.linkname).resolve()
+            try:
+                resolved_link.relative_to(path_resolved)
+            except ValueError:
+                raise ValueError(
+                    f"Archive contains symlink escaping target: {member.name}"
+                ) from None
+
+        tar.extract(member, path)
+
 from ragd.archive.format import (
     COMPATIBLE_VERSIONS,
     ArchiveManifest,
@@ -158,9 +211,9 @@ class ImportEngine:
             with tempfile.TemporaryDirectory() as temp_dir:
                 temp_path = Path(temp_dir)
 
-                # Extract archive
+                # Extract archive safely (prevents path traversal)
                 with tarfile.open(archive_path, "r:*") as tar:
-                    tar.extractall(temp_path)
+                    _safe_extract(tar, temp_path)
 
                 # Check manifest exists
                 manifest_path = temp_path / "manifest.json"
@@ -256,7 +309,7 @@ class ImportEngine:
                     )
 
                 with tarfile.open(archive_path, "r:*") as tar:
-                    tar.extractall(temp_path)
+                    _safe_extract(tar, temp_path)
 
                 manifest = validation.manifest
                 assert manifest is not None

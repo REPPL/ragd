@@ -136,4 +136,4 @@ ragd import ~/backup/ragd-backup.tar.gz --regenerate-embeddings
 
 ---
 
-**Status**: Planned
+**Status**: Completed

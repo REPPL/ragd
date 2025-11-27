@@ -219,4 +219,4 @@ def should_index(path: str, patterns: list[str], excludes: list[str]) -> bool:
 
 ---
 
-**Status**: Planned
+**Status**: Completed

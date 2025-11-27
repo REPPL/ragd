@@ -121,4 +121,4 @@ pq.write_table(table, "embeddings.parquet", compression="zstd")
 
 ---
 
-**Status**: Planned
+**Status**: Completed

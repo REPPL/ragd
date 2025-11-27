@@ -627,3 +627,157 @@ class TestExportImportRoundtrip:
         doc = target_store.get_document("doc-000")
         assert doc is not None
         assert doc.filename == "doc0.pdf"
+
+
+class TestImportSecurityPathTraversal:
+    """Security tests for path traversal prevention in archive import."""
+
+    @pytest.fixture
+    def chroma_store(self, tmp_path: Path) -> ChromaStore:
+        """Create a temporary ChromaDB store."""
+        return ChromaStore(tmp_path / "chroma")
+
+    @pytest.fixture
+    def engine(self, chroma_store: ChromaStore) -> ImportEngine:
+        """Create an import engine."""
+        return ImportEngine(chroma_store)
+
+    def test_rejects_absolute_path(
+        self, engine: ImportEngine, tmp_path: Path
+    ) -> None:
+        """Test archive with absolute path is rejected."""
+        archive_path = tmp_path / "malicious_absolute.tar.gz"
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+
+        # Create minimal manifest
+        manifest = {
+            "version": "1.0",
+            "statistics": {"document_count": 0, "chunk_count": 0},
+            "embeddings": {"included": False},
+        }
+        with open(content_dir / "manifest.json", "w") as f:
+            json.dump(manifest, f)
+
+        (content_dir / "documents").mkdir()
+        (content_dir / "chunks").mkdir()
+
+        # Create archive with absolute path member
+        with tarfile.open(archive_path, "w:gz") as tar:
+            for item in content_dir.iterdir():
+                tar.add(item, arcname=item.name)
+
+            # Add malicious member with absolute path
+            import io
+
+            evil_content = b"malicious content"
+            evil_info = tarfile.TarInfo(name="/etc/passwd")
+            evil_info.size = len(evil_content)
+            tar.addfile(evil_info, io.BytesIO(evil_content))
+
+        result = engine.validate(archive_path)
+        assert result.valid is False
+        assert any("absolute" in e.lower() for e in result.errors)
+
+    def test_rejects_path_traversal(
+        self, engine: ImportEngine, tmp_path: Path
+    ) -> None:
+        """Test archive with path traversal is rejected."""
+        archive_path = tmp_path / "malicious_traversal.tar.gz"
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+
+        # Create minimal manifest
+        manifest = {
+            "version": "1.0",
+            "statistics": {"document_count": 0, "chunk_count": 0},
+            "embeddings": {"included": False},
+        }
+        with open(content_dir / "manifest.json", "w") as f:
+            json.dump(manifest, f)
+
+        (content_dir / "documents").mkdir()
+        (content_dir / "chunks").mkdir()
+
+        # Create archive with path traversal
+        with tarfile.open(archive_path, "w:gz") as tar:
+            for item in content_dir.iterdir():
+                tar.add(item, arcname=item.name)
+
+            # Add malicious member with path traversal
+            import io
+
+            evil_content = b"malicious content"
+            evil_info = tarfile.TarInfo(name="../../../tmp/evil.txt")
+            evil_info.size = len(evil_content)
+            tar.addfile(evil_info, io.BytesIO(evil_content))
+
+        result = engine.validate(archive_path)
+        assert result.valid is False
+        assert any("traversal" in e.lower() for e in result.errors)
+
+    def test_rejects_symlink_outside_target(
+        self, engine: ImportEngine, tmp_path: Path
+    ) -> None:
+        """Test archive with symlink escaping target is rejected."""
+        archive_path = tmp_path / "malicious_symlink.tar.gz"
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+
+        # Create minimal manifest
+        manifest = {
+            "version": "1.0",
+            "statistics": {"document_count": 0, "chunk_count": 0},
+            "embeddings": {"included": False},
+        }
+        with open(content_dir / "manifest.json", "w") as f:
+            json.dump(manifest, f)
+
+        (content_dir / "documents").mkdir()
+        (content_dir / "chunks").mkdir()
+
+        # Create archive with malicious symlink
+        with tarfile.open(archive_path, "w:gz") as tar:
+            for item in content_dir.iterdir():
+                tar.add(item, arcname=item.name)
+
+            # Add symlink pointing outside target
+            evil_info = tarfile.TarInfo(name="evil_link")
+            evil_info.type = tarfile.SYMTYPE
+            evil_info.linkname = "/etc/passwd"
+            tar.addfile(evil_info)
+
+        result = engine.validate(archive_path)
+        assert result.valid is False
+        assert any(
+            "symlink" in e.lower() or "absolute" in e.lower()
+            for e in result.errors
+        )
+
+    def test_accepts_valid_archive(
+        self, engine: ImportEngine, tmp_path: Path
+    ) -> None:
+        """Test valid archive without security issues is accepted."""
+        archive_path = tmp_path / "valid.tar.gz"
+        content_dir = tmp_path / "content"
+        content_dir.mkdir()
+
+        # Create valid manifest
+        manifest = {
+            "version": "1.0",
+            "statistics": {"document_count": 0, "chunk_count": 0},
+            "embeddings": {"included": False},
+        }
+        with open(content_dir / "manifest.json", "w") as f:
+            json.dump(manifest, f)
+
+        (content_dir / "documents").mkdir()
+        (content_dir / "chunks").mkdir()
+
+        # Create clean archive
+        with tarfile.open(archive_path, "w:gz") as tar:
+            for item in content_dir.iterdir():
+                tar.add(item, arcname=item.name)
+
+        result = engine.validate(archive_path)
+        assert result.valid is True
