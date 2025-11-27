@@ -1,0 +1,40 @@
+# Pre-commit configuration for ragd
+# See https://pre-commit.com for more information
+
+repos:
+  # Standard pre-commit hooks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+      - id: check-merge-conflict
+
+  # Ruff for linting and formatting
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.1.9
+    hooks:
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format
+
+  # Local hooks
+  - repo: local
+    hooks:
+      # Version sync validation
+      - id: version-sync
+        name: Check version consistency
+        entry: python scripts/check-version-sync.py
+        language: python
+        pass_filenames: false
+        always_run: true
+
+      # Block .work/ directory commits
+      - id: no-work-commits
+        name: Block .work/ commits
+        entry: bash -c 'if git diff --cached --name-only | grep -q "^\.work/"; then echo "ERROR: Cannot commit files in .work/ directory"; exit 1; fi'
+        language: system
+        pass_filenames: false
+        always_run: true
