@@ -163,4 +163,4 @@ def check_ollama() -> HealthCheck:
 
 ---
 
-**Status**: Planned
+**Status**: Completed

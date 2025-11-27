@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ragd"
-version = "0.1.1"
+version = "0.2.0"
 description = "Local RAG for personal knowledge management"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -29,6 +29,9 @@ dependencies = [
     # CLI Framework
     "typer>=0.9.0",
     "rich>=13.0.0",
+
+    # Security: Fix known vulnerabilities
+    "urllib3>=2.5.0",  # CVE fixes
 
     # Vector Database
     "chromadb>=0.4.0",
@@ -80,9 +83,18 @@ export = [
     # Export functionality (Parquet for embeddings)
     "pyarrow>=14.0.0",
 ]
+watch = [
+    # Folder watching (F-037)
+    "watchdog>=3.0.0",
+]
+web = [
+    # Web archive support (F-038)
+    "trafilatura>=1.6.0",
+    "selectolax>=0.3.0",
+]
 # Meta-extra for all v0.2 features
 v02 = [
-    "ragd[pdf,ocr,metadata,export]",
+    "ragd[pdf,ocr,metadata,export,watch,web]",
 ]
 
 # Development Extras

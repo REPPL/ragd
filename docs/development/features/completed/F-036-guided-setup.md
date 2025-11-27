@@ -175,4 +175,4 @@ ragd init --defaults
 
 ---
 
-**Status**: Planned
+**Status**: Completed

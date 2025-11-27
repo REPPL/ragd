@@ -244,7 +244,6 @@ Commit retrospective to `docs/development/process/retrospectives/` before taggin
 - [Development Hub](../README.md)
 - [Implementation Records](../implementation/)
 - [AI Contributions](../ai-contributions.md)
-- [implement-autonomously Agent](~/.claude/agents/implement-autonomously.md)
 
 ---
 
