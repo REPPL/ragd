@@ -1,5 +1,9 @@
 # State-of-the-Art Embedding Model Selection
 
+> **Note:** This document surveys state-of-the-art techniques including commercial
+> cloud services. ragd implements **local-only** processing. Cloud service integration
+> is not planned until v2.0+.
+
 ## Executive Summary
 
 **Key Recommendations for ragd:**
@@ -288,21 +292,10 @@ embedding:
       reason: "Multilingual documents"
 ```
 
-### API Integration (Optional)
+### API Integration (v2.0+)
 
-```yaml
-embedding:
-  api_models:
-    voyage:
-      enabled: false
-      model: "voyage-3"
-      api_key_env: "VOYAGE_API_KEY"
-
-    openai:
-      enabled: false
-      model: "text-embedding-3-small"
-      api_key_env: "OPENAI_API_KEY"
-```
+> Cloud embedding APIs are not supported until v2.0+. See
+> [Future Cloud Support](../planning/future-cloud-support.md) for planned configuration.
 
 ### Hybrid Retrieval (v0.3+)
 

@@ -1,5 +1,9 @@
 # Personal RAG & Memory Systems - State-of-the-Art
 
+> **Note:** This document surveys state-of-the-art techniques including commercial
+> cloud services. ragd implements **local-only** processing. Cloud service integration
+> is not planned until v2.0+.
+
 State-of-the-art research on adding personal information to RAG systems: memory architectures, user context, personalisation, and privacy-preserving techniques.
 
 ## Executive Summary

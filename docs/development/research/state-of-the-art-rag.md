@@ -1,5 +1,9 @@
 # State-of-the-Art RAG Techniques for ragd Roadmap
 
+> **Note:** This document surveys state-of-the-art techniques including commercial
+> cloud services. ragd implements **local-only** processing. Cloud service integration
+> is not planned until v2.0+.
+
 Cutting-edge techniques not yet in ragged or ragd.
 
 ## Executive Summary

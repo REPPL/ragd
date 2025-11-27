@@ -1,5 +1,9 @@
 # State-of-the-Art Multi-Modal RAG
 
+> **Note:** This document surveys state-of-the-art techniques including commercial
+> cloud services. ragd implements **local-only** processing. Cloud service integration
+> is not planned until v2.0+.
+
 ## Executive Summary
 
 **Key Recommendations for ragd:**
