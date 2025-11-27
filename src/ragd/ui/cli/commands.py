@@ -219,6 +219,7 @@ def search_command(
     limit: int = 10,
     min_score: float | None = None,
     mode: str = "hybrid",
+    cite: str = "none",
     no_interactive: bool = False,
     output_format: OutputFormat = "rich",
     no_color: bool = False,
@@ -248,6 +249,14 @@ def search_command(
         con.print(f"[red]Invalid search mode: {mode}[/red]")
         con.print("Valid modes: hybrid, semantic, keyword")
         raise typer.Exit(1)
+
+    # Validate citation style
+    valid_cite_styles = ["none", "inline", "apa", "mla", "chicago", "bibtex", "markdown"]
+    if cite.lower() not in valid_cite_styles:
+        con.print(f"[red]Invalid citation style: {cite}[/red]")
+        con.print(f"Valid styles: {', '.join(valid_cite_styles)}")
+        raise typer.Exit(1)
+    cite_style = cite.lower()
 
     with Progress(
         SpinnerColumn(),
@@ -302,6 +311,7 @@ def search_command(
             query=query,
             output_format=output_format,
             console=con,
+            citation_style=cite_style,  # type: ignore
         )
         if output:
             con.print(output)

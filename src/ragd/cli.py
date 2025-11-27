@@ -130,6 +130,14 @@ SearchModeOption = Annotated[
     ),
 ]
 
+CitationOption = Annotated[
+    str,
+    typer.Option(
+        "--cite",
+        help="Citation style: none, inline, apa, mla, chicago, bibtex, markdown.",
+    ),
+]
+
 
 @app.command()
 def search(
@@ -139,6 +147,7 @@ def search(
         None, "--min-score", help="Minimum similarity score (0-1). Default: 0.3"
     ),
     mode: SearchModeOption = "hybrid",
+    cite: CitationOption = "none",
     no_interactive: bool = typer.Option(
         False, "--no-interactive", help="Disable interactive navigator, print results directly."
     ),
@@ -154,12 +163,22 @@ def search(
       - hybrid: Combines semantic and keyword search (default)
       - semantic: Pure vector similarity search
       - keyword: Pure BM25 keyword search
+
+    Citation styles:
+      - none: No citations (default)
+      - inline: Simple (filename, p. X) format
+      - apa: APA 7th edition
+      - mla: MLA 9th edition
+      - chicago: Chicago notes-bibliography
+      - bibtex: BibTeX for LaTeX
+      - markdown: Markdown link format
     """
     search_command(
         query=query,
         limit=limit,
         min_score=min_score,
         mode=mode,
+        cite=cite,
         no_interactive=no_interactive,
         output_format=output_format,  # type: ignore
         no_color=no_color,
