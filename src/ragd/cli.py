@@ -89,6 +89,10 @@ def index(
         None, "--contextual/--no-contextual", "-c",
         help="Enable contextual retrieval (requires Ollama). Uses config if not specified."
     ),
+    late_chunking: bool = typer.Option(
+        None, "--late-chunking/--no-late-chunking", "-l",
+        help="Enable late chunking for context-aware embeddings. Uses config if not specified."
+    ),
     verbose: bool = typer.Option(
         False, "--verbose", "-V", help="Show per-file progress instead of progress bar."
     ),
@@ -101,12 +105,16 @@ def index(
 
     Contextual retrieval generates AI-powered context for each chunk,
     improving search accuracy. Requires Ollama to be running locally.
+
+    Late chunking embeds chunks with full document context, improving
+    embedding quality for retrieval.
     """
     index_command(
         path=path,
         recursive=recursive,
         skip_duplicates=skip_duplicates,
         contextual=contextual,
+        late_chunking=late_chunking,
         verbose=verbose,
         output_format=output_format,  # type: ignore
         no_color=no_color,

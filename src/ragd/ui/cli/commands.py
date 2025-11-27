@@ -109,6 +109,7 @@ def index_command(
     recursive: bool = True,
     skip_duplicates: bool = True,
     contextual: bool | None = None,
+    late_chunking: bool | None = None,
     verbose: bool = False,
     output_format: OutputFormat = "rich",
     no_color: bool = False,
@@ -135,6 +136,13 @@ def index_command(
     use_contextual = contextual if contextual is not None else config.retrieval.contextual.enabled
     if use_contextual:
         con.print("[dim]Contextual retrieval enabled (requires Ollama)[/dim]")
+
+    # Determine late chunking setting
+    use_late_chunking = late_chunking if late_chunking is not None else config.embedding.late_chunking
+    if use_late_chunking:
+        con.print("[dim]Late chunking enabled for context-aware embeddings[/dim]")
+        # Temporarily override config for this indexing session
+        config.embedding.late_chunking = True
 
     # Discover files first to get total count
     files = discover_files(path, recursive=recursive)

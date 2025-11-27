@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import Callable
 
 from ragd.config import RagdConfig, load_config
-from ragd.embedding import get_embedder
+from ragd.embedding import get_embedder, ChunkBoundary, create_late_chunking_embedder
 from ragd.ingestion.chunker import Chunk, chunk_text
 from ragd.ingestion.extractor import extract_text
 from ragd.search.bm25 import BM25Index
@@ -169,13 +169,35 @@ def index_document(
             pass
 
     # Generate embeddings (using context-enhanced text if available)
-    embedder = get_embedder(
-        model_name=config.embedding.model,
-        device=config.embedding.device,
-        batch_size=config.embedding.batch_size,
-    )
+    # Check if late chunking is enabled and available
+    use_late_chunking = config.embedding.late_chunking
+    if use_late_chunking:
+        late_embedder = create_late_chunking_embedder(
+            model_name=config.embedding.late_chunking_model,
+            device=config.embedding.device,
+        )
+        if late_embedder is not None:
+            # Use late chunking with full document context
+            chunk_boundaries = [
+                ChunkBoundary(
+                    start=chunk.start_char,
+                    end=chunk.end_char,
+                    content=embedding_texts[i],  # Use context-enhanced if available
+                )
+                for i, chunk in enumerate(chunks)
+            ]
+            embeddings = late_embedder.embed_document_chunks(text, chunk_boundaries)
+        else:
+            # Fall back to standard embedding
+            use_late_chunking = False
 
-    embeddings = embedder.embed(embedding_texts)
+    if not use_late_chunking:
+        embedder = get_embedder(
+            model_name=config.embedding.model,
+            device=config.embedding.device,
+            batch_size=config.embedding.batch_size,
+        )
+        embeddings = embedder.embed(embedding_texts)
 
     # Prepare metadata for each chunk
     metadatas = []
@@ -211,6 +233,7 @@ def index_document(
             "extraction_method": result.extraction_method,
             "normalised": config.normalisation.enabled,
             "contextual": bool(context_texts),  # Was context generated?
+            "late_chunking": use_late_chunking,  # Was late chunking used?
         },
     )
 

@@ -307,6 +307,16 @@ class FeatureDetector:
             extra_steps="ollama serve && ollama pull llama3.2:3b",
         )
 
+    @property
+    def late_chunking(self) -> FeatureStatus:
+        """Check late chunking availability (transformers + torch)."""
+        return self._get_cached(
+            "late_chunking",
+            lambda: _check_import("transformers") and _check_import("torch"),
+            "Late Chunking (transformers + torch)",
+            install_command="pip install transformers torch",
+        )
+
     def all_features(self) -> dict[str, FeatureStatus]:
         """Get status of all optional features.
 
@@ -328,6 +338,7 @@ class FeatureDetector:
             "trafilatura": self.trafilatura,
             "web": self.web,
             "ollama": self.ollama,
+            "late_chunking": self.late_chunking,
         }
 
     def available_features(self) -> list[str]:

@@ -43,6 +43,8 @@ class EmbeddingConfig(BaseModel):
     dimension: int = 384
     batch_size: int = 32
     device: str | None = None
+    late_chunking: bool = False  # Use late chunking for context-aware embeddings
+    late_chunking_model: str = "jinaai/jina-embeddings-v2-small-en"
 
 
 class LLMConfig(BaseModel):
