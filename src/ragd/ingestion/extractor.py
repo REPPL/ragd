@@ -170,7 +170,11 @@ class MarkdownExtractor:
 
 
 class HTMLExtractor:
-    """Extract text from HTML files, stripping tags."""
+    """Extract text from HTML files, stripping tags.
+
+    Basic extractor using BeautifulSoup. For advanced features (F-039),
+    use AdvancedHTMLExtractor.
+    """
 
     def extract(self, path: Path) -> ExtractionResult:
         """Extract text from HTML file.
@@ -217,6 +221,196 @@ class HTMLExtractor:
                 success=False,
                 error=str(e),
             )
+
+
+class AdvancedHTMLExtractor:
+    """Extract text from HTML with F-039 enhancements.
+
+    This extractor provides:
+    - Fast parsing with selectolax (10-100x faster than BeautifulSoup)
+    - Rich metadata extraction (Open Graph, JSON-LD, Schema.org)
+    - Structure preservation (tables, headings, lists as Markdown)
+    - SingleFile archive detection (routes to WebArchiveProcessor)
+    - Tiered processing based on complexity
+
+    Falls back to basic HTMLExtractor if dependencies unavailable.
+
+    Implements F-039: Advanced HTML Processing.
+    """
+
+    def __init__(
+        self,
+        extract_metadata: bool = True,
+        preserve_structure: bool = True,
+        use_trafilatura_for_complex: bool = True,
+    ) -> None:
+        """Initialise advanced HTML extractor.
+
+        Args:
+            extract_metadata: Extract rich metadata (OG, JSON-LD, etc.)
+            preserve_structure: Preserve tables/lists as Markdown
+            use_trafilatura_for_complex: Use trafilatura for complex pages
+        """
+        self.extract_metadata_flag = extract_metadata
+        self.preserve_structure = preserve_structure
+        self.use_trafilatura = use_trafilatura_for_complex
+
+        # Check for optional dependencies
+        self._check_dependencies()
+
+    def _check_dependencies(self) -> None:
+        """Check available optional dependencies."""
+        try:
+            from ragd.web.parser import SELECTOLAX_AVAILABLE
+            self._selectolax_available = SELECTOLAX_AVAILABLE
+        except ImportError:
+            self._selectolax_available = False
+
+        try:
+            from ragd.web.archive import TRAFILATURA_AVAILABLE
+            self._trafilatura_available = TRAFILATURA_AVAILABLE
+        except ImportError:
+            self._trafilatura_available = False
+
+    def extract(self, path: Path) -> ExtractionResult:
+        """Extract text from HTML file with enhancements.
+
+        Args:
+            path: Path to HTML file
+
+        Returns:
+            ExtractionResult with extracted text and rich metadata
+        """
+        try:
+            with open(path, "rb") as f:
+                raw_data = f.read()
+
+            # Try to decode
+            try:
+                html_content = raw_data.decode("utf-8")
+                encoding = "utf-8"
+            except UnicodeDecodeError:
+                html_content = raw_data.decode("latin-1")
+                encoding = "latin-1"
+
+            # Check if this is a SingleFile archive
+            from ragd.web.archive import is_singlefile_archive, WebArchiveProcessor
+
+            if is_singlefile_archive(html_content):
+                # Route to WebArchiveProcessor (F-038)
+                processor = WebArchiveProcessor()
+                archive_result = processor.process(path)
+
+                return ExtractionResult(
+                    text=archive_result.text,
+                    metadata={
+                        "source": str(path),
+                        "format": "html",
+                        "encoding": encoding,
+                        "archive_type": "singlefile",
+                        "original_url": archive_result.metadata.original_url if archive_result.metadata else None,
+                        "archive_date": archive_result.metadata.archive_date.isoformat() if archive_result.metadata and archive_result.metadata.archive_date else None,
+                        "title": archive_result.metadata.title if archive_result.metadata else None,
+                    },
+                    extraction_method="singlefile_archive",
+                    success=archive_result.success,
+                    error=archive_result.error,
+                )
+
+            # Use F-039 enhanced processing
+            return self._extract_enhanced(html_content, path, encoding)
+
+        except ImportError:
+            # F-038/F-039 not available, fall back to basic
+            return HTMLExtractor().extract(path)
+        except Exception as e:
+            return ExtractionResult(
+                text="",
+                extraction_method="advanced_html",
+                success=False,
+                error=str(e),
+            )
+
+    def _extract_enhanced(
+        self, html_content: str, path: Path, encoding: str
+    ) -> ExtractionResult:
+        """Extract with F-039 enhancements.
+
+        Args:
+            html_content: HTML content string
+            path: Source file path
+            encoding: Detected encoding
+
+        Returns:
+            ExtractionResult with enhanced extraction
+        """
+        from ragd.web.parser import parse_html, ComplexityTier
+        from ragd.web.metadata import extract_metadata as extract_html_metadata
+        from ragd.web.structure import extract_structure, get_text_with_structure
+
+        # Parse HTML
+        parse_result = parse_html(html_content)
+
+        # Extract rich metadata if requested
+        metadata_dict: dict[str, Any] = {
+            "source": str(path),
+            "format": "html",
+            "encoding": encoding,
+            "complexity_tier": parse_result.tier.name,
+            "parser_used": parse_result.parser_used,
+            "parse_time_ms": parse_result.parse_time_ms,
+        }
+
+        if self.extract_metadata_flag:
+            html_metadata = extract_html_metadata(html_content)
+            metadata_dict.update({
+                "title": html_metadata.get_best_title(),
+                "description": html_metadata.get_best_description(),
+                "author": html_metadata.get_best_author(),
+                "language": html_metadata.language,
+                "publication_date": html_metadata.get_best_date().isoformat() if html_metadata.get_best_date() else None,
+                "og_type": html_metadata.og_type,
+                "schema_type": html_metadata.schema_type,
+                "keywords": html_metadata.keywords,
+                "tags": html_metadata.tags,
+                "canonical_url": html_metadata.canonical_url,
+            })
+
+        # Extract text with structure preservation if requested
+        if self.preserve_structure:
+            text = get_text_with_structure(html_content)
+            structure = extract_structure(html_content)
+            metadata_dict["structure"] = structure.to_dict()
+        else:
+            text = parse_result.text
+
+        # For complex pages, optionally use trafilatura
+        if (
+            parse_result.tier == ComplexityTier.COMPLEX
+            and self.use_trafilatura
+            and self._trafilatura_available
+        ):
+            try:
+                import trafilatura
+
+                trafilatura_text = trafilatura.extract(
+                    html_content,
+                    include_tables=True,
+                    include_links=True,
+                )
+                if trafilatura_text and len(trafilatura_text) > len(text) * 0.5:
+                    # Use trafilatura text if it's reasonably complete
+                    text = trafilatura_text
+                    metadata_dict["extraction_enhanced"] = "trafilatura"
+            except Exception:
+                pass  # Keep original text
+
+        return ExtractionResult(
+            text=text,
+            metadata=metadata_dict,
+            extraction_method="advanced_html",
+            success=True,
+        )
 
 
 # Extractor registry

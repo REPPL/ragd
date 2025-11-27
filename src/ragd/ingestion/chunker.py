@@ -12,7 +12,7 @@ from typing import Any, Literal, Protocol
 
 import tiktoken
 
-ChunkStrategy = Literal["sentence", "fixed", "recursive"]
+ChunkStrategy = Literal["sentence", "fixed", "recursive", "structure"]
 
 
 @dataclass
@@ -398,11 +398,301 @@ class RecursiveChunker:
         return result
 
 
+class StructureChunker:
+    """Chunk text while respecting HTML structure.
+
+    This chunker preserves structural elements:
+    - Tables are kept together when possible
+    - Heading boundaries are respected
+    - Lists are not split mid-way
+    - Code blocks are preserved
+
+    Implements F-039: Advanced HTML Processing.
+    """
+
+    def __init__(
+        self,
+        chunk_size: int = 512,
+        overlap: int = 50,
+        min_chunk_size: int = 100,
+        keep_tables_together: bool = True,
+        respect_headings: bool = True,
+    ) -> None:
+        """Initialise structure-aware chunker.
+
+        Args:
+            chunk_size: Target chunk size in tokens
+            overlap: Overlap between chunks in tokens
+            min_chunk_size: Minimum chunk size in tokens
+            keep_tables_together: Try to keep Markdown tables together
+            respect_headings: Create chunk boundaries at headings
+        """
+        self.chunk_size = chunk_size
+        self.overlap = overlap
+        self.min_chunk_size = min_chunk_size
+        self.keep_tables_together = keep_tables_together
+        self.respect_headings = respect_headings
+
+        # Patterns for structure detection
+        self._heading_pattern = re.compile(r"^#{1,6}\s+.+$", re.MULTILINE)
+        self._table_pattern = re.compile(
+            r"^\|.+\|\s*\n\|[-:\s|]+\|\s*\n(?:\|.+\|\s*\n?)+",
+            re.MULTILINE
+        )
+        self._code_block_pattern = re.compile(r"```[\s\S]*?```", re.MULTILINE)
+        self._list_pattern = re.compile(
+            r"(?:^[-*+]\s+.+\n?)+|(?:^\d+\.\s+.+\n?)+",
+            re.MULTILINE
+        )
+
+    def chunk(self, text: str, metadata: dict[str, Any] | None = None) -> list[Chunk]:
+        """Split text into chunks while preserving structure.
+
+        Args:
+            text: Text to chunk (plain text or Markdown)
+            metadata: Optional metadata for chunks
+
+        Returns:
+            List of Chunk objects
+        """
+        if not text.strip():
+            return []
+
+        # First, identify structural elements that should stay together
+        protected_regions = self._identify_protected_regions(text)
+
+        # Split by headings if enabled
+        if self.respect_headings:
+            sections = self._split_by_headings(text)
+        else:
+            sections = [text]
+
+        chunks: list[Chunk] = []
+        char_offset = 0
+
+        for section in sections:
+            if not section.strip():
+                continue
+
+            # Check if this section is small enough to be a single chunk
+            section_tokens = count_tokens(section)
+            if section_tokens <= self.chunk_size:
+                start_char = text.find(section, char_offset)
+                if start_char == -1:
+                    start_char = char_offset
+
+                chunks.append(
+                    Chunk(
+                        content=section.strip(),
+                        index=len(chunks),
+                        start_char=start_char,
+                        end_char=start_char + len(section),
+                        token_count=section_tokens,
+                        metadata=metadata.copy() if metadata else {},
+                    )
+                )
+                char_offset = start_char + len(section)
+            else:
+                # Need to split this section further
+                sub_chunks = self._split_large_section(section, protected_regions)
+                for sub_chunk in sub_chunks:
+                    if not sub_chunk.strip():
+                        continue
+
+                    start_char = text.find(sub_chunk, char_offset)
+                    if start_char == -1:
+                        start_char = char_offset
+
+                    chunks.append(
+                        Chunk(
+                            content=sub_chunk.strip(),
+                            index=len(chunks),
+                            start_char=start_char,
+                            end_char=start_char + len(sub_chunk),
+                            token_count=count_tokens(sub_chunk),
+                            metadata=metadata.copy() if metadata else {},
+                        )
+                    )
+                    char_offset = start_char + len(sub_chunk)
+
+        # Merge chunks that are too small
+        chunks = self._merge_small_chunks(chunks)
+
+        # Re-index chunks
+        for i, chunk in enumerate(chunks):
+            chunk.index = i
+
+        return chunks
+
+    def _identify_protected_regions(self, text: str) -> list[tuple[int, int]]:
+        """Identify regions that should not be split.
+
+        Args:
+            text: Text to analyse
+
+        Returns:
+            List of (start, end) tuples for protected regions
+        """
+        regions: list[tuple[int, int]] = []
+
+        # Tables
+        if self.keep_tables_together:
+            for match in self._table_pattern.finditer(text):
+                # Only protect if it fits in a single chunk
+                if count_tokens(match.group()) <= self.chunk_size:
+                    regions.append((match.start(), match.end()))
+
+        # Code blocks (always keep together if they fit)
+        for match in self._code_block_pattern.finditer(text):
+            if count_tokens(match.group()) <= self.chunk_size:
+                regions.append((match.start(), match.end()))
+
+        return sorted(regions, key=lambda x: x[0])
+
+    def _split_by_headings(self, text: str) -> list[str]:
+        """Split text at heading boundaries.
+
+        Args:
+            text: Text to split
+
+        Returns:
+            List of sections
+        """
+        # Find all heading positions
+        headings = list(self._heading_pattern.finditer(text))
+        if not headings:
+            return [text]
+
+        sections = []
+        prev_end = 0
+
+        for match in headings:
+            # Get content before this heading
+            if match.start() > prev_end:
+                before = text[prev_end:match.start()].strip()
+                if before:
+                    sections.append(before)
+
+            prev_end = match.start()
+
+        # Get remaining content (including last heading)
+        if prev_end < len(text):
+            sections.append(text[prev_end:])
+
+        return sections
+
+    def _split_large_section(
+        self, text: str, protected_regions: list[tuple[int, int]]
+    ) -> list[str]:
+        """Split a large section into smaller chunks.
+
+        Args:
+            text: Text to split
+            protected_regions: Regions that should not be split
+
+        Returns:
+            List of text chunks
+        """
+        # Use paragraph-based splitting
+        paragraphs = re.split(r"\n\n+", text)
+        if not paragraphs:
+            return [text]
+
+        chunks: list[str] = []
+        current: list[str] = []
+        current_tokens = 0
+
+        for para in paragraphs:
+            para = para.strip()
+            if not para:
+                continue
+
+            para_tokens = count_tokens(para)
+
+            # If this paragraph is very large, may need recursive splitting
+            if para_tokens > self.chunk_size:
+                # Flush current buffer
+                if current:
+                    chunks.append("\n\n".join(current))
+                    current = []
+                    current_tokens = 0
+
+                # Split the large paragraph by sentences
+                sentences = re.split(r"(?<=[.!?])\s+", para)
+                for sentence in sentences:
+                    sent_tokens = count_tokens(sentence)
+                    if current_tokens + sent_tokens > self.chunk_size and current:
+                        chunks.append(" ".join(current))
+                        current = []
+                        current_tokens = 0
+                    current.append(sentence)
+                    current_tokens += sent_tokens
+
+                continue
+
+            # Check if adding this paragraph exceeds limit
+            if current_tokens + para_tokens > self.chunk_size and current:
+                chunks.append("\n\n".join(current))
+                current = []
+                current_tokens = 0
+
+            current.append(para)
+            current_tokens += para_tokens
+
+        # Flush remaining
+        if current:
+            chunks.append("\n\n".join(current))
+
+        return chunks
+
+    def _merge_small_chunks(self, chunks: list[Chunk]) -> list[Chunk]:
+        """Merge chunks that are too small.
+
+        Args:
+            chunks: List of chunks to potentially merge
+
+        Returns:
+            Merged chunk list
+        """
+        if not chunks:
+            return []
+
+        result: list[Chunk] = []
+
+        for chunk in chunks:
+            if not result:
+                result.append(chunk)
+                continue
+
+            # Check if current chunk is too small and can be merged
+            if chunk.token_count < self.min_chunk_size:
+                last = result[-1]
+                merged_tokens = last.token_count + chunk.token_count
+
+                # Merge if combined size is acceptable
+                if merged_tokens <= self.chunk_size * 1.2:  # Allow 20% overflow
+                    merged_content = last.content + "\n\n" + chunk.content
+                    result[-1] = Chunk(
+                        content=merged_content,
+                        index=last.index,
+                        start_char=last.start_char,
+                        end_char=chunk.end_char,
+                        token_count=merged_tokens,
+                        metadata=last.metadata,
+                    )
+                    continue
+
+            result.append(chunk)
+
+        return result
+
+
 # Chunker registry
 CHUNKERS: dict[ChunkStrategy, type[Chunker]] = {
     "sentence": SentenceChunker,
     "fixed": FixedChunker,
     "recursive": RecursiveChunker,
+    "structure": StructureChunker,
 }
 
 

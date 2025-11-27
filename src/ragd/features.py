@@ -256,6 +256,36 @@ class FeatureDetector:
             install_command="pip install pyarrow",
         )
 
+    @property
+    def selectolax(self) -> FeatureStatus:
+        """Check selectolax availability (fast HTML parsing)."""
+        return self._get_cached(
+            "selectolax",
+            lambda: _check_import("selectolax"),
+            "selectolax (fast HTML parsing)",
+            install_command="pip install 'ragd[web]'",
+        )
+
+    @property
+    def trafilatura(self) -> FeatureStatus:
+        """Check trafilatura availability (web content extraction)."""
+        return self._get_cached(
+            "trafilatura",
+            lambda: _check_import("trafilatura"),
+            "trafilatura (web content extraction)",
+            install_command="pip install 'ragd[web]'",
+        )
+
+    @property
+    def web(self) -> FeatureStatus:
+        """Check web processing availability (selectolax + trafilatura)."""
+        return self._get_cached(
+            "web",
+            lambda: _check_import("selectolax") and _check_import("trafilatura"),
+            "Web processing (selectolax + trafilatura)",
+            install_command="pip install 'ragd[web]'",
+        )
+
     def all_features(self) -> dict[str, FeatureStatus]:
         """Get status of all optional features.
 
@@ -273,6 +303,9 @@ class FeatureDetector:
             "langdetect": self.langdetect,
             "metadata": self.metadata,
             "pyarrow": self.pyarrow,
+            "selectolax": self.selectolax,
+            "trafilatura": self.trafilatura,
+            "web": self.web,
         }
 
     def available_features(self) -> list[str]:
@@ -360,3 +393,6 @@ KEYBERT_AVAILABLE = _check_import("keybert")
 SPACY_AVAILABLE = _check_import("spacy")
 LANGDETECT_AVAILABLE = _check_import("langdetect")
 PYARROW_AVAILABLE = _check_import("pyarrow")
+SELECTOLAX_AVAILABLE = _check_import("selectolax")
+TRAFILATURA_AVAILABLE = _check_import("trafilatura")
+WEB_AVAILABLE = SELECTOLAX_AVAILABLE and TRAFILATURA_AVAILABLE
