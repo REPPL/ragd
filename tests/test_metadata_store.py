@@ -13,11 +13,13 @@ from ragd.metadata import (
     CURRENT_SCHEMA,
     SCHEMA_V1,
     SCHEMA_V2,
+    SCHEMA_V2_1,
     DocumentMetadata,
     MetadataStore,
     get_schema_version,
     migrate_to_current,
     migrate_v1_to_v2,
+    migrate_v2_to_v2_1,
     needs_migration,
 )
 
@@ -28,11 +30,15 @@ class TestDocumentMetadata:
     def test_default_values(self) -> None:
         """Test default values for DocumentMetadata."""
         meta = DocumentMetadata()
-        assert meta.ragd_schema_version == "2.0"
+        assert meta.ragd_schema_version == "2.1"
         assert meta.dc_title == ""
         assert meta.dc_creator == []
         assert meta.dc_language == "en"
         assert meta.ragd_tags == []
+        # v2.1 fields
+        assert meta.ragd_sensitivity == "public"
+        assert meta.ragd_embedding_model == ""
+        assert meta.ragd_embedding_dimension == 0
 
     def test_with_values(self) -> None:
         """Test creating DocumentMetadata with values."""
@@ -126,8 +132,13 @@ class TestMigration:
         assert needs_migration(data) is True
 
     def test_needs_migration_v2(self) -> None:
-        """Test no migration needed for v2 data."""
+        """Test migration needed for v2.0 data (upgrades to v2.1)."""
         data = {"ragd_schema_version": "2.0"}
+        assert needs_migration(data) is True
+
+    def test_needs_migration_v2_1(self) -> None:
+        """Test no migration needed for v2.1 data."""
+        data = {"ragd_schema_version": "2.1"}
         assert needs_migration(data) is False
 
     def test_migrate_v1_to_v2(self) -> None:
@@ -159,6 +170,49 @@ class TestMigration:
         meta = migrate_v1_to_v2(v1_data)
         assert meta.ragd_ingestion_date == indexed
 
+    def test_migrate_v2_to_v2_1(self) -> None:
+        """Test migrating v2.0 data to v2.1."""
+        v2_data = {
+            "ragd_schema_version": "2.0",
+            "dc_title": "Test Document",
+            "dc_creator": ["Author"],
+            "ragd_source_path": "/docs/test.pdf",
+            "ragd_tags": ["important"],
+        }
+        meta = migrate_v2_to_v2_1(
+            v2_data,
+            embedding_model="all-MiniLM-L6-v2",
+            embedding_dimension=384,
+        )
+
+        assert meta.ragd_schema_version == SCHEMA_V2_1
+        assert meta.dc_title == "Test Document"
+        assert meta.ragd_sensitivity == "public"  # Default
+        assert meta.ragd_embedding_model == "all-MiniLM-L6-v2"
+        assert meta.ragd_embedding_dimension == 384
+
+    def test_migrate_v2_to_v2_1_preserves_existing(self) -> None:
+        """Test v2 to v2.1 migration preserves all existing fields."""
+        v2_data = {
+            "ragd_schema_version": "2.0",
+            "dc_title": "Preserve Me",
+            "dc_creator": ["Author A", "Author B"],
+            "dc_subject": ["Python", "Testing"],
+            "ragd_source_path": "/path/to/doc.pdf",
+            "ragd_source_hash": "abc123",
+            "ragd_chunk_count": 15,
+            "ragd_tags": ["work", "important"],
+            "ragd_project": "my-project",
+            "ragd_quality_score": 0.85,
+        }
+        meta = migrate_v2_to_v2_1(v2_data)
+
+        assert meta.dc_title == "Preserve Me"
+        assert meta.dc_creator == ["Author A", "Author B"]
+        assert meta.ragd_chunk_count == 15
+        assert meta.ragd_project == "my-project"
+        assert meta.ragd_quality_score == 0.85
+
     def test_migrate_to_current(self) -> None:
         """Test migrate_to_current dispatches correctly."""
         v1_data = {"source_path": "/test.pdf"}
@@ -167,7 +221,13 @@ class TestMigration:
 
         v2_data = {"ragd_schema_version": "2.0", "dc_title": "Test"}
         meta = migrate_to_current(v2_data)
+        assert meta.ragd_schema_version == CURRENT_SCHEMA  # v2.0 migrates to v2.1
         assert meta.dc_title == "Test"
+
+        v2_1_data = {"ragd_schema_version": "2.1", "dc_title": "Already Current"}
+        meta = migrate_to_current(v2_1_data)
+        assert meta.ragd_schema_version == CURRENT_SCHEMA
+        assert meta.dc_title == "Already Current"
 
 
 class TestMetadataStore:
@@ -377,17 +437,17 @@ class TestMetadataStoreMigration:
         conn.commit()
         conn.close()
 
-        # Get should migrate
+        # Get should migrate (v1 → v2 → v2.1)
         meta = store.get("doc-001")
         assert meta is not None
-        assert meta.ragd_schema_version == SCHEMA_V2
+        assert meta.ragd_schema_version == CURRENT_SCHEMA
         assert meta.ragd_source_path == "/docs/test.pdf"
         assert meta.dc_title == "test"  # Derived
 
         # Verify migration was persisted
         raw = store.get_raw("doc-001")
         assert raw is not None
-        assert raw["ragd_schema_version"] == SCHEMA_V2
+        assert raw["ragd_schema_version"] == CURRENT_SCHEMA
 
     def test_get_migration_stats(self, store: MetadataStore) -> None:
         """Test getting migration statistics."""
@@ -395,7 +455,7 @@ class TestMetadataStoreMigration:
         store.set("doc-002", DocumentMetadata())
 
         stats = store.get_migration_stats()
-        assert stats.get(SCHEMA_V2, 0) == 2
+        assert stats.get(CURRENT_SCHEMA, 0) == 2
 
     def test_migrate_all(self, store: MetadataStore) -> None:
         """Test batch migration."""
@@ -420,7 +480,7 @@ class TestMetadataStoreMigration:
         migrated = store.migrate_all()
         assert migrated == 5
 
-        # Verify all migrated
+        # Verify all migrated to current schema
         stats = store.get_migration_stats()
-        assert stats.get(SCHEMA_V2, 0) == 5
+        assert stats.get(CURRENT_SCHEMA, 0) == 5
         assert stats.get(SCHEMA_V1, 0) == 0

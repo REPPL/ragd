@@ -19,9 +19,11 @@ from ragd.metadata.migration import (
     CURRENT_SCHEMA,
     SCHEMA_V1,
     SCHEMA_V2,
+    SCHEMA_V2_1,
     get_schema_version,
     migrate_to_current,
     migrate_v1_to_v2,
+    migrate_v2_to_v2_1,
     needs_migration,
 )
 from ragd.metadata.schema import DocumentMetadata
@@ -44,8 +46,10 @@ __all__ = [
     "CURRENT_SCHEMA",
     "SCHEMA_V1",
     "SCHEMA_V2",
+    "SCHEMA_V2_1",
     "get_schema_version",
     "migrate_to_current",
     "migrate_v1_to_v2",
+    "migrate_v2_to_v2_1",
     "needs_migration",
 ]

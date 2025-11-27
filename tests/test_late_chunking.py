@@ -205,9 +205,9 @@ class TestLateChunkingLogic:
         assert hasattr(boundary, "content")
 
     def test_max_context_tokens_constant(self):
-        """Test MAX_CONTEXT_TOKENS is defined."""
-        assert hasattr(LateChunkingEmbedder, "MAX_CONTEXT_TOKENS")
-        assert LateChunkingEmbedder.MAX_CONTEXT_TOKENS == 8192
+        """Test DEFAULT_MAX_CONTEXT_TOKENS is defined."""
+        assert hasattr(LateChunkingEmbedder, "DEFAULT_MAX_CONTEXT_TOKENS")
+        assert LateChunkingEmbedder.DEFAULT_MAX_CONTEXT_TOKENS == 8192
 
     def test_long_context_models_defined(self):
         """Test known long-context models are defined."""

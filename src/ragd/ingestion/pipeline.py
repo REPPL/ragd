@@ -218,6 +218,15 @@ def index_document(
             metadata["context"] = context_texts[i]
         metadatas.append(metadata)
 
+    # Determine which embedding model was used
+    if use_late_chunking:
+        embedding_model = config.embedding.late_chunking_model
+        # Late chunking models have varying dimensions; get from embedder
+        embedding_dimension = late_embedder.dimension if late_embedder else config.embedding.dimension
+    else:
+        embedding_model = config.embedding.model
+        embedding_dimension = config.embedding.dimension
+
     # Create document record
     document_record = DocumentRecord(
         document_id=document_id,
@@ -234,6 +243,9 @@ def index_document(
             "normalised": config.normalisation.enabled,
             "contextual": bool(context_texts),  # Was context generated?
             "late_chunking": use_late_chunking,  # Was late chunking used?
+            # v2.1: Track embedding model for multi-modal and archive compatibility
+            "embedding_model": embedding_model,
+            "embedding_dimension": embedding_dimension,
         },
     )
 

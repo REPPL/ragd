@@ -13,8 +13,8 @@ from pathlib import Path
 from typing import Any
 
 # Archive format version
-ARCHIVE_VERSION = "1.0"
-COMPATIBLE_VERSIONS = ["1.0"]
+ARCHIVE_VERSION = "1.1"
+COMPATIBLE_VERSIONS = ["1.0", "1.1"]
 
 
 @dataclass(frozen=True)
@@ -138,6 +138,10 @@ class ArchivedDocument:
     ragd_ingestion_date: str
     ragd_chunk_count: int
     metadata: dict[str, Any] = field(default_factory=dict)
+    # v1.1 / schema v2.1 fields
+    ragd_sensitivity: str = "public"
+    ragd_embedding_model: str = ""
+    ragd_embedding_dimension: int = 0
 
     def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary for JSON serialisation."""
@@ -153,6 +157,10 @@ class ArchivedDocument:
             "ragd_ingestion_date": self.ragd_ingestion_date,
             "ragd_chunk_count": self.ragd_chunk_count,
             "metadata": self.metadata,
+            # v1.1 / schema v2.1 fields
+            "ragd_sensitivity": self.ragd_sensitivity,
+            "ragd_embedding_model": self.ragd_embedding_model,
+            "ragd_embedding_dimension": self.ragd_embedding_dimension,
         }
 
     @classmethod
@@ -170,6 +178,10 @@ class ArchivedDocument:
             ragd_ingestion_date=data.get("ragd_ingestion_date", ""),
             ragd_chunk_count=data.get("ragd_chunk_count", 0),
             metadata=data.get("metadata", {}),
+            # v1.1 / schema v2.1 fields (with defaults for v1.0 archives)
+            ragd_sensitivity=data.get("ragd_sensitivity", "public"),
+            ragd_embedding_model=data.get("ragd_embedding_model", ""),
+            ragd_embedding_dimension=data.get("ragd_embedding_dimension", 0),
         )
 
 

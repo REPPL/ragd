@@ -45,6 +45,7 @@ class EmbeddingConfig(BaseModel):
     device: str | None = None
     late_chunking: bool = False  # Use late chunking for context-aware embeddings
     late_chunking_model: str = "jinaai/jina-embeddings-v2-small-en"
+    max_context_tokens: int = 8192  # Maximum tokens for late chunking context
 
 
 class LLMConfig(BaseModel):
@@ -75,6 +76,7 @@ class ContextualConfig(BaseModel):
     base_url: str = "http://localhost:11434"
     timeout_seconds: int = 60
     batch_size: int = 10
+    prompt_template: str = ""  # Custom prompt template (empty = use default)
 
 
 class RetrievalConfig(BaseModel):
@@ -102,6 +104,17 @@ class CacheConfig(BaseModel):
     max_size_mb: int = 100
 
 
+class MetadataConfig(BaseModel):
+    """LLM-enhanced metadata extraction configuration."""
+
+    llm_summary: bool = False  # Generate document summaries using LLM
+    llm_classification: bool = False  # Auto-classify document types
+    summary_model: str = "llama3.2:3b"  # Model for summary generation
+    summary_max_tokens: int = 150  # Max tokens for summaries
+    classification_model: str = "llama3.2:3b"  # Model for classification
+    base_url: str = "http://localhost:11434"  # Ollama base URL
+
+
 class NormalisationConfig(BaseModel):
     """Text normalisation configuration."""
 
@@ -127,6 +140,7 @@ class RagdConfig(BaseModel):
     chunking: ChunkingConfig = Field(default_factory=ChunkingConfig)
     cache: CacheConfig = Field(default_factory=CacheConfig)
     normalisation: NormalisationConfig = Field(default_factory=NormalisationConfig)
+    metadata: MetadataConfig = Field(default_factory=MetadataConfig)
 
     @property
     def chroma_path(self) -> Path:

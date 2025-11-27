@@ -18,7 +18,8 @@ logger = logging.getLogger(__name__)
 # Schema version constants
 SCHEMA_V1 = "1.0"
 SCHEMA_V2 = "2.0"
-CURRENT_SCHEMA = SCHEMA_V2
+SCHEMA_V2_1 = "2.1"
+CURRENT_SCHEMA = SCHEMA_V2_1
 
 
 def get_schema_version(data: dict[str, Any]) -> str:
@@ -117,11 +118,54 @@ def migrate_v1_to_v2(v1_data: dict[str, Any]) -> DocumentMetadata:
     )
 
 
-def migrate_to_current(data: dict[str, Any]) -> DocumentMetadata:
+def migrate_v2_to_v2_1(
+    v2_data: dict[str, Any],
+    embedding_model: str = "",
+    embedding_dimension: int = 0,
+) -> DocumentMetadata:
+    """Migrate v2.0 metadata to v2.1 schema.
+
+    v2.1 adds:
+    - ragd_sensitivity: str (default "public")
+    - ragd_embedding_model: str (embedding model used)
+    - ragd_embedding_dimension: int (embedding dimension)
+
+    Args:
+        v2_data: Dictionary with v2.0 schema fields
+        embedding_model: Embedding model to back-populate (from config)
+        embedding_dimension: Embedding dimension to back-populate
+
+    Returns:
+        DocumentMetadata instance with v2.1 schema
+    """
+    # Update version
+    v2_data["ragd_schema_version"] = SCHEMA_V2_1
+
+    # Add new fields with defaults
+    v2_data.setdefault("ragd_sensitivity", "public")
+    v2_data.setdefault("ragd_embedding_model", embedding_model)
+    v2_data.setdefault("ragd_embedding_dimension", embedding_dimension)
+
+    logger.debug(
+        "Migrating v2.0→v2.1: %s (embedding=%s)",
+        v2_data.get("ragd_source_path", "")[:50],
+        embedding_model or "unknown",
+    )
+
+    return DocumentMetadata.from_dict(v2_data)
+
+
+def migrate_to_current(
+    data: dict[str, Any],
+    embedding_model: str = "",
+    embedding_dimension: int = 0,
+) -> DocumentMetadata:
     """Migrate metadata from any version to current schema.
 
     Args:
         data: Raw metadata dictionary from storage
+        embedding_model: Embedding model for back-population (v2.1 migration)
+        embedding_dimension: Embedding dimension for back-population
 
     Returns:
         DocumentMetadata instance with current schema
@@ -135,7 +179,20 @@ def migrate_to_current(data: dict[str, Any]) -> DocumentMetadata:
         return DocumentMetadata.from_dict(data)
 
     if version == SCHEMA_V1:
-        return migrate_v1_to_v2(data)
+        # Chain migrations: v1 → v2 → v2.1
+        v2_metadata = migrate_v1_to_v2(data)
+        return migrate_v2_to_v2_1(
+            v2_metadata.to_dict(),
+            embedding_model=embedding_model,
+            embedding_dimension=embedding_dimension,
+        )
+
+    if version == SCHEMA_V2:
+        return migrate_v2_to_v2_1(
+            data,
+            embedding_model=embedding_model,
+            embedding_dimension=embedding_dimension,
+        )
 
     raise ValueError(f"Unknown schema version: {version}")
 

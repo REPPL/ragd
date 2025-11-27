@@ -41,8 +41,8 @@ class LateChunkingEmbedder:
     This preserves full document context in each chunk's embedding.
     """
 
-    # Maximum tokens that can be processed at once
-    MAX_CONTEXT_TOKENS = 8192
+    # Default maximum tokens (can be overridden via config)
+    DEFAULT_MAX_CONTEXT_TOKENS = 8192
 
     # Models known to support long contexts
     LONG_CONTEXT_MODELS = {
@@ -57,6 +57,7 @@ class LateChunkingEmbedder:
         model_name: str = "jinaai/jina-embeddings-v2-small-en",
         device: str | None = None,
         trust_remote_code: bool = True,
+        max_context_tokens: int | None = None,
     ) -> None:
         """Initialise late chunking embedder.
 
@@ -64,10 +65,12 @@ class LateChunkingEmbedder:
             model_name: Hugging Face model name (should support long contexts)
             device: Device to use (cuda, mps, cpu, or None for auto)
             trust_remote_code: Whether to trust remote code for models
+            max_context_tokens: Maximum tokens to process (from config)
         """
         self._model_name = model_name
         self._device = device
         self._trust_remote_code = trust_remote_code
+        self._max_context_tokens = max_context_tokens or self.DEFAULT_MAX_CONTEXT_TOKENS
         self._model: Any = None
         self._tokenizer: Any = None
 
@@ -128,7 +131,7 @@ class LateChunkingEmbedder:
             return_tensors="pt",
             return_offsets_mapping=True,
             truncation=True,
-            max_length=self.MAX_CONTEXT_TOKENS,
+            max_length=self._max_context_tokens,
         )
 
         offset_mapping = encoding["offset_mapping"][0].tolist()
@@ -194,7 +197,7 @@ class LateChunkingEmbedder:
             full_text,
             return_tensors="pt",
             truncation=True,
-            max_length=self.MAX_CONTEXT_TOKENS,
+            max_length=self._max_context_tokens,
             padding=True,
         )
 
@@ -251,7 +254,7 @@ class LateChunkingEmbedder:
                 text,
                 return_tensors="pt",
                 truncation=True,
-                max_length=self.MAX_CONTEXT_TOKENS,
+                max_length=self._max_context_tokens,
                 padding=True,
             )
 

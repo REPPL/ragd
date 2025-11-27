@@ -40,12 +40,14 @@ class TestArchiveFormat:
 
     def test_archive_version_constant(self) -> None:
         """Test archive version is defined."""
-        assert ARCHIVE_VERSION == "1.0"
-        assert "1.0" in COMPATIBLE_VERSIONS
+        assert ARCHIVE_VERSION == "1.1"
+        assert "1.0" in COMPATIBLE_VERSIONS  # Backwards compatible
+        assert "1.1" in COMPATIBLE_VERSIONS
 
     def test_is_version_compatible(self) -> None:
         """Test version compatibility checking."""
         assert is_version_compatible("1.0") is True
+        assert is_version_compatible("1.1") is True
         assert is_version_compatible("2.0") is False
         assert is_version_compatible("0.9") is False
 
@@ -132,10 +134,70 @@ class TestArchiveFormat:
         data = doc.to_dict()
         assert data["id"] == "doc-001"
         assert data["dc_title"] == "Test Document"
+        # v1.1 fields should have defaults
+        assert data["ragd_sensitivity"] == "public"
+        assert data["ragd_embedding_model"] == ""
+        assert data["ragd_embedding_dimension"] == 0
 
         restored = ArchivedDocument.from_dict(data)
         assert restored.id == doc.id
         assert restored.dc_title == doc.dc_title
+        assert restored.ragd_sensitivity == "public"
+
+    def test_archived_document_v1_1_fields(self) -> None:
+        """Test ArchivedDocument with v1.1 fields."""
+        doc = ArchivedDocument(
+            id="doc-002",
+            dc_title="Sensitive Document",
+            dc_creator=["Author"],
+            dc_date="2024-01-15",
+            dc_subject=["security"],
+            ragd_source_path="/path/to/secret.pdf",
+            ragd_source_hash="def456",
+            ragd_tags=["confidential"],
+            ragd_ingestion_date="2024-01-15T11:00:00Z",
+            ragd_chunk_count=5,
+            # v1.1 fields
+            ragd_sensitivity="confidential",
+            ragd_embedding_model="all-MiniLM-L6-v2",
+            ragd_embedding_dimension=384,
+        )
+
+        data = doc.to_dict()
+        assert data["ragd_sensitivity"] == "confidential"
+        assert data["ragd_embedding_model"] == "all-MiniLM-L6-v2"
+        assert data["ragd_embedding_dimension"] == 384
+
+        restored = ArchivedDocument.from_dict(data)
+        assert restored.ragd_sensitivity == "confidential"
+        assert restored.ragd_embedding_model == "all-MiniLM-L6-v2"
+        assert restored.ragd_embedding_dimension == 384
+
+    def test_archived_document_v1_0_backwards_compatible(self) -> None:
+        """Test ArchivedDocument can load v1.0 format (without new fields)."""
+        # Simulates a v1.0 archive document (no v1.1 fields)
+        v1_0_data = {
+            "id": "doc-003",
+            "dc_title": "Old Document",
+            "dc_creator": ["Legacy Author"],
+            "dc_date": "2023-01-01",
+            "dc_subject": [],
+            "ragd_source_path": "/old/path.pdf",
+            "ragd_source_hash": "oldhash",
+            "ragd_tags": [],
+            "ragd_ingestion_date": "2023-01-01T10:00:00Z",
+            "ragd_chunk_count": 3,
+            "metadata": {},
+            # Note: No ragd_sensitivity, ragd_embedding_model, ragd_embedding_dimension
+        }
+
+        restored = ArchivedDocument.from_dict(v1_0_data)
+        assert restored.id == "doc-003"
+        assert restored.dc_title == "Old Document"
+        # Should have defaults for v1.1 fields
+        assert restored.ragd_sensitivity == "public"
+        assert restored.ragd_embedding_model == ""
+        assert restored.ragd_embedding_dimension == 0
 
     def test_archived_chunk(self) -> None:
         """Test ArchivedChunk dataclass."""

@@ -25,7 +25,7 @@ class DocumentMetadata:
     """
 
     # Schema version for migration handling
-    ragd_schema_version: str = "2.0"
+    ragd_schema_version: str = "2.1"
 
     # Dublin Core Core Elements
     dc_title: str = ""
@@ -46,6 +46,11 @@ class DocumentMetadata:
     ragd_quality_score: float = 0.0
     ragd_tags: list[str] = field(default_factory=list)
     ragd_project: str = ""
+
+    # v2.1 Extensions
+    ragd_sensitivity: str = "public"  # public | internal | confidential
+    ragd_embedding_model: str = ""  # e.g., "all-MiniLM-L6-v2"
+    ragd_embedding_dimension: int = 0  # e.g., 384
 
     def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary for JSON storage.
@@ -74,6 +79,10 @@ class DocumentMetadata:
             "ragd_quality_score": self.ragd_quality_score,
             "ragd_tags": self.ragd_tags,
             "ragd_project": self.ragd_project,
+            # v2.1 Extensions
+            "ragd_sensitivity": self.ragd_sensitivity,
+            "ragd_embedding_model": self.ragd_embedding_model,
+            "ragd_embedding_dimension": self.ragd_embedding_dimension,
         }
         return data
 
@@ -114,6 +123,10 @@ class DocumentMetadata:
             ragd_quality_score=data.get("ragd_quality_score", 0.0),
             ragd_tags=data.get("ragd_tags", []),
             ragd_project=data.get("ragd_project", ""),
+            # v2.1 Extensions
+            ragd_sensitivity=data.get("ragd_sensitivity", "public"),
+            ragd_embedding_model=data.get("ragd_embedding_model", ""),
+            ragd_embedding_dimension=data.get("ragd_embedding_dimension", 0),
         )
 
     @classmethod
