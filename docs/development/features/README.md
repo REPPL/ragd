@@ -95,6 +95,7 @@ Features are the primary unit of work. Each feature specification describes:
 | [F-013](./planned/F-013-ragas-evaluation.md) | RAGAS Evaluation | 📅 Planned | ADR-0008 |
 | [F-014](./planned/F-014-agentic-rag.md) | Agentic RAG | 📅 Planned | State-of-the-Art RAG |
 | [F-020](./planned/F-020-ollama-llm-integration.md) | Ollama LLM Integration | 📅 Planned | State-of-the-Art Local RAG |
+| [F-055](./planned/F-055-multi-model-orchestration.md) | Multi-Model Orchestration | 📅 Planned | [State-of-the-Art Multi-Model RAG](../research/state-of-the-art-multi-model-rag.md) |
 
 ### v0.6 Features (Storage)
 
@@ -123,6 +124,8 @@ Features are the primary unit of work. Each feature specification describes:
 | ID | Feature | Status | Research |
 |----|---------|--------|----------|
 | [F-024](./planned/F-024-basic-webui.md) | Basic WebUI | 📅 Planned | State-of-the-Art User Interfaces |
+| [F-056](./planned/F-056-specialised-task-models.md) | Specialised Task Models | 📅 Planned | [State-of-the-Art Multi-Model RAG](../research/state-of-the-art-multi-model-rag.md) |
+| [F-057](./planned/F-057-model-comparison.md) | Model Comparison Mode | 📅 Planned | [State-of-the-Art Multi-Model RAG](../research/state-of-the-art-multi-model-rag.md) |
 
 ### v2.0 Features (Personal Knowledge Assistant)
 
@@ -173,11 +176,11 @@ Features are numbered sequentially with milestone-based ranges:
 | F-025 to F-034, F-037-F-038 | v0.2 | Killer Feature (PDFs, Metadata, Export, Watch, Web) |
 | F-009 to F-012 | v0.3 | Advanced Search (Citation, Contextual, Late Chunking, Hybrid) |
 | F-019 | v0.4 | Multi-Modal |
-| F-013, F-014, F-020 | v0.5 | Chat & Evaluation |
+| F-013, F-014, F-020, F-055 | v0.5 | Chat & Evaluation |
 | F-021 | v0.6 | Storage |
 | F-015 to F-018, F-023 | v0.7 | Privacy & Security |
 | F-022 | v0.8 | Intelligence |
-| F-024 | v1.0 | Platform |
+| F-024, F-056, F-057 | v1.0+ | Platform & Multi-Model Advanced |
 | F-040, F-043 | v2.0-alpha | Memory Layer |
 | F-041, F-042 | v2.0-beta | Persona Agents |
 | F-044 | v2.0 | Personal Vault |

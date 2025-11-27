@@ -37,13 +37,29 @@ Lightweight documentation of significant technical decisions.
 | [0019](./0019-pdf-processing.md) | PDF Processing Library Selection | Accepted |
 | [0023](./0023-metadata-schema-evolution.md) | Metadata Schema Evolution | Accepted |
 | [0024](./0024-optional-dependencies.md) | Optional Dependencies Strategy | Accepted |
+| [0025](./0025-advanced-html-architecture.md) | Advanced HTML Processing Architecture | Accepted |
 
-### Privacy & Security (v0.7)
+### Multi-Model Architecture (v0.5)
+
+| ADR | Title | Status |
+|-----|-------|--------|
+| [0026](./0026-multi-model-architecture.md) | Multi-Model Architecture | Accepted |
+| [0030](./0030-model-quantisation-strategy.md) | Model Quantisation Strategy | Accepted |
+
+### Fine-Tuning (v0.9)
+
+| ADR | Title | Status |
+|-----|-------|--------|
+| [0027](./0027-fine-tuning-strategy.md) | Fine-Tuning Strategy | Proposed |
+
+### Privacy & Security (v0.7+)
 
 | ADR | Title | Status |
 |-----|-------|--------|
 | [0009](./0009-security-architecture.md) | Security Architecture | Accepted |
 | [0010](./0010-vector-database-security.md) | Vector Database Security | Accepted |
+| [0028](./0028-pii-handling-architecture.md) | PII Handling Architecture | Proposed |
+| [0029](./0029-embedding-privacy-strategy.md) | Privacy-Preserving Embedding Strategy | Proposed |
 
 ### Personal Knowledge Assistant (v2.0)
 

@@ -2,15 +2,6 @@
 
 Features planned for future development.
 
-## v0.3 Features (Advanced Retrieval)
-
-| ID | Feature | Research |
-|----|---------|----------|
-| [F-009](./F-009-citation-output.md) | Citation Output | [Citation Systems](../../research/citation-systems.md) |
-| [F-010](./F-010-contextual-retrieval.md) | Contextual Retrieval | ADR-0007 |
-| [F-011](./F-011-late-chunking.md) | Late Chunking | ADR-0007 |
-| [F-012](./F-012-hybrid-search.md) | Hybrid Search | ADR-0007 |
-
 ## v0.4 Features (Multi-Modal)
 
 | ID | Feature | Research |
@@ -24,6 +15,33 @@ Features planned for future development.
 | [F-013](./F-013-ragas-evaluation.md) | RAGAS Evaluation | ADR-0008 |
 | [F-014](./F-014-agentic-rag.md) | Agentic RAG | [State-of-the-Art RAG](../../research/state-of-the-art-rag.md) |
 | [F-020](./F-020-ollama-llm-integration.md) | Ollama LLM Integration | [State-of-the-Art Local RAG](../../research/state-of-the-art-local-rag.md) |
+| [F-055](./F-055-multi-model-orchestration.md) | Multi-Model Orchestration | [State-of-the-Art Multi-Model RAG](../../research/state-of-the-art-multi-model-rag.md) |
+
+## v0.7 Features (Privacy Foundation)
+
+| ID | Feature | Research |
+|----|---------|----------|
+| [F-023](./F-023-pii-detection.md) | PII Detection | [State-of-the-Art PII Removal](../../research/state-of-the-art-pii-removal.md) |
+
+## v0.8 Features (Privacy & Compliance)
+
+| ID | Feature | Research |
+|----|---------|----------|
+| [F-059](./F-059-embedding-privacy-protection.md) | Embedding Privacy Protection | [State-of-the-Art PII Removal](../../research/state-of-the-art-pii-removal.md) |
+| [F-060](./F-060-gdpr-compliant-deletion.md) | GDPR-Compliant Deletion | [State-of-the-Art PII Removal](../../research/state-of-the-art-pii-removal.md) |
+
+## v0.9 Features (Fine-Tuning)
+
+| ID | Feature | Research |
+|----|---------|----------|
+| [F-058](./F-058-fine-tuning-pipeline.md) | Fine-Tuning Pipeline | [State-of-the-Art Fine-Tuning](../../research/state-of-the-art-fine-tuning.md) |
+
+## v1.0+ Features (Multi-Model Advanced)
+
+| ID | Feature | Research |
+|----|---------|----------|
+| [F-056](./F-056-specialised-task-models.md) | Specialised Task Models | [State-of-the-Art Multi-Model RAG](../../research/state-of-the-art-multi-model-rag.md) |
+| [F-057](./F-057-model-comparison.md) | Model Comparison Mode | [State-of-the-Art Multi-Model RAG](../../research/state-of-the-art-multi-model-rag.md) |
 
 ## v0.6+ Features
 

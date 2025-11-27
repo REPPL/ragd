@@ -15,11 +15,15 @@ This directory contains research on cutting-edge techniques that inform ragd's f
 | [state-of-the-art-rag.md](./state-of-the-art-rag.md) | Advanced RAG techniques (2024-2025): Agentic RAG, Contextual Retrieval, GraphRAG |
 | [state-of-the-art-chunking.md](./state-of-the-art-chunking.md) | Text chunking strategies: size optimisation, semantic chunking, overlap, late chunking |
 | [state-of-the-art-privacy.md](./state-of-the-art-privacy.md) | Privacy-preserving architecture: encryption, embedding security, threat models |
+| [state-of-the-art-pii-removal.md](./state-of-the-art-pii-removal.md) | PII detection and removal: Presidio, NER, redaction, GDPR compliance, embedding protection |
 | [state-of-the-art-pdf-processing.md](./state-of-the-art-pdf-processing.md) | Messy PDF processing: Docling, ColPali, OCR comparison, OHRBench findings |
 | [state-of-the-art-metadata.md](./state-of-the-art-metadata.md) | Document metadata: extraction, storage, tagging, provenance, Dublin Core |
 | [state-of-the-art-data-schemas.md](./state-of-the-art-data-schemas.md) | RAG data schemas: Pydantic models, ChromaDB patterns, parent-child relationships, citations |
 | [state-of-the-art-local-rag.md](./state-of-the-art-local-rag.md) | Local RAG: performance, caching, multi-model orchestration, vector/graph storage |
+| [state-of-the-art-multi-model-rag.md](./state-of-the-art-multi-model-rag.md) | Multi-model RAG: SLMs, model routing, SLIM models, LLM-as-Judge, ensembles |
 | [state-of-the-art-embeddings.md](./state-of-the-art-embeddings.md) | Embedding model selection: MTEB benchmarks, nomic, BGE-M3, quantisation |
+| [state-of-the-art-fine-tuning.md](./state-of-the-art-fine-tuning.md) | Fine-tuning local models: embeddings, LLMs (RAFT), rerankers, MLX, Unsloth |
+| [state-of-the-art-quantisation.md](./state-of-the-art-quantisation.md) | LLM quantisation: GGUF K-quants, Apple Silicon optimisation, KV cache, multi-model memory |
 | [state-of-the-art-evaluation.md](./state-of-the-art-evaluation.md) | RAG evaluation frameworks: RAGAS, DeepEval, BEIR, metrics interpretation |
 | [state-of-the-art-setup-ux.md](./state-of-the-art-setup-ux.md) | Easy setup patterns: uv, hardware detection, model provisioning, health checks |
 | [state-of-the-art-cli-modes.md](./state-of-the-art-cli-modes.md) | CLI dual-mode design: porcelain/plumbing, progressive disclosure, verbosity |
@@ -55,11 +59,15 @@ All research documents are complete and inform the roadmap.
 | state-of-the-art-rag.md | ✅ Complete | F-010, F-011, F-014 |
 | state-of-the-art-chunking.md | ✅ Complete | F-003, F-011 |
 | state-of-the-art-privacy.md | ✅ Complete | F-015, F-016, F-017, F-018, F-023 |
+| state-of-the-art-pii-removal.md | ✅ Complete | F-023, F-056, F-057, ADR-0028, ADR-0029 |
 | state-of-the-art-pdf-processing.md | ✅ Complete | v0.2 features |
 | state-of-the-art-metadata.md | ✅ Complete | v0.2 features |
 | state-of-the-art-data-schemas.md | ✅ Complete | F-002, F-003, F-009 |
 | state-of-the-art-local-rag.md | ✅ Complete | F-020, v0.3+ features |
+| state-of-the-art-multi-model-rag.md | ✅ Complete | F-020, F-055, F-056, F-057, ADR-0026 |
 | state-of-the-art-embeddings.md | ✅ Complete | F-004 |
+| state-of-the-art-fine-tuning.md | ✅ Complete | F-058, ADR-0027 |
+| state-of-the-art-quantisation.md | ✅ Complete | ADR-0030, F-020 |
 | state-of-the-art-evaluation.md | ✅ Complete | F-013 |
 | state-of-the-art-setup-ux.md | ✅ Complete | F-007, F-035 |
 | state-of-the-art-cli-modes.md | ✅ Complete | F-006 |
