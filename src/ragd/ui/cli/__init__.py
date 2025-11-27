@@ -15,6 +15,8 @@ from ragd.ui.cli.commands import (
     tag_remove_command,
     tag_list_command,
     list_documents_command,
+    export_command,
+    import_command,
 )
 
 __all__ = [
@@ -32,4 +34,6 @@ __all__ = [
     "tag_remove_command",
     "tag_list_command",
     "list_documents_command",
+    "export_command",
+    "import_command",
 ]

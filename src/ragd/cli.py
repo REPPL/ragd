@@ -30,6 +30,8 @@ from ragd.ui.cli import (
     tag_remove_command,
     tag_list_command,
     list_documents_command,
+    export_command,
+    import_command,
 )
 
 app = typer.Typer(
@@ -410,6 +412,70 @@ def list_docs(
         tag=tag,
         project=project,
         limit=limit,
+        output_format=output_format,  # type: ignore
+        no_color=no_color,
+    )
+
+
+# --- Export/Import commands ---
+
+@app.command("export")
+def export_archive(
+    output_path: Annotated[Path, typer.Argument(help="Path for output archive (.tar.gz).")],
+    no_embeddings: bool = typer.Option(False, "--no-embeddings", help="Exclude embeddings (smaller archive)."),
+    tag: str = typer.Option(None, "--tag", "-t", help="Only export documents with tag."),
+    project: str = typer.Option(None, "--project", "-p", help="Only export documents in project."),
+    verbose: bool = typer.Option(False, "--verbose", "-V", help="Show detailed progress."),
+    output_format: FormatOption = "rich",
+    no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
+) -> None:
+    """Export knowledge base to an archive.
+
+    Creates a portable tar.gz archive containing documents, chunks,
+    embeddings, and metadata.
+
+    Examples:
+        ragd export ~/backup.tar.gz              # Full export
+        ragd export ~/backup.tar.gz --no-embeddings  # Smaller archive
+        ragd export ~/ml.tar.gz --tag "topic:ml"     # Export by tag
+    """
+    export_command(
+        output_path=output_path,
+        no_embeddings=no_embeddings,
+        tag=tag,
+        project=project,
+        verbose=verbose,
+        output_format=output_format,  # type: ignore
+        no_color=no_color,
+    )
+
+
+@app.command("import")
+def import_archive_cmd(
+    archive_path: Annotated[Path, typer.Argument(help="Path to archive (.tar.gz).")],
+    skip_conflicts: bool = typer.Option(False, "--skip-conflicts", help="Skip documents that already exist."),
+    overwrite: bool = typer.Option(False, "--overwrite", help="Overwrite existing documents."),
+    dry_run: bool = typer.Option(False, "--dry-run", help="Validate without importing."),
+    verbose: bool = typer.Option(False, "--verbose", "-V", help="Show detailed progress."),
+    output_format: FormatOption = "rich",
+    no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
+) -> None:
+    """Import knowledge base from an archive.
+
+    Restores documents, chunks, embeddings, and metadata from
+    a portable tar.gz archive.
+
+    Examples:
+        ragd import ~/backup.tar.gz               # Import with default settings
+        ragd import ~/backup.tar.gz --dry-run     # Validate only
+        ragd import ~/backup.tar.gz --overwrite   # Replace existing documents
+    """
+    import_command(
+        archive_path=archive_path,
+        skip_conflicts=skip_conflicts,
+        overwrite=overwrite,
+        dry_run=dry_run,
+        verbose=verbose,
         output_format=output_format,  # type: ignore
         no_color=no_color,
     )
