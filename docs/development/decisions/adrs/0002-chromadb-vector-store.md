@@ -112,7 +112,7 @@ ChromaDB remains the default for simplicity.
 
 ## Related Documentation
 
-- [F-004: Embedding Generation](../../features/planned/F-004-embedding-generation.md)
-- [F-005: Semantic Search](../../features/planned/F-005-semantic-search.md)
+- [F-004: Embedding Generation](../../features/completed/F-004-embedding-generation.md)
+- [F-005: Semantic Search](../../features/completed/F-005-semantic-search.md)
 - [Acknowledgements](../../lineage/acknowledgements.md) - ChromaDB citation
 

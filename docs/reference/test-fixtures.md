@@ -554,7 +554,7 @@ generated/
 
 - [ADR-0019: PDF Processing](../development/decisions/adrs/0019-pdf-processing.md) - Quality detection for fixtures
 - [State-of-the-Art PDF Processing](../development/research/state-of-the-art-pdf-processing.md) - Messy PDF research
-- [F-002: Text Extraction](../development/features/planned/F-002-text-extraction.md) - Extraction testing
+- [F-002: Text Extraction](../development/features/completed/F-002-text-extraction.md) - Extraction testing
 
 ---
 

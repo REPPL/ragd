@@ -41,9 +41,9 @@ v0.2
 
 ## Derives Features
 
-- [F-029: Metadata Storage](../../development/features/planned/F-029-metadata-storage.md)
-- [F-030: Metadata Extraction](../../development/features/planned/F-030-metadata-extraction.md)
-- [F-031: Tag Management](../../development/features/planned/F-031-tag-management.md)
+- [F-029: Metadata Storage](../../development/features/completed/F-029-metadata-storage.md)
+- [F-030: Metadata Extraction](../../development/features/completed/F-030-metadata-extraction.md)
+- [F-031: Tag Management](../../development/features/completed/F-031-tag-management.md)
 
 ## Related Use Cases
 

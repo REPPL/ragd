@@ -521,7 +521,7 @@ def test_docling_real_conversion(sample_pdf_path):
 
 - [State-of-the-Art PDF Processing](./state-of-the-art-pdf-processing.md) - Research context
 - [ADR-0019: PDF Processing](../decisions/adrs/0019-pdf-processing.md) - Library selection
-- [F-026: Docling Integration](../features/planned/F-026-docling-integration.md) - Feature spec
+- [F-026: Docling Integration](../features/completed/F-026-docling-integration.md) - Feature spec
 - [Official Docling Docs](https://docling-project.github.io/docling/)
 - [Docling GitHub](https://github.com/docling-project/docling)
 

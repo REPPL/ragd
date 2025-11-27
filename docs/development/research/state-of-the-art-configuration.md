@@ -1181,8 +1181,8 @@ profiles:
 
 - [ADR-0013: Configuration Schema and Management](../decisions/adrs/0013-configuration-schema.md)
 - [ADR-0011: Hardware Detection](../decisions/adrs/0011-hardware-detection.md)
-- [F-035: Health Check Command](../features/planned/F-035-health-check.md)
-- [F-036: Guided Setup](../features/planned/F-036-guided-setup.md)
+- [F-035: Health Check Command](../features/completed/F-035-health-check.md)
+- [F-036: Guided Setup](../features/completed/F-036-guided-setup.md)
 - [State-of-the-Art Embeddings](./state-of-the-art-embeddings.md)
 - [State-of-the-Art Chunking](./state-of-the-art-chunking.md)
 - [State-of-the-Art Setup UX](./state-of-the-art-setup-ux.md)

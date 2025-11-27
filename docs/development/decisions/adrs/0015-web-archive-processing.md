@@ -251,6 +251,6 @@ Results
 ## Related Documentation
 
 - [State-of-the-Art HTML Processing](../../research/state-of-the-art-html-processing.md)
-- [F-038: Web Archive Support](../../features/planned/F-038-web-archive-support.md)
-- [F-037: Watch Folder](../../features/planned/F-037-watch-folder.md)
+- [F-038: Web Archive Support](../../features/completed/F-038-web-archive-support.md)
+- [F-037: Watch Folder](../../features/completed/F-037-watch-folder.md)
 - [ADR-0014: Daemon Process Management](./0014-daemon-management.md)

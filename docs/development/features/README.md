@@ -31,7 +31,6 @@ Features are the primary unit of work. Each feature specification describes:
 | [F-005](./completed/F-005-semantic-search.md) | Semantic Search | ✅ Complete | UC-002 |
 | [F-006](./completed/F-006-result-formatting.md) | Result Formatting | ✅ Complete | UC-002 |
 | [F-007](./completed/F-007-status-dashboard.md) | Status Dashboard | ✅ Complete | UC-003 |
-| [F-008](./completed/F-008-health-checks.md) | Health Checks | ✅ Complete | UC-003 |
 | [F-009](./planned/F-009-citation-output.md) | Citation Output | 📅 Planned | UC-002 |
 | [F-035](./completed/F-035-health-check.md) | Health Check Command | ✅ Complete | UC-003 |
 | [F-036](./completed/F-036-guided-setup.md) | Guided Setup | ✅ Complete | - |
@@ -42,38 +41,38 @@ Features are the primary unit of work. Each feature specification describes:
 
 | ID | Feature | Status | Research |
 |----|---------|--------|----------|
-| [F-025](./planned/F-025-pdf-quality-detection.md) | PDF Quality Detection | 📅 Planned | [State-of-the-Art PDF Processing](../research/state-of-the-art-pdf-processing.md) |
-| [F-026](./planned/F-026-docling-integration.md) | Docling Integration | 📅 Planned | [State-of-the-Art PDF Processing](../research/state-of-the-art-pdf-processing.md) |
-| [F-027](./planned/F-027-ocr-pipeline.md) | OCR Pipeline | 📅 Planned | [State-of-the-Art PDF Processing](../research/state-of-the-art-pdf-processing.md) |
-| [F-028](./planned/F-028-table-extraction.md) | Table Extraction | 📅 Planned | [State-of-the-Art PDF Processing](../research/state-of-the-art-pdf-processing.md) |
+| [F-025](./completed/F-025-pdf-quality-detection.md) | PDF Quality Detection | ✅ Complete | [State-of-the-Art PDF Processing](../research/state-of-the-art-pdf-processing.md) |
+| [F-026](./completed/F-026-docling-integration.md) | Docling Integration | ✅ Complete | [State-of-the-Art PDF Processing](../research/state-of-the-art-pdf-processing.md) |
+| [F-027](./completed/F-027-ocr-pipeline.md) | OCR Pipeline | ✅ Complete | [State-of-the-Art PDF Processing](../research/state-of-the-art-pdf-processing.md) |
+| [F-028](./completed/F-028-table-extraction.md) | Table Extraction | ✅ Complete | [State-of-the-Art PDF Processing](../research/state-of-the-art-pdf-processing.md) |
 
 #### Metadata Management
 
 | ID | Feature | Status | Research |
 |----|---------|--------|----------|
-| [F-029](./planned/F-029-metadata-storage.md) | Metadata Storage | 📅 Planned | [State-of-the-Art Metadata](../research/state-of-the-art-metadata.md) |
-| [F-030](./planned/F-030-metadata-extraction.md) | Metadata Extraction | 📅 Planned | [State-of-the-Art Metadata](../research/state-of-the-art-metadata.md) |
-| [F-031](./planned/F-031-tag-management.md) | Tag Management | 📅 Planned | [State-of-the-Art Metadata](../research/state-of-the-art-metadata.md) |
+| [F-029](./completed/F-029-metadata-storage.md) | Metadata Storage | ✅ Complete | [State-of-the-Art Metadata](../research/state-of-the-art-metadata.md) |
+| [F-030](./completed/F-030-metadata-extraction.md) | Metadata Extraction | ✅ Complete | [State-of-the-Art Metadata](../research/state-of-the-art-metadata.md) |
+| [F-031](./completed/F-031-tag-management.md) | Tag Management | ✅ Complete | [State-of-the-Art Metadata](../research/state-of-the-art-metadata.md) |
 
 #### Export & Backup
 
 | ID | Feature | Status | Research |
 |----|---------|--------|----------|
-| [F-032](./planned/F-032-export-engine.md) | Export Engine | 📅 Planned | - |
-| [F-033](./planned/F-033-import-engine.md) | Import Engine | 📅 Planned | - |
-| [F-034](./planned/F-034-archive-format.md) | Archive Format | 📅 Planned | - |
+| [F-032](./completed/F-032-export-engine.md) | Export Engine | ✅ Complete | - |
+| [F-033](./completed/F-033-import-engine.md) | Import Engine | ✅ Complete | - |
+| [F-034](./completed/F-034-archive-format.md) | Archive Format | ✅ Complete | - |
 
 #### Watch Folder
 
 | ID | Feature | Status | Research |
 |----|---------|--------|----------|
-| [F-037](./planned/F-037-watch-folder.md) | Watch Folder Auto-Indexing | 📅 Planned | [State-of-the-Art RAG Landscape](../research/state-of-the-art-rag-landscape.md) |
+| [F-037](./completed/F-037-watch-folder.md) | Watch Folder Auto-Indexing | ✅ Complete | [State-of-the-Art RAG Landscape](../research/state-of-the-art-rag-landscape.md) |
 
 #### Web Archive
 
 | ID | Feature | Status | Research |
 |----|---------|--------|----------|
-| [F-038](./planned/F-038-web-archive-support.md) | Web Archive Support | 📅 Planned | [State-of-the-Art HTML Processing](../research/state-of-the-art-html-processing.md) |
+| [F-038](./completed/F-038-web-archive-support.md) | Web Archive Support | ✅ Complete | [State-of-the-Art HTML Processing](../research/state-of-the-art-html-processing.md) |
 
 ### v0.3 Features (Advanced Retrieval)
 

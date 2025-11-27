@@ -316,7 +316,7 @@ ragd search "machine learning" --include-history
 ## Related Documentation
 
 - [State-of-the-Art Deduplication](../../research/state-of-the-art-deduplication.md)
-- [F-037: Watch Folder](../../features/planned/F-037-watch-folder.md)
+- [F-037: Watch Folder](../../features/completed/F-037-watch-folder.md)
 - [ADR-0014: Daemon Process Management](./0014-daemon-management.md)
 - [ADR-0015: Web Archive Processing](./0015-web-archive-processing.md)
 

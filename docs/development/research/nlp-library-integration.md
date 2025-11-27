@@ -507,8 +507,8 @@ metadata = [
 ## Related Documentation
 
 - [State-of-the-Art Metadata](./state-of-the-art-metadata.md) - Research context
-- [F-030: Metadata Extraction](../features/planned/F-030-metadata-extraction.md) - Feature spec
-- [F-029: Metadata Storage](../features/planned/F-029-metadata-storage.md) - Dublin Core schema
+- [F-030: Metadata Extraction](../features/completed/F-030-metadata-extraction.md) - Feature spec
+- [F-029: Metadata Storage](../features/completed/F-029-metadata-storage.md) - Dublin Core schema
 
 ---
 

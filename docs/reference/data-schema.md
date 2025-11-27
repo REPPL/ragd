@@ -519,7 +519,7 @@ class ChunkingConfig(BaseModel):
 - [ADR-0002: ChromaDB Vector Store](../development/decisions/adrs/0002-chromadb-vector-store.md)
 - [ADR-0006: Citation System](../development/decisions/adrs/0006-citation-system.md)
 - [ADR-0018: Chunking Strategy](../development/decisions/adrs/0018-chunking-strategy.md)
-- [F-003: Chunking Engine](../development/features/planned/F-003-chunking-engine.md)
+- [F-003: Chunking Engine](../development/features/completed/F-003-chunking-engine.md)
 - [F-009: Citation Output](../development/features/planned/F-009-citation-output.md)
 
 ---

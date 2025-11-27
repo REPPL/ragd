@@ -225,8 +225,8 @@ ragd meta migrate --status  # Show migration progress
 
 ## Related Documentation
 
-- [F-029: Metadata Storage](../features/planned/F-029-metadata-storage.md)
-- [F-030: Metadata Extraction](../features/planned/F-030-metadata-extraction.md)
+- [F-029: Metadata Storage](../features/completed/F-029-metadata-storage.md)
+- [F-030: Metadata Extraction](../features/completed/F-030-metadata-extraction.md)
 - [State-of-the-Art Metadata](../research/state-of-the-art-metadata.md)
 - [Dublin Core Standard](https://www.dublincore.org/specifications/dublin-core/dcmi-terms/)
 

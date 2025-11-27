@@ -429,7 +429,7 @@ def _memory_to_tier(memory_gb: float) -> HardwareTier:
 - [State-of-the-Art Local RAG](./state-of-the-art-local-rag.md) - Performance optimisation
 - [State-of-the-Art Embeddings](./state-of-the-art-embeddings.md) - Model selection
 - [State-of-the-Art Setup UX](./state-of-the-art-setup-ux.md) - Installation and detection
-- [F-035: Health Check](../features/planned/F-035-health-check.md) - ragd doctor implementation
+- [F-035: Health Check](../features/completed/F-035-health-check.md) - ragd doctor implementation
 
 ---
 

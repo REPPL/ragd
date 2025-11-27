@@ -511,9 +511,9 @@ python -m spacy download en_core_web_sm
 ## Related Documentation
 
 - [UC-005: Manage Metadata](../use-cases/briefs/UC-005-manage-metadata.md)
-- [F-029: Metadata Storage](../development/features/planned/F-029-metadata-storage.md)
-- [F-030: Metadata Extraction](../development/features/planned/F-030-metadata-extraction.md)
-- [F-031: Tag Management](../development/features/planned/F-031-tag-management.md)
+- [F-029: Metadata Storage](../development/features/completed/F-029-metadata-storage.md)
+- [F-030: Metadata Extraction](../development/features/completed/F-030-metadata-extraction.md)
+- [F-031: Tag Management](../development/features/completed/F-031-tag-management.md)
 - [Dublin Core Schema](../reference/metadata-schema.md)
 
 ---

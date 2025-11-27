@@ -220,7 +220,7 @@ class RagdConfig(BaseModel):
 
 ## Related Documentation
 
-- [F-035: Health Check Command](../../features/planned/F-035-health-check.md)
-- [F-036: Guided Setup](../../features/planned/F-036-guided-setup.md)
-- [F-037: Watch Folder](../../features/planned/F-037-watch-folder.md)
+- [F-035: Health Check Command](../../features/completed/F-035-health-check.md)
+- [F-036: Guided Setup](../../features/completed/F-036-guided-setup.md)
+- [F-037: Watch Folder](../../features/completed/F-037-watch-folder.md)
 - [ADR-0011: Hardware Detection](./0011-hardware-detection.md)

@@ -213,12 +213,26 @@ The agent MUST stop and ask when:
 | **0.X.Y** | Bug fixes after milestone | v0.1.1, v0.1.2 |
 | **X.0.0** | Breaking changes or major milestone | v1.0.0 |
 
+### Version Locations (CRITICAL)
+
+ragd defines version in **two places** that must stay synchronised:
+
+| File | Purpose |
+|------|---------|
+| `pyproject.toml` | Package metadata (pip install) |
+| `src/ragd/__init__.py` | Runtime `__version__` (CLI display) |
+
+**Always update BOTH files when changing version.**
+
+See `ragd/.claude/CLAUDE.md` for detailed version management instructions.
+
 ### Rules
 
 1. **pyproject.toml** version = next planned version during development
-2. **Git tag** = version at release moment
-3. **After release**: Bump pyproject.toml to next patch (0.1.0 → 0.1.1)
-4. **Milestone tags**: Use pre-release suffixes during development
+2. **src/ragd/__init__.py** `__version__` = same as pyproject.toml
+3. **Git tag** = version at release moment
+4. **After release**: Bump BOTH files to next patch (0.1.0 → 0.1.1)
+5. **Milestone tags**: Use pre-release suffixes during development
    - `v0.2.0-alpha.1` - Foundation complete
    - `v0.2.0-beta.1` - Features complete
    - `v0.2.0` - Release

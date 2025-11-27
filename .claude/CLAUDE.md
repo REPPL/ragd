@@ -101,9 +101,62 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 | Version | Status | Notes |
 |---------|--------|-------|
 | v0.1.0 | ✅ Released | Core RAG pipeline |
-| v0.2.0 | 📋 Planned | Messy PDFs (killer feature) |
+| v0.2.0 | ✅ Released | Messy PDFs (killer feature) |
+| v0.2.5 | ✅ Released | HTML Enhancement |
 | v0.3.0 | 📋 Planned | Advanced Search |
 | v1.0.0 | 📋 Planned | Personal Platform + WebUI |
+
+### Version Locations (CRITICAL)
+
+ragd defines version in **TWO places** that MUST stay synchronised:
+
+| File | Line | Purpose |
+|------|------|---------|
+| `pyproject.toml` | 7 | Package metadata (pip install) |
+| `src/ragd/__init__.py` | 3 | Runtime `__version__` (CLI) |
+
+**When updating version, ALWAYS update BOTH files:**
+
+```bash
+# 1. Update pyproject.toml
+#    version = "X.Y.Z"
+
+# 2. Update src/ragd/__init__.py
+#    __version__ = "X.Y.Z"
+
+# 3. Verify sync
+grep 'version = ' pyproject.toml
+grep '__version__' src/ragd/__init__.py
+ragd --version  # Must match
+```
+
+A pre-commit hook validates version consistency before commits.
+
+---
+
+## Implementation Checklists
+
+### Pre-Implementation (Before Starting)
+
+- [ ] `pyproject.toml` version matches target milestone
+- [ ] `src/ragd/__init__.py` `__version__` matches pyproject.toml
+- [ ] `ragd --version` displays expected version
+- [ ] `.venv/` activated with Python 3.12+
+- [ ] All dependencies installed (`pip install -e ".[all]"`)
+- [ ] All existing tests pass (`pytest tests/`)
+- [ ] Feature spec exists in `docs/development/features/`
+- [ ] Session file created in `.work/agents/session.yaml` (if tracking)
+
+### Post-Implementation (Before Completing)
+
+- [ ] `ragd --version` shows correct version
+- [ ] `pip show ragd` shows correct version
+- [ ] All unit tests pass: `pytest tests/`
+- [ ] Manual test script runs: `python tests/manual_vX.py`
+- [ ] Coverage target met (≥80%)
+- [ ] Feature spec marked as implemented
+- [ ] Milestone status updated
+- [ ] Pre-commit hooks pass: `pre-commit run --all-files`
 
 ---
 

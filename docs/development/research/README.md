@@ -61,7 +61,7 @@ All research documents are complete and inform the roadmap.
 | state-of-the-art-local-rag.md | ✅ Complete | F-020, v0.3+ features |
 | state-of-the-art-embeddings.md | ✅ Complete | F-004 |
 | state-of-the-art-evaluation.md | ✅ Complete | F-013 |
-| state-of-the-art-setup-ux.md | ✅ Complete | F-007, F-008 |
+| state-of-the-art-setup-ux.md | ✅ Complete | F-007, F-035 |
 | state-of-the-art-cli-modes.md | ✅ Complete | F-006 |
 | state-of-the-art-user-interfaces.md | ✅ Complete | F-024 |
 | state-of-the-art-multi-modal.md | ✅ Complete | F-019 |

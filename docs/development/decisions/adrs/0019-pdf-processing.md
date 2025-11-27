@@ -235,9 +235,9 @@ def pymupdf4llm_extract(pdf_path: Path) -> Document:
 ## Related Documentation
 
 - [State-of-the-Art PDF Processing](../../research/state-of-the-art-pdf-processing.md)
-- [F-025: PDF Quality Detection](../../features/planned/F-025-pdf-quality-detection.md)
-- [F-026: Docling Integration](../../features/planned/F-026-docling-integration.md)
-- [F-027: OCR Pipeline](../../features/planned/F-027-ocr-pipeline.md)
-- [F-028: Table Extraction](../../features/planned/F-028-table-extraction.md)
+- [F-025: PDF Quality Detection](../../features/completed/F-025-pdf-quality-detection.md)
+- [F-026: Docling Integration](../../features/completed/F-026-docling-integration.md)
+- [F-027: OCR Pipeline](../../features/completed/F-027-ocr-pipeline.md)
+- [F-028: Table Extraction](../../features/completed/F-028-table-extraction.md)
 - [UC-004: Process Messy PDFs](../../use-cases/briefs/UC-004-process-messy-pdfs.md)
 

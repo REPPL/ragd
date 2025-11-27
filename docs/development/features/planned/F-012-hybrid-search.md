@@ -149,6 +149,6 @@ CREATE VIRTUAL TABLE chunks_fts USING fts5(
 - [ADR-0007: Advanced Retrieval Techniques](../../decisions/adrs/0007-advanced-retrieval-techniques.md)
 - [F-010: Contextual Retrieval](./F-010-contextual-retrieval.md)
 - [F-011: Late Chunking](./F-011-late-chunking.md)
-- [F-005: Semantic Search](./F-005-semantic-search.md)
+- [F-005: Semantic Search](../completed/F-005-semantic-search.md)
 
 ---

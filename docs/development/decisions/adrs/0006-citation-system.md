@@ -132,6 +132,6 @@ citations:
 
 - [Citation Systems Research](../../research/citation-systems.md)
 - [F-009: Citation Output](../../features/planned/F-009-citation-output.md)
-- [F-005: Semantic Search](../../features/planned/F-005-semantic-search.md)
+- [F-005: Semantic Search](../../features/completed/F-005-semantic-search.md)
 
 ---

@@ -568,7 +568,7 @@ class OCREngine:
 - [State-of-the-Art PDF Processing](./state-of-the-art-pdf-processing.md) - Research context
 - [Docling Integration Guide](./docling-integration-guide.md) - Primary PDF processor
 - [ADR-0019: PDF Processing](../decisions/adrs/0019-pdf-processing.md) - Library selection
-- [F-027: OCR Pipeline](../features/planned/F-027-ocr-pipeline.md) - Feature spec
+- [F-027: OCR Pipeline](../features/completed/F-027-ocr-pipeline.md) - Feature spec
 
 ---
 

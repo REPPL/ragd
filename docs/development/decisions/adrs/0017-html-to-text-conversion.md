@@ -177,8 +177,8 @@ def html_fragment_to_markdown(html: str) -> str:
 ## Related Documentation
 
 - [State-of-the-Art HTML Processing](../../research/state-of-the-art-html-processing.md)
-- [F-002: Text Extraction](../../features/planned/F-002-text-extraction.md)
-- [F-038: Web Archive Support](../../features/planned/F-038-web-archive-support.md)
+- [F-002: Text Extraction](../../features/completed/F-002-text-extraction.md)
+- [F-038: Web Archive Support](../../features/completed/F-038-web-archive-support.md)
 - [ADR-0015: Web Archive Processing](./0015-web-archive-processing.md)
 - [ADR-0006: Citation System](./0006-citation-system.md)
 

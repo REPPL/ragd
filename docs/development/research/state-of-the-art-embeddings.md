@@ -418,7 +418,7 @@ START
 - [State-of-the-Art Local RAG](./state-of-the-art-local-rag.md) - Performance optimisation
 - [State-of-the-Art Evaluation](./state-of-the-art-evaluation.md) - Measuring retrieval quality
 - [ADR-0002: ChromaDB Vector Store](../decisions/adrs/0002-chromadb-vector-store.md) - Storage for embeddings
-- [F-004: Embedding Generation](../features/planned/F-004-embedding-generation.md) - Feature specification
+- [F-004: Embedding Generation](../features/completed/F-004-embedding-generation.md) - Feature specification
 
 ---
 

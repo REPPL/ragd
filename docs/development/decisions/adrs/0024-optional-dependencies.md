@@ -310,8 +310,8 @@ Implement fallback logic in PDF, OCR, and metadata modules.
 
 - [ADR-0019: PDF Processing](./0019-pdf-processing.md)
 - [ADR-0023: Metadata Schema Evolution](./0023-metadata-schema-evolution.md)
-- [F-025: PDF Quality Detection](../features/planned/F-025-pdf-quality-detection.md)
-- [F-027: OCR Pipeline](../features/planned/F-027-ocr-pipeline.md)
+- [F-025: PDF Quality Detection](../features/completed/F-025-pdf-quality-detection.md)
+- [F-027: OCR Pipeline](../features/completed/F-027-ocr-pipeline.md)
 - [Docling Integration Guide](../../research/docling-integration-guide.md)
 - [PaddleOCR Integration Guide](../../research/paddleocr-integration-guide.md)
 

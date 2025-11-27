@@ -60,7 +60,7 @@ Layer 3: TUTORIALS (How users experience it)
 
 **Location:** `docs/development/features/`
 
-**Example:** F-001 through F-008 detail exactly how to implement UC-001.
+**Example:** F-001 through F-007 and F-035-F-036 detail exactly how to implement UC-001.
 
 ### Layer 3: Tutorials
 

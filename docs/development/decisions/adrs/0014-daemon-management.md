@@ -265,6 +265,6 @@ This is explicitly deferred to post-v0.2.
 
 ## Related Documentation
 
-- [F-037: Watch Folder](../../features/planned/F-037-watch-folder.md)
+- [F-037: Watch Folder](../../features/completed/F-037-watch-folder.md)
 - [ADR-0013: Configuration Schema](./0013-configuration-schema.md)
 - [State-of-the-Art RAG Landscape](../../research/state-of-the-art-rag-landscape.md)

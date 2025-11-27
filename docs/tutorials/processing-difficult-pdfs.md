@@ -481,10 +481,10 @@ pip install "ragd[ocr]"
 ## Related Documentation
 
 - [UC-004: Process Messy PDFs](../use-cases/briefs/UC-004-process-messy-pdfs.md)
-- [F-025: PDF Quality Detection](../development/features/planned/F-025-pdf-quality-detection.md)
-- [F-026: Docling Integration](../development/features/planned/F-026-docling-integration.md)
-- [F-027: OCR Pipeline](../development/features/planned/F-027-ocr-pipeline.md)
-- [F-028: Table Extraction](../development/features/planned/F-028-table-extraction.md)
+- [F-025: PDF Quality Detection](../development/features/completed/F-025-pdf-quality-detection.md)
+- [F-026: Docling Integration](../development/features/completed/F-026-docling-integration.md)
+- [F-027: OCR Pipeline](../development/features/completed/F-027-ocr-pipeline.md)
+- [F-028: Table Extraction](../development/features/completed/F-028-table-extraction.md)
 - [ADR-0019: PDF Processing](../development/decisions/adrs/0019-pdf-processing.md)
 
 ---

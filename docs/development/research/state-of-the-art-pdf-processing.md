@@ -290,9 +290,9 @@ Standard RAG Pipeline (v0.1)
 - [ADR-0019: PDF Processing](../decisions/adrs/0019-pdf-processing.md) - Library selection decision
 - [State-of-the-Art RAG](./state-of-the-art-rag.md) - Advanced retrieval techniques
 - [UC-004: Process Messy PDFs](../../use-cases/briefs/UC-004-process-messy-pdfs.md) - Use case brief
-- [F-002: Text Extraction](../features/planned/F-002-text-extraction.md) - Basic extraction (v0.1)
-- [F-025: PDF Quality Detection](../features/planned/F-025-pdf-quality-detection.md) - Quality routing
-- [F-026: Docling Integration](../features/planned/F-026-docling-integration.md) - Primary processor
+- [F-002: Text Extraction](../features/completed/F-002-text-extraction.md) - Basic extraction (v0.1)
+- [F-025: PDF Quality Detection](../features/completed/F-025-pdf-quality-detection.md) - Quality routing
+- [F-026: Docling Integration](../features/completed/F-026-docling-integration.md) - Primary processor
 
 ---
 

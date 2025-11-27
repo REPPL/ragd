@@ -175,7 +175,7 @@ For v0.3+, consider late chunking (JinaAI approach):
 ## Related Documentation
 
 - [State-of-the-Art Chunking](../../research/state-of-the-art-chunking.md)
-- [F-003: Chunking Engine](../../features/planned/F-003-chunking-engine.md)
+- [F-003: Chunking Engine](../../features/completed/F-003-chunking-engine.md)
 - [F-011: Late Chunking](../../features/planned/F-011-late-chunking.md)
 - [State-of-the-Art Embeddings](../../research/state-of-the-art-embeddings.md)
 

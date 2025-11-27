@@ -167,6 +167,6 @@ ragd doctor
 ## Related Documentation
 
 - [State-of-the-Art Setup UX](../../research/state-of-the-art-setup-ux.md)
-- [F-035: Health Check Command](../../features/planned/F-035-health-check.md)
-- [F-036: Guided Setup](../../features/planned/F-036-guided-setup.md)
+- [F-035: Health Check Command](../../features/completed/F-035-health-check.md)
+- [F-036: Guided Setup](../../features/completed/F-036-guided-setup.md)
 - [ADR-0002: Use ChromaDB](./0002-chromadb-vector-store.md)

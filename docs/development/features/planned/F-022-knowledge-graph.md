@@ -68,7 +68,7 @@ Graph-Enhanced Retrieval
 - kuzu (embedded graph database)
 - spaCy (entity extraction)
 - networkx (analysis/visualisation)
-- F-001 to F-008 (core pipeline)
+- F-001 to F-007, F-035 (core pipeline)
 
 ## Technical Notes
 
@@ -203,6 +203,6 @@ ragd graph export --format graphml graph.graphml
 
 - [State-of-the-Art Knowledge Graphs](../../research/state-of-the-art-knowledge-graphs.md) - Research basis
 - [v0.8.0 Milestone](../../milestones/v0.8.0.md) - Release planning
-- [F-005: Semantic Search](./F-005-semantic-search.md) - Enhanced by graph
+- [F-005: Semantic Search](../completed/F-005-semantic-search.md) - Enhanced by graph
 
 ---

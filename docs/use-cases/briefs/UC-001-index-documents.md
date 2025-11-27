@@ -37,10 +37,10 @@ v0.1
 
 ## Derives Features
 
-- [F-001: Document Ingestion Pipeline](../../development/features/planned/F-001-document-ingestion.md)
-- [F-002: Text Extraction](../../development/features/planned/F-002-text-extraction.md)
-- [F-003: Chunking Engine](../../development/features/planned/F-003-chunking-engine.md)
-- [F-004: Embedding Generation](../../development/features/planned/F-004-embedding-generation.md)
+- [F-001: Document Ingestion Pipeline](../../development/features/completed/F-001-document-ingestion.md)
+- [F-002: Text Extraction](../../development/features/completed/F-002-text-extraction.md)
+- [F-003: Chunking Engine](../../development/features/completed/F-003-chunking-engine.md)
+- [F-004: Embedding Generation](../../development/features/completed/F-004-embedding-generation.md)
 
 ## Related Use Cases
 

@@ -541,7 +541,7 @@ deduplication:
 ## Related Documentation
 
 - [ADR-0016: Document Deduplication Strategy](../decisions/adrs/0016-document-deduplication.md)
-- [F-037: Watch Folder](../features/planned/F-037-watch-folder.md)
+- [F-037: Watch Folder](../features/completed/F-037-watch-folder.md)
 - [ADR-0015: Web Archive Processing](../decisions/adrs/0015-web-archive-processing.md)
 - [State-of-the-Art Embeddings](./state-of-the-art-embeddings.md)
 

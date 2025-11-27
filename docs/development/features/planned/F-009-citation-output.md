@@ -208,8 +208,8 @@ citations:
 
 ## Related Documentation
 
-- [F-005: Semantic Search](./F-005-semantic-search.md) - Provides search results
-- [F-006: Result Formatting](./F-006-result-formatting.md) - Renders output
+- [F-005: Semantic Search](../completed/F-005-semantic-search.md) - Provides search results
+- [F-006: Result Formatting](../completed/F-006-result-formatting.md) - Renders output
 - [ADR-0006: Citation System](../../decisions/adrs/0006-citation-system.md) - Architecture decision
 - [Citation Systems Research](../../research/citation-systems.md) - Research background
 

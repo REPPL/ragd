@@ -2,51 +2,39 @@
 
 Features planned for future development.
 
-## v0.1 Features (Core RAG)
-
-| ID | Feature | Use Case |
-|----|---------|----------|
-| [F-001](./F-001-document-ingestion.md) | Document Ingestion Pipeline | UC-001 |
-| [F-002](./F-002-text-extraction.md) | Text Extraction | UC-001 |
-| [F-003](./F-003-chunking-engine.md) | Chunking Engine | UC-001 |
-| [F-004](./F-004-embedding-generation.md) | Embedding Generation | UC-001 |
-| [F-005](./F-005-semantic-search.md) | Semantic Search | UC-002 |
-| [F-006](./F-006-result-formatting.md) | Result Formatting | UC-002 |
-| [F-007](./F-007-status-dashboard.md) | Status Dashboard | UC-003 |
-| [F-008](./F-008-health-checks.md) | Health Checks | UC-003 |
-
-## v0.2 Features (Killer Feature)
-
-### PDF Processing (UC-004)
+## v0.3 Features (Advanced Retrieval)
 
 | ID | Feature | Research |
 |----|---------|----------|
-| [F-025](./F-025-pdf-quality-detection.md) | PDF Quality Detection | [State-of-the-Art PDF Processing](../../research/state-of-the-art-pdf-processing.md) |
-| [F-026](./F-026-docling-integration.md) | Docling Integration | [State-of-the-Art PDF Processing](../../research/state-of-the-art-pdf-processing.md) |
-| [F-027](./F-027-ocr-pipeline.md) | OCR Pipeline | [State-of-the-Art PDF Processing](../../research/state-of-the-art-pdf-processing.md) |
-| [F-028](./F-028-table-extraction.md) | Table Extraction | [State-of-the-Art PDF Processing](../../research/state-of-the-art-pdf-processing.md) |
+| [F-009](./F-009-citation-output.md) | Citation Output | [Citation Systems](../../research/citation-systems.md) |
+| [F-010](./F-010-contextual-retrieval.md) | Contextual Retrieval | ADR-0007 |
+| [F-011](./F-011-late-chunking.md) | Late Chunking | ADR-0007 |
+| [F-012](./F-012-hybrid-search.md) | Hybrid Search | ADR-0007 |
 
-### Metadata Management (UC-005)
-
-| ID | Feature | Research |
-|----|---------|----------|
-| [F-029](./F-029-metadata-storage.md) | Metadata Storage | [State-of-the-Art Metadata](../../research/state-of-the-art-metadata.md) |
-| [F-030](./F-030-metadata-extraction.md) | Metadata Extraction | [State-of-the-Art Metadata](../../research/state-of-the-art-metadata.md) |
-| [F-031](./F-031-tag-management.md) | Tag Management | [State-of-the-Art Metadata](../../research/state-of-the-art-metadata.md) |
-
-### Export & Backup (UC-006)
+## v0.4 Features (Multi-Modal)
 
 | ID | Feature | Research |
 |----|---------|----------|
-| [F-032](./F-032-export-engine.md) | Export Engine | - |
-| [F-033](./F-033-import-engine.md) | Import Engine | - |
-| [F-034](./F-034-archive-format.md) | Archive Format | - |
+| [F-019](./F-019-multi-modal-support.md) | Multi-Modal Support | [State-of-the-Art Multi-Modal](../../research/state-of-the-art-multi-modal.md) |
+
+## v0.5 Features (Chat & Evaluation)
+
+| ID | Feature | Research |
+|----|---------|----------|
+| [F-013](./F-013-ragas-evaluation.md) | RAGAS Evaluation | ADR-0008 |
+| [F-014](./F-014-agentic-rag.md) | Agentic RAG | [State-of-the-Art RAG](../../research/state-of-the-art-rag.md) |
+| [F-020](./F-020-ollama-llm-integration.md) | Ollama LLM Integration | [State-of-the-Art Local RAG](../../research/state-of-the-art-local-rag.md) |
+
+## v0.6+ Features
+
+See [Feature Roadmap](../README.md) for full list of future features.
 
 ## Workflow
 
 1. Create feature document here when feature is scoped
 2. Prioritise features in roadmap discussions
 3. Move to `active/` when development begins
+4. Move to `completed/` when shipped
 
 ## What Belongs Here
 
@@ -56,9 +44,9 @@ Features planned for future development.
 
 ## What Doesn't Belong Here
 
-- Active features → [active/](../active/)
-- Completed features → [completed/](../completed/)
-- Vague ideas → Issues/discussions first
+- Active features -> [active/](../active/)
+- Completed features -> [completed/](../completed/)
+- Vague ideas -> Issues/discussions first
 
 ---
 
@@ -66,4 +54,4 @@ Features planned for future development.
 
 - [Feature Roadmap](../README.md)
 - [Active Features](../active/)
-
+- [Completed Features](../completed/)

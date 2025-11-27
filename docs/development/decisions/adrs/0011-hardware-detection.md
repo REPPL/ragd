@@ -165,6 +165,6 @@ This avoids re-detection on every command while allowing manual override.
 ## Related Documentation
 
 - [State-of-the-Art Apple Silicon](../../research/state-of-the-art-apple-silicon.md)
-- [F-035: Health Check Command](../../features/planned/F-035-health-check.md)
-- [F-036: Guided Setup](../../features/planned/F-036-guided-setup.md)
+- [F-035: Health Check Command](../../features/completed/F-035-health-check.md)
+- [F-036: Guided Setup](../../features/completed/F-036-guided-setup.md)
 - [ADR-0013: Configuration Schema](./0013-configuration-schema.md)
