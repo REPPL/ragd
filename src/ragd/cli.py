@@ -32,6 +32,9 @@ from ragd.ui.cli import (
     list_documents_command,
     export_command,
     import_command,
+    watch_start_command,
+    watch_stop_command,
+    watch_status_command,
 )
 
 app = typer.Typer(
@@ -44,8 +47,10 @@ console = Console()
 # Subcommand groups
 meta_app = typer.Typer(help="Manage document metadata.")
 tag_app = typer.Typer(help="Manage document tags.")
+watch_app = typer.Typer(help="Watch folders for automatic indexing.")
 app.add_typer(meta_app, name="meta")
 app.add_typer(tag_app, name="tag")
+app.add_typer(watch_app, name="watch")
 
 
 # Output format option
@@ -476,6 +481,63 @@ def import_archive_cmd(
         overwrite=overwrite,
         dry_run=dry_run,
         verbose=verbose,
+        output_format=output_format,  # type: ignore
+        no_color=no_color,
+    )
+
+
+# --- Watch subcommands ---
+
+@watch_app.command("start")
+def watch_start(
+    directories: Annotated[list[Path], typer.Argument(help="Directories to watch.")],
+    patterns: list[str] = typer.Option(
+        None, "--pattern", "-p", help="File patterns to watch (e.g., '*.pdf')."
+    ),
+    recursive: bool = typer.Option(
+        True, "--recursive/--no-recursive", "-r", help="Watch subdirectories."
+    ),
+    no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
+) -> None:
+    """Start watching folders for automatic indexing.
+
+    Monitors specified directories for new or modified files and
+    automatically indexes them.
+
+    Examples:
+        ragd watch start ~/Documents
+        ragd watch start ~/PDFs ~/Notes --pattern "*.pdf"
+        ragd watch start ~/Research --no-recursive
+    """
+    watch_start_command(
+        directories=directories,
+        patterns=patterns,
+        recursive=recursive,
+        no_color=no_color,
+    )
+
+
+@watch_app.command("stop")
+def watch_stop(
+    no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
+) -> None:
+    """Stop the folder watcher.
+
+    Stops the background watcher process if running.
+    """
+    watch_stop_command(no_color=no_color)
+
+
+@watch_app.command("status")
+def watch_status_cmd(
+    output_format: FormatOption = "rich",
+    no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
+) -> None:
+    """Show watcher status.
+
+    Displays whether the watcher is running and which folders are being monitored.
+    """
+    watch_status_command(
         output_format=output_format,  # type: ignore
         no_color=no_color,
     )

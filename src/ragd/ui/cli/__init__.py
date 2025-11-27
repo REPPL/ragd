@@ -17,6 +17,9 @@ from ragd.ui.cli.commands import (
     list_documents_command,
     export_command,
     import_command,
+    watch_start_command,
+    watch_stop_command,
+    watch_status_command,
 )
 
 __all__ = [
@@ -36,4 +39,7 @@ __all__ = [
     "list_documents_command",
     "export_command",
     "import_command",
+    "watch_start_command",
+    "watch_stop_command",
+    "watch_status_command",
 ]
