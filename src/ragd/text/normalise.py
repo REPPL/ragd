@@ -100,12 +100,14 @@ class TextNormaliser:
         self,
         text: str,
         source_type: SourceType,
+        source_url: str | None = None,
     ) -> NormalisationResult:
         """Normalise text based on source type.
 
         Args:
             text: Text to normalise
             source_type: Type of source document
+            source_url: Optional source URL for site-specific patterns
 
         Returns:
             NormalisationResult with normalised text and metadata
@@ -127,7 +129,7 @@ class TextNormaliser:
             normalised, pdf_changes = self._normalise_pdf(normalised)
             changes.extend(pdf_changes)
         elif source_type == SourceType.HTML:
-            normalised, html_changes = self._normalise_html(normalised)
+            normalised, html_changes = self._normalise_html(normalised, source_url)
             changes.extend(html_changes)
 
         # Apply universal fixes
@@ -152,11 +154,14 @@ class TextNormaliser:
             Tuple of (normalised_text, list_of_changes)
         """
         from ragd.text.pdf_fixes import (
+            fix_ligature_errors,
             fix_ocr_spelling,
             fix_spaced_letters,
             fix_spurious_newlines,
+            fix_title_ocr,
             fix_word_boundaries,
         )
+        from ragd.text.captions import remove_captions
 
         changes: list[str] = []
         normalised = text
@@ -179,33 +184,72 @@ class TextNormaliser:
                 changes.append("fixed_spurious_newlines")
                 normalised = new_text
 
+        # Apply ligature fixes (F-051)
+        new_text = fix_ligature_errors(normalised)
+        if new_text != normalised:
+            changes.append("fixed_ligature_errors")
+            normalised = new_text
+
+        # Apply title OCR fixes (F-051)
+        new_text = fix_title_ocr(normalised)
+        if new_text != normalised:
+            changes.append("fixed_title_ocr")
+            normalised = new_text
+
         if self.settings.fix_ocr_spelling:
             new_text = fix_ocr_spelling(normalised)
             if new_text != normalised:
                 changes.append("fixed_ocr_spelling")
                 normalised = new_text
 
+        # Remove captions (F-051)
+        new_text = remove_captions(normalised)
+        if new_text != normalised:
+            changes.append("removed_captions")
+            normalised = new_text
+
         return normalised, changes
 
-    def _normalise_html(self, text: str) -> tuple[str, list[str]]:
+    def _normalise_html(
+        self, text: str, source_url: str | None = None
+    ) -> tuple[str, list[str]]:
         """Apply HTML-specific normalisation.
 
         Args:
             text: Text to normalise
+            source_url: Optional source URL for site-specific patterns
 
         Returns:
             Tuple of (normalised_text, list_of_changes)
         """
-        from ragd.text.html_clean import remove_boilerplate
+        from ragd.text.html_clean import fix_html_line_breaks, remove_boilerplate
+        from ragd.text.captions import remove_captions
 
         changes: list[str] = []
         normalised = text
 
+        # Fix line breaks first (F-051)
+        if self.settings.fix_line_breaks:
+            new_text = fix_html_line_breaks(normalised)
+            if new_text != normalised:
+                changes.append("fixed_html_line_breaks")
+                normalised = new_text
+
         if self.settings.remove_boilerplate:
-            new_text = remove_boilerplate(normalised, mode=self.settings.boilerplate_mode)
+            new_text = remove_boilerplate(
+                normalised,
+                mode=self.settings.boilerplate_mode,
+                source_url=source_url,
+            )
             if new_text != normalised:
                 changes.append(f"removed_boilerplate_{self.settings.boilerplate_mode}")
                 normalised = new_text
+
+        # Remove captions (F-051)
+        new_text = remove_captions(normalised)
+        if new_text != normalised:
+            changes.append("removed_captions")
+            normalised = new_text
 
         return normalised, changes
 
@@ -250,6 +294,7 @@ def normalise_text(
     text: str,
     source_type: SourceType,
     settings: NormalisationSettings | None = None,
+    source_url: str | None = None,
 ) -> NormalisationResult:
     """Convenience function to normalise text.
 
@@ -257,12 +302,13 @@ def normalise_text(
         text: Text to normalise
         source_type: Type of source document
         settings: Normalisation settings (uses defaults if None)
+        source_url: Optional source URL for site-specific patterns
 
     Returns:
         NormalisationResult with normalised text
     """
     normaliser = TextNormaliser(settings)
-    return normaliser.normalise(text, source_type)
+    return normaliser.normalise(text, source_type, source_url)
 
 
 def source_type_from_file_type(file_type: str) -> SourceType:

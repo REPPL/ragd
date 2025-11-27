@@ -1,4 +1,4 @@
-"""HTML boilerplate removal.
+"""HTML boilerplate removal and text cleanup.
 
 Removes common non-content elements from HTML-extracted text:
 - Navigation menus
@@ -6,12 +6,123 @@ Removes common non-content elements from HTML-extracted text:
 - Sidebars and advertising
 - Cookie notices
 - Social media widgets
+- Site-specific boilerplate (Medium, NYT, LinkedIn)
+
+Also fixes:
+- Spurious line breaks from HTML element boundaries
 """
 
 from __future__ import annotations
 
 import re
 from dataclasses import dataclass, field
+from urllib.parse import urlparse
+
+
+# Site-specific boilerplate patterns
+SITE_PATTERNS: dict[str, list[str]] = {
+    "medium.com": [
+        r"^(?:Sign in|Sign up|Get started|Open in app)\s*$",
+        r"^(?:Follow|Clap|Share|Save)\s*$",
+        r"^\d+\s*min\s+read$",
+        r"^Written by .+$",
+        r"^Member-only story$",
+        r"^Read more from .+$",
+        r"^Published in .+$",
+        r"^Responses \(\d+\)$",
+        r"^More from .+$",
+        r"^Listen$",
+        r"^Share your thinking\.$",
+    ],
+    "nytimes.com": [
+        r"^Advertisement$",
+        r"^Supported by$",
+        r"^SKIP ADVERTISEMENT$",
+        r"^Continue reading the main story$",
+        r"^More in .+$",
+        r"^Editors' Picks$",
+        r"^Site Index$",
+        r"^The Times$",
+    ],
+    "linkedin.com": [
+        r"^(?:Like|Comment|Share|Repost)\s*$",
+        r"^\d+\s*reactions?$",
+        r"^\d+\s*comments?$",
+        r"^Send$",
+        r"^Copy link$",
+        r"^Report this post$",
+        r"^Messaging$",
+        r"^LinkedIn$",
+    ],
+    "twitter.com": [
+        r"^Retweet$",
+        r"^Quote Tweet$",
+        r"^Bookmark$",
+        r"^\d+\s*(?:Retweets?|Likes?|Replies)$",
+    ],
+    "substack.com": [
+        r"^Subscribe$",
+        r"^Share$",
+        r"^Upgrade to paid$",
+        r"^\d+\s*(?:likes?|comments?)$",
+        r"^Leave a comment$",
+    ],
+}
+
+
+def extract_domain(url: str | None) -> str | None:
+    """Extract domain from URL.
+
+    Args:
+        url: URL string or None
+
+    Returns:
+        Domain name or None
+    """
+    if not url:
+        return None
+
+    try:
+        parsed = urlparse(url)
+        domain = parsed.netloc.lower()
+        # Remove www. prefix
+        if domain.startswith("www."):
+            domain = domain[4:]
+        return domain
+    except Exception:
+        return None
+
+
+def fix_html_line_breaks(text: str) -> str:
+    """Fix spurious line breaks from HTML element boundaries.
+
+    HTML extractors often insert newlines at element boundaries,
+    which breaks mid-sentence. This function rejoins lines that
+    were incorrectly split.
+
+    Args:
+        text: Text with potential spurious line breaks
+
+    Returns:
+        Text with line breaks fixed
+    """
+    # Single newlines mid-sentence → space
+    # Pattern: lowercase letter or comma + newline + lowercase letter
+    text = re.sub(r"([a-z,;:])\n([a-z])", r"\1 \2", text)
+
+    # Also handle: word ending with period followed by lowercase (rare but happens)
+    # Don't merge if the period ends a sentence (next word is capitalised)
+
+    # Handle hyphenated line breaks
+    text = re.sub(r"(\w)-\n(\w)", r"\1\2", text)
+
+    # Multiple spaces → single space
+    text = re.sub(r"  +", " ", text)
+
+    # Preserve paragraph breaks (2+ newlines) but normalise
+    text = re.sub(r"\n{3,}", "\n\n", text)
+
+    return text
 
 
 @dataclass
@@ -102,6 +213,7 @@ def remove_boilerplate(
     text: str,
     mode: str = "moderate",
     custom_patterns: list[str] | None = None,
+    source_url: str | None = None,
 ) -> str:
     """Remove boilerplate content from HTML-extracted text.
 
@@ -109,6 +221,7 @@ def remove_boilerplate(
         text: Text extracted from HTML
         mode: Removal mode - conservative, moderate, or aggressive
         custom_patterns: Additional regex patterns to match boilerplate
+        source_url: Source URL for site-specific pattern matching
 
     Returns:
         Text with boilerplate removed
@@ -133,6 +246,14 @@ def remove_boilerplate(
         # Aggressive adds comments and related
         all_patterns.extend(patterns.comment_patterns)
         all_patterns.extend(patterns.related_patterns)
+
+    # Add site-specific patterns based on source URL
+    domain = extract_domain(source_url)
+    if domain:
+        for site_domain, site_patterns in SITE_PATTERNS.items():
+            if site_domain in domain or domain.endswith(site_domain):
+                all_patterns.extend(site_patterns)
+                break
 
     # Add custom patterns
     if custom_patterns:

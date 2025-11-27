@@ -172,12 +172,27 @@ class MarkdownExtractor:
 class HTMLExtractor:
     """Extract text from HTML files, stripping tags.
 
-    Basic extractor using BeautifulSoup. For advanced features (F-039),
-    use AdvancedHTMLExtractor.
+    Uses trafilatura for article extraction when available (F-051),
+    falls back to BeautifulSoup with proper spacing.
     """
+
+    def __init__(self) -> None:
+        """Initialise HTML extractor."""
+        self._trafilatura_available = self._check_trafilatura()
+
+    def _check_trafilatura(self) -> bool:
+        """Check if trafilatura is available."""
+        try:
+            import trafilatura
+            return True
+        except ImportError:
+            return False
 
     def extract(self, path: Path) -> ExtractionResult:
         """Extract text from HTML file.
+
+        Uses trafilatura for article extraction when available,
+        falls back to BeautifulSoup with space separator (not newline).
 
         Args:
             path: Path to HTML file
@@ -189,27 +204,70 @@ class HTMLExtractor:
             with open(path, "rb") as f:
                 raw_data = f.read()
 
-            # Let BeautifulSoup handle encoding (respects meta charset)
+            # Try to decode
+            try:
+                html_content = raw_data.decode("utf-8")
+                encoding = "utf-8"
+            except UnicodeDecodeError:
+                html_content = raw_data.decode("latin-1")
+                encoding = "latin-1"
+
+            # Try trafilatura first (F-051: trafilatura-first strategy)
+            if self._trafilatura_available:
+                try:
+                    import trafilatura
+
+                    text = trafilatura.extract(
+                        html_content,
+                        include_comments=False,
+                        include_tables=True,
+                        no_fallback=False,
+                        favor_precision=True,
+                    )
+
+                    if text and len(text) > 50:  # Reasonable content extracted
+                        # Get title from HTML
+                        soup = BeautifulSoup(raw_data, "html.parser")
+                        title = soup.title.string if soup.title else None
+
+                        return ExtractionResult(
+                            text=text,
+                            metadata={
+                                "source": str(path),
+                                "format": "html",
+                                "encoding": encoding,
+                                "title": title,
+                            },
+                            extraction_method="trafilatura",
+                        )
+                except Exception:
+                    pass  # Fall through to BeautifulSoup
+
+            # Fallback: BeautifulSoup with SPACE separator (not newline!)
             soup = BeautifulSoup(raw_data, "html.parser")
-            detected_encoding = soup.original_encoding or "utf-8"
 
             # Remove script and style elements
             for element in soup(["script", "style", "nav", "footer", "header"]):
                 element.decompose()
 
-            # Get text with reasonable spacing
-            text = soup.get_text(separator="\n", strip=True)
+            # F-051: Use space separator, not newline
+            # This prevents spurious line breaks at inline element boundaries
+            text = soup.get_text(separator=" ", strip=True)
 
-            # Clean up excessive whitespace
-            lines = [line.strip() for line in text.splitlines() if line.strip()]
-            text = "\n".join(lines)
+            # Normalise whitespace
+            import re
+            text = re.sub(r"\s+", " ", text)
+
+            # Add paragraph breaks at block elements
+            # This is a simple heuristic - trafilatura handles this better
+            text = text.strip()
 
             return ExtractionResult(
                 text=text,
                 metadata={
                     "source": str(path),
                     "format": "html",
-                    "encoding": detected_encoding,
+                    "encoding": soup.original_encoding or encoding,
                     "title": soup.title.string if soup.title else None,
                 },
                 extraction_method="beautifulsoup",

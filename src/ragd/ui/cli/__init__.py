@@ -8,6 +8,7 @@ from ragd.ui.cli.commands import (
     status_command,
     doctor_command,
     config_command,
+    reindex_command,
 )
 
 __all__ = [
@@ -18,4 +19,5 @@ __all__ = [
     "status_command",
     "doctor_command",
     "config_command",
+    "reindex_command",
 ]

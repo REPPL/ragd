@@ -23,6 +23,7 @@ from ragd.ui.cli import (
     status_command,
     doctor_command,
     config_command,
+    reindex_command,
 )
 
 app = typer.Typer(
@@ -222,6 +223,40 @@ def config(
     config_command(
         show=show,
         path=path,
+        no_color=no_color,
+    )
+
+
+@app.command()
+def reindex(
+    document_id: Annotated[
+        str | None, typer.Argument(help="Specific document ID to re-index.")
+    ] = None,
+    all_docs: bool = typer.Option(False, "--all", "-a", help="Re-index all documents."),
+    file_type: str = typer.Option(None, "--type", "-t", help="Re-index by file type (pdf, html)."),
+    force: bool = typer.Option(False, "--force", "-f", help="Skip confirmation prompt."),
+    verbose: bool = typer.Option(False, "--verbose", "-V", help="Show per-file progress."),
+    output_format: FormatOption = "rich",
+    no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
+) -> None:
+    """Re-index documents with improved text extraction.
+
+    Use this command after upgrading ragd to apply the latest text
+    quality improvements to existing documents.
+
+    Examples:
+        ragd reindex --all              # Re-index all documents
+        ragd reindex --type pdf         # Re-index only PDFs
+        ragd reindex doc-123            # Re-index specific document
+        ragd reindex --all --force      # Re-index without confirmation
+    """
+    reindex_command(
+        document_id=document_id,
+        all_docs=all_docs,
+        file_type=file_type,
+        force=force,
+        verbose=verbose,
+        output_format=output_format,  # type: ignore
         no_color=no_color,
     )
 

@@ -327,3 +327,89 @@ def _fix_unrecognised_words(text: str) -> str:
 def _get_word_set() -> set[str]:
     """Get cached set of common words for validation."""
     return get_common_words()
+
+
+# Ligature confusion patterns (fi, fl, ff, ffi, ffl)
+# OCR often misreads these as separate characters
+LIGATURE_PATTERNS = [
+    # "ii" at start of word before vowel → likely "fi"
+    (r"\bii([aeiou])", r"fi\1"),
+    # "ii" in middle of word → likely "fi"
+    (r"([a-z])ii([a-z])", r"\1fi\2"),
+    # Common ligature words
+    (r"\bdeii", "defi"),  # definition, etc.
+    (r"\biind", "find"),
+    (r"\biirst", "first"),
+    (r"\biive", "five"),
+    (r"\biinal", "final"),
+    (r"\biire", "fire"),
+    (r"\biish", "fish"),
+    (r"\bofii", "offi"),  # official, office
+    (r"\bsuii", "suffi"),  # sufficient, suffix
+    (r"\bafii", "affi"),  # affirmative, affiliate
+    (r"\befii", "effi"),  # efficient, efficacy
+    # fl ligature issues
+    (r"\bilow", "flow"),
+    (r"\bioor", "floor"),
+    (r"\bilee", "flee"),
+    (r"\biag", "flag"),
+]
+
+
+def fix_ligature_errors(text: str) -> str:
+    """Fix common OCR ligature confusion (fi, fl, ff).
+
+    OCR systems often fail to recognise typographic ligatures,
+    resulting in "ii" instead of "fi", "ll" patterns for "fl", etc.
+
+    Args:
+        text: Text with potential ligature errors
+
+    Returns:
+        Text with ligature errors corrected
+    """
+    result = text
+
+    for pattern, replacement in LIGATURE_PATTERNS:
+        result = re.sub(pattern, replacement, result, flags=re.IGNORECASE)
+
+    return result
+
+
+# Title case OCR patterns (common misrecognitions in headings)
+TITLE_OCR_PATTERNS = [
+    # Common word corrections
+    (r"\bAti\b", "An"),
+    (r"\bTlie\b", "The"),
+    (r"\bTbe\b", "The"),
+    (r"\bQii", "Qu"),  # Qiiestion → Question
+    (r"\bWliat\b", "What"),
+    (r"\bWlien\b", "When"),
+    (r"\bWliere\b", "Where"),
+    (r"\bWliich\b", "Which"),
+    (r"\bWliy\b", "Why"),
+    (r"\bTliis\b", "This"),
+    (r"\bTliat\b", "That"),
+    (r"\bTliese\b", "These"),
+    (r"\bTliose\b", "Those"),
+]
+
+
+def fix_title_ocr(text: str) -> str:
+    """Fix common OCR errors in title case text.
+
+    Headings and titles often have different OCR error patterns
+    than body text due to different fonts and sizes.
+
+    Args:
+        text: Text with potential title OCR errors
+
+    Returns:
+        Text with title OCR errors corrected
+    """
+    result = text
+
+    for pattern, replacement in TITLE_OCR_PATTERNS:
+        result = re.sub(pattern, replacement, result)
+
+    return result

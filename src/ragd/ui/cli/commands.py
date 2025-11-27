@@ -419,3 +419,115 @@ def config_command(
                 config_dict["hardware"]["tier"] = tier.value
 
         con.print(yaml.safe_dump(config_dict, default_flow_style=False))
+
+
+def reindex_command(
+    document_id: str | None = None,
+    all_docs: bool = False,
+    file_type: str | None = None,
+    force: bool = False,
+    verbose: bool = False,
+    output_format: OutputFormat = "rich",
+    no_color: bool = False,
+) -> None:
+    """Re-index documents with improved text extraction.
+
+    Re-processes existing documents using the latest text extraction
+    and normalisation pipeline (F-051 text quality improvements).
+    """
+    from ragd.config import load_config
+    from ragd.storage import ChromaStore
+    from ragd.ingestion import index_document
+    from ragd.ingestion.extractor import extract_text
+    from ragd.text.normalise import TextNormaliser, source_type_from_file_type
+
+    con = get_console(no_color)
+
+    config = load_config()
+    store = ChromaStore(config.chroma_path)
+
+    # Determine which documents to re-index
+    if all_docs:
+        docs = store.list_documents()
+    elif file_type:
+        docs = store.list_documents(file_type=file_type)
+    elif document_id:
+        doc = store.get_document(document_id)
+        if doc is None:
+            con.print(f"[red]Document not found: {document_id}[/red]")
+            raise typer.Exit(1)
+        docs = [doc]
+    else:
+        con.print("[red]Specify --all, --type, or a document ID[/red]")
+        raise typer.Exit(1)
+
+    if not docs:
+        con.print("[yellow]No documents found matching criteria.[/yellow]")
+        raise typer.Exit()
+
+    doc_count = len(docs)
+
+    if not force:
+        if not typer.confirm(f"Re-index {doc_count} document{'s' if doc_count != 1 else ''}?"):
+            con.print("[yellow]Cancelled.[/yellow]")
+            raise typer.Exit()
+
+    con.print(f"\n[bold]Re-indexing {doc_count} document{'s' if doc_count != 1 else ''}...[/bold]\n")
+
+    success_count = 0
+    error_count = 0
+    normaliser = TextNormaliser()
+
+    with Progress(
+        SpinnerColumn(),
+        TextColumn("[progress.description]{task.description}"),
+        BarColumn(),
+        MofNCompleteColumn(),
+        console=con,
+        transient=False,
+    ) as progress:
+        task = progress.add_task("Re-indexing...", total=doc_count)
+
+        for i, doc in enumerate(docs):
+            try:
+                source_path = Path(doc.get("source_path", ""))
+                doc_id = doc.get("id", "")
+                doc_name = doc.get("name", source_path.name if source_path else "unknown")
+
+                if verbose:
+                    progress.update(
+                        task,
+                        description=f"[dim]{doc_name[:40]}...[/dim]"
+                        if len(doc_name) > 40
+                        else f"[dim]{doc_name}[/dim]",
+                    )
+
+                # Delete old chunks for this document
+                store.delete_chunks(doc_id)
+
+                # Re-extract and re-index
+                if source_path.exists():
+                    # Re-index from source file
+                    index_document(source_path, config=config, document_id=doc_id)
+                    success_count += 1
+                else:
+                    # Source file no longer exists - log warning
+                    if verbose:
+                        con.print(f"[yellow]Source not found: {source_path}[/yellow]")
+                    error_count += 1
+
+            except Exception as e:
+                if verbose:
+                    con.print(f"[red]Error re-indexing {doc_name}: {e}[/red]")
+                error_count += 1
+
+            progress.update(task, completed=i + 1)
+
+        progress.update(task, description="[green]Complete[/green]")
+
+    # Summary
+    con.print()
+    if success_count > 0:
+        con.print(f"[green]✓[/green] Re-indexed {success_count} document{'s' if success_count != 1 else ''}")
+    if error_count > 0:
+        con.print(f"[yellow]![/yellow] {error_count} document{'s' if error_count != 1 else ''} had errors")
