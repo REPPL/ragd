@@ -127,6 +127,22 @@ class NormalisationConfig(BaseModel):
     boilerplate_mode: str = "aggressive"  # conservative | moderate | aggressive
 
 
+class MultiModalConfig(BaseModel):
+    """Multi-modal (vision) configuration."""
+
+    enabled: bool = False  # Disabled by default (requires ColPali)
+    vision_model: str = "vidore/colpali-v1.0"
+    vision_dimension: int = 128
+    extract_images: bool = True
+    min_image_width: int = 100  # Skip images smaller than this
+    min_image_height: int = 100
+    generate_captions: bool = False  # Requires Ollama with LLaVA
+    caption_model: str = "llava:7b"
+    caption_base_url: str = "http://localhost:11434"
+    store_thumbnails: bool = True
+    thumbnail_max_size: int = 256  # Max dimension for thumbnails
+
+
 class RagdConfig(BaseModel):
     """Main ragd configuration."""
 
@@ -141,6 +157,7 @@ class RagdConfig(BaseModel):
     cache: CacheConfig = Field(default_factory=CacheConfig)
     normalisation: NormalisationConfig = Field(default_factory=NormalisationConfig)
     metadata: MetadataConfig = Field(default_factory=MetadataConfig)
+    multi_modal: MultiModalConfig = Field(default_factory=MultiModalConfig)
 
     @property
     def chroma_path(self) -> Path:
@@ -156,6 +173,11 @@ class RagdConfig(BaseModel):
     def metadata_path(self) -> Path:
         """Get the metadata database path."""
         return self.storage.data_dir / "metadata.sqlite"
+
+    @property
+    def images_path(self) -> Path:
+        """Get the images storage path."""
+        return self.storage.data_dir / "images"
 
 
 def create_default_config() -> RagdConfig:

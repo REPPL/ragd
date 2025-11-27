@@ -34,6 +34,7 @@ class IndexResult:
     success: bool
     skipped: bool = False
     error: str | None = None
+    image_count: int = 0  # Number of images extracted (v0.4.0)
 
 
 def index_document(
@@ -266,12 +267,40 @@ def index_document(
         ]
         bm25_index.add_chunks(document_id, chunk_tuples)
 
+    # Extract and index images from PDFs (v0.4.0 multi-modal support)
+    image_count = 0
+    if config.multi_modal.enabled and file_type == "pdf":
+        try:
+            from ragd.storage.images import ImageStore
+            from ragd.vision.pipeline import index_images_from_pdf
+
+            image_store = ImageStore(
+                config.chroma_path,
+                dimension=config.multi_modal.vision_dimension,
+            )
+            image_result = index_images_from_pdf(
+                path,
+                document_id=document_id,
+                store=image_store,
+                config=config,
+                skip_duplicates=skip_duplicates,
+            )
+            if image_result.success:
+                image_count = image_result.image_count
+        except ImportError:
+            # Vision dependencies not installed - continue without images
+            pass
+        except Exception:
+            # Log but don't fail document indexing due to image extraction
+            pass
+
     return IndexResult(
         document_id=document_id,
         path=str(path),
         filename=path.name,
         chunk_count=len(chunks),
         success=True,
+        image_count=image_count,
     )
 
 
