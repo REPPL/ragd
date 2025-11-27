@@ -84,8 +84,8 @@ Query → [BM25 Search] + [Vector Search] → Reciprocal Rank Fusion → Results
 ## Related Documentation
 
 - [State-of-the-Art RAG Research](../../research/state-of-the-art-rag.md)
-- [F-010: Contextual Retrieval](../../features/planned/F-010-contextual-retrieval.md)
-- [F-011: Late Chunking](../../features/planned/F-011-late-chunking.md)
-- [F-012: Hybrid Search](../../features/planned/F-012-hybrid-search.md)
+- [F-010: Contextual Retrieval](../../features/completed/F-010-contextual-retrieval.md)
+- [F-011: Late Chunking](../../features/completed/F-011-late-chunking.md)
+- [F-012: Hybrid Search](../../features/completed/F-012-hybrid-search.md)
 
 ---

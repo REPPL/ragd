@@ -607,7 +607,7 @@ class ChunkMetadata:
 
 - [ADR-0018: Chunking Strategy](../decisions/adrs/0018-chunking-strategy.md) - Architecture decision
 - [F-003: Chunking Engine](../features/completed/F-003-chunking-engine.md) - Feature specification
-- [F-011: Late Chunking](../features/planned/F-011-late-chunking.md) - Advanced chunking feature
+- [F-011: Late Chunking](../features/completed/F-011-late-chunking.md) - Advanced chunking feature
 - [State-of-the-Art Embeddings](./state-of-the-art-embeddings.md) - Model selection and limits
 - [State-of-the-Art Evaluation](./state-of-the-art-evaluation.md) - Measuring chunking quality
 - [State-of-the-Art RAG](./state-of-the-art-rag.md) - Overall RAG architecture
