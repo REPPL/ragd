@@ -3,7 +3,7 @@
 ## Overview
 
 **Use Case**: Command-line folder watching
-**Milestone**: v0.2.9
+**Milestone**: v0.3.0
 **Priority**: P1
 
 ## Problem Statement
@@ -98,7 +98,7 @@ Queue: 0 files pending
 ## Related Documentation
 
 - [F-037: Watch Folder Auto-Indexing](./F-037-watch-folder.md)
-- [v0.2.6-v0.2.9 Milestone](../../milestones/v0.2.6-v0.2.9.md)
+- [v0.3.0 Milestone](../../milestones/v0.3.0.md)
 
 ---
 

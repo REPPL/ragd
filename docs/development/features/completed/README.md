@@ -2,20 +2,19 @@
 
 Features that have been implemented and released.
 
-## v0.2.6-v0.2.9 - CLI Enhancements (Released)
+## v0.3.0 - Advanced Search & CLI (Released)
 
 | ID | Feature | Release |
 |----|---------|---------|
-| [F-051](./F-051-text-quality-v2.md) | Text Quality v2 + Reindex CLI | v0.2.6 |
-| [F-052](./F-052-metadata-cli.md) | Metadata CLI (meta, tag, list) | v0.2.7 |
-| [F-053](./F-053-export-import-cli.md) | Export/Import CLI | v0.2.8 |
-| [F-054](./F-054-watch-folder-cli.md) | Watch Folder CLI | v0.2.9 |
-
-## v0.2.5 - HTML Enhancement (Released)
-
-| ID | Feature | Release |
-|----|---------|---------|
-| [F-039](./F-039-advanced-html-processing.md) | Advanced HTML Processing | v0.2.5 |
+| [F-009](./F-009-citation-output.md) | Citation Output | v0.3.0 |
+| [F-010](./F-010-contextual-retrieval.md) | Contextual Retrieval | v0.3.0 |
+| [F-011](./F-011-late-chunking.md) | Late Chunking | v0.3.0 |
+| [F-012](./F-012-hybrid-search.md) | Hybrid Search | v0.3.0 |
+| [F-039](./F-039-advanced-html-processing.md) | Advanced HTML Processing | v0.3.0 |
+| [F-051](./F-051-text-quality-v2.md) | Text Quality v2 + Reindex CLI | v0.3.0 |
+| [F-052](./F-052-metadata-cli.md) | Metadata CLI (meta, tag, list) | v0.3.0 |
+| [F-053](./F-053-export-import-cli.md) | Export/Import CLI | v0.3.0 |
+| [F-054](./F-054-watch-folder-cli.md) | Watch Folder CLI | v0.3.0 |
 
 ## v0.2.0 - PDF Processing, Metadata, and Archive (Released)
 

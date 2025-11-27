@@ -3,7 +3,7 @@
 ## Overview
 
 **Use Case**: Command-line metadata management
-**Milestone**: v0.2.7
+**Milestone**: v0.3.0
 **Priority**: P1
 
 ## Problem Statement
@@ -91,7 +91,7 @@ app.add_typer(tag_app, name="tag")
 
 - [F-029: Metadata Storage](./F-029-metadata-storage.md)
 - [F-031: Tag Management](./F-031-tag-management.md)
-- [v0.2.6-v0.2.9 Milestone](../../milestones/v0.2.6-v0.2.9.md)
+- [v0.3.0 Milestone](../../milestones/v0.3.0.md)
 
 ---
 

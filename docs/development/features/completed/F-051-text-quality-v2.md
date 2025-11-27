@@ -3,7 +3,7 @@
 ## Overview
 
 **Use Case**: Improved text extraction quality
-**Milestone**: v0.2.6
+**Milestone**: v0.3.0
 **Priority**: P1
 
 ## Problem Statement
@@ -91,7 +91,7 @@ LIGATURE_PATTERNS = [
 ## Related Documentation
 
 - [F-039: Advanced HTML Processing](./F-039-advanced-html-processing.md)
-- [v0.2.6-v0.2.9 Milestone](../../milestones/v0.2.6-v0.2.9.md)
+- [v0.3.0 Milestone](../../milestones/v0.3.0.md)
 
 ---
 

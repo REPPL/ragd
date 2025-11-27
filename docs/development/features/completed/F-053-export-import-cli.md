@@ -3,7 +3,7 @@
 ## Overview
 
 **Use Case**: Command-line backup and restore
-**Milestone**: v0.2.8
+**Milestone**: v0.3.0
 **Priority**: P1
 
 ## Problem Statement
@@ -85,7 +85,7 @@ class ConflictResolution(Enum):
 - [F-032: Export Engine](./F-032-export-engine.md)
 - [F-033: Import Engine](./F-033-import-engine.md)
 - [F-034: Archive Format](./F-034-archive-format.md)
-- [v0.2.6-v0.2.9 Milestone](../../milestones/v0.2.6-v0.2.9.md)
+- [v0.3.0 Milestone](../../milestones/v0.3.0.md)
 
 ---
 
