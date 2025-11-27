@@ -202,16 +202,17 @@ def search_command(
     query: str,
     limit: int = 10,
     min_score: float | None = None,
+    mode: str = "hybrid",
     no_interactive: bool = False,
     output_format: OutputFormat = "rich",
     no_color: bool = False,
 ) -> None:
     """Search indexed documents with natural language.
 
-    Returns the most relevant document chunks based on semantic similarity.
+    Returns the most relevant document chunks using hybrid search.
     """
     from ragd.config import load_config
-    from ragd.search import search as do_search
+    from ragd.search import hybrid_search, SearchMode
     from ragd.ui import format_search_results
     from ragd.ui.tui import run_search_navigator
 
@@ -224,6 +225,14 @@ def search_command(
         min_score if min_score is not None else config.retrieval.min_score
     )
 
+    # Parse search mode
+    try:
+        search_mode = SearchMode(mode.lower())
+    except ValueError:
+        con.print(f"[red]Invalid search mode: {mode}[/red]")
+        con.print("Valid modes: hybrid, semantic, keyword")
+        raise typer.Exit(1)
+
     with Progress(
         SpinnerColumn(),
         TextColumn("[progress.description]{task.description}"),
@@ -231,13 +240,34 @@ def search_command(
         transient=True,
     ) as progress:
         if output_format == "rich":
-            progress.add_task("Searching...", total=None)
-        results = do_search(
+            progress.add_task(f"Searching ({mode})...", total=None)
+        hybrid_results = hybrid_search(
             query,
             limit=limit,
+            mode=search_mode,
             min_score=effective_min_score,
             config=config,
         )
+
+    # Convert HybridSearchResult to legacy SearchResult format for compatibility
+    from ragd.search import SearchResult, SourceLocation
+
+    results = [
+        SearchResult(
+            content=hr.content,
+            score=hr.combined_score,
+            document_id=hr.document_id,
+            document_name=hr.document_name,
+            chunk_index=hr.chunk_index,
+            metadata=hr.metadata,
+            location=SourceLocation(
+                page_number=hr.location.page_number if hr.location else None,
+                char_start=hr.location.char_start if hr.location else None,
+                char_end=hr.location.char_end if hr.location else None,
+            ) if hr.location else None,
+        )
+        for hr in hybrid_results
+    ]
 
     # Determine if we should use interactive mode
     # Interactive mode requires: TTY, rich format, not disabled, and results exist

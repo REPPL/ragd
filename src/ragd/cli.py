@@ -105,6 +105,16 @@ def index(
     )
 
 
+SearchModeOption = Annotated[
+    str,
+    typer.Option(
+        "--mode",
+        "-m",
+        help="Search mode: hybrid (default), semantic, or keyword.",
+    ),
+]
+
+
 @app.command()
 def search(
     query: Annotated[str, typer.Argument(help="Search query.")],
@@ -112,6 +122,7 @@ def search(
     min_score: float = typer.Option(
         None, "--min-score", help="Minimum similarity score (0-1). Default: 0.3"
     ),
+    mode: SearchModeOption = "hybrid",
     no_interactive: bool = typer.Option(
         False, "--no-interactive", help="Disable interactive navigator, print results directly."
     ),
@@ -120,13 +131,19 @@ def search(
 ) -> None:
     """Search indexed documents with natural language.
 
-    Returns the most relevant document chunks based on semantic similarity.
+    Returns the most relevant document chunks using hybrid search (semantic + keyword).
     By default, opens an interactive navigator to browse results (use j/k or arrows to navigate, q to quit).
+
+    Search modes:
+      - hybrid: Combines semantic and keyword search (default)
+      - semantic: Pure vector similarity search
+      - keyword: Pure BM25 keyword search
     """
     search_command(
         query=query,
         limit=limit,
         min_score=min_score,
+        mode=mode,
         no_interactive=no_interactive,
         output_format=output_format,  # type: ignore
         no_color=no_color,

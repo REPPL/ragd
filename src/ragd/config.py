@@ -53,6 +53,17 @@ class LLMConfig(BaseModel):
     base_url: str = "http://localhost:11434"
 
 
+class SearchConfig(BaseModel):
+    """Search configuration for hybrid search."""
+
+    mode: str = "hybrid"  # hybrid | semantic | keyword
+    semantic_weight: float = 0.7
+    keyword_weight: float = 0.3
+    rrf_k: int = 60
+    bm25_k1: float = 1.2
+    bm25_b: float = 0.75
+
+
 class RetrievalConfig(BaseModel):
     """Retrieval configuration."""
 
@@ -98,6 +109,7 @@ class RagdConfig(BaseModel):
     embedding: EmbeddingConfig = Field(default_factory=EmbeddingConfig)
     llm: LLMConfig = Field(default_factory=LLMConfig)
     retrieval: RetrievalConfig = Field(default_factory=RetrievalConfig)
+    search: SearchConfig = Field(default_factory=SearchConfig)
     chunking: ChunkingConfig = Field(default_factory=ChunkingConfig)
     cache: CacheConfig = Field(default_factory=CacheConfig)
     normalisation: NormalisationConfig = Field(default_factory=NormalisationConfig)

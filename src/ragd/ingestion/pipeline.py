@@ -15,6 +15,7 @@ from ragd.config import RagdConfig, load_config
 from ragd.embedding import get_embedder
 from ragd.ingestion.chunker import Chunk, chunk_text
 from ragd.ingestion.extractor import extract_text
+from ragd.search.bm25 import BM25Index
 from ragd.storage import ChromaStore, DocumentRecord
 from ragd.storage.chromadb import generate_content_hash, generate_document_id
 from ragd.text import TextNormaliser, normalise_text
@@ -40,6 +41,7 @@ def index_document(
     store: ChromaStore,
     config: RagdConfig,
     skip_duplicates: bool = True,
+    bm25_index: BM25Index | None = None,
 ) -> IndexResult:
     """Index a single document.
 
@@ -48,6 +50,7 @@ def index_document(
         store: ChromaDB store
         config: Configuration
         skip_duplicates: Whether to skip already-indexed documents
+        bm25_index: Optional BM25 index for hybrid search
 
     Returns:
         IndexResult with status
@@ -181,6 +184,14 @@ def index_document(
         document_record=document_record,
     )
 
+    # Add to BM25 index for hybrid search
+    if bm25_index is not None:
+        chunk_tuples = [
+            (f"{document_id}_chunk_{i}", content)
+            for i, content in enumerate(chunk_texts)
+        ]
+        bm25_index.add_chunks(document_id, chunk_tuples)
+
     return IndexResult(
         document_id=document_id,
         path=str(path),
@@ -217,22 +228,27 @@ def index_path(
     if not files:
         return []
 
-    # Initialise store
+    # Initialise stores
     store = ChromaStore(config.chroma_path)
+    bm25_index = BM25Index(config.chroma_path / "bm25.db")
 
     results = []
     total = len(files)
 
-    for i, file_path in enumerate(files):
-        if progress_callback:
-            progress_callback(i + 1, total, file_path.name)
+    try:
+        for i, file_path in enumerate(files):
+            if progress_callback:
+                progress_callback(i + 1, total, file_path.name)
 
-        result = index_document(
-            file_path,
-            store=store,
-            config=config,
-            skip_duplicates=skip_duplicates,
-        )
-        results.append(result)
+            result = index_document(
+                file_path,
+                store=store,
+                config=config,
+                skip_duplicates=skip_duplicates,
+                bm25_index=bm25_index,
+            )
+            results.append(result)
+    finally:
+        bm25_index.close()
 
     return results
