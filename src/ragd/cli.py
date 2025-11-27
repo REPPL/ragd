@@ -85,6 +85,10 @@ def index(
     skip_duplicates: bool = typer.Option(
         True, "--skip-duplicates/--no-skip-duplicates", help="Skip already-indexed documents."
     ),
+    contextual: bool = typer.Option(
+        None, "--contextual/--no-contextual", "-c",
+        help="Enable contextual retrieval (requires Ollama). Uses config if not specified."
+    ),
     verbose: bool = typer.Option(
         False, "--verbose", "-V", help="Show per-file progress instead of progress bar."
     ),
@@ -94,11 +98,15 @@ def index(
     """Index documents from a file or directory.
 
     Supported formats: PDF, TXT, MD, HTML
+
+    Contextual retrieval generates AI-powered context for each chunk,
+    improving search accuracy. Requires Ollama to be running locally.
     """
     index_command(
         path=path,
         recursive=recursive,
         skip_duplicates=skip_duplicates,
+        contextual=contextual,
         verbose=verbose,
         output_format=output_format,  # type: ignore
         no_color=no_color,

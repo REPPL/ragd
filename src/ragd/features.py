@@ -286,6 +286,27 @@ class FeatureDetector:
             install_command="pip install 'ragd[web]'",
         )
 
+    @property
+    def ollama(self) -> FeatureStatus:
+        """Check Ollama availability (local LLM for contextual retrieval)."""
+
+        def check_ollama() -> bool:
+            try:
+                from ragd.llm.ollama import check_ollama_available
+
+                available, _ = check_ollama_available()
+                return available
+            except Exception:
+                return False
+
+        return self._get_cached(
+            "ollama",
+            check_ollama,
+            "Ollama (local LLM)",
+            install_command="brew install ollama  # or download from ollama.ai",
+            extra_steps="ollama serve && ollama pull llama3.2:3b",
+        )
+
     def all_features(self) -> dict[str, FeatureStatus]:
         """Get status of all optional features.
 
@@ -306,6 +327,7 @@ class FeatureDetector:
             "selectolax": self.selectolax,
             "trafilatura": self.trafilatura,
             "web": self.web,
+            "ollama": self.ollama,
         }
 
     def available_features(self) -> list[str]:

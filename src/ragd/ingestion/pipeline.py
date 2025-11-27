@@ -42,6 +42,7 @@ def index_document(
     config: RagdConfig,
     skip_duplicates: bool = True,
     bm25_index: BM25Index | None = None,
+    contextual: bool | None = None,
 ) -> IndexResult:
     """Index a single document.
 
@@ -51,6 +52,7 @@ def index_document(
         config: Configuration
         skip_duplicates: Whether to skip already-indexed documents
         bm25_index: Optional BM25 index for hybrid search
+        contextual: Override contextual retrieval setting (uses config if None)
 
     Returns:
         IndexResult with status
@@ -132,19 +134,52 @@ def index_document(
             error="No chunks generated from document",
         )
 
-    # Generate embeddings
+    # Determine if contextual retrieval is enabled
+    use_contextual = contextual if contextual is not None else config.retrieval.contextual.enabled
+
+    # Original chunk content (for storage and BM25)
+    original_chunk_texts = [c.content for c in chunks]
+
+    # Generate context for chunks (if enabled and LLM available)
+    # Embedding texts may include context prefix
+    embedding_texts = original_chunk_texts.copy()
+    context_texts: list[str] = []  # Store context for metadata
+
+    if use_contextual:
+        try:
+            from ragd.llm.context import create_context_generator
+
+            context_gen = create_context_generator(
+                base_url=config.retrieval.contextual.base_url,
+                model=config.retrieval.contextual.model,
+            )
+
+            if context_gen is not None:
+                contextual_chunks = context_gen.generate_contextual_chunks(
+                    chunks=[(i, c) for i, c in enumerate(original_chunk_texts)],
+                    title=path.name,
+                    file_type=file_type,
+                )
+                # Use combined text for embedding, store context separately
+                embedding_texts = [cc.combined for cc in contextual_chunks]
+                context_texts = [cc.context for cc in contextual_chunks]
+
+        except Exception:
+            # Graceful fallback - continue without context
+            pass
+
+    # Generate embeddings (using context-enhanced text if available)
     embedder = get_embedder(
         model_name=config.embedding.model,
         device=config.embedding.device,
         batch_size=config.embedding.batch_size,
     )
 
-    chunk_texts = [c.content for c in chunks]
-    embeddings = embedder.embed(chunk_texts)
+    embeddings = embedder.embed(embedding_texts)
 
     # Prepare metadata for each chunk
     metadatas = []
-    for chunk in chunks:
+    for i, chunk in enumerate(chunks):
         metadata = {
             "chunk_index": chunk.index,
             "start_char": chunk.start_char,
@@ -156,6 +191,9 @@ def index_document(
         }
         if result.pages:
             metadata["pages"] = result.pages
+        # Add context if generated
+        if context_texts and i < len(context_texts):
+            metadata["context"] = context_texts[i]
         metadatas.append(metadata)
 
     # Create document record
@@ -172,23 +210,24 @@ def index_document(
             "pages": result.pages,
             "extraction_method": result.extraction_method,
             "normalised": config.normalisation.enabled,
+            "contextual": bool(context_texts),  # Was context generated?
         },
     )
 
-    # Store in ChromaDB
+    # Store in ChromaDB (use original content for display)
     store.add_document(
         document_id=document_id,
-        chunks=chunk_texts,
+        chunks=original_chunk_texts,
         embeddings=embeddings,
         metadatas=metadatas,
         document_record=document_record,
     )
 
-    # Add to BM25 index for hybrid search
+    # Add to BM25 index for hybrid search (use original content)
     if bm25_index is not None:
         chunk_tuples = [
             (f"{document_id}_chunk_{i}", content)
-            for i, content in enumerate(chunk_texts)
+            for i, content in enumerate(original_chunk_texts)
         ]
         bm25_index.add_chunks(document_id, chunk_tuples)
 
@@ -207,6 +246,7 @@ def index_path(
     recursive: bool = True,
     skip_duplicates: bool = True,
     progress_callback: Callable[[int, int, str], None] | None = None,
+    contextual: bool | None = None,
 ) -> list[IndexResult]:
     """Index documents from a path.
 
@@ -216,6 +256,7 @@ def index_path(
         recursive: Whether to search directories recursively
         skip_duplicates: Whether to skip already-indexed documents
         progress_callback: Optional callback for progress updates (current, total, filename)
+        contextual: Override contextual retrieval setting (uses config if None)
 
     Returns:
         List of IndexResult for each document
@@ -246,6 +287,7 @@ def index_path(
                 config=config,
                 skip_duplicates=skip_duplicates,
                 bm25_index=bm25_index,
+                contextual=contextual,
             )
             results.append(result)
     finally:

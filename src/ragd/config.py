@@ -64,12 +64,24 @@ class SearchConfig(BaseModel):
     bm25_b: float = 0.75
 
 
+class ContextualConfig(BaseModel):
+    """Contextual retrieval configuration."""
+
+    enabled: bool = False  # Disabled by default (requires Ollama)
+    provider: str = "ollama"
+    model: str = "llama3.2:3b"
+    base_url: str = "http://localhost:11434"
+    timeout_seconds: int = 60
+    batch_size: int = 10
+
+
 class RetrievalConfig(BaseModel):
     """Retrieval configuration."""
 
     default_limit: int = 10
     min_score: float = 0.3  # Filter low-relevance results by default
     rerank: bool = False
+    contextual: ContextualConfig = Field(default_factory=ContextualConfig)
 
 
 class ChunkingConfig(BaseModel):

@@ -108,6 +108,7 @@ def index_command(
     path: Path,
     recursive: bool = True,
     skip_duplicates: bool = True,
+    contextual: bool | None = None,
     verbose: bool = False,
     output_format: OutputFormat = "rich",
     no_color: bool = False,
@@ -129,6 +130,11 @@ def index_command(
     # Load config and ensure directories
     config = load_config()
     ensure_data_dir(config)
+
+    # Determine contextual retrieval setting
+    use_contextual = contextual if contextual is not None else config.retrieval.contextual.enabled
+    if use_contextual:
+        con.print("[dim]Contextual retrieval enabled (requires Ollama)[/dim]")
 
     # Discover files first to get total count
     files = discover_files(path, recursive=recursive)
@@ -169,6 +175,7 @@ def index_command(
                 recursive=recursive,
                 skip_duplicates=skip_duplicates,
                 progress_callback=progress_callback,
+                contextual=use_contextual,
             )
             progress.update(
                 task, completed=total_files, description="[green]Complete[/green]"
@@ -186,6 +193,7 @@ def index_command(
             recursive=recursive,
             skip_duplicates=skip_duplicates,
             progress_callback=verbose_callback if output_format == "rich" else None,
+            contextual=use_contextual,
         )
 
     # Format output
