@@ -7,10 +7,10 @@ Documentation for contributors and developers.
 | Area | Status |
 |------|--------|
 | Use Cases | 6 P0 briefs defined |
-| Features | 10 v0.1 features complete |
-| Tutorials | Getting Started complete |
-| Milestone | v0.1.0 released |
-| ADRs | 4 foundational decisions |
+| Features | v0.1 (9), v0.2 (12), v0.3 (4) = 25 features complete |
+| Tutorials | Getting Started + 3 v0.2 tutorials |
+| Milestone | v0.3.0 released |
+| ADRs | 24+ architecture decisions |
 
 ## Structure
 
@@ -44,11 +44,21 @@ Layer 3: TUTORIALS (How users experience it)
 - [Planned Features](./features/planned/)
 - [Milestones](./milestones/)
 
+### v0.3.0 (Latest Release)
+- [v0.3.0 Milestone](./milestones/v0.3.0.md)
+- [v0.3.0 Implementation](./implementation/v0.3.0.md)
+- [F-009: Citation Output](./features/completed/F-009-citation-output.md)
+- [F-010: Contextual Retrieval](./features/completed/F-010-contextual-retrieval.md)
+- [F-011: Late Chunking](./features/completed/F-011-late-chunking.md)
+- [F-012: Hybrid Search](./features/completed/F-012-hybrid-search.md)
+
+### v0.2.0 (Released)
+- [v0.2.0 Milestone](./milestones/v0.2.0.md)
+- [v0.2.0 Implementation](./implementation/v0.2.0.md)
+
 ### v0.1.0 (Released)
 - [v0.1.0 Milestone](./milestones/v0.1.0.md)
 - [v0.1.0 Implementation](./implementation/v0.1.0.md)
-- [F-001: Document Ingestion](./features/completed/F-001-document-ingestion.md)
-- [F-005: Semantic Search](./features/completed/F-005-semantic-search.md)
 
 ### History
 - [Completed Features](./features/completed/)

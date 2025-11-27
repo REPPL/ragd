@@ -6,9 +6,9 @@ Release planning and milestone tracking.
 
 | Version | Name | Focus | Status |
 |---------|------|-------|--------|
-| [v0.1.0](./v0.1.0.md) | Core RAG | Index, search, status | 📋 Planned |
-| [v0.2.0](./v0.2.0.md) | Killer Feature | Messy PDFs, metadata, export | 📋 Planned |
-| [v0.3.0](./v0.3.0.md) | Advanced Search | Hybrid, reranking, query processing | 📋 Planned |
+| [v0.1.0](./v0.1.0.md) | Core RAG | Index, search, status | ✅ Released |
+| [v0.2.0](./v0.2.0.md) | Killer Feature | Messy PDFs, metadata, export | ✅ Released |
+| [v0.3.0](./v0.3.0.md) | Advanced Search | Hybrid, reranking, query processing | ✅ Released |
 | [v0.4.0](./v0.4.0.md) | Multi-Modal | Vision embeddings, image queries | 📋 Planned |
 | [v0.5.0](./v0.5.0.md) | Chat | LLM integration, conversation | 📋 Planned |
 | [v0.6.0](./v0.6.0.md) | Storage | LEANN, backend switching | 📋 Planned |

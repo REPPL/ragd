@@ -31,7 +31,6 @@ Features are the primary unit of work. Each feature specification describes:
 | [F-005](./completed/F-005-semantic-search.md) | Semantic Search | ✅ Complete | UC-002 |
 | [F-006](./completed/F-006-result-formatting.md) | Result Formatting | ✅ Complete | UC-002 |
 | [F-007](./completed/F-007-status-dashboard.md) | Status Dashboard | ✅ Complete | UC-003 |
-| [F-009](./planned/F-009-citation-output.md) | Citation Output | 📅 Planned | UC-002 |
 | [F-035](./completed/F-035-health-check.md) | Health Check Command | ✅ Complete | UC-003 |
 | [F-036](./completed/F-036-guided-setup.md) | Guided Setup | ✅ Complete | - |
 
@@ -78,9 +77,10 @@ Features are the primary unit of work. Each feature specification describes:
 
 | ID | Feature | Status | Research |
 |----|---------|--------|----------|
-| [F-010](./planned/F-010-contextual-retrieval.md) | Contextual Retrieval | 📅 Planned | ADR-0007 |
-| [F-011](./planned/F-011-late-chunking.md) | Late Chunking | 📅 Planned | ADR-0007 |
-| [F-012](./planned/F-012-hybrid-search.md) | Hybrid Search | 📅 Planned | ADR-0007 |
+| [F-009](./completed/F-009-citation-output.md) | Citation Output | ✅ Complete | - |
+| [F-010](./completed/F-010-contextual-retrieval.md) | Contextual Retrieval | ✅ Complete | ADR-0007 |
+| [F-011](./completed/F-011-late-chunking.md) | Late Chunking | ✅ Complete | ADR-0007 |
+| [F-012](./completed/F-012-hybrid-search.md) | Hybrid Search | ✅ Complete | ADR-0007 |
 
 ### v0.4 Features (Multi-Modal)
 
@@ -169,9 +169,9 @@ Features are numbered sequentially with milestone-based ranges:
 
 | Range | Milestone | Theme |
 |-------|-----------|-------|
-| F-001 to F-009, F-035-F-036 | v0.1 | Core RAG |
+| F-001 to F-007, F-035-F-036 | v0.1 | Core RAG |
 | F-025 to F-034, F-037-F-038 | v0.2 | Killer Feature (PDFs, Metadata, Export, Watch, Web) |
-| F-010 to F-012 | v0.3 | Advanced Search |
+| F-009 to F-012 | v0.3 | Advanced Search (Citation, Contextual, Late Chunking, Hybrid) |
 | F-019 | v0.4 | Multi-Modal |
 | F-013, F-014, F-020 | v0.5 | Chat & Evaluation |
 | F-021 | v0.6 | Storage |
