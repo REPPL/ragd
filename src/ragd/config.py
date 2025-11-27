@@ -138,6 +138,11 @@ class RagdConfig(BaseModel):
         """Get the documents storage path."""
         return self.storage.data_dir / self.storage.documents_dir
 
+    @property
+    def metadata_path(self) -> Path:
+        """Get the metadata database path."""
+        return self.storage.data_dir / "metadata.sqlite"
+
 
 def create_default_config() -> RagdConfig:
     """Create a default configuration based on detected hardware.

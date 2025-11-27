@@ -24,6 +24,12 @@ from ragd.ui.cli import (
     doctor_command,
     config_command,
     reindex_command,
+    meta_show_command,
+    meta_edit_command,
+    tag_add_command,
+    tag_remove_command,
+    tag_list_command,
+    list_documents_command,
 )
 
 app = typer.Typer(
@@ -32,6 +38,12 @@ app = typer.Typer(
     no_args_is_help=True,
 )
 console = Console()
+
+# Subcommand groups
+meta_app = typer.Typer(help="Manage document metadata.")
+tag_app = typer.Typer(help="Manage document tags.")
+app.add_typer(meta_app, name="meta")
+app.add_typer(tag_app, name="tag")
 
 
 # Output format option
@@ -256,6 +268,148 @@ def reindex(
         file_type=file_type,
         force=force,
         verbose=verbose,
+        output_format=output_format,  # type: ignore
+        no_color=no_color,
+    )
+
+
+# --- Metadata subcommands ---
+
+@meta_app.command("show")
+def meta_show(
+    document_id: Annotated[str, typer.Argument(help="Document ID to show metadata for.")],
+    output_format: FormatOption = "rich",
+    no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
+) -> None:
+    """Show metadata for a document.
+
+    Displays Dublin Core metadata and RAG-specific fields.
+    """
+    meta_show_command(
+        document_id=document_id,
+        output_format=output_format,  # type: ignore
+        no_color=no_color,
+    )
+
+
+@meta_app.command("edit")
+def meta_edit(
+    document_id: Annotated[str, typer.Argument(help="Document ID to edit.")],
+    title: str = typer.Option(None, "--title", help="Set document title."),
+    creator: str = typer.Option(None, "--creator", help="Set creator(s), semicolon-separated."),
+    description: str = typer.Option(None, "--description", help="Set description."),
+    doc_type: str = typer.Option(None, "--type", help="Set document type."),
+    project: str = typer.Option(None, "--project", help="Set project name."),
+    no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
+) -> None:
+    """Edit metadata for a document.
+
+    Update specific metadata fields. Use semicolons to separate multiple creators.
+
+    Examples:
+        ragd meta edit doc-123 --title "My Document"
+        ragd meta edit doc-123 --creator "Smith, J.; Doe, J."
+        ragd meta edit doc-123 --project "Research"
+    """
+    meta_edit_command(
+        document_id=document_id,
+        title=title,
+        creator=creator,
+        description=description,
+        doc_type=doc_type,
+        project=project,
+        no_color=no_color,
+    )
+
+
+# --- Tag subcommands ---
+
+@tag_app.command("add")
+def tag_add(
+    document_id: Annotated[str, typer.Argument(help="Document ID to tag.")],
+    tags: Annotated[list[str], typer.Argument(help="Tags to add.")],
+    no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
+) -> None:
+    """Add tags to a document.
+
+    Examples:
+        ragd tag add doc-123 important
+        ragd tag add doc-123 "topic:ml" "status:reading"
+    """
+    tag_add_command(
+        document_id=document_id,
+        tags=tags,
+        no_color=no_color,
+    )
+
+
+@tag_app.command("remove")
+def tag_remove(
+    document_id: Annotated[str, typer.Argument(help="Document ID to untag.")],
+    tags: Annotated[list[str], typer.Argument(help="Tags to remove.")],
+    no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
+) -> None:
+    """Remove tags from a document.
+
+    Examples:
+        ragd tag remove doc-123 draft
+    """
+    tag_remove_command(
+        document_id=document_id,
+        tags=tags,
+        no_color=no_color,
+    )
+
+
+@tag_app.command("list")
+def tag_list(
+    document_id: Annotated[str | None, typer.Argument(help="Document ID (optional).")] = None,
+    show_counts: bool = typer.Option(False, "--counts", "-c", help="Show document counts per tag."),
+    output_format: FormatOption = "rich",
+    no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
+) -> None:
+    """List tags.
+
+    Without a document ID, lists all tags in the knowledge base.
+    With a document ID, lists tags for that document.
+
+    Examples:
+        ragd tag list              # All tags
+        ragd tag list --counts     # Tags with document counts
+        ragd tag list doc-123      # Tags for specific document
+    """
+    tag_list_command(
+        document_id=document_id,
+        show_counts=show_counts,
+        output_format=output_format,  # type: ignore
+        no_color=no_color,
+    )
+
+
+# --- List command ---
+
+@app.command("list")
+def list_docs(
+    tag: str = typer.Option(None, "--tag", "-t", help="Filter by tag."),
+    project: str = typer.Option(None, "--project", "-p", help="Filter by project."),
+    limit: int = typer.Option(None, "--limit", "-n", help="Maximum results."),
+    output_format: FormatOption = "rich",
+    no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
+) -> None:
+    """List documents in the knowledge base.
+
+    Filter documents by tag, project, or other criteria.
+
+    Examples:
+        ragd list                     # All documents
+        ragd list --tag important     # Documents with tag
+        ragd list --project Research  # Documents in project
+        ragd list -n 10               # First 10 documents
+    """
+    list_documents_command(
+        tag=tag,
+        project=project,
+        limit=limit,
         output_format=output_format,  # type: ignore
         no_color=no_color,
     )

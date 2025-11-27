@@ -9,6 +9,12 @@ from ragd.ui.cli.commands import (
     doctor_command,
     config_command,
     reindex_command,
+    meta_show_command,
+    meta_edit_command,
+    tag_add_command,
+    tag_remove_command,
+    tag_list_command,
+    list_documents_command,
 )
 
 __all__ = [
@@ -20,4 +26,10 @@ __all__ = [
     "doctor_command",
     "config_command",
     "reindex_command",
+    "meta_show_command",
+    "meta_edit_command",
+    "tag_add_command",
+    "tag_remove_command",
+    "tag_list_command",
+    "list_documents_command",
 ]
