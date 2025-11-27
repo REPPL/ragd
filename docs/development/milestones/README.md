@@ -8,6 +8,8 @@ Release planning and milestone tracking.
 |---------|------|-------|--------|
 | [v0.1.0](./v0.1.0.md) | Core RAG | Index, search, status | ✅ Released |
 | [v0.2.0](./v0.2.0.md) | Killer Feature | Messy PDFs, metadata, export | ✅ Released |
+| [v0.2.5](./v0.2.5.md) | HTML Enhancement | Advanced HTML processing | ✅ Released |
+| [v0.2.6-v0.2.9](./v0.2.6-v0.2.9.md) | CLI Enhancements | Text quality, metadata/tag/export/watch CLI | ✅ Released |
 | [v0.3.0](./v0.3.0.md) | Advanced Search | Hybrid, reranking, query processing | ✅ Released |
 | [v0.4.0](./v0.4.0.md) | Multi-Modal | Vision embeddings, image queries | 📋 Planned |
 | [v0.5.0](./v0.5.0.md) | Chat | LLM integration, conversation | 📋 Planned |
