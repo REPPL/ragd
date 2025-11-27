@@ -1,5 +1,9 @@
 # State-of-the-Art Document Metadata for RAG Systems
 
+> **Note:** This document surveys state-of-the-art techniques including commercial
+> cloud services. ragd implements **local-only** processing. Cloud service integration
+> is not planned until v2.0+.
+
 Techniques for extracting, storing, and leveraging document metadata to enable tagging, selection, citation, and traceability.
 
 ## Executive Summary

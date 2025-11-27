@@ -43,6 +43,8 @@ class EmbeddingConfig(BaseModel):
     dimension: int = 384
     batch_size: int = 32
     device: str | None = None
+    late_chunking: bool = False  # Use late chunking for context-aware embeddings
+    late_chunking_model: str = "jinaai/jina-embeddings-v2-small-en"
 
 
 class LLMConfig(BaseModel):
@@ -53,12 +55,35 @@ class LLMConfig(BaseModel):
     base_url: str = "http://localhost:11434"
 
 
+class SearchConfig(BaseModel):
+    """Search configuration for hybrid search."""
+
+    mode: str = "hybrid"  # hybrid | semantic | keyword
+    semantic_weight: float = 0.7
+    keyword_weight: float = 0.3
+    rrf_k: int = 60
+    bm25_k1: float = 1.2
+    bm25_b: float = 0.75
+
+
+class ContextualConfig(BaseModel):
+    """Contextual retrieval configuration."""
+
+    enabled: bool = False  # Disabled by default (requires Ollama)
+    provider: str = "ollama"
+    model: str = "llama3.2:3b"
+    base_url: str = "http://localhost:11434"
+    timeout_seconds: int = 60
+    batch_size: int = 10
+
+
 class RetrievalConfig(BaseModel):
     """Retrieval configuration."""
 
     default_limit: int = 10
     min_score: float = 0.3  # Filter low-relevance results by default
     rerank: bool = False
+    contextual: ContextualConfig = Field(default_factory=ContextualConfig)
 
 
 class ChunkingConfig(BaseModel):
@@ -77,6 +102,18 @@ class CacheConfig(BaseModel):
     max_size_mb: int = 100
 
 
+class NormalisationConfig(BaseModel):
+    """Text normalisation configuration."""
+
+    enabled: bool = True
+    fix_spaced_letters: bool = True
+    fix_word_boundaries: bool = True
+    fix_line_breaks: bool = True
+    fix_ocr_spelling: bool = True
+    remove_boilerplate: bool = True
+    boilerplate_mode: str = "aggressive"  # conservative | moderate | aggressive
+
+
 class RagdConfig(BaseModel):
     """Main ragd configuration."""
 
@@ -86,8 +123,10 @@ class RagdConfig(BaseModel):
     embedding: EmbeddingConfig = Field(default_factory=EmbeddingConfig)
     llm: LLMConfig = Field(default_factory=LLMConfig)
     retrieval: RetrievalConfig = Field(default_factory=RetrievalConfig)
+    search: SearchConfig = Field(default_factory=SearchConfig)
     chunking: ChunkingConfig = Field(default_factory=ChunkingConfig)
     cache: CacheConfig = Field(default_factory=CacheConfig)
+    normalisation: NormalisationConfig = Field(default_factory=NormalisationConfig)
 
     @property
     def chroma_path(self) -> Path:
@@ -98,6 +137,11 @@ class RagdConfig(BaseModel):
     def documents_path(self) -> Path:
         """Get the documents storage path."""
         return self.storage.data_dir / self.storage.documents_dir
+
+    @property
+    def metadata_path(self) -> Path:
+        """Get the metadata database path."""
+        return self.storage.data_dir / "metadata.sqlite"
 
 
 def create_default_config() -> RagdConfig:

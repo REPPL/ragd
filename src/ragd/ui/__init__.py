@@ -7,6 +7,7 @@ This module provides UI implementations for different interfaces:
 """
 
 from ragd.ui.formatters import (
+    CitationStyleOption,
     OutputFormat,
     format_search_results,
     format_status,
@@ -15,6 +16,7 @@ from ragd.ui.formatters import (
 )
 
 __all__ = [
+    "CitationStyleOption",
     "OutputFormat",
     "format_search_results",
     "format_status",

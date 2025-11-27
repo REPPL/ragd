@@ -2,22 +2,36 @@
 
 Features that have been implemented and released.
 
+## v0.3.0 - Advanced Search & CLI (Released)
+
+| ID | Feature | Release |
+|----|---------|---------|
+| [F-009](./F-009-citation-output.md) | Citation Output | v0.3.0 |
+| [F-010](./F-010-contextual-retrieval.md) | Contextual Retrieval | v0.3.0 |
+| [F-011](./F-011-late-chunking.md) | Late Chunking | v0.3.0 |
+| [F-012](./F-012-hybrid-search.md) | Hybrid Search | v0.3.0 |
+| [F-039](./F-039-advanced-html-processing.md) | Advanced HTML Processing | v0.3.0 |
+| [F-051](./F-051-text-quality-v2.md) | Text Quality v2 + Reindex CLI | v0.3.0 |
+| [F-052](./F-052-metadata-cli.md) | Metadata CLI (meta, tag, list) | v0.3.0 |
+| [F-053](./F-053-export-import-cli.md) | Export/Import CLI | v0.3.0 |
+| [F-054](./F-054-watch-folder-cli.md) | Watch Folder CLI | v0.3.0 |
+
 ## v0.2.0 - PDF Processing, Metadata, and Archive (Released)
 
 | ID | Feature | Release |
 |----|---------|---------|
 | [F-025](./F-025-pdf-quality-detection.md) | PDF Quality Detection | v0.2.0 |
 | [F-026](./F-026-docling-integration.md) | Docling Integration | v0.2.0 |
-| [F-027](./F-027-ocr-pipeline.md) | OCR Pipeline | v0.2.1 |
-| [F-028](./F-028-table-extraction.md) | Table Extraction | v0.2.1 |
+| [F-027](./F-027-ocr-pipeline.md) | OCR Pipeline | v0.2.0 |
+| [F-028](./F-028-table-extraction.md) | Table Extraction | v0.2.0 |
 | [F-029](./F-029-metadata-storage.md) | Metadata Storage | v0.2.0 |
 | [F-030](./F-030-metadata-extraction.md) | Metadata Extraction | v0.2.0 |
-| [F-031](./F-031-tag-management.md) | Tag Management | v0.2.1 |
-| [F-032](./F-032-export-engine.md) | Export Engine | v0.2.2 |
-| [F-033](./F-033-import-engine.md) | Import Engine | v0.2.2 |
-| [F-034](./F-034-archive-format.md) | Archive Format | v0.2.2 |
-| [F-037](./F-037-watch-folder.md) | Watch Folder | v0.2.3 |
-| [F-038](./F-038-web-archive-support.md) | Web Archive Support | v0.2.3 |
+| [F-031](./F-031-tag-management.md) | Tag Management | v0.2.0 |
+| [F-032](./F-032-export-engine.md) | Export Engine | v0.2.0 |
+| [F-033](./F-033-import-engine.md) | Import Engine | v0.2.0 |
+| [F-034](./F-034-archive-format.md) | Archive Format | v0.2.0 |
+| [F-037](./F-037-watch-folder.md) | Watch Folder | v0.2.0 |
+| [F-038](./F-038-web-archive-support.md) | Web Archive Support | v0.2.0 |
 
 ## v0.1.0 - Core RAG (Released)
 

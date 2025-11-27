@@ -478,9 +478,9 @@ ragd-backup.tar.gz
 
 ## Next Steps
 
-- **Automate indexing:** Watch Folder tutorial (v0.2.3)
-- **Advanced search:** [Search Guide](../guides/search.md)
-- **Configuration:** [Configuration Guide](../guides/configuration.md)
+- **CLI essentials:** [CLI Essentials Guide](../guides/cli/essentials.md)
+- **Advanced CLI:** [CLI Advanced Guide](../guides/cli/advanced.md)
+- **Troubleshooting:** [Troubleshooting Guide](../guides/troubleshooting.md)
 
 ---
 
@@ -524,6 +524,6 @@ ragd-backup.tar.gz
 - [F-032: Export Engine](../development/features/completed/F-032-export-engine.md)
 - [F-033: Import Engine](../development/features/completed/F-033-import-engine.md)
 - [F-034: Archive Format](../development/features/completed/F-034-archive-format.md)
-- [Archive Format Specification](../reference/archive-format.md)
+- [Data Schema Reference](../reference/data-schema.md)
 
 ---

@@ -1,5 +1,9 @@
 # Citation Systems Research
 
+> **Note:** This document surveys state-of-the-art techniques including commercial
+> cloud services. ragd implements **local-only** processing. Cloud service integration
+> is not planned until v2.0+.
+
 Best practices for citing documents in RAG systems.
 
 ## Executive Summary

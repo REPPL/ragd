@@ -23,6 +23,18 @@ from ragd.ui.cli import (
     status_command,
     doctor_command,
     config_command,
+    reindex_command,
+    meta_show_command,
+    meta_edit_command,
+    tag_add_command,
+    tag_remove_command,
+    tag_list_command,
+    list_documents_command,
+    export_command,
+    import_command,
+    watch_start_command,
+    watch_stop_command,
+    watch_status_command,
 )
 
 app = typer.Typer(
@@ -31,6 +43,14 @@ app = typer.Typer(
     no_args_is_help=True,
 )
 console = Console()
+
+# Subcommand groups
+meta_app = typer.Typer(help="Manage document metadata.")
+tag_app = typer.Typer(help="Manage document tags.")
+watch_app = typer.Typer(help="Watch folders for automatic indexing.")
+app.add_typer(meta_app, name="meta")
+app.add_typer(tag_app, name="tag")
+app.add_typer(watch_app, name="watch")
 
 
 # Output format option
@@ -85,6 +105,14 @@ def index(
     skip_duplicates: bool = typer.Option(
         True, "--skip-duplicates/--no-skip-duplicates", help="Skip already-indexed documents."
     ),
+    contextual: bool = typer.Option(
+        None, "--contextual/--no-contextual", "-c",
+        help="Enable contextual retrieval (requires Ollama). Uses config if not specified."
+    ),
+    late_chunking: bool = typer.Option(
+        None, "--late-chunking/--no-late-chunking", "-l",
+        help="Enable late chunking for context-aware embeddings. Uses config if not specified."
+    ),
     verbose: bool = typer.Option(
         False, "--verbose", "-V", help="Show per-file progress instead of progress bar."
     ),
@@ -94,15 +122,41 @@ def index(
     """Index documents from a file or directory.
 
     Supported formats: PDF, TXT, MD, HTML
+
+    Contextual retrieval generates AI-powered context for each chunk,
+    improving search accuracy. Requires Ollama to be running locally.
+
+    Late chunking embeds chunks with full document context, improving
+    embedding quality for retrieval.
     """
     index_command(
         path=path,
         recursive=recursive,
         skip_duplicates=skip_duplicates,
+        contextual=contextual,
+        late_chunking=late_chunking,
         verbose=verbose,
         output_format=output_format,  # type: ignore
         no_color=no_color,
     )
+
+
+SearchModeOption = Annotated[
+    str,
+    typer.Option(
+        "--mode",
+        "-m",
+        help="Search mode: hybrid (default), semantic, or keyword.",
+    ),
+]
+
+CitationOption = Annotated[
+    str,
+    typer.Option(
+        "--cite",
+        help="Citation style: none, inline, apa, mla, chicago, bibtex, markdown.",
+    ),
+]
 
 
 @app.command()
@@ -112,6 +166,8 @@ def search(
     min_score: float = typer.Option(
         None, "--min-score", help="Minimum similarity score (0-1). Default: 0.3"
     ),
+    mode: SearchModeOption = "hybrid",
+    cite: CitationOption = "none",
     no_interactive: bool = typer.Option(
         False, "--no-interactive", help="Disable interactive navigator, print results directly."
     ),
@@ -120,13 +176,29 @@ def search(
 ) -> None:
     """Search indexed documents with natural language.
 
-    Returns the most relevant document chunks based on semantic similarity.
+    Returns the most relevant document chunks using hybrid search (semantic + keyword).
     By default, opens an interactive navigator to browse results (use j/k or arrows to navigate, q to quit).
+
+    Search modes:
+      - hybrid: Combines semantic and keyword search (default)
+      - semantic: Pure vector similarity search
+      - keyword: Pure BM25 keyword search
+
+    Citation styles:
+      - none: No citations (default)
+      - inline: Simple (filename, p. X) format
+      - apa: APA 7th edition
+      - mla: MLA 9th edition
+      - chicago: Chicago notes-bibliography
+      - bibtex: BibTeX for LaTeX
+      - markdown: Markdown link format
     """
     search_command(
         query=query,
         limit=limit,
         min_score=min_score,
+        mode=mode,
+        cite=cite,
         no_interactive=no_interactive,
         output_format=output_format,  # type: ignore
         no_color=no_color,
@@ -170,6 +242,303 @@ def config(
     config_command(
         show=show,
         path=path,
+        no_color=no_color,
+    )
+
+
+@app.command()
+def reindex(
+    document_id: Annotated[
+        str | None, typer.Argument(help="Specific document ID to re-index.")
+    ] = None,
+    all_docs: bool = typer.Option(False, "--all", "-a", help="Re-index all documents."),
+    file_type: str = typer.Option(None, "--type", "-t", help="Re-index by file type (pdf, html)."),
+    force: bool = typer.Option(False, "--force", "-f", help="Skip confirmation prompt."),
+    verbose: bool = typer.Option(False, "--verbose", "-V", help="Show per-file progress."),
+    output_format: FormatOption = "rich",
+    no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
+) -> None:
+    """Re-index documents with improved text extraction.
+
+    Use this command after upgrading ragd to apply the latest text
+    quality improvements to existing documents.
+
+    Examples:
+        ragd reindex --all              # Re-index all documents
+        ragd reindex --type pdf         # Re-index only PDFs
+        ragd reindex doc-123            # Re-index specific document
+        ragd reindex --all --force      # Re-index without confirmation
+    """
+    reindex_command(
+        document_id=document_id,
+        all_docs=all_docs,
+        file_type=file_type,
+        force=force,
+        verbose=verbose,
+        output_format=output_format,  # type: ignore
+        no_color=no_color,
+    )
+
+
+# --- Metadata subcommands ---
+
+@meta_app.command("show")
+def meta_show(
+    document_id: Annotated[str, typer.Argument(help="Document ID to show metadata for.")],
+    output_format: FormatOption = "rich",
+    no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
+) -> None:
+    """Show metadata for a document.
+
+    Displays Dublin Core metadata and RAG-specific fields.
+    """
+    meta_show_command(
+        document_id=document_id,
+        output_format=output_format,  # type: ignore
+        no_color=no_color,
+    )
+
+
+@meta_app.command("edit")
+def meta_edit(
+    document_id: Annotated[str, typer.Argument(help="Document ID to edit.")],
+    title: str = typer.Option(None, "--title", help="Set document title."),
+    creator: str = typer.Option(None, "--creator", help="Set creator(s), semicolon-separated."),
+    description: str = typer.Option(None, "--description", help="Set description."),
+    doc_type: str = typer.Option(None, "--type", help="Set document type."),
+    project: str = typer.Option(None, "--project", help="Set project name."),
+    no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
+) -> None:
+    """Edit metadata for a document.
+
+    Update specific metadata fields. Use semicolons to separate multiple creators.
+
+    Examples:
+        ragd meta edit doc-123 --title "My Document"
+        ragd meta edit doc-123 --creator "Smith, J.; Doe, J."
+        ragd meta edit doc-123 --project "Research"
+    """
+    meta_edit_command(
+        document_id=document_id,
+        title=title,
+        creator=creator,
+        description=description,
+        doc_type=doc_type,
+        project=project,
+        no_color=no_color,
+    )
+
+
+# --- Tag subcommands ---
+
+@tag_app.command("add")
+def tag_add(
+    document_id: Annotated[str, typer.Argument(help="Document ID to tag.")],
+    tags: Annotated[list[str], typer.Argument(help="Tags to add.")],
+    no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
+) -> None:
+    """Add tags to a document.
+
+    Examples:
+        ragd tag add doc-123 important
+        ragd tag add doc-123 "topic:ml" "status:reading"
+    """
+    tag_add_command(
+        document_id=document_id,
+        tags=tags,
+        no_color=no_color,
+    )
+
+
+@tag_app.command("remove")
+def tag_remove(
+    document_id: Annotated[str, typer.Argument(help="Document ID to untag.")],
+    tags: Annotated[list[str], typer.Argument(help="Tags to remove.")],
+    no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
+) -> None:
+    """Remove tags from a document.
+
+    Examples:
+        ragd tag remove doc-123 draft
+    """
+    tag_remove_command(
+        document_id=document_id,
+        tags=tags,
+        no_color=no_color,
+    )
+
+
+@tag_app.command("list")
+def tag_list(
+    document_id: Annotated[str | None, typer.Argument(help="Document ID (optional).")] = None,
+    show_counts: bool = typer.Option(False, "--counts", "-c", help="Show document counts per tag."),
+    output_format: FormatOption = "rich",
+    no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
+) -> None:
+    """List tags.
+
+    Without a document ID, lists all tags in the knowledge base.
+    With a document ID, lists tags for that document.
+
+    Examples:
+        ragd tag list              # All tags
+        ragd tag list --counts     # Tags with document counts
+        ragd tag list doc-123      # Tags for specific document
+    """
+    tag_list_command(
+        document_id=document_id,
+        show_counts=show_counts,
+        output_format=output_format,  # type: ignore
+        no_color=no_color,
+    )
+
+
+# --- List command ---
+
+@app.command("list")
+def list_docs(
+    tag: str = typer.Option(None, "--tag", "-t", help="Filter by tag."),
+    project: str = typer.Option(None, "--project", "-p", help="Filter by project."),
+    limit: int = typer.Option(None, "--limit", "-n", help="Maximum results."),
+    output_format: FormatOption = "rich",
+    no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
+) -> None:
+    """List documents in the knowledge base.
+
+    Filter documents by tag, project, or other criteria.
+
+    Examples:
+        ragd list                     # All documents
+        ragd list --tag important     # Documents with tag
+        ragd list --project Research  # Documents in project
+        ragd list -n 10               # First 10 documents
+    """
+    list_documents_command(
+        tag=tag,
+        project=project,
+        limit=limit,
+        output_format=output_format,  # type: ignore
+        no_color=no_color,
+    )
+
+
+# --- Export/Import commands ---
+
+@app.command("export")
+def export_archive(
+    output_path: Annotated[Path, typer.Argument(help="Path for output archive (.tar.gz).")],
+    no_embeddings: bool = typer.Option(False, "--no-embeddings", help="Exclude embeddings (smaller archive)."),
+    tag: str = typer.Option(None, "--tag", "-t", help="Only export documents with tag."),
+    project: str = typer.Option(None, "--project", "-p", help="Only export documents in project."),
+    verbose: bool = typer.Option(False, "--verbose", "-V", help="Show detailed progress."),
+    output_format: FormatOption = "rich",
+    no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
+) -> None:
+    """Export knowledge base to an archive.
+
+    Creates a portable tar.gz archive containing documents, chunks,
+    embeddings, and metadata.
+
+    Examples:
+        ragd export ~/backup.tar.gz              # Full export
+        ragd export ~/backup.tar.gz --no-embeddings  # Smaller archive
+        ragd export ~/ml.tar.gz --tag "topic:ml"     # Export by tag
+    """
+    export_command(
+        output_path=output_path,
+        no_embeddings=no_embeddings,
+        tag=tag,
+        project=project,
+        verbose=verbose,
+        output_format=output_format,  # type: ignore
+        no_color=no_color,
+    )
+
+
+@app.command("import")
+def import_archive_cmd(
+    archive_path: Annotated[Path, typer.Argument(help="Path to archive (.tar.gz).")],
+    skip_conflicts: bool = typer.Option(False, "--skip-conflicts", help="Skip documents that already exist."),
+    overwrite: bool = typer.Option(False, "--overwrite", help="Overwrite existing documents."),
+    dry_run: bool = typer.Option(False, "--dry-run", help="Validate without importing."),
+    verbose: bool = typer.Option(False, "--verbose", "-V", help="Show detailed progress."),
+    output_format: FormatOption = "rich",
+    no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
+) -> None:
+    """Import knowledge base from an archive.
+
+    Restores documents, chunks, embeddings, and metadata from
+    a portable tar.gz archive.
+
+    Examples:
+        ragd import ~/backup.tar.gz               # Import with default settings
+        ragd import ~/backup.tar.gz --dry-run     # Validate only
+        ragd import ~/backup.tar.gz --overwrite   # Replace existing documents
+    """
+    import_command(
+        archive_path=archive_path,
+        skip_conflicts=skip_conflicts,
+        overwrite=overwrite,
+        dry_run=dry_run,
+        verbose=verbose,
+        output_format=output_format,  # type: ignore
+        no_color=no_color,
+    )
+
+
+# --- Watch subcommands ---
+
+@watch_app.command("start")
+def watch_start(
+    directories: Annotated[list[Path], typer.Argument(help="Directories to watch.")],
+    patterns: list[str] = typer.Option(
+        None, "--pattern", "-p", help="File patterns to watch (e.g., '*.pdf')."
+    ),
+    recursive: bool = typer.Option(
+        True, "--recursive/--no-recursive", "-r", help="Watch subdirectories."
+    ),
+    no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
+) -> None:
+    """Start watching folders for automatic indexing.
+
+    Monitors specified directories for new or modified files and
+    automatically indexes them.
+
+    Examples:
+        ragd watch start ~/Documents
+        ragd watch start ~/PDFs ~/Notes --pattern "*.pdf"
+        ragd watch start ~/Research --no-recursive
+    """
+    watch_start_command(
+        directories=directories,
+        patterns=patterns,
+        recursive=recursive,
+        no_color=no_color,
+    )
+
+
+@watch_app.command("stop")
+def watch_stop(
+    no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
+) -> None:
+    """Stop the folder watcher.
+
+    Stops the background watcher process if running.
+    """
+    watch_stop_command(no_color=no_color)
+
+
+@watch_app.command("status")
+def watch_status_cmd(
+    output_format: FormatOption = "rich",
+    no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
+) -> None:
+    """Show watcher status.
+
+    Displays whether the watcher is running and which folders are being monitored.
+    """
+    watch_status_command(
+        output_format=output_format,  # type: ignore
         no_color=no_color,
     )
 

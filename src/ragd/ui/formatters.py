@@ -19,6 +19,7 @@ if TYPE_CHECKING:
     from ragd.search.searcher import SearchResult
 
 OutputFormat = Literal["rich", "plain", "json"]
+CitationStyleOption = Literal["none", "inline", "apa", "mla", "chicago", "bibtex", "markdown"]
 
 
 def format_search_results(
@@ -26,6 +27,7 @@ def format_search_results(
     query: str,
     output_format: OutputFormat = "rich",
     console: Console | None = None,
+    citation_style: CitationStyleOption = "none",
 ) -> str | None:
     """Format search results for display.
 
@@ -34,38 +36,56 @@ def format_search_results(
         query: Original query string
         output_format: Output format (rich, plain, json)
         console: Rich console for rich output
+        citation_style: Citation format to include (none disables)
 
     Returns:
         Formatted string for plain/json, None for rich (printed directly)
     """
+    # Generate citations if requested
+    citations = []
+    if citation_style != "none" and results:
+        from ragd.citation import Citation, format_citation
+
+        citations = [
+            format_citation(Citation.from_search_result(r), citation_style)
+            for r in results
+        ]
+
     if output_format == "json":
+        result_data = []
+        for i, r in enumerate(results):
+            item = {
+                "content": r.content,
+                "score": round(r.score, 4),
+                "document": r.document_name,
+                "chunk_index": r.chunk_index,
+            }
+            if citations:
+                item["citation"] = citations[i]
+            result_data.append(item)
+
         return json.dumps(
             {
                 "query": query,
                 "count": len(results),
-                "results": [
-                    {
-                        "content": r.content,
-                        "score": round(r.score, 4),
-                        "document": r.document_name,
-                        "chunk_index": r.chunk_index,
-                    }
-                    for r in results
-                ],
+                "citation_style": citation_style,
+                "results": result_data,
             },
             indent=2,
         )
 
     if output_format == "plain":
         lines = [f"Query: {query}", f"Results: {len(results)}", ""]
-        for i, r in enumerate(results, 1):
+        for i, r in enumerate(results):
             lines.extend(
                 [
-                    f"[{i}] Score: {r.score:.4f} | Source: {r.document_name}",
+                    f"[{i + 1}] Score: {r.score:.4f} | Source: {r.document_name}",
                     r.content[:500] + "..." if len(r.content) > 500 else r.content,
-                    "",
                 ]
             )
+            if citations:
+                lines.append(f"    Citation: {citations[i]}")
+            lines.append("")
         return "\n".join(lines)
 
     # Rich format
@@ -79,7 +99,7 @@ def format_search_results(
     console.print(f"\n[bold]Search results for:[/bold] {query}")
     console.print(f"[dim]Found {len(results)} results[/dim]\n")
 
-    for i, r in enumerate(results, 1):
+    for i, r in enumerate(results):
         # Create score colour based on value
         if r.score >= 0.8:
             score_colour = "green"
@@ -91,13 +111,24 @@ def format_search_results(
         # Truncate content for display
         content = r.content[:500] + "..." if len(r.content) > 500 else r.content
 
+        # Add citation if enabled
+        subtitle = f"Chunk {r.chunk_index}"
+        if citations:
+            subtitle = f"{subtitle} | {citations[i]}"
+
         panel = Panel(
             content,
             title=f"[{score_colour}]{r.score:.4f}[/{score_colour}] | {r.document_name}",
-            subtitle=f"Chunk {r.chunk_index}",
+            subtitle=subtitle,
             border_style="dim",
         )
         console.print(panel)
+
+    # Print citation list at end if BibTeX
+    if citation_style == "bibtex" and citations:
+        console.print("\n[bold]BibTeX Citations:[/bold]")
+        for citation in citations:
+            console.print(f"[dim]{citation}[/dim]")
 
     return None
 

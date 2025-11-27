@@ -1,5 +1,9 @@
 # State-of-the-Art Local RAG: Performance, Models & Storage
 
+> **Note:** This document surveys state-of-the-art techniques including commercial
+> cloud services. ragd implements **local-only** processing. Cloud service integration
+> is not planned until v2.0+.
+
 Advanced techniques for optimising local RAG implementations.
 
 ## Executive Summary

@@ -1,5 +1,9 @@
 # State-of-the-Art PDF Processing for RAG Systems
 
+> **Note:** This document surveys state-of-the-art techniques including commercial
+> cloud services. ragd implements **local-only** processing. Cloud service integration
+> is not planned until v2.0+.
+
 Cutting-edge techniques for processing difficult/messy PDFs in RAG pipelines.
 
 ## Executive Summary

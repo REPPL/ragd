@@ -15,9 +15,14 @@ These retrospectives document the AI-assisted development process, including:
 
 Each milestone gets a retrospective file:
 
-| File | Milestone |
-|------|-----------|
-| [v0.1.0-retrospective.md](./v0.1.0-retrospective.md) | Core RAG Pipeline |
+| File | Milestone | Notes |
+|------|-----------|-------|
+| [v0.1.0-retrospective.md](./v0.1.0-retrospective.md) | Core RAG Pipeline | |
+| [v0.2.0-retrospective.md](./v0.2.0-retrospective.md) | Killer Feature | PDF, metadata, export backends |
+| [v0.2.5-retrospective.md](./v0.2.5-retrospective.md) | F-039 HTML Processing | Now released in v0.3.0 |
+| [v0.3.0-retrospective.md](./v0.3.0-retrospective.md) | Advanced Search & CLI | Includes F-039, F-051-054 |
+
+**Note:** Retrospectives are historical records documenting actual development sessions. The v0.2.5 retrospective documents F-039 work that is now released as part of v0.3.0.
 
 ## PII Requirements
 

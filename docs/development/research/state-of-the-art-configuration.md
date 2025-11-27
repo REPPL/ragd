@@ -1,5 +1,9 @@
 # State-of-the-Art Configuration Management for RAG/ML Applications
 
+> **Note:** This document surveys state-of-the-art techniques including commercial
+> cloud services. ragd implements **local-only** processing. Cloud service integration
+> is not planned until v2.0+.
+
 ## Executive Summary
 
 This research surveys configuration management patterns for RAG and ML applications in 2024-2025, providing recommendations for ragd's configuration architecture defined in ADR-0013.
@@ -533,36 +537,10 @@ if args.model:
 
 ### Secrets Management
 
-**Never store secrets in config file**. Use environment variables or secret management tools:
+**Never store secrets in config file**. Use environment variables or secret management tools.
 
-```yaml
-# config.yaml - NO SECRETS HERE
-llm:
-  provider: openai
-  model: gpt-4
-  # API key from environment: OPENAI_API_KEY
-
-external_services:
-  enable_web_search: true
-  # Tavily key from environment: TAVILY_API_KEY
-```
-
-```python
-import os
-from typing import Optional
-
-def get_api_key(service: str) -> Optional[str]:
-    """Get API key from environment."""
-    key = os.getenv(f"{service.upper()}_API_KEY")
-    if not key:
-        logger.warning(f"No API key found for {service}")
-    return key
-
-# Usage
-openai_key = get_api_key("openai")
-if openai_key:
-    llm = OpenAI(api_key=openai_key)
-```
+> Cloud LLM provider configuration (OpenAI, etc.) is not supported until v2.0+.
+> See [Future Cloud Support](../planning/future-cloud-support.md) for planned API key patterns.
 
 ## Schema Versioning and Migration
 

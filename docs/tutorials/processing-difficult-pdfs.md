@@ -436,7 +436,7 @@ Congratulations! You've completed the difficult PDFs tutorial. You now know how 
 
 - **Organise with metadata:** [Organising Your Knowledge Base](./organising-knowledge-base.md)
 - **Back up your data:** [Backing Up Your Data](./backing-up-data.md)
-- **Configure OCR:** [OCR Configuration Guide](../guides/ocr-configuration.md)
+- **Troubleshooting:** [Troubleshooting Guide](../guides/troubleshooting.md)
 
 ---
 

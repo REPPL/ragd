@@ -62,7 +62,9 @@ and discusses OAuth 2.0 token validation procedures.
 |----------|-------|------|-------|
 | Ollama | llama3.2:3b | Free (local) | Medium |
 | Ollama | phi3:mini | Free (local) | Fast |
-| Claude | haiku | $0.25/1M tokens | Fast |
+| Ollama | qwen2.5:3b | Free (local) | Fast |
+
+> Cloud LLM providers (Claude, OpenAI) are not supported until v2.0+.
 
 ## Implementation Tasks
 
@@ -113,7 +115,7 @@ class ContextualChunk:
 retrieval:
   contextual:
     enabled: true
-    provider: ollama      # ollama | claude | openai
+    provider: ollama      # Local only (cloud providers in v2.0+)
     model: llama3.2:3b
     batch_size: 10
     timeout_seconds: 30

@@ -475,8 +475,8 @@ ragd uses Dublin Core metadata fields:
 ## Next Steps
 
 - **Back up your data:** [Backing Up Your Data](./backing-up-data.md)
-- **Advanced search:** [Search Guide](../guides/search.md)
-- **Automate tagging:** [Tag Automation Guide](../guides/tag-automation.md)
+- **CLI reference:** [CLI Guide](../guides/cli/)
+- **Troubleshooting:** [Troubleshooting Guide](../guides/troubleshooting.md)
 
 ---
 
@@ -514,6 +514,6 @@ python -m spacy download en_core_web_sm
 - [F-029: Metadata Storage](../development/features/completed/F-029-metadata-storage.md)
 - [F-030: Metadata Extraction](../development/features/completed/F-030-metadata-extraction.md)
 - [F-031: Tag Management](../development/features/completed/F-031-tag-management.md)
-- [Dublin Core Schema](../reference/metadata-schema.md)
+- [Data Schema Reference](../reference/data-schema.md)
 
 ---
