@@ -20,6 +20,10 @@ from ragd.ui.cli.commands import (
     watch_start_command,
     watch_stop_command,
     watch_status_command,
+    ask_command,
+    chat_command,
+    models_list_command,
+    evaluate_command,
 )
 
 __all__ = [
@@ -42,4 +46,8 @@ __all__ = [
     "watch_start_command",
     "watch_stop_command",
     "watch_status_command",
+    "ask_command",
+    "chat_command",
+    "models_list_command",
+    "evaluate_command",
 ]

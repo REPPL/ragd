@@ -9,10 +9,22 @@ from __future__ import annotations
 import json
 import urllib.error
 import urllib.request
+from collections.abc import Iterator
 from dataclasses import dataclass
 from typing import Any
 
 from ragd.llm.client import LLMClient, LLMResponse
+
+
+@dataclass
+class StreamChunk:
+    """A chunk of streamed response."""
+
+    content: str
+    done: bool = False
+    model: str | None = None
+    tokens_used: int | None = None
+    finish_reason: str | None = None
 
 
 class OllamaError(Exception):
@@ -112,6 +124,79 @@ class OllamaClient(LLMClient):
                 "prompt_eval_count": response.get("prompt_eval_count"),
             },
         )
+
+    def generate_stream(
+        self,
+        prompt: str,
+        system_prompt: str | None = None,
+        temperature: float = 0.7,
+        max_tokens: int | None = None,
+    ) -> Iterator[StreamChunk]:
+        """Generate streaming response using Ollama.
+
+        Args:
+            prompt: User prompt
+            system_prompt: Optional system prompt
+            temperature: Sampling temperature
+            max_tokens: Maximum tokens (maps to num_predict)
+
+        Yields:
+            StreamChunk objects with content fragments
+
+        Raises:
+            OllamaError: If request fails
+        """
+        url = f"{self.base_url}/api/generate"
+
+        payload: dict[str, Any] = {
+            "model": self.model,
+            "prompt": prompt,
+            "stream": True,
+            "options": {
+                "temperature": temperature,
+            },
+        }
+
+        if system_prompt:
+            payload["system"] = system_prompt
+
+        if max_tokens:
+            payload["options"]["num_predict"] = max_tokens
+
+        headers = {"Content-Type": "application/json"}
+        body = json.dumps(payload).encode("utf-8")
+        request = urllib.request.Request(url, data=body, headers=headers, method="POST")
+
+        try:
+            with urllib.request.urlopen(request, timeout=self.timeout) as response:
+                for line in response:
+                    if line:
+                        try:
+                            data = json.loads(line.decode("utf-8"))
+                            chunk = StreamChunk(
+                                content=data.get("response", ""),
+                                done=data.get("done", False),
+                                model=data.get("model"),
+                                tokens_used=data.get("eval_count"),
+                                finish_reason=data.get("done_reason"),
+                            )
+                            yield chunk
+                            if chunk.done:
+                                break
+                        except json.JSONDecodeError:
+                            continue
+
+        except urllib.error.URLError as e:
+            if "Connection refused" in str(e):
+                raise OllamaError(
+                    "Cannot connect to Ollama. Is it running? "
+                    "Start with: ollama serve"
+                ) from e
+            raise OllamaError(f"Network error: {e}") from e
+
+        except urllib.error.HTTPError as e:
+            error_body = e.read().decode("utf-8", errors="ignore")
+            raise OllamaError(f"HTTP {e.code}: {error_body}") from e
 
     def is_available(self) -> bool:
         """Check if Ollama is running and model is available.

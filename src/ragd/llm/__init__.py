@@ -10,13 +10,31 @@ from ragd.llm.metadata import (
     LLMMetadataEnhancer,
     create_metadata_enhancer,
 )
-from ragd.llm.ollama import OllamaClient, OllamaError
+from ragd.llm.models import (
+    ModelInfo,
+    ModelNotAvailableError,
+    ModelRegistry,
+    ModelRouter,
+    ModelsConfig,
+    TaskType,
+    create_model_router,
+)
+from ragd.llm.ollama import OllamaClient, OllamaError, StreamChunk
 
 __all__ = [
     "LLMClient",
     "LLMResponse",
     "OllamaClient",
     "OllamaError",
+    "StreamChunk",
+    # Model orchestration
+    "ModelInfo",
+    "ModelNotAvailableError",
+    "ModelRegistry",
+    "ModelRouter",
+    "ModelsConfig",
+    "TaskType",
+    "create_model_router",
     # Metadata enhancement
     "LLMMetadataEnhancer",
     "EnhancedMetadata",

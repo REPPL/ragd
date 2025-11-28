@@ -8,20 +8,12 @@ Features planned for future development.
 |----|---------|----------|
 | [F-064](./F-064-tag-provenance.md) | Tag Provenance Schema | [State-of-the-Art Tagging](../../research/state-of-the-art-tagging.md) |
 
-## v0.4 Features (Multi-Modal)
+## v0.6 Features (Storage & Backends)
 
 | ID | Feature | Research |
 |----|---------|----------|
-| [F-019](./F-019-multi-modal-support.md) | Multi-Modal Support | [State-of-the-Art Multi-Modal](../../research/state-of-the-art-multi-modal.md) |
-
-## v0.5 Features (Chat & Evaluation)
-
-| ID | Feature | Research |
-|----|---------|----------|
-| [F-013](./F-013-ragas-evaluation.md) | RAGAS Evaluation | ADR-0008 |
-| [F-014](./F-014-agentic-rag.md) | Agentic RAG | [State-of-the-Art RAG](../../research/state-of-the-art-rag.md) |
-| [F-020](./F-020-ollama-llm-integration.md) | Ollama LLM Integration | [State-of-the-Art Local RAG](../../research/state-of-the-art-local-rag.md) |
-| [F-055](./F-055-multi-model-orchestration.md) | Multi-Model Orchestration | [State-of-the-Art Multi-Model RAG](../../research/state-of-the-art-multi-model-rag.md) |
+| [F-021](./F-021-vector-store-abstraction.md) | Vector Store Abstraction | [State-of-the-Art Local RAG](../../research/state-of-the-art-local-rag.md) |
+| [F-022](./F-022-knowledge-graph.md) | Knowledge Graph | [State-of-the-Art RAG](../../research/state-of-the-art-rag.md) |
 
 ## v0.7 Features (Privacy Foundation)
 

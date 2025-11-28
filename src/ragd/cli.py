@@ -35,6 +35,10 @@ from ragd.ui.cli import (
     watch_start_command,
     watch_stop_command,
     watch_status_command,
+    ask_command,
+    chat_command,
+    models_list_command,
+    evaluate_command,
 )
 
 app = typer.Typer(
@@ -48,9 +52,11 @@ console = Console()
 meta_app = typer.Typer(help="Manage document metadata.")
 tag_app = typer.Typer(help="Manage document tags.")
 watch_app = typer.Typer(help="Watch folders for automatic indexing.")
+models_app = typer.Typer(help="Manage LLM models.")
 app.add_typer(meta_app, name="meta")
 app.add_typer(tag_app, name="tag")
 app.add_typer(watch_app, name="watch")
+app.add_typer(models_app, name="models")
 
 
 # Output format option
@@ -538,6 +544,146 @@ def watch_status_cmd(
     Displays whether the watcher is running and which folders are being monitored.
     """
     watch_status_command(
+        output_format=output_format,  # type: ignore
+        no_color=no_color,
+    )
+
+
+# --- Models subcommands ---
+
+@models_app.command("list")
+def models_list(
+    output_format: FormatOption = "rich",
+    no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
+) -> None:
+    """List available LLM models.
+
+    Shows all models downloaded in Ollama and current configuration.
+    """
+    models_list_command(
+        output_format=output_format,  # type: ignore
+        no_color=no_color,
+    )
+
+
+# --- Ask/Chat commands ---
+
+@app.command()
+def ask(
+    question: Annotated[str, typer.Argument(help="Question to ask.")],
+    model: str = typer.Option(None, "--model", "-m", help="LLM model to use (default: from config)."),
+    temperature: float = typer.Option(0.7, "--temperature", "-t", help="Sampling temperature (0.0-1.0)."),
+    limit: int = typer.Option(5, "--limit", "-n", help="Maximum search results for context."),
+    no_stream: bool = typer.Option(False, "--no-stream", help="Disable streaming output."),
+    agentic: bool = typer.Option(None, "--agentic/--no-agentic", help="Enable/disable agentic RAG (CRAG + Self-RAG)."),
+    show_confidence: bool = typer.Option(False, "--show-confidence", "-c", help="Show confidence score."),
+    cite: str = typer.Option("numbered", "--cite", help="Citation style: none, numbered, inline."),
+    verbose: bool = typer.Option(False, "--verbose", "-V", help="Show detailed progress."),
+    output_format: FormatOption = "rich",
+    no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
+) -> None:
+    """Ask a question using your knowledge base.
+
+    Retrieves relevant documents and generates an answer using Ollama LLM.
+    Requires Ollama to be running locally.
+
+    Agentic mode (--agentic) enables:
+    - CRAG: Evaluates retrieval quality and rewrites queries if needed
+    - Self-RAG: Assesses response faithfulness and refines if needed
+
+    Examples:
+        ragd ask "What authentication methods are recommended?"
+        ragd ask "Summarise the security policy" --model llama3.2:8b
+        ragd ask "Compare the approaches" --agentic --show-confidence
+    """
+    ask_command(
+        question=question,
+        model=model,
+        temperature=temperature,
+        limit=limit,
+        stream=not no_stream,
+        agentic=agentic,
+        show_confidence=show_confidence,
+        cite=cite,
+        verbose=verbose,
+        output_format=output_format,  # type: ignore
+        no_color=no_color,
+    )
+
+
+@app.command()
+def chat(
+    model: str = typer.Option(None, "--model", "-m", help="LLM model to use (default: from config)."),
+    temperature: float = typer.Option(0.7, "--temperature", "-t", help="Sampling temperature (0.0-1.0)."),
+    limit: int = typer.Option(5, "--limit", "-n", help="Maximum search results per query."),
+    session_id: str = typer.Option(None, "--session", "-s", help="Resume a previous chat session."),
+    output_format: FormatOption = "rich",
+    no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
+) -> None:
+    """Start an interactive chat with your knowledge base.
+
+    Multi-turn conversation with RAG-powered responses. Each question
+    retrieves relevant context from your documents.
+
+    Requires Ollama to be running locally.
+
+    Chat commands:
+        /exit, /quit, /q  - Exit chat
+        /clear            - Clear conversation history
+        /history          - Show conversation history
+        /help             - Show available commands
+
+    Examples:
+        ragd chat
+        ragd chat --model llama3.2:8b
+        ragd chat --session abc123  # Resume previous session
+    """
+    chat_command(
+        model=model,
+        temperature=temperature,
+        limit=limit,
+        session_id=session_id,
+        output_format=output_format,  # type: ignore
+        no_color=no_color,
+    )
+
+
+@app.command()
+def evaluate(
+    query: Annotated[str | None, typer.Option("--query", "-q", help="Single query to evaluate.")] = None,
+    test_file: Annotated[Path | None, typer.Option("--test-file", "-f", help="YAML/JSON file with test queries.")] = None,
+    expected: str = typer.Option(None, "--expected", "-e", help="Expected answer for recall computation."),
+    limit: int = typer.Option(5, "--limit", "-n", help="Maximum search results."),
+    threshold: float = typer.Option(0.5, "--threshold", help="Relevance threshold (0-1)."),
+    no_save: bool = typer.Option(False, "--no-save", help="Don't save evaluation results."),
+    output_format: FormatOption = "rich",
+    no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
+) -> None:
+    """Evaluate RAG retrieval quality.
+
+    Computes metrics for your RAG system:
+    - Context Precision: Are retrieved docs relevant?
+    - Relevance Score: Weighted relevance with position decay
+
+    Single query:
+        ragd evaluate --query "What is machine learning?"
+
+    With expected answer:
+        ragd evaluate --query "..." --expected "ML is a subset of AI..."
+
+    Batch evaluation:
+        ragd evaluate --test-file queries.yaml
+
+    Output as JSON:
+        ragd evaluate --query "..." --format json
+    """
+    evaluate_command(
+        query=query,
+        test_file=test_file,
+        expected=expected,
+        limit=limit,
+        threshold=threshold,
+        save=not no_save,
         output_format=output_format,  # type: ignore
         no_color=no_color,
     )

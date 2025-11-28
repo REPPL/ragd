@@ -2,6 +2,15 @@
 
 Features that have been implemented and released.
 
+## v0.5.0 - Chat (Released)
+
+| ID | Feature | Release |
+|----|---------|---------|
+| [F-013](./F-013-ragas-evaluation.md) | RAGAS Evaluation | v0.5.0 |
+| [F-014](./F-014-agentic-rag.md) | Agentic RAG (CRAG + Self-RAG) | v0.5.0 |
+| [F-020](./F-020-ollama-llm-integration.md) | Ollama LLM Integration | v0.5.0 |
+| [F-055](./F-055-multi-model-orchestration.md) | Multi-Model Orchestration | v0.5.0 |
+
 ## v0.3.0 - Advanced Search & CLI (Released)
 
 | ID | Feature | Release |

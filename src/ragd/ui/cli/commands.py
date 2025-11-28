@@ -1157,3 +1157,482 @@ def watch_status_command(
             for event in status.recent_events[-5:]:
                 icon = "📄" if event.event_type == "indexed" else "⏭️"
                 con.print(f"  {icon} {event.event_type}: {Path(event.path).name}")
+
+
+def ask_command(
+    question: str,
+    model: str | None = None,
+    temperature: float = 0.7,
+    limit: int = 5,
+    stream: bool = True,
+    agentic: bool | None = None,
+    show_confidence: bool = False,
+    cite: str = "numbered",
+    verbose: bool = False,
+    output_format: OutputFormat = "rich",
+    no_color: bool = False,
+) -> None:
+    """Ask a question using RAG with LLM generation.
+
+    Retrieves relevant documents and generates an answer using Ollama.
+    """
+    from ragd.chat import ChatSession, ChatConfig, check_chat_available
+    from ragd.chat import AgenticRAG, AgenticConfig
+    from ragd.config import load_config
+
+    con = get_console(no_color)
+    config = load_config()
+
+    # Check LLM availability
+    available, message = check_chat_available(config)
+    if not available:
+        con.print(f"[red]LLM not available: {message}[/red]")
+        con.print("\nTo use this feature:")
+        con.print("  1. Install Ollama: https://ollama.ai")
+        con.print("  2. Start Ollama: [cyan]ollama serve[/cyan]")
+        con.print("  3. Pull a model: [cyan]ollama pull llama3.2:3b[/cyan]")
+        raise typer.Exit(1)
+
+    # Determine agentic mode
+    use_agentic = agentic if agentic is not None else False
+
+    if verbose:
+        model_name = model or config.llm.model
+        con.print(f"[dim]Model: {model_name}[/dim]")
+        if use_agentic:
+            con.print("[dim]Agentic mode: enabled (CRAG + Self-RAG)[/dim]")
+        con.print(f"[dim]Retrieving context...[/dim]\n")
+
+    try:
+        if use_agentic:
+            # Use AgenticRAG for CRAG + Self-RAG
+            agentic_config = AgenticConfig(
+                crag_enabled=True,
+                self_rag_enabled=True,
+            )
+            rag = AgenticRAG(config=config, agentic_config=agentic_config)
+
+            try:
+                with Progress(
+                    SpinnerColumn(),
+                    TextColumn("[progress.description]{task.description}"),
+                    console=con,
+                    transient=True,
+                ) as progress:
+                    progress.add_task("Generating answer (agentic)...", total=None)
+                    response = rag.ask(question, max_results=limit, agentic=True)
+
+                con.print("[bold]Answer:[/bold]\n")
+                con.print(response.answer)
+
+                # Show confidence if requested
+                if show_confidence:
+                    quality_color = {
+                        "excellent": "green",
+                        "good": "cyan",
+                        "poor": "yellow",
+                        "irrelevant": "red",
+                    }.get(response.retrieval_quality.value, "white")
+                    con.print(f"\n[dim]Confidence: {response.confidence:.0%} | "
+                             f"Retrieval: [{quality_color}]{response.retrieval_quality.value}[/{quality_color}][/dim]")
+                    if response.rewrites_attempted > 0:
+                        con.print(f"[dim]Query rewrites: {response.rewrites_attempted}[/dim]")
+
+                # Print citations
+                if response.citations and cite != "none":
+                    con.print("\n[bold]Sources:[/bold]")
+                    for i, cit in enumerate(response.citations, 1):
+                        loc = f", p. {cit.page_number}" if cit.page_number else ""
+                        con.print(f"  [{i}] {cit.filename}{loc}")
+            finally:
+                rag.close()
+
+        else:
+            # Standard chat mode
+            chat_config = ChatConfig(
+                model=model or config.llm.model,
+                temperature=temperature,
+                search_limit=limit,
+                auto_save=False,
+            )
+
+            session = ChatSession(config=config, chat_config=chat_config)
+
+            try:
+                if stream and output_format == "rich":
+                    # Streaming output
+                    con.print("[bold]Answer:[/bold]\n")
+
+                    full_response = ""
+                    citations = []
+
+                    for chunk in session.ask(question, stream=True):
+                        con.print(chunk, end="")
+                        full_response += chunk
+
+                    # Get citations from session history
+                    if session.history.messages:
+                        last_msg = session.history.messages[-1]
+                        citations = last_msg.citations
+
+                    con.print("\n")  # Newline after streaming
+
+                    # Print citations
+                    if citations and cite != "none":
+                        con.print("\n[bold]Sources:[/bold]")
+                        for i, cit in enumerate(citations, 1):
+                            loc = f", p. {cit.page_number}" if cit.page_number else ""
+                            con.print(f"  [{i}] {cit.filename}{loc}")
+                else:
+                    # Non-streaming output
+                    with Progress(
+                        SpinnerColumn(),
+                        TextColumn("[progress.description]{task.description}"),
+                        console=con,
+                        transient=True,
+                    ) as progress:
+                        progress.add_task("Generating answer...", total=None)
+                        answer = session.ask(question, stream=False)
+
+                    con.print("[bold]Answer:[/bold]\n")
+                    con.print(answer.answer)
+
+                    # Print citations
+                    if answer.citations and cite != "none":
+                        con.print("\n[bold]Sources:[/bold]")
+                        for i, cit in enumerate(answer.citations, 1):
+                            loc = f", p. {cit.page_number}" if cit.page_number else ""
+                            con.print(f"  [{i}] {cit.filename}{loc}")
+            finally:
+                session.close()
+
+    except Exception as e:
+        con.print(f"[red]Error: {e}[/red]")
+        raise typer.Exit(1)
+
+
+def models_list_command(
+    output_format: OutputFormat = "rich",
+    no_color: bool = False,
+) -> None:
+    """List available LLM models from Ollama.
+
+    Shows all downloaded models and their status.
+    """
+    from ragd.config import load_config
+    from ragd.llm import ModelRegistry, OllamaClient
+
+    con = get_console(no_color)
+    config = load_config()
+
+    # Check Ollama connection
+    client = OllamaClient(base_url=config.llm.ollama_url, model=config.llm.model)
+
+    try:
+        registry = ModelRegistry(client)
+        models = registry.list_available(refresh=True)
+
+        if not models:
+            con.print("[yellow]No models found.[/yellow]")
+            con.print("\nOllama may not be running or no models installed.")
+            con.print("Start Ollama: [cyan]ollama serve[/cyan]")
+            con.print("Pull a model: [cyan]ollama pull llama3.2:3b[/cyan]")
+            return
+
+        if output_format == "json":
+            import json
+            data = [
+                {
+                    "name": m.name,
+                    "size_bytes": m.size_bytes,
+                    "size_display": m.display_size,
+                    "family": m.family,
+                    "parameters": m.parameters,
+                    "quantisation": m.quantisation,
+                }
+                for m in models
+            ]
+            con.print(json.dumps(data, indent=2))
+        else:
+            from rich.table import Table
+
+            table = Table(title="Available Models (Ollama)")
+            table.add_column("Model", style="cyan")
+            table.add_column("Size", justify="right")
+            table.add_column("Parameters")
+            table.add_column("Quantisation")
+
+            for m in sorted(models, key=lambda x: x.name):
+                table.add_row(
+                    m.name,
+                    m.display_size,
+                    m.parameters or "-",
+                    m.quantisation or "-",
+                )
+
+            con.print(table)
+
+            # Show configuration
+            con.print(f"\n[bold]Configuration:[/bold]")
+            con.print(f"  Default model: {config.llm.model}")
+            con.print(f"  Ollama URL: {config.llm.ollama_url}")
+
+    except Exception as e:
+        con.print(f"[red]Error listing models: {e}[/red]")
+        con.print("\nIs Ollama running? Start with: [cyan]ollama serve[/cyan]")
+        raise typer.Exit(1)
+
+
+def chat_command(
+    model: str | None = None,
+    temperature: float = 0.7,
+    limit: int = 5,
+    session_id: str | None = None,
+    output_format: OutputFormat = "rich",
+    no_color: bool = False,
+) -> None:
+    """Start an interactive chat session with RAG.
+
+    Multi-turn conversation with your knowledge base.
+    """
+    from ragd.chat import ChatSession, ChatConfig, check_chat_available
+    from ragd.config import load_config
+
+    con = get_console(no_color)
+    config = load_config()
+
+    # Check LLM availability
+    available, message = check_chat_available(config)
+    if not available:
+        con.print(f"[red]LLM not available: {message}[/red]")
+        con.print("\nTo use this feature:")
+        con.print("  1. Install Ollama: https://ollama.ai")
+        con.print("  2. Start Ollama: [cyan]ollama serve[/cyan]")
+        con.print("  3. Pull a model: [cyan]ollama pull llama3.2:3b[/cyan]")
+        raise typer.Exit(1)
+
+    # Build chat config
+    chat_config = ChatConfig(
+        model=model or config.llm.model,
+        temperature=temperature,
+        search_limit=limit,
+        auto_save=True,
+    )
+
+    session = ChatSession(config=config, chat_config=chat_config, session_id=session_id)
+
+    con.print("\n[bold]ragd Chat[/bold]")
+    con.print(f"[dim]Model: {chat_config.model}[/dim]")
+    con.print("[dim]Type '/exit' to quit, '/help' for commands[/dim]\n")
+
+    try:
+        while True:
+            try:
+                user_input = con.input("[bold cyan]You:[/bold cyan] ")
+            except EOFError:
+                break
+            except KeyboardInterrupt:
+                con.print()
+                break
+
+            user_input = user_input.strip()
+            if not user_input:
+                continue
+
+            # Handle commands
+            if user_input.lower() in ["/exit", "/quit", "/q"]:
+                break
+            elif user_input.lower() == "/help":
+                con.print("\n[bold]Commands:[/bold]")
+                con.print("  /exit, /quit, /q - Exit chat")
+                con.print("  /clear          - Clear conversation history")
+                con.print("  /history        - Show conversation history")
+                con.print("  /help           - Show this help\n")
+                continue
+            elif user_input.lower() == "/clear":
+                session.history.clear()
+                con.print("[dim]Conversation history cleared.[/dim]\n")
+                continue
+            elif user_input.lower() == "/history":
+                if not session.history.messages:
+                    con.print("[dim]No conversation history.[/dim]\n")
+                else:
+                    con.print("\n[bold]History:[/bold]")
+                    for msg in session.history.messages:
+                        role = msg.role.value.capitalize()
+                        content = msg.content[:100] + "..." if len(msg.content) > 100 else msg.content
+                        con.print(f"  [{role}] {content}")
+                    con.print()
+                continue
+
+            # Generate response
+            con.print()
+            con.print("[bold green]Assistant:[/bold green] ", end="")
+
+            try:
+                for chunk in session.chat(user_input, stream=True):
+                    con.print(chunk, end="")
+                con.print("\n")
+            except Exception as e:
+                con.print(f"\n[red]Error: {e}[/red]\n")
+
+    except Exception as e:
+        con.print(f"[red]Error: {e}[/red]")
+        raise typer.Exit(1)
+    finally:
+        session.close()
+        con.print("[dim]Chat session saved.[/dim]")
+
+
+def evaluate_command(
+    query: str | None = None,
+    test_file: Path | None = None,
+    expected: str | None = None,
+    limit: int = 5,
+    threshold: float = 0.5,
+    save: bool = True,
+    output_format: str = "rich",
+    no_color: bool = False,
+) -> None:
+    """Evaluate RAG quality.
+
+    Computes retrieval metrics for a query or batch of queries.
+    """
+    import json
+    import yaml
+    from rich.table import Table
+
+    from ragd.config import load_config
+    from ragd.evaluation import (
+        Evaluator,
+        EvaluationConfig,
+        EvaluationStorage,
+        MetricType,
+    )
+
+    con = get_console(no_color)
+    config = load_config()
+
+    # Check inputs
+    if query is None and test_file is None:
+        con.print("[red]Error: Must provide either --query or --test-file[/red]")
+        raise typer.Exit(1)
+
+    # Create evaluation config
+    eval_config = EvaluationConfig(
+        metrics=[
+            MetricType.CONTEXT_PRECISION,
+            MetricType.RELEVANCE_SCORE,
+        ],
+        relevance_threshold=threshold,
+        search_limit=limit,
+    )
+
+    evaluator = Evaluator(config=config, eval_config=eval_config)
+    storage = EvaluationStorage() if save else None
+
+    try:
+        if test_file:
+            # Batch evaluation from file
+            if not test_file.exists():
+                con.print(f"[red]Error: File not found: {test_file}[/red]")
+                raise typer.Exit(1)
+
+            with open(test_file) as f:
+                if test_file.suffix in [".yaml", ".yml"]:
+                    data = yaml.safe_load(f)
+                else:
+                    data = json.load(f)
+
+            queries = data.get("evaluations", data.get("queries", []))
+            if not queries:
+                con.print("[red]Error: No queries found in test file[/red]")
+                raise typer.Exit(1)
+
+            with Progress(
+                SpinnerColumn(),
+                TextColumn("[progress.description]{task.description}"),
+                BarColumn(),
+                MofNCompleteColumn(),
+                console=con,
+            ) as progress:
+                task = progress.add_task("Evaluating queries...", total=len(queries))
+                report = evaluator.evaluate_batch(queries)
+                progress.update(task, completed=len(queries))
+
+            # Compute summary and comparison
+            report.compute_summary()
+            if storage:
+                report.comparison = storage.compare_with_previous(report)
+                storage.save_report(report)
+
+            # Output
+            if output_format == "json":
+                con.print_json(data=report.to_dict())
+            else:
+                con.print("\n[bold]Evaluation Report[/bold]\n")
+
+                # Summary table
+                summary_table = Table(title="Summary Metrics")
+                summary_table.add_column("Metric", style="cyan")
+                summary_table.add_column("Value", justify="right")
+                if report.comparison:
+                    summary_table.add_column("Change", justify="right")
+
+                for key, value in report.summary.items():
+                    if value is not None:
+                        formatted = f"{value:.3f}" if isinstance(value, float) else str(value)
+                        row = [key, formatted]
+                        if report.comparison and key in report.comparison:
+                            change = report.comparison[key]
+                            change_str = f"+{change:.3f}" if change > 0 else f"{change:.3f}"
+                            colour = "green" if change > 0 else "red"
+                            row.append(f"[{colour}]{change_str}[/{colour}]")
+                        elif report.comparison:
+                            row.append("-")
+                        summary_table.add_row(*row)
+
+                con.print(summary_table)
+
+                # Individual results
+                con.print(f"\n[dim]Evaluated {len(report.results)} queries[/dim]")
+
+        else:
+            # Single query evaluation
+            expected_docs = None
+            if expected:
+                expected_docs = [expected]
+
+            result = evaluator.evaluate(
+                query=query,
+                expected_docs=expected_docs,
+            )
+
+            if storage:
+                storage.save_result(result)
+
+            # Output
+            if output_format == "json":
+                con.print_json(data=result.to_dict())
+            else:
+                con.print("\n[bold]Evaluation Result[/bold]\n")
+
+                metrics_table = Table(title=f"Query: {query[:50]}..." if len(query) > 50 else f"Query: {query}")
+                metrics_table.add_column("Metric", style="cyan")
+                metrics_table.add_column("Score", justify="right")
+
+                metrics = result.metrics
+                if metrics.context_precision is not None:
+                    metrics_table.add_row("Context Precision", f"{metrics.context_precision:.3f}")
+                if metrics.relevance_score is not None:
+                    metrics_table.add_row("Relevance Score", f"{metrics.relevance_score:.3f}")
+                if metrics.context_recall is not None:
+                    metrics_table.add_row("Context Recall", f"{metrics.context_recall:.3f}")
+
+                metrics_table.add_row("Overall Score", f"[bold]{metrics.overall_score:.3f}[/bold]")
+
+                con.print(metrics_table)
+                con.print(f"\n[dim]Retrieved {result.retrieved_chunks} chunks in {result.evaluation_time_ms:.0f}ms[/dim]")
+
+    finally:
+        evaluator.close()
