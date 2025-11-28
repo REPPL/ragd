@@ -86,7 +86,7 @@ Features are the primary unit of work. Each feature specification describes:
 
 | ID | Feature | Status | Research |
 |----|---------|--------|----------|
-| [F-019](./planned/F-019-multi-modal-support.md) | Multi-Modal Support | 📅 Planned | State-of-the-Art Multi-Modal |
+| [F-019](./completed/F-019-multi-modal-support.md) | Multi-Modal Support | ✅ Complete | State-of-the-Art Multi-Modal |
 
 ### v0.5 Features (Chat & Evaluation)
 

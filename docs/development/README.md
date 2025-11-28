@@ -7,10 +7,10 @@ Documentation for contributors and developers.
 | Area | Status |
 |------|--------|
 | Use Cases | 6 P0 briefs defined |
-| Features | v0.1 (9), v0.2 (12), v0.3 (4) = 25 features complete |
+| Features | v0.1 (9), v0.2 (12), v0.3 (4), v0.4 (1) = 26 features complete |
 | Tutorials | Getting Started + 3 v0.2 tutorials |
-| Milestone | v0.3.0 released |
-| ADRs | 24+ architecture decisions |
+| Milestone | v0.4.0 released |
+| ADRs | 29+ architecture decisions |
 
 ## Structure
 
@@ -44,7 +44,12 @@ Layer 3: TUTORIALS (How users experience it)
 - [Planned Features](./features/planned/)
 - [Milestones](./milestones/)
 
-### v0.3.0 (Latest Release)
+### v0.4.0 (Latest Release)
+- [v0.4.0 Milestone](./milestones/v0.4.0.md)
+- [v0.4.0 Implementation](./implementation/v0.4.0.md)
+- [F-019: Multi-Modal Support](./features/completed/F-019-multi-modal-support.md)
+
+### v0.3.0 (Released)
 - [v0.3.0 Milestone](./milestones/v0.3.0.md)
 - [v0.3.0 Implementation](./implementation/v0.3.0.md)
 - [F-009: Citation Output](./features/completed/F-009-citation-output.md)
