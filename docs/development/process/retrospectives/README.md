@@ -21,6 +21,8 @@ Each milestone gets a retrospective file:
 | [v0.2.0-retrospective.md](./v0.2.0-retrospective.md) | Killer Feature | PDF, metadata, export backends |
 | [v0.2.5-retrospective.md](./v0.2.5-retrospective.md) | F-039 HTML Processing | Now released in v0.3.0 |
 | [v0.3.0-retrospective.md](./v0.3.0-retrospective.md) | Advanced Search & CLI | Includes F-039, F-051-054 |
+| [v0.4.0-retrospective.md](./v0.4.0-retrospective.md) | Multi-Modal | ColPali vision embeddings (F-019) |
+| [v0.4.1-retrospective.md](./v0.4.1-retrospective.md) | Boolean Search | Query parser, operators |
 
 **Note:** Retrospectives are historical records documenting actual development sessions. The v0.2.5 retrospective documents F-039 work that is now released as part of v0.3.0.
 
