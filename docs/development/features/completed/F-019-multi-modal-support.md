@@ -44,24 +44,24 @@ Unified Search (text + images)
 
 ## Implementation Tasks
 
-- [ ] Add image extraction to ingestion pipeline
-- [ ] Integrate ColPali/ColQwen for vision embeddings
-- [ ] Create multi-modal ChromaDB collection
-- [ ] Implement unified search across modalities
-- [ ] Add image display in CLI (via Rich or external viewer)
-- [ ] Implement optional caption generation
-- [ ] Add image-specific metadata (dimensions, format)
-- [ ] Write unit tests for image extraction
-- [ ] Write integration tests for multi-modal search
+- [x] Add image extraction to ingestion pipeline
+- [x] Integrate ColPali/ColQwen for vision embeddings
+- [x] Create multi-modal ChromaDB collection
+- [x] Implement unified search across modalities
+- [x] Add image display in CLI (via Rich or external viewer)
+- [x] Implement optional caption generation
+- [x] Add image-specific metadata (dimensions, format)
+- [x] Write unit tests for image extraction
+- [x] Write integration tests for multi-modal search
 
 ## Success Criteria
 
-- [ ] Images extracted from PDFs automatically
-- [ ] Visual content searchable by description
-- [ ] Mixed results (text + images) ranked correctly
-- [ ] Processing time < 1s per image for embedding
-- [ ] Works offline with local models
-- [ ] Image results display usefully in CLI
+- [x] Images extracted from PDFs automatically
+- [x] Visual content searchable by description
+- [x] Mixed results (text + images) ranked correctly
+- [x] Processing time < 1s per image for embedding
+- [x] Works offline with local models
+- [x] Image results display usefully in CLI
 
 ## Dependencies
 
@@ -142,3 +142,5 @@ def multi_modal_search(query: str, k: int = 10) -> list[Result]:
 - [F-002: Text Extraction](../completed/F-002-text-extraction.md) - Extended for images
 
 ---
+
+**Status**: Complete
