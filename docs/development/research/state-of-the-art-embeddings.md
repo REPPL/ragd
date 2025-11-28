@@ -408,10 +408,12 @@ START
 
 ## Related Documentation
 
+- [State-of-the-Art Fine-Tuning](./state-of-the-art-fine-tuning.md) - Fine-tuning embeddings and LLMs for domain-specific RAG
 - [State-of-the-Art Local RAG](./state-of-the-art-local-rag.md) - Performance optimisation
 - [State-of-the-Art Evaluation](./state-of-the-art-evaluation.md) - Measuring retrieval quality
 - [ADR-0002: ChromaDB Vector Store](../decisions/adrs/0002-chromadb-vector-store.md) - Storage for embeddings
 - [F-004: Embedding Generation](../features/completed/F-004-embedding-generation.md) - Feature specification
+- [F-058: Fine-Tuning Pipeline](../features/planned/F-058-fine-tuning-pipeline.md) - Domain-specific fine-tuning
 
 ---
 

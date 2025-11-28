@@ -2,7 +2,8 @@
 
 ## Overview
 
-**Research**: [State-of-the-Art Privacy](../../research/state-of-the-art-privacy.md)
+**Research**: [State-of-the-Art PII Removal](../../research/state-of-the-art-pii-removal.md)
+**ADR**: [ADR-0028: PII Handling Architecture](../../decisions/adrs/0028-pii-handling-architecture.md)
 **Milestone**: v0.7
 **Priority**: P1
 
@@ -79,8 +80,7 @@ Continue Pipeline
 
 ```yaml
 pii:
-  enabled: true
-  scan_on_index: prompt  # always, never, prompt
+  enabled: false  # Default: OFF (opt-in per folder or command)
 
   detection:
     engine: presidio  # presidio, spacy, hybrid
@@ -90,12 +90,21 @@ pii:
       - EMAIL_ADDRESS
       - PHONE_NUMBER
       - CREDIT_CARD
-      - US_SSN
-      - LOCATION
+      - UK_NINO
+      - IBAN_CODE
 
   handling:
     default_action: prompt  # index, skip, redact, prompt
     redaction_char: "█"
+
+  # Per-folder overrides (opt-in for sensitive folders)
+  folders:
+    ~/Documents/Medical/:
+      enabled: true
+      default_action: redact
+    ~/Documents/Financial/:
+      enabled: true
+      default_action: prompt
 
   allowlist:
     - example.com  # Don't flag example domains
@@ -153,7 +162,10 @@ def generate_pii_report(document: Document) -> PIIReport:
 ### CLI Integration
 
 ```bash
-# Scan before indexing (interactive)
+# Default: NO PII scanning (news, articles, general documents)
+ragd index ~/Documents/articles/
+
+# Opt-in: Scan before indexing (interactive)
 ragd index ~/Documents/contracts/ --scan-pii
 
 # Output:
@@ -171,10 +183,13 @@ ragd index ~/Documents/contracts/ --scan-pii
 # [V] View details
 # [Q] Quit
 
-# Always scan, never prompt (for scripts)
-ragd index ~/Documents/ --scan-pii --pii-action skip
+# Opt-in: Scan and auto-redact (for scripts)
+ragd index ~/Documents/medical/ --scan-pii --pii-action redact
 
-# Generate PII report only
+# Configure folder for persistent scanning
+ragd config set pii.folders."~/Documents/medical/".enabled true
+
+# Generate PII report only (no indexing)
 ragd scan ~/Documents/contracts/
 ```
 
@@ -193,8 +208,11 @@ def redact_pii(text: str, results: list[PIIResult]) -> str:
 
 ## Related Documentation
 
-- [State-of-the-Art Privacy](../../research/state-of-the-art-privacy.md) - Research basis
-- [v0.7.0 Milestone](../../milestones/v0.7.0.md) - Release planning
+- [State-of-the-Art PII Removal](../../research/state-of-the-art-pii-removal.md) - Comprehensive PII research
+- [State-of-the-Art Privacy](../../research/state-of-the-art-privacy.md) - Privacy architecture research
+- [ADR-0028: PII Handling Architecture](../../decisions/adrs/0028-pii-handling-architecture.md) - Architecture decision
+- [F-059: Embedding Privacy Protection](./F-059-embedding-privacy-protection.md) - Embedding-level defence
+- [F-060: GDPR-Compliant Deletion](./F-060-gdpr-compliant-deletion.md) - Compliance deletion
 - [F-015: Database Encryption](./F-015-database-encryption.md) - Related privacy feature
 - [F-017: Secure Deletion](./F-017-secure-deletion.md) - For removing PII later
 

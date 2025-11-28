@@ -2,6 +2,12 @@
 
 Features planned for future development.
 
+## v0.3.2 Features (Tag Provenance)
+
+| ID | Feature | Research |
+|----|---------|----------|
+| [F-064](./F-064-tag-provenance.md) | Tag Provenance Schema | [State-of-the-Art Tagging](../../research/state-of-the-art-tagging.md) |
+
 ## v0.4 Features (Multi-Modal)
 
 | ID | Feature | Research |
@@ -22,6 +28,14 @@ Features planned for future development.
 | ID | Feature | Research |
 |----|---------|----------|
 | [F-023](./F-023-pii-detection.md) | PII Detection | [State-of-the-Art PII Removal](../../research/state-of-the-art-pii-removal.md) |
+
+### v0.7 Stretch Goals (Tagging Enhancements)
+
+| ID | Feature | Research |
+|----|---------|----------|
+| [F-061](./F-061-auto-tag-suggestions.md) | Auto-Tag Suggestions | [State-of-the-Art Tagging](../../research/state-of-the-art-tagging.md) |
+| [F-062](./F-062-tag-library-management.md) | Tag Library Management | [State-of-the-Art Tagging](../../research/state-of-the-art-tagging.md) |
+| [F-063](./F-063-smart-collections.md) | Smart Collections | [State-of-the-Art Tagging](../../research/state-of-the-art-tagging.md) |
 
 ## v0.8 Features (Privacy & Compliance)
 

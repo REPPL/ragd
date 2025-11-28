@@ -33,6 +33,7 @@ This directory contains research on cutting-edge techniques that inform ragd's f
 | [state-of-the-art-rag-landscape.md](./state-of-the-art-rag-landscape.md) | RAG tool landscape: PrivateGPT, AnythingLLM, Khoj, differentiation strategy |
 | [state-of-the-art-configuration.md](./state-of-the-art-configuration.md) | Configuration management: XDG directories, Pydantic, defaults, schema versioning |
 | [state-of-the-art-personal-rag.md](./state-of-the-art-personal-rag.md) | Personal RAG: memory architectures (Mem0, Letta), PersonaRAG, user context, privacy |
+| [state-of-the-art-tagging.md](./state-of-the-art-tagging.md) | Document tagging: automated/manual tagging, tag libraries, provenance, smart collections |
 
 ### Implementation Research
 
@@ -77,6 +78,7 @@ All research documents are complete and inform the roadmap.
 | state-of-the-art-rag-landscape.md | ✅ Complete | Strategic positioning |
 | state-of-the-art-configuration.md | ✅ Complete | ADR-0013, F-035, F-036 |
 | state-of-the-art-personal-rag.md | ✅ Complete | F-040, F-041, F-042, F-044 (v2.0) |
+| state-of-the-art-tagging.md | ✅ Complete | F-031, F-061, F-062, F-063, F-064 |
 | cli-best-practices.md | ✅ Complete | F-001, F-006 |
 | cli-documentation-standards.md | ✅ Complete | CLI reference docs (v0.2+) |
 | citation-systems.md | ✅ Complete | F-009 |

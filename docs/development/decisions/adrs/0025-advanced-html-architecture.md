@@ -96,7 +96,7 @@ ExtractionResult
 ## Related
 
 - [F-038: Web Archive Support](../../features/completed/F-038-web-archive-support.md)
-- [F-039: Advanced HTML Processing](../../features/planned/F-039-advanced-html-processing.md)
+- [F-039: Advanced HTML Processing](../../features/completed/F-039-advanced-html-processing.md)
 - [ADR-0024: Optional Dependencies](./0024-optional-dependencies.md)
 
 ---

@@ -239,5 +239,5 @@ def pymupdf4llm_extract(pdf_path: Path) -> Document:
 - [F-026: Docling Integration](../../features/completed/F-026-docling-integration.md)
 - [F-027: OCR Pipeline](../../features/completed/F-027-ocr-pipeline.md)
 - [F-028: Table Extraction](../../features/completed/F-028-table-extraction.md)
-- [UC-004: Process Messy PDFs](../../use-cases/briefs/UC-004-process-messy-pdfs.md)
+- [UC-004: Process Messy PDFs](../../../use-cases/briefs/UC-004-process-messy-pdfs.md)
 
