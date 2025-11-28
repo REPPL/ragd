@@ -187,16 +187,38 @@ class BM25Index:
         return results
 
     def _escape_query(self, query: str) -> str:
-        """Escape special characters in FTS5 query.
+        """Parse and transform query for FTS5.
+
+        Supports boolean operators (AND, OR, NOT), parentheses,
+        quoted phrases, and prefix wildcards when detected.
+        Falls back to simple escaping if parsing fails.
 
         Args:
             query: Raw query string
 
         Returns:
-            Escaped query safe for FTS5
+            FTS5-compatible query string
         """
-        # Handle special FTS5 operators
-        # Convert to simple word search for safety
+        from ragd.search.query import QueryParseError, parse_query
+
+        try:
+            return parse_query(query)
+        except QueryParseError:
+            # Fallback to simple escaping on parse error
+            return self._simple_escape(query)
+
+    def _simple_escape(self, query: str) -> str:
+        """Simple escaping fallback for FTS5 query.
+
+        Provides safe escaping by quoting each word.
+        This is the original ragd behaviour before boolean support.
+
+        Args:
+            query: Raw query string
+
+        Returns:
+            Safely escaped FTS5 query with quoted terms
+        """
         words = query.split()
         escaped_words = []
 

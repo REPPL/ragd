@@ -226,10 +226,34 @@ def search_command(
 ) -> None:
     """Search indexed documents with natural language.
 
-    Returns the most relevant document chunks using hybrid search.
+    Returns the most relevant document chunks using hybrid search
+    (semantic + keyword). Supports boolean operators in keyword mode.
+
+    Boolean Operators (--mode keyword):
+
+        AND    Both terms required       "python AND testing"
+
+        OR     Either term matches       "ML OR machine learning"
+
+        NOT    Exclude term              "web NOT Django"
+
+        ()     Group expressions         "(A OR B) AND C"
+
+        ""     Exact phrase              "machine learning"
+
+        *      Prefix match              "mach*"
+
+    Examples:
+
+        ragd search "machine learning"
+
+        ragd search "python AND testing" --mode keyword
+
+        ragd search "(Python OR Java) AND web" --mode keyword
     """
     from ragd.config import load_config
     from ragd.search import hybrid_search, SearchMode
+    from ragd.search.query import QueryParseError
     from ragd.ui import format_search_results
     from ragd.ui.tui import run_search_navigator
 
@@ -258,21 +282,25 @@ def search_command(
         raise typer.Exit(1)
     cite_style = cite.lower()
 
-    with Progress(
-        SpinnerColumn(),
-        TextColumn("[progress.description]{task.description}"),
-        console=con,
-        transient=True,
-    ) as progress:
-        if output_format == "rich":
-            progress.add_task(f"Searching ({mode})...", total=None)
-        hybrid_results = hybrid_search(
-            query,
-            limit=limit,
-            mode=search_mode,
-            min_score=effective_min_score,
-            config=config,
-        )
+    try:
+        with Progress(
+            SpinnerColumn(),
+            TextColumn("[progress.description]{task.description}"),
+            console=con,
+            transient=True,
+        ) as progress:
+            if output_format == "rich":
+                progress.add_task(f"Searching ({mode})...", total=None)
+            hybrid_results = hybrid_search(
+                query,
+                limit=limit,
+                mode=search_mode,
+                min_score=effective_min_score,
+                config=config,
+            )
+    except QueryParseError as e:
+        con.print(f"[red]{e.user_message()}[/red]")
+        raise typer.Exit(1)
 
     # Convert HybridSearchResult to legacy SearchResult format for compatibility
     from ragd.search import SearchResult, SourceLocation
