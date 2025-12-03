@@ -1,6 +1,6 @@
 """ragd - Local RAG for personal knowledge management."""
 
-__version__ = "0.8.1"
+__version__ = "0.8.2"
 
 # Lazy imports for submodules
 from ragd import vision
