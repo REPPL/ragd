@@ -23,11 +23,12 @@ Tutorials help newcomers get started with ragd through hands-on learning experie
 | [Organising Your Knowledge Base](./organising-knowledge-base.md) | Use tags and metadata effectively | 📝 Draft |
 | [Backing Up Your Data](./backing-up-data.md) | Export and restore your knowledge base | 📝 Draft |
 
-### Chat Interface (v0.5)
+### Chat Interface (v0.5+)
 
 | Tutorial | Description | Status |
 |----------|-------------|--------|
 | [Chatting with Your Knowledge](./chatting-with-your-knowledge.md) | Have conversations about your documents | ✅ Complete |
+| [Understanding Chat + Search](./chat-with-search.md) | How hybrid search powers your questions | ✅ Complete |
 
 ## Tutorial Guidelines
 

@@ -65,6 +65,9 @@ ragd status
 | v0.3.0 | Advanced Search | ✅ Released |
 | v0.4.0 | Multi-Modal (vision embeddings) | ✅ Released |
 | v0.5.0 | Chat (LLM integration, agentic RAG) | ✅ Released |
+| v0.6.0 | Storage Abstraction (FAISS, backends) | ✅ Released |
+| v0.6.5 | Polish & Stability | ✅ Released |
+| v0.7.0 | Privacy & Security (encryption, PII) | ✅ Released |
 | v1.0.0 | Personal Platform + Basic WebUI | 📋 Planned |
 
 See [Milestones](./development/milestones/) for details.

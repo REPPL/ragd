@@ -85,7 +85,7 @@ This directory documents the knowledge transfer process from ragged to ragd, pre
 
 ## Related Documentation
 
-- [Product Vision](../planning/vision/) - ragd's vision (inherited from ragged)
+- [Planning](../planning/) - High-level design documents
 - [Feature Roadmap](../features/) - Feature specifications
 - [Milestones](../milestones/) - Release planning
 - [ADRs](../decisions/adrs/) - Architecture decisions

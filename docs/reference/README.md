@@ -1,6 +1,6 @@
 # Reference
 
-Technical reference documentation for ragd v0.1.0.
+Technical reference documentation for ragd.
 
 ## Purpose
 

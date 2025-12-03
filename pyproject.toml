@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ragd"
-version = "0.6.6"
+version = "0.7.6"
 description = "Local RAG for personal knowledge management"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -58,6 +58,11 @@ dependencies = [
 
     # System utilities
     "psutil>=5.9.0",
+
+    # OCR for scanned documents (required for v0.7.6+)
+    "paddleocr>=2.7.0",
+    "paddlepaddle>=2.5.0",
+    "opencv-python-headless>=4.8.0",
 ]
 
 [project.optional-dependencies]
@@ -67,12 +72,9 @@ pdf = [
     "docling>=2.0.0",
     "docling-core>=2.0.0",
 ]
-ocr = [
-    # OCR for scanned documents (primary + fallback)
-    "paddleocr>=2.7.0",
-    "paddlepaddle>=2.5.0",
+ocr-fallback = [
+    # EasyOCR as fallback OCR engine (optional)
     "easyocr>=1.7.0",
-    "opencv-python-headless>=4.8.0",
 ]
 metadata = [
     # Metadata extraction (keywords, entities, language)
@@ -100,16 +102,29 @@ faiss = [
     "faiss-cpu>=1.7.4",
 ]
 
+# v0.7 Feature Extras
+encryption = [
+    # Database encryption (F-015)
+    # Note: SQLCipher requires system-level installation:
+    #   macOS: brew install sqlcipher
+    #   Linux: apt-get install sqlcipher libsqlcipher-dev
+    # Then install: pip install pysqlcipher3
+    "pysqlcipher3>=1.2.0",
+    "argon2-cffi>=23.1.0",
+]
+privacy = [
+    # PII detection (F-023)
+    "presidio-analyzer>=2.2.0",
+    "spacy>=3.7.0",
+]
+
 # Meta-extra for all v0.2 features
 v02 = [
     # PDF (docling)
     "docling>=2.0.0",
     "docling-core>=2.0.0",
-    # OCR
-    "paddleocr>=2.7.0",
-    "paddlepaddle>=2.5.0",
+    # OCR fallback (PaddleOCR now in main deps)
     "easyocr>=1.7.0",
-    "opencv-python-headless>=4.8.0",
     # Metadata
     "keybert>=0.8.0",
     "spacy>=3.7.0",
@@ -139,15 +154,12 @@ security = [
     "bandit>=1.7.0",
     "safety>=2.3.0",
 ]
-# Everything (v0.2 features + all dev tools)
+# Everything (v0.2 features + v0.7 features + all dev tools)
 all = [
-    # v0.2 features
+    # v0.2 features (PaddleOCR now in main deps)
     "docling>=2.0.0",
     "docling-core>=2.0.0",
-    "paddleocr>=2.7.0",
-    "paddlepaddle>=2.5.0",
-    "easyocr>=1.7.0",
-    "opencv-python-headless>=4.8.0",
+    "easyocr>=1.7.0",  # OCR fallback
     "keybert>=0.8.0",
     "spacy>=3.7.0",
     "langdetect>=1.0.9",
@@ -155,6 +167,10 @@ all = [
     "watchdog>=3.0.0",
     "trafilatura>=1.6.0",
     "selectolax>=0.3.0",
+    # v0.7 features
+    "pysqlcipher3>=1.2.0",
+    "argon2-cffi>=23.1.0",
+    "presidio-analyzer>=2.2.0",
     # Dev tools
     "ruff>=0.1.0",
     "mypy>=1.0.0",

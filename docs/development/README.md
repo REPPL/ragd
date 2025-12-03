@@ -7,9 +7,9 @@ Documentation for contributors and developers.
 | Area | Status |
 |------|--------|
 | Use Cases | 6 P0 briefs defined |
-| Features | v0.1 (9), v0.2 (12), v0.3 (4), v0.4 (1), v0.5 (4) = 30 features complete |
-| Tutorials | Getting Started + 3 v0.2 tutorials |
-| Milestone | v0.5.0 released |
+| Features | v0.1 (9), v0.2 (12), v0.3 (4), v0.4 (1), v0.5 (4), v0.6 (10), v0.7 (6) = 46 features complete |
+| Tutorials | Getting Started + 3 v0.2 tutorials + Chat tutorial |
+| Milestone | v0.7.0 released |
 | ADRs | 29+ architecture decisions |
 
 ## Structure
@@ -44,7 +44,30 @@ Layer 3: TUTORIALS (How users experience it)
 - [Planned Features](./features/planned/)
 - [Milestones](./milestones/)
 
-### v0.5.0 (Latest Release)
+### v0.7.0 (Latest Release)
+- [v0.7.0 Milestone](./milestones/v0.7.0.md)
+- [v0.7.0 Implementation](./implementation/v0.7.0.md)
+- [F-015: Database Encryption](./features/completed/F-015-database-encryption.md)
+- [F-016: Session Management](./features/completed/F-016-session-management.md)
+- [F-017: Secure Deletion](./features/completed/F-017-secure-deletion.md)
+- [F-023: PII Detection](./features/completed/F-023-pii-detection.md)
+- [F-065: Chat Citation Display](./features/completed/F-065-chat-citation-display.md)
+- [F-066: Configurable Chat Prompts](./features/completed/F-066-configurable-chat-prompts.md)
+
+### v0.6.5 (Released)
+- [v0.6.5 Milestone](./milestones/v0.6.5.md)
+- [v0.6.5 Implementation](./implementation/v0.6.5.md)
+- [F-076: RAGAS Evaluation Metrics](./features/completed/F-076-ragas-evaluation-metrics.md)
+- [F-077: CLI Visual Polish](./features/completed/F-077-cli-visual-polish.md)
+- [F-078: Configuration Validation](./features/completed/F-078-configuration-validation.md)
+- [F-079: Dependency Error Handling](./features/completed/F-079-dependency-error-handling.md)
+
+### v0.6.0 (Released)
+- [v0.6.0 Milestone](./milestones/v0.6.0.md)
+- [F-021: Vector Store Abstraction](./features/completed/F-021-vector-store-abstraction.md)
+- [F-070: Backend Recommendation](./features/completed/F-070-backend-recommendation.md)
+
+### v0.5.0 (Released)
 - [v0.5.0 Milestone](./milestones/v0.5.0.md)
 - [v0.5.0 Implementation](./implementation/v0.5.0.md)
 - [F-013: RAGAS Evaluation](./features/completed/F-013-ragas-evaluation.md)
