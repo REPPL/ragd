@@ -1,0 +1,55 @@
+# Model Card: Qwen 2.5 7B
+# Strong multilingual and coding model
+
+id: qwen2.5:7b
+name: Qwen 2.5 7B
+model_type: llm
+provider: ollama
+description: >
+  Powerful 7B model from Alibaba with excellent multilingual support
+  and strong coding capabilities. Good alternative to Llama for
+  diverse document collections.
+
+capabilities:
+  - chat
+  - reasoning
+  - coding
+  - summarisation
+  - extraction
+  - rag_generation
+  - long_context
+
+hardware:
+  min_ram_gb: 8
+  recommended_ram_gb: 16
+  min_vram_gb: 6
+  recommended_vram_gb: 8
+  quantisation_supported: true
+  cpu_inference: true
+  mps_inference: true
+  cuda_inference: true
+
+strengths:
+  - Excellent multilingual support
+  - Strong coding assistance
+  - Good long context handling
+  - High quality outputs
+
+weaknesses:
+  - Moderate inference speed
+  - Higher memory than smaller models
+
+limitations:
+  - Real-time chat applications
+  - Very specialised domains
+  - Complex mathematical proofs
+
+use_cases:
+  - Multilingual document Q&A
+  - Code documentation queries
+  - Technical writing assistance
+  - Research synthesis
+
+context_length: 32768
+parameters: 7.0
+licence: Qwen

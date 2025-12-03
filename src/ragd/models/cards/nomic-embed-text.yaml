@@ -1,0 +1,56 @@
+# Model Card: Nomic Embed Text
+# High-quality embeddings for semantic search
+
+id: nomic-embed-text
+name: Nomic Embed Text
+model_type: embedding
+provider: ollama
+description: >
+  State-of-the-art open embedding model with 768 dimensions.
+  Excellent semantic understanding and retrieval quality.
+  Default embedding model for ragd.
+
+capabilities:
+  - semantic_search
+  - clustering
+  - classification
+  - contextual_retrieval
+
+hardware:
+  min_ram_gb: 2
+  recommended_ram_gb: 4
+  min_vram_gb: 1
+  recommended_vram_gb: 2
+  quantisation_supported: false
+  cpu_inference: true
+  mps_inference: true
+  cuda_inference: true
+
+strengths:
+  - Excellent semantic understanding
+  - Fast batch processing
+  - Open source and local
+  - Good cross-lingual transfer
+
+weaknesses:
+  - Larger than MiniLM alternatives
+  - Fixed dimension output
+
+limitations:
+  - Very long documents (>8K tokens)
+  - Specialised domain jargon
+  - Real-time streaming
+
+use_cases:
+  - Document semantic search
+  - Similar document finding
+  - Content clustering
+  - RAG retrieval
+
+context_length: 8192
+parameters: 0.137
+
+metadata:
+  dimension: 768
+  normalised: true
+  pooling: mean

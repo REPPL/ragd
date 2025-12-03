@@ -38,8 +38,16 @@ from ragd.ui.cli import (
     ask_command,
     chat_command,
     models_list_command,
+    models_recommend_command,
+    models_show_command,
     evaluate_command,
     quality_command,
+    # Backend commands
+    backend_show_command,
+    backend_list_command,
+    backend_health_command,
+    backend_set_command,
+    backend_benchmark_command,
 )
 
 app = typer.Typer(
@@ -54,10 +62,12 @@ meta_app = typer.Typer(help="Manage document metadata.")
 tag_app = typer.Typer(help="Manage document tags.")
 watch_app = typer.Typer(help="Watch folders for automatic indexing.")
 models_app = typer.Typer(help="Manage LLM models.")
+backend_app = typer.Typer(help="Manage vector store backends.")
 app.add_typer(meta_app, name="meta")
 app.add_typer(tag_app, name="tag")
 app.add_typer(watch_app, name="watch")
 app.add_typer(models_app, name="models")
+app.add_typer(backend_app, name="backend")
 
 
 # Output format option
@@ -567,6 +577,69 @@ def models_list(
     )
 
 
+@models_app.command("recommend")
+def models_recommend(
+    use_case: Annotated[
+        str | None, typer.Option("--use-case", "-u", help="Use case (quick_qa, research, coding, etc.).")
+    ] = None,
+    model_type: str = typer.Option("llm", "--type", "-t", help="Model type (llm, embedding)."),
+    all_models: bool = typer.Option(False, "--all", "-a", help="Include non-installed models."),
+    output_format: FormatOption = "rich",
+    no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
+) -> None:
+    """Recommend models based on your hardware.
+
+    Analyses your hardware capabilities and recommends optimal models
+    for your use case.
+
+    Use cases:
+      - quick_qa: Fast Q&A, low latency
+      - research: In-depth analysis, quality priority
+      - coding: Code-related queries
+      - summarisation: Document summarisation
+      - multilingual: Non-English documents
+      - agentic: CRAG/Self-RAG evaluation
+      - embedding: Document embedding
+      - contextual: Contextual retrieval
+
+    Examples:
+        ragd models recommend
+        ragd models recommend --use-case research
+        ragd models recommend --type embedding
+        ragd models recommend --all  # Include non-installed models
+    """
+    models_recommend_command(
+        use_case=use_case,
+        model_type=model_type,
+        require_installed=not all_models,
+        output_format=output_format,  # type: ignore
+        no_color=no_color,
+    )
+
+
+@models_app.command("show")
+def models_show(
+    model_id: Annotated[str, typer.Argument(help="Model ID to show details for.")],
+    output_format: FormatOption = "rich",
+    no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
+) -> None:
+    """Show model card details.
+
+    Displays detailed information about a model including capabilities,
+    hardware requirements, strengths, weaknesses, and limitations.
+
+    Examples:
+        ragd models show llama3.2:3b
+        ragd models show nomic-embed-text
+        ragd models show qwen2.5:7b --format json
+    """
+    models_show_command(
+        model_id=model_id,
+        output_format=output_format,  # type: ignore
+        no_color=no_color,
+    )
+
+
 # --- Ask/Chat commands ---
 
 @app.command()
@@ -724,6 +797,129 @@ def quality(
         file_type=file_type,
         test_corpus=test_corpus,
         verbose=verbose,
+        output_format=output_format,  # type: ignore
+        no_color=no_color,
+    )
+
+
+# --- Backend subcommands ---
+
+@backend_app.command("show")
+def backend_show(
+    output_format: FormatOption = "rich",
+    no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
+) -> None:
+    """Show current backend information.
+
+    Displays the active vector store backend, status, and statistics.
+
+    Examples:
+        ragd backend show
+        ragd backend show --format json
+    """
+    backend_show_command(
+        output_format=output_format,  # type: ignore
+        no_color=no_color,
+    )
+
+
+@backend_app.command("list")
+def backend_list(
+    output_format: FormatOption = "rich",
+    no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
+) -> None:
+    """List available backends.
+
+    Shows all supported vector store backends and their installation status.
+
+    Examples:
+        ragd backend list
+        ragd backend list --format json
+    """
+    backend_list_command(
+        output_format=output_format,  # type: ignore
+        no_color=no_color,
+    )
+
+
+@backend_app.command("health")
+def backend_health(
+    backend: Annotated[
+        str | None, typer.Argument(help="Backend to check (default: current).")
+    ] = None,
+    all_backends: bool = typer.Option(
+        False, "--all", "-a", help="Check all available backends."
+    ),
+    output_format: FormatOption = "rich",
+    no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
+) -> None:
+    """Run health checks on backends.
+
+    Validates backend connectivity, performance, and data integrity.
+
+    Examples:
+        ragd backend health              # Current backend
+        ragd backend health chromadb     # Specific backend
+        ragd backend health --all        # All available backends
+    """
+    backend_health_command(
+        backend=backend,
+        all_backends=all_backends,
+        output_format=output_format,  # type: ignore
+        no_color=no_color,
+    )
+
+
+@backend_app.command("set")
+def backend_set(
+    backend: Annotated[str, typer.Argument(help="Backend to set as default.")],
+    output_format: FormatOption = "rich",
+    no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
+) -> None:
+    """Set the default backend.
+
+    Changes the vector store backend used for new operations.
+    Existing data remains in the previous backend until migrated.
+
+    Available backends: chromadb, faiss
+
+    Examples:
+        ragd backend set faiss
+        ragd backend set chromadb
+    """
+    backend_set_command(
+        backend=backend,
+        output_format=output_format,  # type: ignore
+        no_color=no_color,
+    )
+
+
+@backend_app.command("benchmark")
+def backend_benchmark(
+    backend: Annotated[
+        str | None, typer.Argument(help="Backend to benchmark (default: current).")
+    ] = None,
+    vectors: int = typer.Option(1000, "--vectors", "-v", help="Number of vectors to add."),
+    queries: int = typer.Option(100, "--queries", "-q", help="Number of search queries."),
+    dimension: int = typer.Option(768, "--dimension", "-d", help="Vector dimension."),
+    output_format: FormatOption = "rich",
+    no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
+) -> None:
+    """Run performance benchmarks on a backend.
+
+    Measures add, search, delete, and health check performance
+    with synthetic data.
+
+    Examples:
+        ragd backend benchmark              # Benchmark current backend
+        ragd backend benchmark chromadb     # Benchmark ChromaDB
+        ragd backend benchmark --vectors 5000 --queries 500
+    """
+    backend_benchmark_command(
+        backend=backend,
+        vectors=vectors,
+        queries=queries,
+        dimension=dimension,
         output_format=output_format,  # type: ignore
         no_color=no_color,
     )

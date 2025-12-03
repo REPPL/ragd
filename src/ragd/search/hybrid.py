@@ -6,15 +6,19 @@ multiple retrieval sources for improved relevance.
 
 from __future__ import annotations
 
+import warnings
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from ragd.config import RagdConfig, load_config
 from ragd.embedding import get_embedder
 from ragd.search.bm25 import BM25Index, BM25Result
-from ragd.storage import ChromaStore
+from ragd.storage import BackendType, ChromaStore, VectorStore, create_vector_store
+
+if TYPE_CHECKING:
+    from ragd.storage.types import VectorSearchResult
 
 
 class SearchMode(Enum):
@@ -89,18 +93,42 @@ class HybridSearcher:
         config: RagdConfig | None = None,
         chroma_store: ChromaStore | None = None,
         bm25_index: BM25Index | None = None,
+        *,
+        vector_store: VectorStore | None = None,
     ) -> None:
         """Initialise hybrid searcher.
 
         Args:
             config: Configuration (loads default if not provided)
-            chroma_store: Optional pre-initialised ChromaStore
+            chroma_store: Optional pre-initialised ChromaStore (deprecated, use vector_store)
             bm25_index: Optional pre-initialised BM25Index
+            vector_store: Optional pre-initialised VectorStore (preferred over chroma_store)
         """
         self.config = config or load_config()
 
-        # Initialise stores
-        self._chroma = chroma_store or ChromaStore(self.config.chroma_path)
+        # Handle vector store initialisation
+        # Priority: vector_store > chroma_store > factory create
+        if vector_store is not None:
+            self._vector_store = vector_store
+        elif chroma_store is not None:
+            # Deprecated path - wrap legacy ChromaStore
+            warnings.warn(
+                "chroma_store parameter is deprecated. Use vector_store instead.",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+            self._vector_store = chroma_store  # type: ignore[assignment]
+        else:
+            # Create via factory (default: ChromaDB)
+            self._vector_store = create_vector_store(
+                backend=BackendType.CHROMADB,
+                persist_directory=self.config.chroma_path,
+                dimension=self.config.embedding.dimension,
+            )
+
+        # Keep legacy reference for backwards compatibility
+        self._chroma = self._vector_store  # type: ignore[assignment]
+
         self._bm25 = bm25_index or BM25Index(
             self.config.chroma_path / "bm25.db"
         )
@@ -176,8 +204,8 @@ class HybridSearcher:
         # Generate query embedding
         query_embedding = self._embedder.embed_single(query)
 
-        # Search ChromaDB
-        raw_results = self._chroma.search(
+        # Search vector store (returns VectorSearchResult or dict depending on backend)
+        raw_results = self._vector_store.search(
             query_embedding=query_embedding,
             limit=limit,
             where=filters,
@@ -185,11 +213,23 @@ class HybridSearcher:
 
         results = []
         for rank, raw in enumerate(raw_results, start=1):
-            score = raw.get("score", 0.0)
+            # Handle both VectorSearchResult objects and legacy dicts
+            if hasattr(raw, "score"):
+                # VectorSearchResult object
+                score = raw.score
+                content = raw.content
+                metadata = raw.metadata
+                chunk_id = raw.id
+            else:
+                # Legacy dict format
+                score = raw.get("score", 0.0)
+                content = raw.get("content", "")
+                metadata = raw.get("metadata", {})
+                chunk_id = raw.get("id", "")
+
             if score < min_score:
                 continue
 
-            metadata = raw.get("metadata", {})
             location = SourceLocation(
                 page_number=metadata.get("page_number"),
                 char_start=metadata.get("start_char"),
@@ -198,7 +238,7 @@ class HybridSearcher:
 
             results.append(
                 HybridSearchResult(
-                    content=raw.get("content", ""),
+                    content=content,
                     combined_score=score,
                     semantic_score=score,
                     keyword_score=None,
@@ -207,7 +247,7 @@ class HybridSearcher:
                     rrf_score=score,
                     document_id=metadata.get("document_id", ""),
                     document_name=metadata.get("filename", ""),
-                    chunk_id=raw.get("id", ""),
+                    chunk_id=chunk_id,
                     chunk_index=metadata.get("chunk_index", 0),
                     metadata=metadata,
                     location=location,
@@ -290,7 +330,7 @@ class HybridSearcher:
 
         # Get semantic results
         query_embedding = self._embedder.embed_single(query)
-        semantic_raw = self._chroma.search(
+        semantic_raw = self._vector_store.search(
             query_embedding=query_embedding,
             limit=fetch_limit,
             where=filters,
@@ -303,15 +343,31 @@ class HybridSearcher:
         semantic_ranking: list[tuple[str, float]] = []
         keyword_ranking: list[tuple[str, float]] = []
 
-        # Map chunk_id to full result data
+        # Map chunk_id to full result data (using dict for flexibility)
         semantic_data: dict[str, dict[str, Any]] = {}
         keyword_data: dict[str, BM25Result] = {}
 
         for raw in semantic_raw:
-            chunk_id = raw.get("id", "")
+            # Handle both VectorSearchResult objects and legacy dicts
+            if hasattr(raw, "id"):
+                chunk_id = raw.id
+                score = raw.score
+                content = raw.content
+                metadata = raw.metadata
+            else:
+                chunk_id = raw.get("id", "")
+                score = raw.get("score", 0.0)
+                content = raw.get("content", "")
+                metadata = raw.get("metadata", {})
+
             if chunk_id:
-                semantic_ranking.append((chunk_id, raw.get("score", 0.0)))
-                semantic_data[chunk_id] = raw
+                semantic_ranking.append((chunk_id, score))
+                semantic_data[chunk_id] = {
+                    "id": chunk_id,
+                    "score": score,
+                    "content": content,
+                    "metadata": metadata,
+                }
 
         for bm25_res in keyword_raw:
             if bm25_res.chunk_id:

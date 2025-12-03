@@ -1861,3 +1861,233 @@ def _display_document_quality(
                 for k, v in detail.items():
                     if k != "assessment":
                         con.print(f"  {k}: {v}")
+
+
+def models_recommend_command(
+    use_case: str | None = None,
+    model_type: str = "llm",
+    require_installed: bool = True,
+    output_format: OutputFormat = "rich",
+    no_color: bool = False,
+) -> None:
+    """Recommend models based on hardware and use case.
+
+    Shows optimal model recommendations based on detected hardware
+    capabilities and specified use case requirements.
+    """
+    from rich.panel import Panel
+    from rich.table import Table
+
+    from ragd.models import (
+        ModelRecommender,
+        ModelType,
+        UseCase,
+    )
+
+    con = get_console(no_color)
+
+    # Parse model type
+    try:
+        mt = ModelType(model_type)
+    except ValueError:
+        con.print(f"[red]Unknown model type: {model_type}[/red]")
+        con.print(f"Valid types: {', '.join(t.value for t in ModelType)}")
+        raise typer.Exit(1)
+
+    # Parse use case
+    uc = None
+    if use_case:
+        try:
+            uc = UseCase(use_case)
+        except ValueError:
+            con.print(f"[red]Unknown use case: {use_case}[/red]")
+            con.print(f"Valid use cases: {', '.join(u.value for u in UseCase)}")
+            raise typer.Exit(1)
+
+    # Create recommender
+    recommender = ModelRecommender()
+    hw = recommender.hardware
+
+    # Get recommendations
+    recommendations = recommender.recommend(
+        use_case=uc,
+        model_type=mt,
+        prefer_installed=require_installed,
+        max_recommendations=5,
+    )
+
+    if output_format == "json":
+        import json
+        data = {
+            "hardware": {
+                "total_ram_gb": hw.total_ram_gb,
+                "available_ram_gb": hw.available_ram_gb,
+                "has_gpu": hw.has_gpu,
+                "gpu_name": hw.gpu_name,
+                "gpu_vram_gb": hw.gpu_vram_gb,
+                "is_apple_silicon": hw.is_apple_silicon,
+            },
+            "recommendations": [
+                {
+                    "model_id": r.model_id,
+                    "score": r.score,
+                    "reasons": r.reasons,
+                    "warnings": r.warnings,
+                    "is_installed": r.is_installed,
+                }
+                for r in recommendations
+            ],
+        }
+        con.print(json.dumps(data, indent=2))
+        return
+
+    # Rich output
+    # Hardware panel
+    hw_lines = [
+        f"RAM: {hw.available_ram_gb:.1f} / {hw.total_ram_gb:.1f} GB",
+        f"CPU Cores: {hw.cpu_cores}",
+    ]
+    if hw.has_gpu:
+        hw_lines.append(f"GPU: {hw.gpu_name}")
+        if hw.gpu_vram_gb:
+            hw_lines.append(f"VRAM: {hw.gpu_vram_gb:.1f} GB")
+    if hw.is_apple_silicon:
+        hw_lines.append("Apple Silicon: Yes (MPS enabled)")
+
+    con.print(Panel("\n".join(hw_lines), title="Detected Hardware", border_style="blue"))
+
+    if not recommendations:
+        con.print("\n[yellow]No model recommendations available.[/yellow]")
+        if require_installed:
+            con.print("Try with --all to see models that can be installed.")
+        return
+
+    # Recommendations table
+    table = Table(title=f"Model Recommendations ({mt.value})")
+    table.add_column("Model", style="cyan")
+    table.add_column("Score", justify="center")
+    table.add_column("Status")
+    table.add_column("Reasons")
+
+    for r in recommendations:
+        score_color = "green" if r.score >= 0.7 else "yellow" if r.score >= 0.5 else "red"
+        status = "[green]Installed[/green]" if r.is_installed else "[dim]Not installed[/dim]"
+
+        reasons_text = "; ".join(r.reasons[:2])
+        if r.warnings:
+            reasons_text += f" [yellow]({r.warnings[0]})[/yellow]"
+
+        table.add_row(
+            r.model_id,
+            f"[{score_color}]{r.score:.0%}[/{score_color}]",
+            status,
+            reasons_text,
+        )
+
+    con.print(table)
+
+    # Show use cases if none specified
+    if not use_case:
+        con.print("\n[bold]Available use cases:[/bold]")
+        for uc_item in UseCase:
+            con.print(f"  --use-case {uc_item.value}")
+
+
+def models_show_command(
+    model_id: str,
+    output_format: OutputFormat = "rich",
+    no_color: bool = False,
+) -> None:
+    """Show detailed information about a model.
+
+    Displays the model card with capabilities, hardware requirements,
+    strengths, weaknesses, and limitations.
+    """
+    from rich.panel import Panel
+    from rich.table import Table
+    from rich.text import Text
+
+    from ragd.models import load_model_card, get_installed_models
+
+    con = get_console(no_color)
+
+    card = load_model_card(model_id)
+    if not card:
+        con.print(f"[red]Model card not found: {model_id}[/red]")
+        con.print("\nAvailable model cards:")
+        from ragd.models import list_model_cards
+        for c in list_model_cards():
+            con.print(f"  {c.id}")
+        raise typer.Exit(1)
+
+    installed_models = get_installed_models()
+    is_installed = model_id in installed_models or any(
+        m.startswith(model_id.split(":")[0]) for m in installed_models
+    )
+
+    if output_format == "json":
+        import json
+        data = card.to_dict()
+        data["is_installed"] = is_installed
+        con.print(json.dumps(data, indent=2))
+        return
+
+    # Rich output
+    # Header panel
+    status = "[green]Installed[/green]" if is_installed else "[dim]Not installed[/dim]"
+    header_text = f"{card.name}\n{card.description}\n\nType: {card.model_type.value} | Provider: {card.provider} | Status: {status}"
+    con.print(Panel(header_text, title=f"Model: {card.id}", border_style="blue"))
+
+    # Capabilities
+    if card.capabilities:
+        con.print("\n[bold]Capabilities:[/bold]")
+        caps = ", ".join(c.value for c in card.capabilities)
+        con.print(f"  {caps}")
+
+    # Hardware requirements
+    if card.hardware:
+        con.print("\n[bold]Hardware Requirements:[/bold]")
+        hw = card.hardware
+        con.print(f"  RAM: {hw.min_ram_gb:.0f} GB min, {hw.recommended_ram_gb:.0f} GB recommended")
+        if hw.min_vram_gb:
+            con.print(f"  VRAM: {hw.min_vram_gb:.0f} GB min, {hw.recommended_vram_gb:.0f} GB recommended")
+        inference = []
+        if hw.cpu_inference:
+            inference.append("CPU")
+        if hw.mps_inference:
+            inference.append("MPS")
+        if hw.cuda_inference:
+            inference.append("CUDA")
+        con.print(f"  Inference: {', '.join(inference)}")
+
+    # Strengths, Weaknesses, Limitations
+    if card.strengths:
+        con.print("\n[bold green]Strengths:[/bold green]")
+        for s in card.strengths:
+            con.print(f"  + {s}")
+
+    if card.weaknesses:
+        con.print("\n[bold yellow]Weaknesses:[/bold yellow]")
+        for w in card.weaknesses:
+            con.print(f"  - {w}")
+
+    if card.limitations:
+        con.print("\n[bold red]Limitations:[/bold red]")
+        for lim in card.limitations:
+            con.print(f"  ! {lim}")
+
+    # Use cases
+    if card.use_cases:
+        con.print("\n[bold]Recommended Use Cases:[/bold]")
+        for uc in card.use_cases:
+            con.print(f"  * {uc}")
+
+    # Additional info
+    if card.context_length or card.parameters:
+        con.print("\n[bold]Specifications:[/bold]")
+        if card.context_length:
+            con.print(f"  Context length: {card.context_length:,} tokens")
+        if card.parameters:
+            con.print(f"  Parameters: {card.parameters:.1f}B")
+        if card.licence:
+            con.print(f"  Licence: {card.licence}")

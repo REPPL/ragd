@@ -23,8 +23,18 @@ from ragd.ui.cli.commands import (
     ask_command,
     chat_command,
     models_list_command,
+    models_recommend_command,
+    models_show_command,
     evaluate_command,
     quality_command,
+)
+
+from ragd.ui.cli.backend import (
+    backend_show_command,
+    backend_list_command,
+    backend_health_command,
+    backend_set_command,
+    backend_benchmark_command,
 )
 
 __all__ = [
@@ -50,6 +60,14 @@ __all__ = [
     "ask_command",
     "chat_command",
     "models_list_command",
+    "models_recommend_command",
+    "models_show_command",
     "evaluate_command",
     "quality_command",
+    # Backend commands
+    "backend_show_command",
+    "backend_list_command",
+    "backend_health_command",
+    "backend_set_command",
+    "backend_benchmark_command",
 ]

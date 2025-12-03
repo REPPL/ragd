@@ -1,0 +1,53 @@
+# Model Card: Llama 3.2 8B
+# Balanced model for quality RAG responses
+
+id: llama3.2:8b
+name: Llama 3.2 8B
+model_type: llm
+provider: ollama
+description: >
+  Well-rounded 8B parameter model offering strong performance across
+  a wide range of tasks. Recommended for most personal RAG deployments.
+
+capabilities:
+  - chat
+  - reasoning
+  - summarisation
+  - extraction
+  - rag_generation
+  - rag_evaluation
+
+hardware:
+  min_ram_gb: 8
+  recommended_ram_gb: 16
+  min_vram_gb: 6
+  recommended_vram_gb: 8
+  quantisation_supported: true
+  cpu_inference: true
+  mps_inference: true
+  cuda_inference: true
+
+strengths:
+  - Good balance of speed and quality
+  - Strong instruction following
+  - Reliable RAG responses
+  - Handles nuanced queries
+
+weaknesses:
+  - Slower than 3B models
+  - Higher memory requirements
+
+limitations:
+  - Expert-level domain knowledge
+  - Very long documents (>16K tokens)
+  - Advanced mathematical reasoning
+
+use_cases:
+  - General document Q&A
+  - Research assistance
+  - Content summarisation
+  - Knowledge synthesis
+
+context_length: 16384
+parameters: 8.0
+licence: Llama 3.2 Community

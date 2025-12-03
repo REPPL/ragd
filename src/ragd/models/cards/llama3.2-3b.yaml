@@ -1,0 +1,51 @@
+# Model Card: Llama 3.2 3B
+# Fast, efficient model for personal RAG
+
+id: llama3.2:3b
+name: Llama 3.2 3B
+model_type: llm
+provider: ollama
+description: >
+  Fast and efficient 3B parameter model optimised for instruction following
+  and RAG use cases. Excellent balance of speed and quality for personal use.
+
+capabilities:
+  - chat
+  - summarisation
+  - extraction
+  - rag_generation
+
+hardware:
+  min_ram_gb: 4
+  recommended_ram_gb: 8
+  min_vram_gb: 3
+  recommended_vram_gb: 4
+  quantisation_supported: true
+  cpu_inference: true
+  mps_inference: true
+  cuda_inference: true
+
+strengths:
+  - Fast inference speed
+  - Low memory footprint
+  - Good instruction following
+  - Efficient on Apple Silicon
+
+weaknesses:
+  - Lower accuracy than larger models
+  - Limited nuance in complex queries
+
+limitations:
+  - Complex multi-step reasoning
+  - Long context handling (>8K tokens)
+  - Highly technical domains
+
+use_cases:
+  - Quick document Q&A
+  - Simple summarisation
+  - Personal knowledge queries
+  - Development and testing
+
+context_length: 8192
+parameters: 3.0
+licence: Llama 3.2 Community
