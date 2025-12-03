@@ -65,6 +65,31 @@ from ragd.ui.cli import (
     tier_summary_command,
     tier_promote_command,
     tier_demote_command,
+    # Collection commands (F-063)
+    collection_create_command,
+    collection_list_command,
+    collection_show_command,
+    collection_update_command,
+    collection_delete_command,
+    collection_export_command,
+    # Suggestion commands (F-061)
+    suggestions_show_command,
+    suggestions_pending_command,
+    suggestions_confirm_command,
+    suggestions_reject_command,
+    suggestions_stats_command,
+    # Library commands (F-062)
+    library_show_command,
+    library_create_command,
+    library_add_command,
+    library_remove_command,
+    library_rename_command,
+    library_delete_command,
+    library_hide_command,
+    library_validate_command,
+    library_promote_command,
+    library_pending_command,
+    library_stats_command,
 )
 
 app = typer.Typer(
@@ -78,6 +103,8 @@ console = Console()
 meta_app = typer.Typer(help="Manage document metadata.")
 tag_app = typer.Typer(help="Manage document tags.")
 tier_app = typer.Typer(help="Manage data sensitivity tiers.")
+collection_app = typer.Typer(help="Manage smart collections (F-063).")
+library_app = typer.Typer(help="Manage tag library (F-062).")
 watch_app = typer.Typer(help="Watch folders for automatic indexing.")
 models_app = typer.Typer(help="Manage LLM models.")
 backend_app = typer.Typer(help="Manage vector store backends.")
@@ -86,6 +113,8 @@ session_app = typer.Typer(help="Manage encryption session.")
 app.add_typer(meta_app, name="meta")
 app.add_typer(tag_app, name="tag")
 app.add_typer(tier_app, name="tier")
+app.add_typer(collection_app, name="collection")
+app.add_typer(library_app, name="library")
 app.add_typer(watch_app, name="watch")
 app.add_typer(models_app, name="models")
 app.add_typer(backend_app, name="backend")
@@ -1266,6 +1295,376 @@ def session_status(
         ragd session status
     """
     session_status_command(no_color=no_color)
+
+
+# --- Collection subcommands (F-063) ---
+
+@collection_app.command("create")
+def collection_create(
+    name: Annotated[str, typer.Argument(help="Collection name.")],
+    include_all: list[str] | None = typer.Option(
+        None, "--include-all", "-a",
+        help="Tags that must ALL be present (AND logic).",
+    ),
+    include_any: list[str] | None = typer.Option(
+        None, "--include-any", "-o",
+        help="Tags where at least ONE must be present (OR logic).",
+    ),
+    exclude: list[str] | None = typer.Option(
+        None, "--exclude", "-x",
+        help="Tags that must NOT be present.",
+    ),
+    description: str = typer.Option("", "--description", "-d", help="Collection description."),
+    parent: str | None = typer.Option(None, "--parent", "-p", help="Parent collection name."),
+) -> None:
+    """Create a new smart collection.
+
+    Smart collections are virtual folders based on tag queries.
+    Documents matching the query automatically appear in the collection.
+
+    Examples:
+        ragd collection create "Q3 Finance" --include-all finance q3-2024 --exclude draft
+        ragd collection create "Research" --include-any academic research papers
+        ragd collection create "Active Projects" --include-any project/alpha project/beta
+    """
+    collection_create_command(
+        name=name,
+        include_all=include_all,
+        include_any=include_any,
+        exclude=exclude,
+        description=description,
+        parent=parent,
+    )
+
+
+@collection_app.command("list")
+def collection_list(
+    parent: str | None = typer.Option(None, "--parent", "-p", help="List children of this collection."),
+) -> None:
+    """List all collections.
+
+    Shows collection names, document counts, and query definitions.
+
+    Examples:
+        ragd collection list
+        ragd collection list --parent "Finance"
+    """
+    collection_list_command(parent=parent)
+
+
+@collection_app.command("show")
+def collection_show(
+    name: Annotated[str, typer.Argument(help="Collection name.")],
+    limit: int = typer.Option(20, "--limit", "-n", help="Maximum documents to show."),
+) -> None:
+    """Show collection details and contents.
+
+    Displays the collection query and matching documents.
+
+    Examples:
+        ragd collection show "Q3 Finance"
+        ragd collection show "Research" --limit 50
+    """
+    collection_show_command(name=name, limit=limit)
+
+
+@collection_app.command("update")
+def collection_update(
+    name: Annotated[str, typer.Argument(help="Collection name.")],
+    include_all: list[str] | None = typer.Option(
+        None, "--include-all", "-a",
+        help="New tags that must ALL be present.",
+    ),
+    include_any: list[str] | None = typer.Option(
+        None, "--include-any", "-o",
+        help="New tags where at least ONE must be present.",
+    ),
+    exclude: list[str] | None = typer.Option(
+        None, "--exclude", "-x",
+        help="New tags that must NOT be present.",
+    ),
+    description: str | None = typer.Option(None, "--description", "-d", help="New description."),
+) -> None:
+    """Update a collection's query or description.
+
+    Examples:
+        ragd collection update "Q3 Finance" --exclude draft review
+        ragd collection update "Research" --description "Academic papers"
+    """
+    collection_update_command(
+        name=name,
+        include_all=include_all,
+        include_any=include_any,
+        exclude=exclude,
+        description=description,
+    )
+
+
+@collection_app.command("delete")
+def collection_delete(
+    name: Annotated[str, typer.Argument(help="Collection name.")],
+    force: bool = typer.Option(False, "--force", "-f", help="Skip confirmation."),
+) -> None:
+    """Delete a collection.
+
+    The documents in the collection are NOT deleted, only the collection definition.
+
+    Examples:
+        ragd collection delete "Q3 Finance"
+        ragd collection delete "Old Projects" --force
+    """
+    collection_delete_command(name=name, force=force)
+
+
+@collection_app.command("export")
+def collection_export(
+    name: Annotated[str, typer.Argument(help="Collection name.")],
+    output: Path | None = typer.Option(None, "--output", "-o", help="Output file."),
+    format: str = typer.Option("json", "--format", "-f", help="Output format (json, csv, ids)."),
+) -> None:
+    """Export collection members.
+
+    Examples:
+        ragd collection export "Q3 Finance" --format json > q3_docs.json
+        ragd collection export "Research" --format ids > doc_ids.txt
+    """
+    collection_export_command(name=name, output=output, format=format)
+
+
+# --- Tag suggestions subcommands (F-061) ---
+
+@tag_app.command("suggestions")
+def tag_suggestions(
+    doc_id: Annotated[str, typer.Argument(help="Document ID.")],
+    all_: bool = typer.Option(False, "--all", "-a", help="Show all suggestions (not just pending)."),
+) -> None:
+    """Show tag suggestions for a document.
+
+    Displays auto-generated tag suggestions from KeyBERT, LLM, and NER.
+
+    Examples:
+        ragd tag suggestions doc-123
+        ragd tag suggestions doc-123 --all
+    """
+    suggestions_show_command(doc_id=doc_id, all_=all_)
+
+
+@tag_app.command("pending")
+def tag_pending(
+    limit: int = typer.Option(20, "--limit", "-n", help="Maximum documents to show."),
+) -> None:
+    """Show all documents with pending tag suggestions.
+
+    Examples:
+        ragd tag pending
+        ragd tag pending --limit 50
+    """
+    suggestions_pending_command(limit=limit)
+
+
+@tag_app.command("confirm")
+def tag_confirm(
+    doc_id: Annotated[str, typer.Argument(help="Document ID.")],
+    tags: list[str] | None = typer.Argument(None, help="Specific tags to confirm."),
+    min_confidence: float | None = typer.Option(
+        None, "--min-confidence", "-c",
+        help="Only confirm tags above this confidence.",
+    ),
+) -> None:
+    """Confirm tag suggestions and apply them.
+
+    Confirmed suggestions become regular tags with provenance tracking.
+
+    Examples:
+        ragd tag confirm doc-123 finance quarterly
+        ragd tag confirm doc-123 --min-confidence 0.8
+    """
+    suggestions_confirm_command(doc_id=doc_id, tags=tags, min_confidence=min_confidence)
+
+
+@tag_app.command("reject")
+def tag_reject(
+    doc_id: Annotated[str, typer.Argument(help="Document ID.")],
+    tags: list[str] | None = typer.Argument(None, help="Specific tags to reject."),
+) -> None:
+    """Reject tag suggestions.
+
+    Rejected suggestions won't be shown again.
+
+    Examples:
+        ragd tag reject doc-123 irrelevant-tag
+        ragd tag reject doc-123  # Reject all pending
+    """
+    suggestions_reject_command(doc_id=doc_id, tags=tags)
+
+
+@tag_app.command("stats")
+def tag_stats() -> None:
+    """Show tag suggestion statistics.
+
+    Displays counts by status and source.
+
+    Examples:
+        ragd tag stats
+    """
+    suggestions_stats_command()
+
+
+# --- Library subcommands (F-062) ---
+
+@library_app.command("show")
+def library_show_cmd() -> None:
+    """Show the tag library with all namespaces.
+
+    Displays system and user namespaces with their allowed tags.
+
+    Examples:
+        ragd library show
+    """
+    library_show_command()
+
+
+@library_app.command("create")
+def library_create(
+    name: Annotated[str, typer.Argument(help="Namespace name.")],
+    open_: bool = typer.Option(False, "--open", "-o", help="Create as open namespace (any value allowed)."),
+    closed: bool = typer.Option(False, "--closed", "-c", help="Create as closed namespace (predefined values only)."),
+    description: str = typer.Option("", "--description", "-d", help="Namespace description."),
+    tags: list[str] | None = typer.Option(None, "--tags", "-t", help="Initial tag values."),
+) -> None:
+    """Create a new namespace in the tag library.
+
+    Examples:
+        ragd library create project --closed --tags alpha beta gamma
+        ragd library create topic --open
+    """
+    library_create_command(
+        name=name,
+        open_=open_,
+        closed=closed,
+        description=description,
+        tags=tags,
+    )
+
+
+@library_app.command("add")
+def library_add(
+    namespace: Annotated[str, typer.Argument(help="Namespace name.")],
+    tags: Annotated[list[str], typer.Argument(help="Tag values to add.")],
+) -> None:
+    """Add tag values to a namespace.
+
+    Examples:
+        ragd library add project delta
+        ragd library add status pending complete
+    """
+    library_add_command(namespace=namespace, tags=tags)
+
+
+@library_app.command("remove")
+def library_remove(
+    namespace: Annotated[str, typer.Argument(help="Namespace name.")],
+    tags: Annotated[list[str], typer.Argument(help="Tag values to remove.")],
+) -> None:
+    """Remove tag values from a namespace.
+
+    Examples:
+        ragd library remove project gamma
+    """
+    library_remove_command(namespace=namespace, tags=tags)
+
+
+@library_app.command("rename")
+def library_rename(
+    namespace: Annotated[str, typer.Argument(help="Namespace name.")],
+    old_value: Annotated[str, typer.Argument(help="Current tag value.")],
+    new_value: Annotated[str, typer.Argument(help="New tag value.")],
+) -> None:
+    """Rename a tag value in a namespace.
+
+    Updates the namespace definition and all documents using this tag.
+
+    Examples:
+        ragd library rename project alpha apollo
+    """
+    library_rename_command(namespace=namespace, old_value=old_value, new_value=new_value)
+
+
+@library_app.command("delete")
+def library_delete_cmd(
+    name: Annotated[str, typer.Argument(help="Namespace name to delete.")],
+    force: bool = typer.Option(False, "--force", "-f", help="Skip confirmation."),
+) -> None:
+    """Delete a namespace from the tag library.
+
+    Cannot delete system namespaces. Tags in documents are NOT removed.
+
+    Examples:
+        ragd library delete project
+        ragd library delete custom --force
+    """
+    library_delete_command(name=name, force=force)
+
+
+@library_app.command("hide")
+def library_hide(
+    name: Annotated[str, typer.Argument(help="Namespace name.")],
+    show: bool = typer.Option(False, "--show", "-s", help="Show instead of hide."),
+) -> None:
+    """Hide a namespace from listings.
+
+    Hidden namespaces still work, just aren't shown in listings.
+
+    Examples:
+        ragd library hide sensitivity
+        ragd library hide sensitivity --show  # Unhide
+    """
+    library_hide_command(name=name, show=show)
+
+
+@library_app.command("validate")
+def library_validate() -> None:
+    """Validate all tags against the library.
+
+    Shows tags that don't match any namespace definition.
+
+    Examples:
+        ragd library validate
+    """
+    library_validate_command()
+
+
+@library_app.command("promote")
+def library_promote(
+    tag_name: Annotated[str, typer.Argument(help="Tag name to promote.")],
+    namespace: str = typer.Option(..., "--namespace", "-n", help="Target namespace."),
+) -> None:
+    """Promote a pending tag to a namespace.
+
+    Examples:
+        ragd library promote machine-learning --namespace topic
+    """
+    library_promote_command(tag_name=tag_name, namespace=namespace)
+
+
+@library_app.command("pending")
+def library_pending() -> None:
+    """Show pending tags awaiting promotion.
+
+    Examples:
+        ragd library pending
+    """
+    library_pending_command()
+
+
+@library_app.command("stats")
+def library_stats_cmd() -> None:
+    """Show tag library statistics.
+
+    Examples:
+        ragd library stats
+    """
+    library_stats_command()
 
 
 if __name__ == "__main__":

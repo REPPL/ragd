@@ -5,6 +5,9 @@ This module provides:
 - MetadataStore: SQLite-backed persistent storage
 - MetadataExtractor: NLP-based metadata extraction
 - Migration utilities for schema evolution
+- Smart Collections (F-063)
+- Auto-Tag Suggestions (F-061)
+- Tag Library Management (F-062)
 """
 
 from __future__ import annotations
@@ -32,6 +35,27 @@ from ragd.metadata.schema import DocumentMetadata
 from ragd.metadata.store import MetadataStore
 from ragd.metadata.tags import TagManager
 
+# F-063: Smart Collections
+from ragd.metadata.collections import (
+    Collection,
+    CollectionManager,
+    TagQuery,
+)
+
+# F-061: Auto-Tag Suggestions
+from ragd.metadata.suggestions import (
+    SuggestionConfig,
+    SuggestionEngine,
+    TagSuggestion,
+)
+
+# F-062: Tag Library Management
+from ragd.metadata.library import (
+    LibraryConfig,
+    TagLibrary,
+    TagNamespace,
+)
+
 __all__ = [
     # Schema
     "DocumentMetadata",
@@ -56,4 +80,16 @@ __all__ = [
     "migrate_v2_to_v2_1",
     "migrate_v2_1_to_v2_2",
     "needs_migration",
+    # F-063: Smart Collections
+    "Collection",
+    "CollectionManager",
+    "TagQuery",
+    # F-061: Auto-Tag Suggestions
+    "SuggestionConfig",
+    "SuggestionEngine",
+    "TagSuggestion",
+    # F-062: Tag Library Management
+    "LibraryConfig",
+    "TagLibrary",
+    "TagNamespace",
 ]

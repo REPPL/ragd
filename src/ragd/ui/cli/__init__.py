@@ -60,6 +60,37 @@ from ragd.ui.cli.tiers import (
     tier_demote_command,
 )
 
+from ragd.ui.cli.collections import (
+    collection_create_command,
+    collection_list_command,
+    collection_show_command,
+    collection_update_command,
+    collection_delete_command,
+    collection_export_command,
+)
+
+from ragd.ui.cli.suggestions import (
+    suggestions_show_command,
+    suggestions_pending_command,
+    suggestions_confirm_command,
+    suggestions_reject_command,
+    suggestions_stats_command,
+)
+
+from ragd.ui.cli.library import (
+    library_show_command,
+    library_create_command,
+    library_add_command,
+    library_remove_command,
+    library_rename_command,
+    library_delete_command,
+    library_hide_command,
+    library_validate_command,
+    library_promote_command,
+    library_pending_command,
+    library_stats_command,
+)
+
 from ragd.ui.cli.errors import (
     handle_dependency_errors,
     format_error_for_cli,
@@ -115,6 +146,31 @@ __all__ = [
     "tier_summary_command",
     "tier_promote_command",
     "tier_demote_command",
+    # Collection commands (F-063)
+    "collection_create_command",
+    "collection_list_command",
+    "collection_show_command",
+    "collection_update_command",
+    "collection_delete_command",
+    "collection_export_command",
+    # Suggestion commands (F-061)
+    "suggestions_show_command",
+    "suggestions_pending_command",
+    "suggestions_confirm_command",
+    "suggestions_reject_command",
+    "suggestions_stats_command",
+    # Library commands (F-062)
+    "library_show_command",
+    "library_create_command",
+    "library_add_command",
+    "library_remove_command",
+    "library_rename_command",
+    "library_delete_command",
+    "library_hide_command",
+    "library_validate_command",
+    "library_promote_command",
+    "library_pending_command",
+    "library_stats_command",
     # Error handling
     "handle_dependency_errors",
     "format_error_for_cli",
