@@ -93,7 +93,7 @@ ExtractionResult
 
 **Rejected**: Increases base install size. Optional dependency approach is more flexible.
 
-## Related
+## Related Documentation
 
 - [F-038: Web Archive Support](../../features/completed/F-038-web-archive-support.md)
 - [F-039: Advanced HTML Processing](../../features/completed/F-039-advanced-html-processing.md)
@@ -101,4 +101,4 @@ ExtractionResult
 
 ---
 
-**Last Updated**: 2025-11-27
+**Status**: Accepted
