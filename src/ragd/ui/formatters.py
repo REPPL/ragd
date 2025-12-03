@@ -96,8 +96,9 @@ def format_search_results(
         console.print(f"[yellow]No results found for:[/yellow] {query}")
         return None
 
-    console.print(f"\n[bold]Search results for:[/bold] {query}")
-    console.print(f"[dim]Found {len(results)} results[/dim]\n")
+    from ragd.ui.styles import print_search_header
+
+    print_search_header(console, query, len(results))
 
     for i, r in enumerate(results):
         # Create score colour based on value
@@ -316,33 +317,77 @@ def format_health_results(
             lines.append(f"[{icon}] {r.name}: {r.message} ({r.duration_ms:.1f}ms)")
         return "\n".join(lines)
 
-    # Rich format
+    # Rich format with ASCII banner
     if console is None:
         console = Console()
 
-    overall_status = "[green]HEALTHY[/green]" if all_healthy else "[red]UNHEALTHY[/red]"
-    console.print(f"\n[bold]Health Status:[/bold] {overall_status}\n")
+    # Determine overall status
+    has_unhealthy = any(r.status == "unhealthy" for r in results)
+    has_degraded = any(r.status == "degraded" for r in results)
 
-    table = Table()
-    table.add_column("Check", style="bold")
-    table.add_column("Status")
-    table.add_column("Message")
-    table.add_column("Time", justify="right")
+    if has_unhealthy:
+        overall = "UNHEALTHY"
+        overall_colour = "red"
+    elif has_degraded:
+        overall = "DEGRADED"
+        overall_colour = "yellow"
+    else:
+        overall = "HEALTHY"
+        overall_colour = "green"
 
+    # Print ASCII banner header
+    width = 60
+    border = "+" + "-" * (width - 2) + "+"
+
+    console.print()
+    console.print(f"+-- System Health " + "-" * (width - 19) + "+")
+    status_line = f"|  Overall: [{overall_colour}]{overall}[/{overall_colour}]"
+    padding = width - 14 - len(overall)
+    console.print(status_line + " " * padding + "|")
+    console.print("|" + " " * (width - 2) + "|")
+
+    # Categorise checks
+    core_checks = ["Configuration", "Storage", "Embedding Model", "Dependencies"]
+    optional_checks = ["Docling", "OCR", "Ollama", "NLTK Data"]
+
+    # Print core components
+    console.print("|  [bold]Core Components:[/bold]" + " " * (width - 21) + "|")
     for r in results:
-        if r.status == "healthy":
-            status_text = Text("✓", style="green")
-        elif r.status == "degraded":
-            status_text = Text("⚠", style="yellow")
-        else:
-            status_text = Text("✗", style="red")
+        if r.name in core_checks or r.name not in optional_checks:
+            if r.status == "healthy":
+                icon = "[green][OK][/green]"
+            elif r.status == "degraded":
+                icon = "[yellow][!!][/yellow]"
+            else:
+                icon = "[red][XX][/red]"
 
-        table.add_row(
-            r.name,
-            status_text,
-            r.message,
-            f"{r.duration_ms:.1f}ms",
-        )
+            # Truncate message if needed
+            msg = r.message[:30] + "..." if len(r.message) > 30 else r.message
+            line = f"|    {icon} {r.name:<18} {msg}"
+            padding = width - len(r.name) - len(r.message[:30]) - 14
+            if len(r.message) > 30:
+                padding -= 3
+            console.print(line + " " * max(0, padding) + "|")
 
-    console.print(table)
+    # Print optional features if any exist
+    optional_results = [r for r in results if r.name in optional_checks]
+    if optional_results:
+        console.print("|" + " " * (width - 2) + "|")
+        console.print("|  [bold]Optional Features:[/bold]" + " " * (width - 23) + "|")
+        for r in optional_results:
+            if r.status == "healthy":
+                icon = "[green][OK][/green]"
+            elif r.status == "degraded":
+                icon = "[yellow][!!][/yellow]"
+            else:
+                icon = "[red][XX][/red]"
+
+            msg = r.message[:30] + "..." if len(r.message) > 30 else r.message
+            line = f"|    {icon} {r.name:<18} {msg}"
+            padding = width - len(r.name) - len(r.message[:30]) - 14
+            if len(r.message) > 30:
+                padding -= 3
+            console.print(line + " " * max(0, padding) + "|")
+
+    console.print(border)
     return None

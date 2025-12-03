@@ -253,12 +253,16 @@ def doctor(
 def config(
     show: bool = typer.Option(False, "--show", "-s", help="Show current configuration."),
     path: bool = typer.Option(False, "--path", "-p", help="Show configuration file path."),
+    validate: bool = typer.Option(
+        False, "--validate", "-v", help="Validate configuration and detect issues."
+    ),
     no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
 ) -> None:
     """Manage ragd configuration."""
     config_command(
         show=show,
         path=path,
+        validate=validate,
         no_color=no_color,
     )
 
@@ -729,6 +733,9 @@ def evaluate(
     expected: str = typer.Option(None, "--expected", "-e", help="Expected answer for recall computation."),
     limit: int = typer.Option(5, "--limit", "-n", help="Maximum search results."),
     threshold: float = typer.Option(0.5, "--threshold", help="Relevance threshold (0-1)."),
+    include_llm: bool = typer.Option(
+        False, "--include-llm", help="Include LLM-based metrics (faithfulness, answer_relevancy)."
+    ),
     no_save: bool = typer.Option(False, "--no-save", help="Don't save evaluation results."),
     output_format: FormatOption = "rich",
     no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
@@ -739,11 +746,18 @@ def evaluate(
     - Context Precision: Are retrieved docs relevant?
     - Relevance Score: Weighted relevance with position decay
 
+    With --include-llm (requires Ollama):
+    - Faithfulness: Is the answer grounded in context?
+    - Answer Relevancy: Does the answer address the question?
+
     Single query:
         ragd evaluate --query "What is machine learning?"
 
     With expected answer:
         ragd evaluate --query "..." --expected "ML is a subset of AI..."
+
+    With LLM metrics:
+        ragd evaluate --query "..." --expected "ML is..." --include-llm
 
     Batch evaluation:
         ragd evaluate --test-file queries.yaml
@@ -757,6 +771,7 @@ def evaluate(
         expected=expected,
         limit=limit,
         threshold=threshold,
+        include_llm=include_llm,
         save=not no_save,
         output_format=output_format,  # type: ignore
         no_color=no_color,

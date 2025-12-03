@@ -249,3 +249,167 @@ def compute_ndcg(
         return 0.0
 
     return actual_dcg / ideal_dcg
+
+
+# LLM-based metric prompts
+FAITHFULNESS_PROMPT = """You are evaluating whether an answer is grounded in the provided context.
+
+Context:
+{context}
+
+Question: {question}
+
+Answer: {answer}
+
+Rate how faithfully the answer is grounded in the context on a scale from 0 to 1:
+- 1.0: Every claim in the answer is directly supported by the context
+- 0.5: Some claims are supported, but others are not found in context
+- 0.0: The answer contains claims that contradict or are not in context
+
+Respond with ONLY a single number between 0 and 1, nothing else."""
+
+ANSWER_RELEVANCY_PROMPT = """You are evaluating whether an answer addresses the question.
+
+Question: {question}
+
+Answer: {answer}
+
+Rate how well the answer addresses the question on a scale from 0 to 1:
+- 1.0: The answer directly and completely addresses the question
+- 0.5: The answer partially addresses the question
+- 0.0: The answer does not address the question at all
+
+Respond with ONLY a single number between 0 and 1, nothing else."""
+
+
+def compute_faithfulness(
+    question: str,
+    answer: str,
+    context: str,
+    base_url: str = "http://localhost:11434",
+    model: str = "llama3.2:3b",
+) -> float | None:
+    """Compute faithfulness score using LLM.
+
+    Measures how grounded the answer is in the provided context.
+    No hallucinations = high faithfulness.
+
+    Args:
+        question: The user's question
+        answer: The generated answer
+        context: The retrieved context
+        base_url: Ollama API base URL
+        model: Model to use for evaluation
+
+    Returns:
+        Faithfulness score (0-1), or None if LLM unavailable
+    """
+    return _call_llm_for_score(
+        prompt=FAITHFULNESS_PROMPT.format(
+            context=context[:2000],  # Limit context length
+            question=question,
+            answer=answer,
+        ),
+        base_url=base_url,
+        model=model,
+    )
+
+
+def compute_answer_relevancy(
+    question: str,
+    answer: str,
+    base_url: str = "http://localhost:11434",
+    model: str = "llama3.2:3b",
+) -> float | None:
+    """Compute answer relevancy score using LLM.
+
+    Measures how well the answer addresses the question.
+
+    Args:
+        question: The user's question
+        answer: The generated answer
+        base_url: Ollama API base URL
+        model: Model to use for evaluation
+
+    Returns:
+        Relevancy score (0-1), or None if LLM unavailable
+    """
+    return _call_llm_for_score(
+        prompt=ANSWER_RELEVANCY_PROMPT.format(
+            question=question,
+            answer=answer,
+        ),
+        base_url=base_url,
+        model=model,
+    )
+
+
+def _call_llm_for_score(
+    prompt: str,
+    base_url: str,
+    model: str,
+) -> float | None:
+    """Call LLM and parse numeric score from response.
+
+    Args:
+        prompt: The evaluation prompt
+        base_url: Ollama API base URL
+        model: Model to use
+
+    Returns:
+        Parsed score (0-1), or None if failed
+    """
+    import json
+    import urllib.request
+
+    try:
+        url = f"{base_url}/api/generate"
+        data = json.dumps({
+            "model": model,
+            "prompt": prompt,
+            "stream": False,
+            "options": {
+                "temperature": 0.0,  # Deterministic for evaluation
+                "num_predict": 10,  # Only need a short response
+            },
+        }).encode()
+
+        request = urllib.request.Request(
+            url,
+            data=data,
+            headers={"Content-Type": "application/json"},
+        )
+
+        with urllib.request.urlopen(request, timeout=30) as response:
+            result = json.loads(response.read().decode())
+            response_text = result.get("response", "").strip()
+
+            # Parse the numeric response
+            return _parse_score(response_text)
+
+    except Exception:
+        # Graceful degradation - return None if LLM unavailable
+        return None
+
+
+def _parse_score(response: str) -> float | None:
+    """Parse a numeric score from LLM response.
+
+    Args:
+        response: The LLM response text
+
+    Returns:
+        Parsed score (0-1), or None if invalid
+    """
+    import re
+
+    # Try to extract a decimal number
+    match = re.search(r"(\d+\.?\d*)", response)
+    if match:
+        try:
+            score = float(match.group(1))
+            # Clamp to 0-1 range
+            return max(0.0, min(1.0, score))
+        except ValueError:
+            return None
+    return None

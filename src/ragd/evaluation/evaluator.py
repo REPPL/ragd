@@ -17,6 +17,8 @@ from ragd.evaluation.metrics import (
     compute_context_precision,
     compute_context_recall,
     compute_relevance_score,
+    compute_faithfulness,
+    compute_answer_relevancy,
 )
 from ragd.search.hybrid import HybridSearcher, SearchMode
 
@@ -41,6 +43,14 @@ class EvaluationConfig:
     relevance_threshold: float = 0.5
     search_limit: int = 5
     include_llm_metrics: bool = False
+
+    def __post_init__(self) -> None:
+        """Add LLM metrics if include_llm_metrics is enabled."""
+        if self.include_llm_metrics:
+            if MetricType.FAITHFULNESS not in self.metrics:
+                self.metrics.append(MetricType.FAITHFULNESS)
+            if MetricType.ANSWER_RELEVANCY not in self.metrics:
+                self.metrics.append(MetricType.ANSWER_RELEVANCY)
 
 
 @dataclass
@@ -218,10 +228,31 @@ class Evaluator:
         if MetricType.RELEVANCE_SCORE in self.eval_config.metrics:
             metrics.relevance_score = compute_relevance_score(scores)
 
-        # LLM-based metrics (Phase 2)
-        if self.eval_config.include_llm_metrics:
-            # TODO: Implement faithfulness and answer_relevancy
-            pass
+        # LLM-based metrics
+        if self.eval_config.include_llm_metrics and expected_answer:
+            # Build context from retrieved chunks
+            context = "\n\n".join(r.content for r in results)
+
+            # Get LLM config from ragd config
+            base_url = self.config.llm.base_url
+            model = self.config.llm.model
+
+            if MetricType.FAITHFULNESS in self.eval_config.metrics:
+                metrics.faithfulness = compute_faithfulness(
+                    question=query,
+                    answer=expected_answer,
+                    context=context,
+                    base_url=base_url,
+                    model=model,
+                )
+
+            if MetricType.ANSWER_RELEVANCY in self.eval_config.metrics:
+                metrics.answer_relevancy = compute_answer_relevancy(
+                    question=query,
+                    answer=expected_answer,
+                    base_url=base_url,
+                    model=model,
+                )
 
         evaluation_time = (time.time() - start_time) * 1000
 

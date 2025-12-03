@@ -13,6 +13,8 @@ from ragd.evaluation.metrics import (
     compute_context_precision,
     compute_context_recall,
     compute_relevance_score,
+    compute_faithfulness,
+    compute_answer_relevancy,
 )
 from ragd.evaluation.evaluator import (
     Evaluator,
@@ -34,6 +36,8 @@ __all__ = [
     "compute_context_precision",
     "compute_context_recall",
     "compute_relevance_score",
+    "compute_faithfulness",
+    "compute_answer_relevancy",
     # Evaluator
     "Evaluator",
     "EvaluationConfig",

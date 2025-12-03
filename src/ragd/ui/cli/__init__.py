@@ -37,6 +37,11 @@ from ragd.ui.cli.backend import (
     backend_benchmark_command,
 )
 
+from ragd.ui.cli.errors import (
+    handle_dependency_errors,
+    format_error_for_cli,
+)
+
 __all__ = [
     "get_console",
     "init_command",
@@ -70,4 +75,7 @@ __all__ = [
     "backend_health_command",
     "backend_set_command",
     "backend_benchmark_command",
+    # Error handling
+    "handle_dependency_errors",
+    "format_error_for_cli",
 ]

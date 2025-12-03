@@ -61,8 +61,11 @@ def init_command(
 
     con = get_console(no_color)
 
-    con.print("\n[bold]Welcome to ragd![/bold]")
-    con.print("Setting up your local RAG system...\n")
+    # Print header
+    from ragd.ui.styles import print_init_header
+
+    con.print()
+    print_init_header(con)
 
     # Detect hardware
     with Progress(
@@ -227,22 +230,20 @@ def index_command(
             TextColumn("[progress.description]{task.description}"),
             BarColumn(),
             MofNCompleteColumn(),
+            TextColumn("{task.fields[current_file]}"),
             console=con,
             transient=False,
         ) as progress:
-            task = progress.add_task("Indexing...", total=total_files)
+            task = progress.add_task("Indexing...", total=total_files, current_file="")
 
             def progress_callback(completed: int, total: int, filename: str) -> None:
                 # completed = number of files finished, filename = current file (empty when done)
                 if filename:
-                    desc = (
-                        f"[dim]{filename[:40]}...[/dim]"
-                        if len(filename) > 40
-                        else f"[dim]{filename}[/dim]"
-                    )
+                    truncated = filename[:35] + "..." if len(filename) > 35 else filename
+                    file_display = f"[dim]({truncated})[/dim]"
                 else:
-                    desc = "[green]Complete[/green]"
-                progress.update(task, completed=completed, description=desc)
+                    file_display = "[green](done)[/green]"
+                progress.update(task, completed=completed, current_file=file_display)
 
             results = index_path(
                 path,
@@ -459,8 +460,7 @@ def doctor_command(
 
     con = get_console(no_color)
 
-    con.print("\n[bold]Running health checks...[/bold]\n")
-
+    # Run checks silently, let the formatter display everything
     config = load_config()
     results = run_health_checks(config)
 
@@ -480,6 +480,7 @@ def doctor_command(
 def config_command(
     show: bool = False,
     path: bool = False,
+    validate: bool = False,
     no_color: bool = False,
 ) -> None:
     """Manage ragd configuration."""
@@ -492,7 +493,11 @@ def config_command(
         con.print(str(DEFAULT_CONFIG_PATH))
         return
 
-    if show or not (show or path):
+    if validate:
+        _config_validate(con)
+        return
+
+    if show or not (show or path or validate):
         if not config_exists():
             con.print("[yellow]No configuration file found.[/yellow]")
             con.print(f"Expected at: {DEFAULT_CONFIG_PATH}")
@@ -511,6 +516,66 @@ def config_command(
                 config_dict["hardware"]["tier"] = tier.value
 
         con.print(yaml.safe_dump(config_dict, default_flow_style=False))
+
+
+def _config_validate(con: Console) -> None:
+    """Run configuration validation checks."""
+    from ragd.config import DEFAULT_CONFIG_PATH, load_config, config_exists
+    from ragd.config_validator import (
+        validate_config,
+        ValidationSeverity,
+    )
+
+    if not config_exists():
+        con.print("[yellow]No configuration file found.[/yellow]")
+        con.print(f"Expected at: {DEFAULT_CONFIG_PATH}")
+        con.print("\nRun [cyan]ragd init[/cyan] to create configuration.")
+        raise typer.Exit(1)
+
+    config_obj = load_config()
+    report = validate_config(config_obj, DEFAULT_CONFIG_PATH)
+
+    # Print banner
+    width = 60
+    con.print()
+    con.print("+" + "-" * (width - 2) + "+")
+    con.print("|  Configuration Validation" + " " * (width - 29) + "|")
+    con.print("+" + "-" * (width - 2) + "+")
+    con.print()
+
+    # Print results
+    for result in report.results:
+        if result.passed:
+            icon = "[green][OK][/green]"
+        elif result.severity == ValidationSeverity.ERROR:
+            icon = "[red][XX][/red]"
+        elif result.severity == ValidationSeverity.WARNING:
+            icon = "[yellow][!!][/yellow]"
+        else:
+            icon = "[dim][--][/dim]"
+
+        con.print(f"  {icon} {result.name:<20} {result.message}")
+
+        if not result.passed and result.suggestion:
+            con.print(f"      [dim]-> {result.suggestion}[/dim]")
+
+    # Print summary
+    con.print()
+    summary_parts = []
+    if report.error_count:
+        summary_parts.append(f"[red]{report.error_count} error{'s' if report.error_count != 1 else ''}[/red]")
+    if report.warning_count:
+        summary_parts.append(f"[yellow]{report.warning_count} warning{'s' if report.warning_count != 1 else ''}[/yellow]")
+    if report.info_count:
+        summary_parts.append(f"[dim]{report.info_count} info[/dim]")
+
+    if not summary_parts:
+        con.print("[green]All checks passed![/green]")
+    else:
+        con.print(" | ".join(summary_parts))
+
+    if report.has_errors:
+        raise typer.Exit(1)
 
 
 def reindex_command(
@@ -1485,9 +1550,11 @@ def chat_command(
 
     session = ChatSession(config=config, chat_config=chat_config, session_id=session_id)
 
-    con.print("\n[bold]ragd Chat[/bold]")
-    con.print(f"[dim]Model: {chat_config.model}[/dim]")
-    con.print("[dim]Type '/exit' to quit, '/help' for commands[/dim]\n")
+    # Print header
+    from ragd.ui.styles import print_chat_header
+
+    con.print()
+    print_chat_header(con, chat_config.model)
 
     try:
         while True:
@@ -1529,14 +1596,30 @@ def chat_command(
                     con.print()
                 continue
 
-            # Generate response
+            # Generate response with thinking indicator
             con.print()
-            con.print("[bold green]Assistant:[/bold green] ", end="")
 
             try:
-                for chunk in session.chat(user_input, stream=True):
-                    con.print(chunk, end="")
-                con.print("\n")
+                # Show thinking spinner
+                from rich.status import Status
+                response_started = False
+
+                with Status("[dim]Thinking...[/dim]", console=con, spinner="dots") as status:
+                    response_chunks = []
+                    for chunk in session.chat(user_input, stream=True):
+                        if not response_started:
+                            # First chunk received - stop spinner and show prefix
+                            status.stop()
+                            con.print("[bold green]Assistant:[/bold green] ", end="")
+                            response_started = True
+                        con.print(chunk, end="")
+                        response_chunks.append(chunk)
+
+                if not response_started:
+                    # No response received
+                    con.print("[dim]No response generated.[/dim]")
+                else:
+                    con.print("\n")
             except Exception as e:
                 con.print(f"\n[red]Error: {e}[/red]\n")
 
@@ -1554,6 +1637,7 @@ def evaluate_command(
     expected: str | None = None,
     limit: int = 5,
     threshold: float = 0.5,
+    include_llm: bool = False,
     save: bool = True,
     output_format: str = "rich",
     no_color: bool = False,
@@ -1561,6 +1645,7 @@ def evaluate_command(
     """Evaluate RAG quality.
 
     Computes retrieval metrics for a query or batch of queries.
+    When --include-llm is set, also computes faithfulness and answer_relevancy.
     """
     import json
     import yaml
@@ -1583,13 +1668,16 @@ def evaluate_command(
         raise typer.Exit(1)
 
     # Create evaluation config
+    metrics = [
+        MetricType.CONTEXT_PRECISION,
+        MetricType.RELEVANCE_SCORE,
+    ]
+
     eval_config = EvaluationConfig(
-        metrics=[
-            MetricType.CONTEXT_PRECISION,
-            MetricType.RELEVANCE_SCORE,
-        ],
+        metrics=metrics,
         relevance_threshold=threshold,
         search_limit=limit,
+        include_llm_metrics=include_llm,
     )
 
     evaluator = Evaluator(config=config, eval_config=eval_config)
