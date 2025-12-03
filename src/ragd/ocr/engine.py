@@ -169,11 +169,17 @@ class PaddleOCREngine:
 
         Args:
             lang: Language code ('en', 'ch', 'ja', etc.)
-            use_gpu: Enable GPU acceleration (requires CUDA)
-            use_angle_cls: Enable text orientation classification
+            use_gpu: Deprecated in PaddleOCR 3.x (GPU auto-detected)
+            use_angle_cls: Enable text line orientation classification
 
         Raises:
             DependencyError: If PaddleOCR is not installed
+
+        Note:
+            PaddleOCR 3.x changed the API significantly:
+            - show_log parameter removed
+            - use_gpu parameter removed (auto-detection)
+            - use_angle_cls renamed to use_textline_orientation
         """
         if not PADDLEOCR_AVAILABLE:
             raise DependencyError(
@@ -206,11 +212,11 @@ class PaddleOCREngine:
 
             from paddleocr import PaddleOCR
 
+            # PaddleOCR 3.x API: show_log and use_gpu removed,
+            # use_angle_cls renamed to use_textline_orientation
             self._ocr = PaddleOCR(
-                use_angle_cls=self._use_angle_cls,
                 lang=self._lang,
-                show_log=False,
-                use_gpu=self._use_gpu,
+                use_textline_orientation=self._use_angle_cls,
             )
 
             elapsed = time.perf_counter() - start
@@ -224,7 +230,8 @@ class PaddleOCREngine:
             raise FileNotFoundError(f"Image not found: {image_path}")
 
         ocr = self._ensure_ocr()
-        result = ocr.ocr(str(image_path), cls=self._use_angle_cls)
+        # PaddleOCR 3.x: cls parameter removed (orientation set at init time)
+        result = ocr.ocr(str(image_path))
 
         ocr_results: list[OCRResult] = []
         line_num = 0

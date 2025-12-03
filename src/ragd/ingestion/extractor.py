@@ -220,8 +220,12 @@ class HTMLExtractor:
             except (json.JSONDecodeError, TypeError):
                 pass
 
-        # Try to find __NEXT_DATA__ (Next.js apps) or similar
-        for script in soup.find_all("script", id=re.compile(r"__NEXT_DATA__|__NUXT__|__APP_STATE__")):
+        # Try to find framework-embedded state (Next.js, Nuxt, Redux, Apollo, etc.)
+        framework_patterns = (
+            r"__NEXT_DATA__|__NUXT__|__APP_STATE__|__APP_DATA__|"
+            r"__INITIAL_STATE__|__PRELOADED_STATE__|__APOLLO_STATE__"
+        )
+        for script in soup.find_all("script", id=re.compile(framework_patterns)):
             try:
                 data = json.loads(script.string or "")
                 # Deep search for content-like fields

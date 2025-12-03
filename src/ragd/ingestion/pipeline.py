@@ -216,7 +216,15 @@ def index_document(
         )
 
     # Try OCR fallback if extraction yielded insufficient text
-    if len(result.text.strip()) < MIN_EXTRACTION_CHARS:
+    extracted_chars = len(result.text.strip())
+    if extracted_chars < MIN_EXTRACTION_CHARS:
+        logger.debug(
+            "Extraction yielded %d chars (threshold: %d) for %s via %s, triggering OCR fallback",
+            extracted_chars,
+            MIN_EXTRACTION_CHARS,
+            path.name,
+            result.extraction_method,
+        )
         result = _try_ocr_fallback(path, result)
 
     if not result.text.strip():
@@ -284,6 +292,17 @@ def index_document(
         # Provide detailed diagnostics for why chunking failed
         text_len = len(text)
         min_size = config.chunking.min_chunk_size
+        # Log sample of text for debugging (first 200 chars)
+        text_sample = text[:200].replace("\n", "\\n") if text else "(empty)"
+        logger.debug(
+            "Chunking failed for %s: %d chars, min_chunk_size=%d, strategy=%s. "
+            "Text sample: %s",
+            path.name,
+            text_len,
+            min_size,
+            config.chunking.strategy,
+            text_sample,
+        )
         error_msg = (
             f"No chunks generated (extracted {text_len} chars, min_chunk_size={min_size}). "
             f"Text too short or filtered out. Method: {result.extraction_method}"
