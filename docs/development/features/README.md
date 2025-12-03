@@ -97,11 +97,25 @@ Features are the primary unit of work. Each feature specification describes:
 | [F-020](./completed/F-020-ollama-llm-integration.md) | Ollama LLM Integration | ✅ Complete | State-of-the-Art Local RAG |
 | [F-055](./completed/F-055-multi-model-orchestration.md) | Multi-Model Orchestration | ✅ Complete | [State-of-the-Art Multi-Model RAG](../research/state-of-the-art-multi-model-rag.md) |
 
-### v0.6 Features (Storage)
+### v0.6.0 Features (Storage)
 
 | ID | Feature | Status | Research |
 |----|---------|--------|----------|
-| [F-021](./planned/F-021-vector-store-abstraction.md) | Vector Store Abstraction | 📅 Planned | ADR-0002 |
+| [F-021](./completed/F-021-vector-store-abstraction.md) | Vector Store Abstraction | ✅ Complete | ADR-0002 |
+| [F-070](./completed/F-070-backend-recommendation.md) | Backend Recommendation | ✅ Complete | - |
+| [F-071](./completed/F-071-metadata-proxy-layer.md) | Metadata Proxy Layer | ✅ Complete | - |
+| [F-072](./completed/F-072-backend-health-checks.md) | Backend Health Checks | ✅ Complete | - |
+| [F-073](./completed/F-073-performance-profiler.md) | Performance Profiler | ✅ Complete | - |
+| [F-074](./completed/F-074-model-recommendation.md) | Model Recommendation | ✅ Complete | - |
+
+### v0.6.5 Features (Polish & Stability)
+
+| ID | Feature | Status | Research |
+|----|---------|--------|----------|
+| [F-076](./completed/F-076-ragas-evaluation-metrics.md) | RAGAS Evaluation Metrics | ✅ Complete | - |
+| [F-077](./completed/F-077-cli-visual-polish.md) | CLI Visual Polish | ✅ Complete | - |
+| [F-078](./completed/F-078-configuration-validation.md) | Configuration Validation | ✅ Complete | - |
+| [F-079](./completed/F-079-dependency-error-handling.md) | Dependency Error Handling | ✅ Complete | - |
 
 ### v0.7 Features (Privacy & Security)
 
@@ -177,7 +191,8 @@ Features are numbered sequentially with milestone-based ranges:
 | F-009 to F-012 | v0.3 | Advanced Search (Citation, Contextual, Late Chunking, Hybrid) |
 | F-019 | v0.4 | Multi-Modal |
 | F-013, F-014, F-020, F-055 | v0.5 | Chat & Evaluation |
-| F-021 | v0.6 | Storage |
+| F-021, F-070 to F-074 | v0.6.0 | Storage |
+| F-076 to F-079 | v0.6.5 | Polish & Stability |
 | F-015 to F-018, F-023 | v0.7 | Privacy & Security |
 | F-022 | v0.8 | Intelligence |
 | F-024, F-056, F-057 | v1.0+ | Platform & Multi-Model Advanced |
