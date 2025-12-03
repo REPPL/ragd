@@ -41,12 +41,15 @@ def print_banner(
     empty = "|" + " " * (width - 2) + "|"
 
     # Centre title and subtitle
-    title_padded = f"|  {title}" + " " * (width - 4 - len(title)) + "|"
+    # Padding = width - 4 (for "|  " at start and "|" at end) - text length
+    title_padding = width - 4 - len(title)
+    title_padded = f"|  {title}" + " " * title_padding + "|"
 
     console.print(border)
     console.print(title_padded)
     if subtitle:
-        subtitle_padded = f"|  [dim]{subtitle}[/dim]" + " " * (width - 4 - len(subtitle) - 11) + "|"
+        subtitle_padding = width - 4 - len(subtitle)
+        subtitle_padded = f"|  [dim]{subtitle}[/dim]" + " " * subtitle_padding + "|"
         console.print(subtitle_padded)
     console.print(border)
 

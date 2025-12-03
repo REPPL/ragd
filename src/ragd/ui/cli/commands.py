@@ -118,6 +118,11 @@ def init_command(
 
     # Create and save configuration
     config = create_default_config()
+
+    # Override LLM model with detected model (if different from default)
+    if config.llm.model != llm_model:
+        config.llm.model = llm_model
+
     ensure_data_dir(config)
     save_config(config)
 

@@ -222,7 +222,7 @@ class ConfigValidator:
                 passed=False,
                 message=f"LLM model '{model}' not found (similar: {matching_models[0]})",
                 severity=ValidationSeverity.ERROR,
-                suggestion=f"Update config: ragd config set llm.model {matching_models[0]}",
+                suggestion=f"Edit ~/.ragd/config.yaml: change llm.model to '{matching_models[0]}'",
             )
 
         # Model not found at all
