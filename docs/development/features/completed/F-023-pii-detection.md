@@ -4,8 +4,9 @@
 
 **Research**: [State-of-the-Art PII Removal](../../research/state-of-the-art-pii-removal.md)
 **ADR**: [ADR-0028: PII Handling Architecture](../../decisions/adrs/0028-pii-handling-architecture.md)
-**Milestone**: v0.7
+**Milestone**: v0.7.0
 **Priority**: P1
+**Status**: Completed
 
 ## Problem Statement
 
@@ -18,7 +19,7 @@ Personal documents often contain sensitive information: names, addresses, phone 
 ```
 Document Ingestion
     ↓
-PII Detection (Presidio/spaCy)
+PII Detection (Presidio/spaCy/Regex)
     ↓
 User Decision
     ├── Index as-is
@@ -48,25 +49,25 @@ Continue Pipeline
 
 ## Implementation Tasks
 
-- [ ] Integrate Presidio for PII detection
-- [ ] Add spaCy NER fallback
-- [ ] Implement regex patterns for common PII
-- [ ] Create PII report generation
-- [ ] Add `--scan-pii` flag to index command
-- [ ] Implement user prompts for PII handling
-- [ ] Add PII redaction option (experimental)
-- [ ] Create PII allowlist/blocklist configuration
-- [ ] Write unit tests for each PII type
-- [ ] Write integration tests for detection pipeline
+- [x] Integrate Presidio for PII detection
+- [x] Add spaCy NER fallback
+- [x] Implement regex patterns for common PII
+- [x] Create PII report generation
+- [x] Add `--scan-pii` flag to index command
+- [x] Implement user prompts for PII handling
+- [x] Add PII redaction option (experimental)
+- [x] Create PII allowlist/blocklist configuration
+- [x] Write unit tests for each PII type
+- [x] Write integration tests for detection pipeline
 
 ## Success Criteria
 
-- [ ] Detects common PII types (names, emails, phones)
-- [ ] Reports PII before indexing
-- [ ] User can choose to proceed, skip, or redact
-- [ ] Detection works offline (local models)
-- [ ] False positive rate < 10%
-- [ ] Processing overhead < 20%
+- [x] Detects common PII types (names, emails, phones)
+- [x] Reports PII before indexing
+- [x] User can choose to proceed, skip, or redact
+- [x] Detection works offline (local models)
+- [x] False positive rate < 10%
+- [x] Processing overhead < 20%
 
 ## Dependencies
 
@@ -74,7 +75,42 @@ Continue Pipeline
 - spacy (NER fallback)
 - F-001: Document Ingestion (integration point)
 
-## Technical Notes
+## Implementation Notes
+
+### Module Structure
+
+```
+src/ragd/privacy/
+├── __init__.py
+└── pii.py  # PII detection engines
+```
+
+### Detection Engines
+
+```python
+class PIIEngine(Enum):
+    PRESIDIO = "presidio"  # Microsoft's framework
+    SPACY = "spacy"        # NER fallback
+    REGEX = "regex"        # Pattern matching
+    HYBRID = "hybrid"      # Best of all
+```
+
+### Entity Types
+
+```python
+class PIIEntityType(Enum):
+    PERSON = "PERSON"
+    EMAIL_ADDRESS = "EMAIL_ADDRESS"
+    PHONE_NUMBER = "PHONE_NUMBER"
+    CREDIT_CARD = "CREDIT_CARD"
+    US_SSN = "US_SSN"
+    UK_NINO = "UK_NINO"
+    IBAN_CODE = "IBAN_CODE"
+    IP_ADDRESS = "IP_ADDRESS"
+    LOCATION = "LOCATION"
+    DATE_TIME = "DATE_TIME"
+    ORGANIZATION = "ORGANIZATION"
+```
 
 ### Configuration
 
@@ -111,54 +147,6 @@ pii:
     - 555-*  # Don't flag 555 phone numbers
 ```
 
-### PII Detection
-
-```python
-from presidio_analyzer import AnalyzerEngine
-
-analyzer = AnalyzerEngine()
-
-def detect_pii(text: str) -> list[PIIResult]:
-    results = analyzer.analyze(
-        text=text,
-        entities=config.pii.detection.entities,
-        language="en"
-    )
-    return [
-        PIIResult(
-            type=r.entity_type,
-            value=text[r.start:r.end],
-            start=r.start,
-            end=r.end,
-            confidence=r.score
-        )
-        for r in results
-        if r.score >= config.pii.detection.confidence_threshold
-    ]
-```
-
-### PII Report
-
-```python
-@dataclass
-class PIIReport:
-    document: str
-    total_pii_found: int
-    by_type: dict[str, int]
-    high_confidence: list[PIIResult]
-    low_confidence: list[PIIResult]
-
-def generate_pii_report(document: Document) -> PIIReport:
-    results = detect_pii(document.content)
-    return PIIReport(
-        document=document.path,
-        total_pii_found=len(results),
-        by_type=Counter(r.type for r in results),
-        high_confidence=[r for r in results if r.confidence > 0.85],
-        low_confidence=[r for r in results if r.confidence <= 0.85]
-    )
-```
-
 ### CLI Integration
 
 ```bash
@@ -169,7 +157,7 @@ ragd index ~/Documents/articles/
 ragd index ~/Documents/contracts/ --scan-pii
 
 # Output:
-# ⚠️ PII Detected in 3 documents:
+# PII Detected in 3 documents:
 #
 # contract-2024.pdf:
 #   - 5 PERSON names
@@ -193,16 +181,16 @@ ragd config set pii.folders."~/Documents/medical/".enabled true
 ragd scan ~/Documents/contracts/
 ```
 
-### Redaction (Optional)
+### Redaction
 
 ```python
-def redact_pii(text: str, results: list[PIIResult]) -> str:
+def redact_pii(text: str, entities: list[PIIEntity], redaction_char: str = "█") -> str:
     """Replace PII with redaction characters."""
     redacted = text
     # Process in reverse order to preserve positions
-    for pii in sorted(results, key=lambda x: x.start, reverse=True):
-        replacement = config.pii.handling.redaction_char * len(pii.value)
-        redacted = redacted[:pii.start] + replacement + redacted[pii.end:]
+    for entity in sorted(entities, key=lambda x: x.start, reverse=True):
+        replacement = redaction_char * (entity.end - entity.start)
+        redacted = redacted[:entity.start] + replacement + redacted[entity.end:]
     return redacted
 ```
 
@@ -211,9 +199,11 @@ def redact_pii(text: str, results: list[PIIResult]) -> str:
 - [State-of-the-Art PII Removal](../../research/state-of-the-art-pii-removal.md) - Comprehensive PII research
 - [State-of-the-Art Privacy](../../research/state-of-the-art-privacy.md) - Privacy architecture research
 - [ADR-0028: PII Handling Architecture](../../decisions/adrs/0028-pii-handling-architecture.md) - Architecture decision
-- [F-059: Embedding Privacy Protection](./F-059-embedding-privacy-protection.md) - Embedding-level defence
-- [F-060: GDPR-Compliant Deletion](./F-060-gdpr-compliant-deletion.md) - Compliance deletion
+- [F-059: Embedding Privacy Protection](../planned/F-059-embedding-privacy-protection.md) - Embedding-level defence
+- [F-060: GDPR-Compliant Deletion](../planned/F-060-gdpr-compliant-deletion.md) - Compliance deletion
 - [F-015: Database Encryption](./F-015-database-encryption.md) - Related privacy feature
 - [F-017: Secure Deletion](./F-017-secure-deletion.md) - For removing PII later
 
 ---
+
+**Status**: Completed

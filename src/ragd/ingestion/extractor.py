@@ -174,7 +174,11 @@ class HTMLExtractor:
 
     Uses trafilatura for article extraction when available (F-051),
     falls back to BeautifulSoup with proper spacing.
+    Includes script tag mining for JavaScript-rendered content (v0.7.6).
     """
+
+    # Minimum content length to consider extraction successful
+    MIN_CONTENT_LENGTH = 20  # Lowered from 50 in v0.7.6
 
     def __init__(self) -> None:
         """Initialise HTML extractor."""
@@ -187,6 +191,80 @@ class HTMLExtractor:
             return True
         except ImportError:
             return False
+
+    def _extract_from_script_tags(self, soup: "BeautifulSoup") -> str:
+        """Extract text content from script tags containing JSON data.
+
+        Many modern web apps (React, Next.js, Vue) embed article content
+        in script tags as JSON (e.g., __NEXT_DATA__, application/ld+json).
+
+        Args:
+            soup: BeautifulSoup parsed HTML
+
+        Returns:
+            Extracted text content or empty string
+        """
+        import json
+        import re
+
+        extracted_text = []
+
+        # Try to find JSON-LD structured data (Schema.org)
+        for script in soup.find_all("script", type="application/ld+json"):
+            try:
+                data = json.loads(script.string or "")
+                # Extract text from common fields
+                for field in ["articleBody", "description", "text", "content"]:
+                    if field in data and isinstance(data[field], str):
+                        extracted_text.append(data[field])
+            except (json.JSONDecodeError, TypeError):
+                pass
+
+        # Try to find __NEXT_DATA__ (Next.js apps) or similar
+        for script in soup.find_all("script", id=re.compile(r"__NEXT_DATA__|__NUXT__|__APP_STATE__")):
+            try:
+                data = json.loads(script.string or "")
+                # Deep search for content-like fields
+                content = self._find_content_in_json(data)
+                if content:
+                    extracted_text.append(content)
+            except (json.JSONDecodeError, TypeError):
+                pass
+
+        return "\n\n".join(extracted_text)
+
+    def _find_content_in_json(self, data: dict | list, depth: int = 0) -> str:
+        """Recursively search JSON structure for article content.
+
+        Args:
+            data: JSON data structure
+            depth: Current recursion depth (max 10)
+
+        Returns:
+            Extracted content or empty string
+        """
+        if depth > 10:
+            return ""
+
+        content_fields = {"content", "body", "text", "articleBody", "description", "markdown"}
+        results = []
+
+        if isinstance(data, dict):
+            for key, value in data.items():
+                if key.lower() in content_fields and isinstance(value, str) and len(value) > 100:
+                    results.append(value)
+                elif isinstance(value, (dict, list)):
+                    nested = self._find_content_in_json(value, depth + 1)
+                    if nested:
+                        results.append(nested)
+        elif isinstance(data, list):
+            for item in data:
+                if isinstance(item, (dict, list)):
+                    nested = self._find_content_in_json(item, depth + 1)
+                    if nested:
+                        results.append(nested)
+
+        return "\n\n".join(results)
 
     def extract(self, path: Path) -> ExtractionResult:
         """Extract text from HTML file.
@@ -212,6 +290,10 @@ class HTMLExtractor:
                 html_content = raw_data.decode("latin-1")
                 encoding = "latin-1"
 
+            # Parse with BeautifulSoup for metadata and fallback
+            soup = BeautifulSoup(raw_data, "html.parser")
+            title = soup.title.string if soup.title else None
+
             # Try trafilatura first (F-051: trafilatura-first strategy)
             if self._trafilatura_available:
                 try:
@@ -225,11 +307,7 @@ class HTMLExtractor:
                         favor_precision=True,
                     )
 
-                    if text and len(text) > 50:  # Reasonable content extracted
-                        # Get title from HTML
-                        soup = BeautifulSoup(raw_data, "html.parser")
-                        title = soup.title.string if soup.title else None
-
+                    if text and len(text) > self.MIN_CONTENT_LENGTH:
                         return ExtractionResult(
                             text=text,
                             metadata={
@@ -241,25 +319,43 @@ class HTMLExtractor:
                             extraction_method="trafilatura",
                         )
                 except Exception:
-                    pass  # Fall through to BeautifulSoup
+                    pass  # Fall through to other methods
+
+            # Try script tag mining (v0.7.6: for JavaScript-rendered content)
+            script_text = self._extract_from_script_tags(soup)
+            if script_text and len(script_text) > self.MIN_CONTENT_LENGTH:
+                return ExtractionResult(
+                    text=script_text,
+                    metadata={
+                        "source": str(path),
+                        "format": "html",
+                        "encoding": encoding,
+                        "title": title,
+                    },
+                    extraction_method="script_json",
+                )
 
             # Fallback: BeautifulSoup with SPACE separator (not newline!)
-            soup = BeautifulSoup(raw_data, "html.parser")
+            # Create a fresh soup for text extraction (scripts not removed yet)
+            soup_for_text = BeautifulSoup(raw_data, "html.parser")
 
-            # Remove script and style elements
-            for element in soup(["script", "style", "nav", "footer", "header"]):
+            # Remove script and style elements, but be more selective with nav/footer
+            for element in soup_for_text(["script", "style"]):
                 element.decompose()
 
-            # F-051: Use space separator, not newline
-            # This prevents spurious line breaks at inline element boundaries
-            text = soup.get_text(separator=" ", strip=True)
+            # Only remove nav/footer/header if there's content in main/article tags
+            main_content = soup_for_text.find(["main", "article"])
+            if main_content:
+                text = main_content.get_text(separator=" ", strip=True)
+            else:
+                # No main/article, remove nav/footer/header as fallback
+                for element in soup_for_text(["nav", "footer", "header"]):
+                    element.decompose()
+                text = soup_for_text.get_text(separator=" ", strip=True)
 
             # Normalise whitespace
             import re
             text = re.sub(r"\s+", " ", text)
-
-            # Add paragraph breaks at block elements
-            # This is a simple heuristic - trafilatura handles this better
             text = text.strip()
 
             return ExtractionResult(
@@ -268,7 +364,7 @@ class HTMLExtractor:
                     "source": str(path),
                     "format": "html",
                     "encoding": soup.original_encoding or encoding,
-                    "title": soup.title.string if soup.title else None,
+                    "title": title,
                 },
                 extraction_method="beautifulsoup",
             )

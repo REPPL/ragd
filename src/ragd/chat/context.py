@@ -5,11 +5,17 @@ Handles assembling retrieved content into context for LLM prompts.
 
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass, field
 from typing import Any
 
 from ragd.citation import Citation
 from ragd.search.hybrid import HybridSearchResult
+
+logger = logging.getLogger(__name__)
+
+# Default minimum relevance score to include in context (v0.7.6)
+DEFAULT_MIN_RELEVANCE = 0.3
 
 
 @dataclass
@@ -142,25 +148,43 @@ class ContextWindow:
         self,
         results: list[HybridSearchResult],
         max_results: int | None = None,
+        min_relevance: float = DEFAULT_MIN_RELEVANCE,
     ) -> int:
-        """Add search results as context.
+        """Add search results as context with relevance filtering.
 
         Args:
             results: Search results to add
             max_results: Maximum results to add
+            min_relevance: Minimum relevance score to include (v0.7.6)
 
         Returns:
             Number of results added
         """
         added = 0
+        filtered = 0
+
         for result in results:
             if max_results is not None and added >= max_results:
                 break
+
+            # Relevance validation (v0.7.6): skip low-scoring results
+            if result.combined_score < min_relevance:
+                filtered += 1
+                continue
+
             context = RetrievedContext.from_search_result(result)
             if self.add_context(context):
                 added += 1
             else:
                 break  # No more room
+
+        if filtered > 0:
+            logger.debug(
+                "Filtered %d results below min_relevance threshold %.2f",
+                filtered,
+                min_relevance,
+            )
+
         return added
 
     def format_context(self, include_scores: bool = False) -> str:

@@ -330,6 +330,246 @@ ragd config reset
 
 ---
 
+## ragd unlock
+
+Unlock the encrypted database.
+
+### Synopsis
+
+```
+ragd unlock [OPTIONS]
+```
+
+### Options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `--extend` | flag | | Extend current session instead of re-authenticating |
+
+### Examples
+
+```bash
+# Unlock database
+ragd unlock
+Enter password: ********
+✓ Session unlocked for 5 minutes
+
+# Extend current session
+ragd unlock --extend
+✓ Session extended by 5 minutes
+```
+
+---
+
+## ragd lock
+
+Lock the session immediately.
+
+### Synopsis
+
+```
+ragd lock
+```
+
+### Examples
+
+```bash
+ragd lock
+✓ Session locked
+```
+
+---
+
+## ragd password
+
+Manage encryption password.
+
+### Subcommands
+
+| Command | Description |
+|---------|-------------|
+| `change` | Change encryption password |
+| `reset` | Reset encryption (deletes all data) |
+
+### ragd password change
+
+```bash
+ragd password change
+Current password: ********
+New password: ********
+Confirm password: ********
+✓ Password changed
+```
+
+### ragd password reset
+
+```bash
+ragd password reset --confirm-data-loss
+⚠️  This will DELETE ALL DATA and reset encryption.
+Type 'DELETE' to confirm: DELETE
+✓ Encryption reset
+```
+
+---
+
+## ragd session
+
+View session status.
+
+### Synopsis
+
+```
+ragd session status
+```
+
+### Examples
+
+```bash
+ragd session status
+Session: Unlocked (4:32 remaining)
+
+ragd session status
+Session: Locked
+```
+
+---
+
+## ragd delete
+
+Delete documents from the knowledge base.
+
+### Synopsis
+
+```
+ragd delete <DOC_IDS> [OPTIONS]
+```
+
+### Arguments
+
+| Argument | Required | Description |
+|----------|----------|-------------|
+| `DOC_IDS` | Yes | Document IDs to delete |
+
+### Options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `--secure` | flag | | Securely overwrite storage |
+| `--purge` | flag | | Cryptographic erasure with key rotation |
+| `--force` | flag | | Skip confirmation prompts |
+
+### Subcommands
+
+| Command | Description |
+|---------|-------------|
+| `audit` | View deletion audit log |
+
+### Examples
+
+```bash
+# Standard deletion
+ragd delete doc123
+Delete "doc123" from index? [y/N] y
+✓ Removed from index
+
+# Secure deletion
+ragd delete doc123 --secure
+Secure delete "doc123"? This cannot be undone. [y/N] y
+✓ Securely deleted
+
+# Cryptographic erasure
+ragd delete doc123 --purge
+Enter password to confirm: ********
+✓ Purged with key rotation
+
+# View audit log
+ragd delete audit
+ragd delete audit --all
+ragd delete audit -n 10
+```
+
+---
+
+## ragd ask
+
+Ask a question with citation support.
+
+### Synopsis
+
+```
+ragd ask <QUERY> [OPTIONS]
+```
+
+### Citation Options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `--cite` | string | `numbered` | Citation style: `none`, `numbered`, `inline` |
+
+### Examples
+
+```bash
+# Default numbered citations
+ragd ask "What authentication methods are recommended?"
+
+Sources:
+  [1] security-guide.pdf, p. 5
+  [2] best-practices.md
+
+# Disable citations
+ragd ask "Summarise the policy" --cite none
+
+# Inline citations
+ragd ask "Compare approaches" --cite inline
+```
+
+---
+
+## ragd chat
+
+Interactive chat with citation support.
+
+### Synopsis
+
+```
+ragd chat [OPTIONS]
+```
+
+### Options
+
+| Option | Short | Type | Default | Description |
+|--------|-------|------|---------|-------------|
+| `--cite` | `-c` | string | from config | Citation style: `none`, `numbered` |
+| `--session` | `-s` | string | | Resume previous session |
+| `--model` | `-m` | string | from config | LLM model to use |
+
+### Examples
+
+```bash
+# Start chat with default citation mode
+ragd chat
+
+# Disable citations
+ragd chat --cite none
+
+# Resume previous session
+ragd chat --session abc123
+
+# Use different model
+ragd chat --model llama3.2:8b
+```
+
+### Built-in Commands
+
+| Command | Description |
+|---------|-------------|
+| `/exit`, `/quit`, `/q` | Exit chat |
+| `/clear` | Clear conversation history |
+| `/history` | Show conversation history |
+| `/help` | Show help |
+
+---
+
 ## Environment Variables
 
 | Variable | Description | Default |

@@ -193,6 +193,6 @@ embedding:
 - [ADR-0010: Vector Database Security](./0010-vector-database-security.md)
 - [ADR-0028: PII Handling Architecture](./0028-pii-handling-architecture.md)
 - [F-059: Embedding Privacy Protection](../../features/planned/F-059-embedding-privacy-protection.md)
-- [F-023: PII Detection](../../features/planned/F-023-pii-detection.md)
+- [F-023: PII Detection](../../features/completed/F-023-pii-detection.md)
 
 ---

@@ -6,6 +6,7 @@ from ragd.ui.cli.commands import (
     index_command,
     search_command,
     status_command,
+    stats_command,
     doctor_command,
     config_command,
     reindex_command,
@@ -37,6 +38,19 @@ from ragd.ui.cli.backend import (
     backend_benchmark_command,
 )
 
+from ragd.ui.cli.security import (
+    unlock_command,
+    lock_command,
+    password_change_command,
+    password_reset_command,
+    session_status_command,
+)
+
+from ragd.ui.cli.deletion import (
+    delete_command,
+    delete_audit_command,
+)
+
 from ragd.ui.cli.errors import (
     handle_dependency_errors,
     format_error_for_cli,
@@ -48,6 +62,7 @@ __all__ = [
     "index_command",
     "search_command",
     "status_command",
+    "stats_command",
     "doctor_command",
     "config_command",
     "reindex_command",
@@ -75,6 +90,15 @@ __all__ = [
     "backend_health_command",
     "backend_set_command",
     "backend_benchmark_command",
+    # Security commands
+    "unlock_command",
+    "lock_command",
+    "password_change_command",
+    "password_reset_command",
+    "session_status_command",
+    # Deletion commands
+    "delete_command",
+    "delete_audit_command",
     # Error handling
     "handle_dependency_errors",
     "format_error_for_cli",

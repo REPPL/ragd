@@ -4,8 +4,9 @@
 
 **Research**: [State-of-the-Art Privacy](../../research/state-of-the-art-privacy.md)
 **ADR**: [ADR-0009: Security Architecture](../../decisions/adrs/0009-security-architecture.md)
-**Milestone**: v0.7
+**Milestone**: v0.7.0
 **Priority**: P0
+**Status**: Completed
 
 ## Problem Statement
 
@@ -63,33 +64,44 @@ SQLCipher provides transparent AES-256 encryption for SQLite:
 
 ## Implementation Tasks
 
-- [ ] Add SQLCipher dependency
-- [ ] Implement Argon2id key derivation
-- [ ] Implement master key management
-- [ ] Modify ChromaDB initialisation for SQLCipher
-- [ ] Add password prompt on first use
-- [ ] Add unlock command
-- [ ] Add lock command
-- [ ] Implement key rotation
-- [ ] Handle password changes
-- [ ] Write security tests
-- [ ] Document backup procedures
+- [x] Add SQLCipher dependency
+- [x] Implement Argon2id key derivation
+- [x] Implement master key management
+- [x] Modify ChromaDB initialisation for SQLCipher
+- [x] Add password prompt on first use
+- [x] Add unlock command
+- [x] Add lock command
+- [x] Implement key rotation
+- [x] Handle password changes
+- [x] Write security tests
+- [x] Document backup procedures
 
 ## Success Criteria
 
-- [ ] Database encrypted at rest with AES-256
-- [ ] Password required to unlock
-- [ ] Argon2id key derivation (64MB, 3 iterations)
-- [ ] Performance overhead < 15%
-- [ ] Graceful handling of wrong password
-- [ ] Key rotation supported
+- [x] Database encrypted at rest with AES-256
+- [x] Password required to unlock
+- [x] Argon2id key derivation (64MB, 3 iterations)
+- [x] Performance overhead < 15%
+- [x] Graceful handling of wrong password
+- [x] Key rotation supported
 
 ## Dependencies
 
 - sqlcipher3 Python binding
 - argon2-cffi library
 
-## Technical Notes
+## Implementation Notes
+
+### Module Structure
+
+```
+src/ragd/security/
+├── __init__.py
+├── crypto.py          # Argon2id key derivation
+├── keystore.py        # Master key management
+├── encrypted_store.py # SQLCipher wrapper
+└── session.py         # Session integration
+```
 
 ### CLI Commands
 
@@ -137,55 +149,6 @@ security:
     auto_lock_minutes: 5
 ```
 
-### ChromaDB with SQLCipher
-
-```python
-import sqlcipher3
-
-def create_encrypted_client(path: str, key: bytes) -> chromadb.Client:
-    # SQLCipher connection
-    conn = sqlcipher3.connect(f"{path}/chroma.db")
-    conn.execute(f"PRAGMA key = \"x'{key.hex()}'\"")
-
-    # ChromaDB with custom SQLite
-    return chromadb.Client(
-        Settings(
-            chroma_db_impl="duckdb+parquet",
-            persist_directory=path,
-            anonymized_telemetry=False
-        )
-    )
-```
-
-### Error Handling
-
-```
-Error: Incorrect password
-
-The password you entered is incorrect.
-
-Suggestions:
-  • Check caps lock is off
-  • Try your password again
-  • Use 'ragd password reset' if you've forgotten
-    (Warning: This will delete all data)
-```
-
-### Migration from Unencrypted
-
-```bash
-ragd migrate --encrypt
-Enter new password: ********
-
-Migrating to encrypted database...
-  ├─ Exporting current data... done
-  ├─ Creating encrypted database... done
-  ├─ Importing data... done
-  └─ Verifying... done
-
-✓ Migration complete. Old database backed up to ~/.ragd/backup/
-```
-
 ## Related Documentation
 
 - [ADR-0009: Security Architecture](../../decisions/adrs/0009-security-architecture.md)
@@ -194,3 +157,5 @@ Migrating to encrypted database...
 - [State-of-the-Art Privacy Research](../../research/state-of-the-art-privacy.md)
 
 ---
+
+**Status**: Completed

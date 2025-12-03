@@ -2,6 +2,44 @@
 
 Features that have been implemented and released.
 
+## v0.7.0 - Privacy & Security (Released)
+
+### Chat Improvements
+
+| ID | Feature | Release |
+|----|---------|---------|
+| [F-065](./F-065-chat-citation-display.md) | Chat Citation Display | v0.7.0 |
+| [F-066](./F-066-configurable-chat-prompts.md) | Configurable Chat Prompts | v0.7.0 |
+
+### Privacy Core
+
+| ID | Feature | Release |
+|----|---------|---------|
+| [F-015](./F-015-database-encryption.md) | Database Encryption | v0.7.0 |
+| [F-016](./F-016-session-management.md) | Session Management | v0.7.0 |
+| [F-017](./F-017-secure-deletion.md) | Secure Deletion | v0.7.0 |
+| [F-023](./F-023-pii-detection.md) | PII Detection | v0.7.0 |
+
+## v0.6.5 - Polish & Stability (Released)
+
+| ID | Feature | Release |
+|----|---------|---------|
+| [F-076](./F-076-ragas-evaluation-metrics.md) | RAGAS Evaluation Metrics | v0.6.5 |
+| [F-077](./F-077-cli-visual-polish.md) | CLI Visual Polish | v0.6.5 |
+| [F-078](./F-078-configuration-validation.md) | Configuration Validation | v0.6.5 |
+| [F-079](./F-079-dependency-error-handling.md) | Dependency Error Handling | v0.6.5 |
+
+## v0.6.0 - Storage Abstraction (Released)
+
+| ID | Feature | Release |
+|----|---------|---------|
+| [F-021](./F-021-vector-store-abstraction.md) | Vector Store Abstraction | v0.6.0 |
+| [F-070](./F-070-backend-recommendation.md) | Backend Recommendation | v0.6.0 |
+| [F-071](./F-071-metadata-proxy-layer.md) | Metadata Proxy Layer | v0.6.0 |
+| [F-072](./F-072-backend-health-checks.md) | Backend Health Checks | v0.6.0 |
+| [F-073](./F-073-performance-profiler.md) | Performance Profiler | v0.6.0 |
+| [F-074](./F-074-model-recommendation.md) | Model Recommendation | v0.6.0 |
+
 ## v0.5.0 - Chat (Released)
 
 | ID | Feature | Release |
@@ -82,3 +120,4 @@ Features that have been implemented and released.
 
 - [Feature Roadmap](../README.md)
 - [Implementation Records](../../implementation/)
+- [v0.7.0 Implementation](../../implementation/v0.7.0.md)

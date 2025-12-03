@@ -21,6 +21,7 @@ from ragd.ui.cli import (
     index_command,
     search_command,
     status_command,
+    stats_command,
     doctor_command,
     config_command,
     reindex_command,
@@ -48,6 +49,15 @@ from ragd.ui.cli import (
     backend_health_command,
     backend_set_command,
     backend_benchmark_command,
+    # Security commands
+    unlock_command,
+    lock_command,
+    password_change_command,
+    password_reset_command,
+    session_status_command,
+    # Deletion commands
+    delete_command,
+    delete_audit_command,
 )
 
 app = typer.Typer(
@@ -63,11 +73,15 @@ tag_app = typer.Typer(help="Manage document tags.")
 watch_app = typer.Typer(help="Watch folders for automatic indexing.")
 models_app = typer.Typer(help="Manage LLM models.")
 backend_app = typer.Typer(help="Manage vector store backends.")
+password_app = typer.Typer(help="Manage encryption password.")
+session_app = typer.Typer(help="Manage encryption session.")
 app.add_typer(meta_app, name="meta")
 app.add_typer(tag_app, name="tag")
 app.add_typer(watch_app, name="watch")
 app.add_typer(models_app, name="models")
 app.add_typer(backend_app, name="backend")
+app.add_typer(password_app, name="password")
+app.add_typer(session_app, name="session")
 
 
 # Output format option
@@ -229,6 +243,31 @@ def status(
 ) -> None:
     """Show ragd status and statistics."""
     status_command(
+        output_format=output_format,  # type: ignore
+        no_color=no_color,
+    )
+
+
+@app.command()
+def stats(
+    output_format: FormatOption = "rich",
+    no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
+) -> None:
+    """Show comprehensive index statistics.
+
+    Displays detailed information about indexed content including:
+    - Document and chunk counts
+    - File type breakdown
+    - Storage size and backend info
+    - Embedding model and retrieval health
+
+    Use this to verify what content is indexed before querying.
+
+    Examples:
+        ragd stats                # Rich output
+        ragd stats --format json  # JSON for scripting
+    """
+    stats_command(
         output_format=output_format,  # type: ignore
         no_color=no_color,
     )
@@ -695,6 +734,7 @@ def chat(
     temperature: float = typer.Option(0.7, "--temperature", "-t", help="Sampling temperature (0.0-1.0)."),
     limit: int = typer.Option(5, "--limit", "-n", help="Maximum search results per query."),
     session_id: str = typer.Option(None, "--session", "-s", help="Resume a previous chat session."),
+    cite: str = typer.Option(None, "--cite", "-c", help="Citation style: none, numbered (default from config)."),
     output_format: FormatOption = "rich",
     no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
 ) -> None:
@@ -714,6 +754,7 @@ def chat(
     Examples:
         ragd chat
         ragd chat --model llama3.2:8b
+        ragd chat --cite none  # Disable citations
         ragd chat --session abc123  # Resume previous session
     """
     chat_command(
@@ -721,6 +762,7 @@ def chat(
         temperature=temperature,
         limit=limit,
         session_id=session_id,
+        cite=cite,
         output_format=output_format,  # type: ignore
         no_color=no_color,
     )
@@ -938,6 +980,167 @@ def backend_benchmark(
         output_format=output_format,  # type: ignore
         no_color=no_color,
     )
+
+
+# --- Delete command ---
+
+delete_app = typer.Typer(help="Delete documents from knowledge base.")
+app.add_typer(delete_app, name="delete")
+
+
+@delete_app.callback(invoke_without_command=True)
+def delete(
+    ctx: typer.Context,
+    document_ids: Annotated[
+        list[str] | None, typer.Argument(help="Document IDs to delete.")
+    ] = None,
+    secure: bool = typer.Option(False, "--secure", "-s", help="Use secure deletion (overwrite storage)."),
+    purge: bool = typer.Option(False, "--purge", "-p", help="Use cryptographic erasure (rotate key)."),
+    source: str = typer.Option(None, "--source", help="Filter by source path."),
+    force: bool = typer.Option(False, "--force", "-f", help="Skip confirmation prompt."),
+    no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
+) -> None:
+    """Delete documents from the knowledge base.
+
+    Supports three deletion levels:
+    - Standard (default): Remove from index
+    - Secure (--secure): Overwrite storage locations
+    - Purge (--purge): Cryptographic erasure with key rotation
+
+    Examples:
+        ragd delete doc-123              # Standard deletion
+        ragd delete doc-123 --secure     # Secure deletion
+        ragd delete doc-123 --purge      # Cryptographic erasure
+        ragd delete doc-1 doc-2 doc-3    # Bulk deletion
+        ragd delete --source ~/old-docs/ # Delete by source
+    """
+    if ctx.invoked_subcommand is not None:
+        return
+
+    if not document_ids and not source:
+        ctx.get_help()
+        raise typer.Exit(0)
+
+    ids = list(document_ids) if document_ids else []
+
+    delete_command(
+        document_ids=ids,
+        secure=secure,
+        purge=purge,
+        source=source,
+        force=force,
+        no_color=no_color,
+    )
+
+
+@delete_app.command("audit")
+def delete_audit(
+    show_all: bool = typer.Option(False, "--all", "-a", help="Show all entries."),
+    limit: int = typer.Option(10, "--limit", "-n", help="Maximum entries to show."),
+    no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
+) -> None:
+    """Show deletion audit log.
+
+    Displays recent deletion operations for auditing purposes.
+
+    Examples:
+        ragd delete audit           # Recent deletions
+        ragd delete audit --all     # Full history
+        ragd delete audit -n 20     # Last 20 entries
+    """
+    delete_audit_command(
+        show_all=show_all,
+        limit=limit,
+        no_color=no_color,
+    )
+
+
+# --- Security commands ---
+
+@app.command()
+def unlock(
+    extend: bool = typer.Option(False, "--extend", "-e", help="Extend existing session timer."),
+    no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
+) -> None:
+    """Unlock encrypted database.
+
+    Prompts for password and unlocks the session for the configured timeout.
+    Use --extend to reset the timer on an already-unlocked session.
+
+    Examples:
+        ragd unlock              # Unlock with password
+        ragd unlock --extend     # Reset session timer
+    """
+    unlock_command(no_color=no_color, extend=extend)
+
+
+@app.command()
+def lock(
+    no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
+) -> None:
+    """Lock encryption session immediately.
+
+    Clears encryption keys from memory. Requires re-authentication
+    to access encrypted data.
+
+    Examples:
+        ragd lock
+    """
+    lock_command(no_color=no_color)
+
+
+# --- Password subcommands ---
+
+@password_app.command("change")
+def password_change(
+    no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
+) -> None:
+    """Change encryption password.
+
+    Prompts for current password and new password.
+    The session remains active after changing password.
+
+    Examples:
+        ragd password change
+    """
+    password_change_command(no_color=no_color)
+
+
+@password_app.command("reset")
+def password_reset(
+    confirm_data_loss: bool = typer.Option(
+        False, "--confirm-data-loss", help="Confirm you understand data will be lost."
+    ),
+    no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
+) -> None:
+    """Reset encryption (WARNING: deletes all data).
+
+    This is a destructive operation that removes all encryption keys.
+    Any encrypted data will become PERMANENTLY INACCESSIBLE.
+
+    Use this only if you've forgotten your password and accept data loss.
+
+    Examples:
+        ragd password reset --confirm-data-loss
+    """
+    password_reset_command(no_color=no_color, confirm_data_loss=confirm_data_loss)
+
+
+# --- Session subcommands ---
+
+@session_app.command("status")
+def session_status(
+    no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
+) -> None:
+    """Show encryption session status.
+
+    Displays current session state, time remaining until auto-lock,
+    and failed authentication attempts.
+
+    Examples:
+        ragd session status
+    """
+    session_status_command(no_color=no_color)
 
 
 if __name__ == "__main__":

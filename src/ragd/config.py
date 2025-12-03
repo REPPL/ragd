@@ -132,6 +132,42 @@ class NormalisationConfig(BaseModel):
     boilerplate_mode: str = "aggressive"  # conservative | moderate | aggressive
 
 
+class EncryptionConfig(BaseModel):
+    """Encryption configuration (F-015)."""
+
+    enabled: bool = False  # Opt-in at init
+    algorithm: str = "AES-256-GCM"
+    kdf: str = "argon2id"
+    kdf_memory_mb: int = 64
+    kdf_iterations: int = 3
+    kdf_parallelism: int = 4
+
+
+class SessionConfig(BaseModel):
+    """Session management configuration (F-016)."""
+
+    auto_lock_minutes: int = 5  # 0 = disabled
+    failed_attempts_lockout: int = 5
+    lockout_minutes: int = 15
+    activity_resets_timer: bool = True
+
+
+class DeletionConfig(BaseModel):
+    """Secure deletion configuration (F-017)."""
+
+    default_level: str = "standard"  # standard | secure | purge
+    require_confirmation: bool = True
+    audit_log: bool = True
+
+
+class SecurityConfig(BaseModel):
+    """Security configuration (v0.7)."""
+
+    encryption: EncryptionConfig = Field(default_factory=EncryptionConfig)
+    session: SessionConfig = Field(default_factory=SessionConfig)
+    deletion: DeletionConfig = Field(default_factory=DeletionConfig)
+
+
 class MultiModalConfig(BaseModel):
     """Multi-modal (vision) configuration."""
 
@@ -146,6 +182,27 @@ class MultiModalConfig(BaseModel):
     caption_base_url: str = "http://localhost:11434"
     store_thumbnails: bool = True
     thumbnail_max_size: int = 256  # Max dimension for thumbnails
+
+
+class ChatPromptsConfig(BaseModel):
+    """Configurable prompt settings for chat."""
+
+    citation_instruction: str = (
+        "Always cite your sources by referencing document names and page numbers."
+    )
+
+
+class ChatConfig(BaseModel):
+    """Chat session configuration."""
+
+    temperature: float = 0.7
+    max_tokens: int = 1024
+    context_window: int = 4096
+    history_turns: int = 5
+    search_limit: int = 5
+    auto_save: bool = True
+    default_cite_mode: str = "numbered"  # numbered, none, inline
+    prompts: ChatPromptsConfig = Field(default_factory=ChatPromptsConfig)
 
 
 class RagdConfig(BaseModel):
@@ -163,6 +220,8 @@ class RagdConfig(BaseModel):
     normalisation: NormalisationConfig = Field(default_factory=NormalisationConfig)
     metadata: MetadataConfig = Field(default_factory=MetadataConfig)
     multi_modal: MultiModalConfig = Field(default_factory=MultiModalConfig)
+    security: SecurityConfig = Field(default_factory=SecurityConfig)
+    chat: ChatConfig = Field(default_factory=ChatConfig)
 
     @property
     def chroma_path(self) -> Path:
@@ -183,6 +242,16 @@ class RagdConfig(BaseModel):
     def images_path(self) -> Path:
         """Get the images storage path."""
         return self.storage.data_dir / "images"
+
+    @property
+    def security_path(self) -> Path:
+        """Get the security metadata path (salt, verification hash)."""
+        return self.storage.data_dir / ".security"
+
+    @property
+    def is_encrypted(self) -> bool:
+        """Check if encryption is enabled in configuration."""
+        return self.security.encryption.enabled
 
 
 def create_default_config() -> RagdConfig:

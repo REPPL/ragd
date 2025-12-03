@@ -6,21 +6,159 @@ extraction -> chunking -> embedding -> storage.
 
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass
 from datetime import datetime
+from enum import Enum
 from pathlib import Path
 from typing import Callable
 
 from ragd.config import RagdConfig, load_config
 from ragd.embedding import get_embedder, ChunkBoundary, create_late_chunking_embedder
 from ragd.ingestion.chunker import Chunk, chunk_text
-from ragd.ingestion.extractor import extract_text
+from ragd.ingestion.extractor import extract_text, ExtractionResult
 from ragd.search.bm25 import BM25Index
 from ragd.storage import ChromaStore, DocumentRecord
 from ragd.storage.chromadb import generate_content_hash, generate_document_id
 from ragd.text import TextNormaliser, normalise_text
 from ragd.text.normalise import NormalisationSettings, source_type_from_file_type
 from ragd.utils.paths import discover_files, get_file_type
+
+logger = logging.getLogger(__name__)
+
+# Minimum characters to consider extraction successful (below triggers OCR fallback)
+MIN_EXTRACTION_CHARS = 50
+
+
+class FailureCategory(Enum):
+    """Categories for document extraction failures."""
+
+    IMAGE_ONLY = "image_only"  # PDF has images but no text layer
+    ENCRYPTED = "encrypted"  # PDF is password-protected
+    MALFORMED = "malformed"  # PDF/file is corrupted or malformed
+    JS_CONTENT = "js_content"  # HTML with JavaScript-rendered content
+    EMPTY_FILE = "empty_file"  # File is empty or contains no content
+    TEXT_TOO_SHORT = "text_too_short"  # Extracted text below minimum threshold
+    UNKNOWN = "unknown"  # Unknown failure reason
+
+
+# Remediation suggestions for each failure category
+FAILURE_REMEDIATION = {
+    FailureCategory.IMAGE_ONLY: "This PDF appears to be scanned/image-only. OCR was attempted but may have failed. Try 're-indexing after verifying PaddleOCR is installed.",
+    FailureCategory.ENCRYPTED: "This PDF is password-protected. Remove the password protection before indexing.",
+    FailureCategory.MALFORMED: "This file appears to be corrupted or malformed. Try re-downloading or re-exporting from the source application.",
+    FailureCategory.JS_CONTENT: "This HTML page uses JavaScript to render content. Try saving as 'Complete webpage' or use a browser extension like SingleFile.",
+    FailureCategory.EMPTY_FILE: "This file contains no extractable content.",
+    FailureCategory.TEXT_TOO_SHORT: "Extracted text is too short to generate meaningful chunks. The document may be mostly images or contain very little text.",
+    FailureCategory.UNKNOWN: "Unknown extraction failure. Check the error message for details.",
+}
+
+
+def classify_failure(
+    path: Path,
+    result: ExtractionResult,
+    error_msg: str | None = None,
+) -> tuple[FailureCategory, str]:
+    """Classify a document extraction failure.
+
+    Args:
+        path: Path to the document
+        result: Extraction result
+        error_msg: Optional error message
+
+    Returns:
+        Tuple of (FailureCategory, remediation suggestion)
+    """
+    file_type = get_file_type(path)
+    file_size = path.stat().st_size if path.exists() else 0
+    error_lower = (error_msg or "").lower()
+    extraction_method = result.extraction_method or ""
+
+    # Empty file
+    if file_size == 0:
+        return FailureCategory.EMPTY_FILE, FAILURE_REMEDIATION[FailureCategory.EMPTY_FILE]
+
+    # PDF-specific failures
+    if file_type == "pdf":
+        # Encrypted PDF
+        if "encrypted" in error_lower or "password" in error_lower:
+            return FailureCategory.ENCRYPTED, FAILURE_REMEDIATION[FailureCategory.ENCRYPTED]
+
+        # Malformed PDF
+        if any(x in error_lower for x in ["syntax error", "invalid", "corrupt", "could not parse"]):
+            return FailureCategory.MALFORMED, FAILURE_REMEDIATION[FailureCategory.MALFORMED]
+
+        # Image-only PDF (no text extracted, has size suggesting content)
+        if file_size > 10000 and len(result.text.strip()) == 0:
+            return FailureCategory.IMAGE_ONLY, FAILURE_REMEDIATION[FailureCategory.IMAGE_ONLY]
+
+    # HTML-specific failures
+    if file_type == "html":
+        # Check for JavaScript-heavy content indicators
+        if len(result.text.strip()) < 50 and file_size > 5000:
+            return FailureCategory.JS_CONTENT, FAILURE_REMEDIATION[FailureCategory.JS_CONTENT]
+
+    # Text too short for chunking
+    if 0 < len(result.text.strip()) < MIN_EXTRACTION_CHARS:
+        return FailureCategory.TEXT_TOO_SHORT, FAILURE_REMEDIATION[FailureCategory.TEXT_TOO_SHORT]
+
+    # Unknown
+    return FailureCategory.UNKNOWN, FAILURE_REMEDIATION[FailureCategory.UNKNOWN]
+
+
+def _try_ocr_fallback(path: Path, original_result: ExtractionResult) -> ExtractionResult:
+    """Try OCR extraction if standard extraction yielded insufficient text.
+
+    Args:
+        path: Path to document
+        original_result: Result from standard extraction
+
+    Returns:
+        OCR result if successful and better, otherwise original result
+    """
+    # Only apply OCR fallback to PDFs
+    file_type = get_file_type(path)
+    if file_type != "pdf":
+        return original_result
+
+    try:
+        from ragd.ocr.pipeline import OCRPipeline
+
+        logger.info(
+            "Text extraction yielded %d chars for %s, attempting OCR fallback",
+            len(original_result.text.strip()),
+            path.name,
+        )
+
+        ocr_pipeline = OCRPipeline()
+        ocr_result = ocr_pipeline.process_pdf(path)
+
+        if ocr_result.full_text and len(ocr_result.full_text.strip()) > len(
+            original_result.text.strip()
+        ):
+            logger.info(
+                "OCR extracted %d chars (vs %d from standard), using OCR result",
+                len(ocr_result.full_text.strip()),
+                len(original_result.text.strip()),
+            )
+            return ExtractionResult(
+                text=ocr_result.full_text,
+                extraction_method=f"ocr_{ocr_result.engine_used}",
+                success=True,
+                pages=ocr_result.page_count,
+                metadata={
+                    "ocr_confidence": ocr_result.average_confidence,
+                    "ocr_quality": ocr_result.get_quality_assessment(),
+                    "fallback_from": original_result.extraction_method,
+                },
+            )
+
+    except ImportError:
+        logger.debug("OCR not available for fallback (paddleocr not installed)")
+    except Exception as e:
+        logger.warning("OCR fallback failed for %s: %s", path.name, e)
+
+    return original_result
 
 
 @dataclass
@@ -35,6 +173,8 @@ class IndexResult:
     skipped: bool = False
     error: str | None = None
     image_count: int = 0  # Number of images extracted (v0.4.0)
+    failure_category: FailureCategory | None = None  # Categorised failure type (v0.7.6)
+    remediation: str | None = None  # Suggested fix for the failure (v0.7.6)
 
 
 def index_document(
@@ -63,6 +203,7 @@ def index_document(
     # Extract text
     result = extract_text(path)
     if not result.success:
+        category, remediation = classify_failure(path, result, result.error)
         return IndexResult(
             document_id=document_id,
             path=str(path),
@@ -70,18 +211,30 @@ def index_document(
             chunk_count=0,
             success=False,
             error=result.error,
+            failure_category=category,
+            remediation=remediation,
         )
 
+    # Try OCR fallback if extraction yielded insufficient text
+    if len(result.text.strip()) < MIN_EXTRACTION_CHARS:
+        result = _try_ocr_fallback(path, result)
+
     if not result.text.strip():
+        error_msg = (
+            f"No text extracted from document (method: {result.extraction_method}, "
+            f"file size: {path.stat().st_size} bytes). "
+            "Document may be image-only, encrypted, or empty."
+        )
+        category, remediation = classify_failure(path, result, error_msg)
         return IndexResult(
             document_id=document_id,
             path=str(path),
             filename=path.name,
             chunk_count=0,
             success=False,
-            error=f"No text extracted from document (method: {result.extraction_method}, "
-                  f"file size: {path.stat().st_size} bytes). "
-                  "Document may be image-only, encrypted, or empty.",
+            error=error_msg,
+            failure_category=category,
+            remediation=remediation,
         )
 
     # Apply text normalisation
@@ -131,14 +284,20 @@ def index_document(
         # Provide detailed diagnostics for why chunking failed
         text_len = len(text)
         min_size = config.chunking.min_chunk_size
+        error_msg = (
+            f"No chunks generated (extracted {text_len} chars, min_chunk_size={min_size}). "
+            f"Text too short or filtered out. Method: {result.extraction_method}"
+        )
+        category, remediation = classify_failure(path, result, error_msg)
         return IndexResult(
             document_id=document_id,
             path=str(path),
             filename=path.name,
             chunk_count=0,
             success=False,
-            error=f"No chunks generated (extracted {text_len} chars, min_chunk_size={min_size}). "
-                  f"Text too short or filtered out. Method: {result.extraction_method}",
+            error=error_msg,
+            failure_category=category,
+            remediation=remediation,
         )
 
     # Determine if contextual retrieval is enabled

@@ -104,8 +104,8 @@ security:
 ## Related Documentation
 
 - [State-of-the-Art Privacy Research](../../research/state-of-the-art-privacy.md)
-- [F-015: Database Encryption](../../features/planned/F-015-database-encryption.md)
-- [F-016: Session Management](../../features/planned/F-016-session-management.md)
+- [F-015: Database Encryption](../../features/completed/F-015-database-encryption.md)
+- [F-016: Session Management](../../features/completed/F-016-session-management.md)
 - [ADR-0010: Vector Database Security](./0010-vector-database-security.md)
 
 ---

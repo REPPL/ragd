@@ -451,6 +451,144 @@ def status_command(
         con.print(output)
 
 
+def stats_command(
+    output_format: OutputFormat = "rich",
+    no_color: bool = False,
+) -> None:
+    """Show comprehensive index statistics.
+
+    Displays detailed information about indexed content including
+    document counts, file types, storage size, and retrieval health.
+    """
+    import json
+    from collections import Counter
+    from datetime import datetime
+
+    from rich.panel import Panel
+    from rich.table import Table
+
+    from ragd.config import load_config, config_exists
+    from ragd.storage import ChromaStore
+    from ragd.metadata import MetadataStore
+
+    con = get_console(no_color)
+
+    if not config_exists():
+        con.print("[yellow]ragd is not initialised.[/yellow]")
+        con.print("Run [cyan]ragd init[/cyan] to set up.")
+        raise typer.Exit()
+
+    config = load_config()
+    store = ChromaStore(config.chroma_path)
+    metadata_store = MetadataStore(config.metadata_path)
+
+    # Get basic stats
+    stats = store.get_stats()
+    doc_count = stats.document_count
+    chunk_count = stats.chunk_count
+
+    # Get file type breakdown from metadata
+    file_types: Counter[str] = Counter()
+    indexed_dates: list[datetime] = []
+
+    try:
+        all_metadata = metadata_store.query(limit=10000)
+        for _, meta in all_metadata:
+            # Extract file type from format or source path
+            if meta.dc_format:
+                file_type = meta.dc_format.split("/")[-1].upper()
+            elif meta.ragd_source_path:
+                ext = Path(meta.ragd_source_path).suffix.lower()
+                file_type = ext[1:].upper() if ext else "UNKNOWN"
+            else:
+                file_type = "UNKNOWN"
+            file_types[file_type] += 1
+
+            if meta.ragd_ingestion_date:
+                indexed_dates.append(meta.ragd_ingestion_date)
+    except Exception:
+        # Metadata store might not exist or be empty
+        pass
+
+    # Calculate averages
+    avg_chunks = chunk_count / doc_count if doc_count > 0 else 0
+
+    # Get storage size
+    storage_mb = None
+    if stats.index_size_bytes:
+        storage_mb = stats.index_size_bytes / (1024 * 1024)
+
+    # Get date range
+    date_range = None
+    if indexed_dates:
+        min_date = min(indexed_dates)
+        max_date = max(indexed_dates)
+        date_range = (min_date, max_date)
+
+    # Output
+    if output_format == "json":
+        data = {
+            "documents": {
+                "indexed": doc_count,
+                "chunks": chunk_count,
+                "avg_chunks_per_doc": round(avg_chunks, 1),
+            },
+            "file_types": dict(file_types.most_common()),
+            "storage": {
+                "backend": stats.backend.value if stats.backend else "chromadb",
+                "dimension": stats.dimension,
+                "size_mb": round(storage_mb, 1) if storage_mb else None,
+            },
+            "retrieval": {
+                "embedding_model": config.embedding.model,
+                "late_chunking": config.embedding.late_chunking,
+            },
+            "date_range": {
+                "earliest": date_range[0].isoformat() if date_range else None,
+                "latest": date_range[1].isoformat() if date_range else None,
+            },
+        }
+        con.print(json.dumps(data, indent=2))
+        return
+
+    # Rich output
+    con.print()
+    con.print(Panel("[bold]Index Statistics[/bold]", expand=False))
+    con.print()
+
+    # Documents section
+    con.print("[bold cyan]Documents[/bold cyan]")
+    con.print(f"  Indexed: {doc_count:,}")
+    con.print(f"  Chunks: {chunk_count:,} (avg {avg_chunks:.1f} per document)")
+    if storage_mb:
+        con.print(f"  Storage: {storage_mb:.1f} MB")
+    con.print()
+
+    # File types section
+    if file_types:
+        con.print("[bold cyan]Content Analysis[/bold cyan]")
+        types_str = ", ".join(f"{t} ({c})" for t, c in file_types.most_common(5))
+        con.print(f"  File types: {types_str}")
+        if date_range:
+            min_date, max_date = date_range
+            con.print(f"  Date range: {min_date.strftime('%Y-%m-%d')} to {max_date.strftime('%Y-%m-%d')}")
+        con.print()
+
+    # Retrieval health section
+    con.print("[bold cyan]Retrieval Health[/bold cyan]")
+    con.print(f"  Embedding model: {config.embedding.model}")
+    con.print(f"  Vector dimension: {stats.dimension or 384}")
+    con.print(f"  Late chunking: {'enabled' if config.embedding.late_chunking else 'disabled'}")
+    if stats.last_modified:
+        con.print(f"  Last indexed: {stats.last_modified.strftime('%Y-%m-%d %H:%M')}")
+    con.print()
+
+    # Tips section
+    if doc_count == 0:
+        con.print("[dim]No documents indexed yet.[/dim]")
+        con.print("[dim]Run 'ragd index <path>' to add documents.[/dim]")
+
+
 def doctor_command(
     output_format: OutputFormat = "rich",
     no_color: bool = False,
@@ -1522,6 +1660,7 @@ def chat_command(
     temperature: float = 0.7,
     limit: int = 5,
     session_id: str | None = None,
+    cite: str | None = None,
     output_format: OutputFormat = "rich",
     no_color: bool = False,
 ) -> None:
@@ -1534,6 +1673,9 @@ def chat_command(
 
     con = get_console(no_color)
     config = load_config()
+
+    # Get citation mode from config or parameter
+    cite_mode = cite if cite is not None else config.chat.default_cite_mode
 
     # Check LLM availability
     available, message = check_chat_available(config)
@@ -1624,7 +1766,18 @@ def chat_command(
                     # No response received
                     con.print("[dim]No response generated.[/dim]")
                 else:
-                    con.print("\n")
+                    con.print()  # End response line
+
+                    # Display citations if enabled
+                    if cite_mode != "none" and session.history.messages:
+                        last_msg = session.history.messages[-1]
+                        if last_msg.citations:
+                            con.print("\n[bold]Sources:[/bold]")
+                            for i, cit in enumerate(last_msg.citations, 1):
+                                loc = f", p. {cit.page_number}" if cit.page_number else ""
+                                con.print(f"  [{i}] {cit.filename}{loc}")
+
+                    con.print()  # Extra line before next prompt
             except Exception as e:
                 con.print(f"\n[red]Error: {e}[/red]\n")
 

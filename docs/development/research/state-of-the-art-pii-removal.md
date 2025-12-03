@@ -641,11 +641,11 @@ ragd audit --type pii --since "2024-01-01"
 ## Related Documentation
 
 - [State-of-the-Art Privacy](./state-of-the-art-privacy.md) - Encryption and threat models
-- [F-023: PII Detection](../features/planned/F-023-pii-detection.md) - Detection feature spec
+- [F-023: PII Detection](../features/completed/F-023-pii-detection.md) - Detection feature spec
 - [F-059: Embedding Privacy Protection](../features/planned/F-059-embedding-privacy-protection.md) - Embedding defence
 - [F-060: GDPR-Compliant Deletion](../features/planned/F-060-gdpr-compliant-deletion.md) - Compliance deletion
-- [F-015: Database Encryption](../features/planned/F-015-database-encryption.md) - Data-at-rest protection
-- [F-017: Secure Deletion](../features/planned/F-017-secure-deletion.md) - Data removal
+- [F-015: Database Encryption](../features/completed/F-015-database-encryption.md) - Data-at-rest protection
+- [F-017: Secure Deletion](../features/completed/F-017-secure-deletion.md) - Data removal
 - [ADR-0003: Privacy-First Architecture](../decisions/adrs/0003-privacy-first-architecture.md) - Core privacy principles
 - [ADR-0028: PII Handling Architecture](../decisions/adrs/0028-pii-handling-architecture.md) - PII architecture
 - [ADR-0029: Privacy-Preserving Embedding Strategy](../decisions/adrs/0029-embedding-privacy-strategy.md) - Embedding protection

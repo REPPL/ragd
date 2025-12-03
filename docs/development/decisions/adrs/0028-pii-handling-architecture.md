@@ -240,7 +240,7 @@ ragd index ~/Documents/medical/ --no-scan-pii
 
 ## Related Documentation
 
-- [F-023: PII Detection](../../features/planned/F-023-pii-detection.md)
+- [F-023: PII Detection](../../features/completed/F-023-pii-detection.md)
 - [F-060: GDPR-Compliant Deletion](../../features/planned/F-060-gdpr-compliant-deletion.md)
 - [ADR-0003: Privacy-First Architecture](./0003-privacy-first-architecture.md)
 - [ADR-0029: Privacy-Preserving Embedding Strategy](./0029-embedding-privacy-strategy.md)

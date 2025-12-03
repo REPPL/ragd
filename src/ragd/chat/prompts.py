@@ -62,24 +62,64 @@ class PromptTemplate:
         )
         return self.system_prompt, user_message
 
+    def with_citation_instruction(self, instruction: str) -> "PromptTemplate":
+        """Create a copy with custom citation instruction in system prompt.
+
+        Args:
+            instruction: Citation instruction to inject
+
+        Returns:
+            New PromptTemplate with modified system prompt
+        """
+        # Replace generic citation mentions with custom instruction
+        modified_system = self.system_prompt
+        # Look for existing citation text and replace
+        citation_markers = [
+            "cite sources",
+            "Cite sources",
+            "cite your sources",
+            "Cite your sources",
+        ]
+        for marker in citation_markers:
+            if marker in modified_system:
+                modified_system = modified_system.replace(marker, instruction)
+                break
+        else:
+            # No marker found, append instruction
+            modified_system = f"{modified_system} {instruction}"
+
+        return PromptTemplate(
+            name=self.name,
+            system_prompt=modified_system,
+            user_template=self.user_template,
+            description=self.description,
+        )
+
 
 # Default RAG prompt templates
 RAG_ANSWER_TEMPLATE = PromptTemplate(
     name="rag_answer",
     system_prompt=(
-        "You are a helpful assistant that answers questions based on the provided context. "
-        "Always cite your sources by referencing the document names. "
-        "If the context doesn't contain enough information to answer, say so clearly. "
+        "You are a helpful assistant that answers questions based ONLY on the provided context. "
+        "CRITICAL RULES:\n"
+        "1. ONLY use information explicitly stated in the provided context.\n"
+        "2. NEVER make up, fabricate, or hallucinate citations, references, or sources.\n"
+        "3. NEVER use your general knowledge to answer if the context lacks information.\n"
+        "4. If the context does not contain relevant information, respond with: "
+        "'I don't have information about that in my indexed documents.'\n"
+        "5. Always cite sources by referencing the document names shown in the context.\n"
         "Be concise and accurate."
     ),
     user_template="""Answer the following question based ONLY on the provided context.
+
+IMPORTANT: If the context does not contain relevant information, say "I don't have information about that in my indexed documents." Do NOT make up references or use general knowledge.
 
 Context:
 {context}
 
 Question: {question}
 
-Provide a clear, accurate answer with source citations.""",
+Provide a clear, accurate answer citing only sources shown in the context above.""",
     description="Answer a single question using retrieved context",
 )
 
@@ -122,9 +162,14 @@ RAG_CHAT_TEMPLATE = PromptTemplate(
     name="rag_chat",
     system_prompt=(
         "You are a helpful assistant having a conversation about the user's documents. "
-        "Use the provided context to answer questions accurately. "
-        "If you need clarification or the context is insufficient, ask or say so. "
-        "Maintain conversation continuity and cite sources."
+        "CRITICAL RULES:\n"
+        "1. ONLY use information from the provided context to answer questions.\n"
+        "2. NEVER make up, fabricate, or hallucinate citations, references, or sources.\n"
+        "3. NEVER use your general knowledge if the context lacks relevant information.\n"
+        "4. If the context does not contain relevant information, say: "
+        "'I don't have information about that in my indexed documents.'\n"
+        "5. Always cite sources by referencing document names and page numbers from the context.\n"
+        "Maintain conversation continuity where relevant."
     ),
     user_template="""Previous conversation:
 {history}
@@ -134,7 +179,7 @@ Retrieved context:
 
 User: {question}
 
-Respond helpfully, citing sources when using information from the context.""",
+IMPORTANT: Only use information from the context above. If no relevant context exists, say "I don't have information about that in my indexed documents." Do NOT make up references.""",
     description="Multi-turn chat with context",
 )
 
@@ -173,11 +218,15 @@ _TEMPLATES: dict[str, PromptTemplate] = {
 }
 
 
-def get_prompt_template(name: str) -> PromptTemplate:
+def get_prompt_template(
+    name: str,
+    citation_instruction: str | None = None,
+) -> PromptTemplate:
     """Get a prompt template by name.
 
     Args:
         name: Template name (e.g., 'answer', 'summarise', 'chat')
+        citation_instruction: Optional custom citation instruction to inject
 
     Returns:
         PromptTemplate instance
@@ -188,7 +237,14 @@ def get_prompt_template(name: str) -> PromptTemplate:
     if name not in _TEMPLATES:
         available = ", ".join(sorted(set(_TEMPLATES.keys())))
         raise KeyError(f"Unknown template '{name}'. Available: {available}")
-    return _TEMPLATES[name]
+
+    template = _TEMPLATES[name]
+
+    # Apply custom citation instruction if provided
+    if citation_instruction:
+        template = template.with_citation_instruction(citation_instruction)
+
+    return template
 
 
 def register_template(template: PromptTemplate) -> None:

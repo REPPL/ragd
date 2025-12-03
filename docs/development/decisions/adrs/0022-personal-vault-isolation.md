@@ -250,7 +250,7 @@ Use HSM for key storage and operations.
 ## Related Documentation
 
 - [F-044: Personal Information Vault](../../features/planned/F-044-personal-vault.md)
-- [F-015: Database Encryption](../../features/planned/F-015-database-encryption.md)
+- [F-015: Database Encryption](../../features/completed/F-015-database-encryption.md)
 - [ADR-0009: Security Architecture](./0009-security-architecture.md)
 - [ADR-0010: Vector Database Security](./0010-vector-database-security.md)
 - [State-of-the-Art Privacy](../../research/state-of-the-art-privacy.md)

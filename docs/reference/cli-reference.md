@@ -1,6 +1,6 @@
 # CLI Reference
 
-Complete command reference for ragd v0.5.0.
+Complete command reference for ragd v0.7.0.
 
 ## Synopsis
 
@@ -506,7 +506,7 @@ Requires Ollama to be running with a compatible model.
 | `--agentic` | | Enable agentic RAG (CRAG + Self-RAG) | Auto |
 | `--no-agentic` | | Disable agentic RAG | |
 | `--show-confidence` | | Display confidence scores | `false` |
-| `--cite` | | Citation style: `none`, `numbered`, `inline` | `numbered` |
+| `--cite` | `-c` | Citation style: `none`, `numbered`, `inline` | `numbered` |
 | `--limit` | `-n` | Max context chunks | `5` |
 
 #### Examples
@@ -575,6 +575,7 @@ Opens an interactive REPL for conversational queries:
 |--------|-------|-------------|---------|
 | `--model` | `-m` | Override LLM model | Config value |
 | `--session` | `-s` | Session name to resume | New session |
+| `--cite` | `-c` | Citation style: `none`, `numbered` | Config value |
 | `--agentic` | | Force agentic mode | Auto |
 
 #### Chat Commands
@@ -758,6 +759,181 @@ Default: llama3.2:3b
 
 ---
 
+### ragd unlock
+
+Unlock the encrypted database.
+
+#### Synopsis
+
+```
+ragd unlock [OPTIONS]
+```
+
+#### Description
+
+Unlocks the encrypted database for a session:
+1. Prompts for password
+2. Derives encryption key using Argon2id
+3. Starts session timer
+
+#### Options
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| `--extend` | Extend current session instead of re-authenticating | `false` |
+
+#### Examples
+
+```bash
+# Unlock database
+ragd unlock
+
+# Extend current session
+ragd unlock --extend
+```
+
+---
+
+### ragd lock
+
+Lock the session immediately.
+
+#### Synopsis
+
+```
+ragd lock
+```
+
+#### Description
+
+Locks the session and clears encryption keys from memory.
+
+#### Examples
+
+```bash
+ragd lock
+```
+
+---
+
+### ragd password
+
+Manage encryption password.
+
+#### Synopsis
+
+```
+ragd password <COMMAND>
+```
+
+#### Subcommands
+
+| Command | Description |
+|---------|-------------|
+| `change` | Change encryption password |
+| `reset` | Reset encryption (deletes all data) |
+| `rotate-key` | Rotate encryption key |
+
+#### Examples
+
+```bash
+# Change password
+ragd password change
+
+# Reset encryption (warning: deletes data)
+ragd password reset --confirm-data-loss
+
+# Rotate encryption key
+ragd password rotate-key
+```
+
+---
+
+### ragd session
+
+View session status.
+
+#### Synopsis
+
+```
+ragd session status
+```
+
+#### Description
+
+Shows current session state, remaining time, and failed attempt count.
+
+#### Examples
+
+```bash
+ragd session status
+```
+
+#### Output
+
+```
+Session: Unlocked (4:32 remaining)
+Failed attempts: 0
+```
+
+---
+
+### ragd delete
+
+Delete documents from the knowledge base.
+
+#### Synopsis
+
+```
+ragd delete <DOC_IDS>... [OPTIONS]
+```
+
+#### Description
+
+Removes documents from the index with three deletion levels:
+- **Standard** - Remove from index only
+- **Secure** - Overwrite storage locations
+- **Cryptographic** - Rotate encryption key (maximum security)
+
+#### Arguments
+
+| Argument | Description | Required |
+|----------|-------------|----------|
+| `DOC_IDS` | Document IDs to delete | Yes (1 or more) |
+
+#### Options
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| `--secure` | Securely overwrite storage | `false` |
+| `--purge` | Cryptographic erasure with key rotation | `false` |
+| `--force` | Skip confirmation prompts | `false` |
+
+#### Subcommands
+
+| Command | Description |
+|---------|-------------|
+| `audit` | View deletion audit log |
+
+#### Examples
+
+```bash
+# Standard deletion
+ragd delete doc123
+
+# Secure deletion
+ragd delete doc123 --secure
+
+# Cryptographic erasure
+ragd delete doc123 --purge
+
+# View audit log
+ragd delete audit
+ragd delete audit -n 10
+```
+
+---
+
 ## Exit Codes Reference
 
 ragd uses standard sysexits.h codes where applicable:
@@ -821,4 +997,4 @@ ragd config validate
 
 ---
 
-**Status**: Reference specification for v0.5.0
+**Status**: Reference specification for v0.7.0

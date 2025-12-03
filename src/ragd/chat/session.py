@@ -20,6 +20,15 @@ from ragd.config import RagdConfig, load_config
 from ragd.llm import LLMResponse, OllamaClient, OllamaError, StreamChunk
 from ragd.search.hybrid import HybridSearcher, HybridSearchResult, SearchMode
 
+# Response when no relevant context is found
+NO_CONTEXT_RESPONSE = (
+    "I don't have information about that in my indexed documents.\n\n"
+    "Suggestions:\n"
+    "- Try rephrasing your question with different keywords\n"
+    "- Run 'ragd search \"your query\"' to check if relevant content exists\n"
+    "- Run 'ragd stats' to see what topics are indexed"
+)
+
 
 @dataclass
 class ChatConfig:
@@ -119,9 +128,10 @@ class ChatSession:
             max_results=self.chat_config.search_limit,
         )
 
-        # Get prompt template
+        # Get prompt template with citation instruction from config
         if isinstance(template, str):
-            template = get_prompt_template(template)
+            citation_instruction = self.config.chat.prompts.citation_instruction
+            template = get_prompt_template(template, citation_instruction)
 
         # Format prompt
         history_text = self._history.format_for_prompt(
@@ -173,6 +183,17 @@ class ChatSession:
         Returns:
             CitedAnswer with response and citations
         """
+        # Empty-context guard: return helpful message if no relevant context
+        if not citations:
+            answer = CitedAnswer(
+                answer=NO_CONTEXT_RESPONSE,
+                citations=[],
+            )
+            self._history.add_assistant_message(NO_CONTEXT_RESPONSE, citations=[])
+            if self.chat_config.auto_save:
+                self._save_history()
+            return answer
+
         try:
             response = self._llm.generate(
                 prompt=user_prompt,
@@ -224,6 +245,14 @@ class ChatSession:
         Yields:
             Response chunks as strings
         """
+        # Empty-context guard: return helpful message if no relevant context
+        if not citations:
+            self._history.add_assistant_message(NO_CONTEXT_RESPONSE, citations=[])
+            if self.chat_config.auto_save:
+                self._save_history()
+            yield NO_CONTEXT_RESPONSE
+            return
+
         full_response = ""
 
         try:

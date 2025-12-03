@@ -8,20 +8,7 @@ Features planned for future development.
 |----|---------|----------|
 | [F-064](./F-064-tag-provenance.md) | Tag Provenance Schema | [State-of-the-Art Tagging](../../research/state-of-the-art-tagging.md) |
 
-## v0.6 Features (Storage & Backends)
-
-| ID | Feature | Research |
-|----|---------|----------|
-| [F-021](./F-021-vector-store-abstraction.md) | Vector Store Abstraction | [State-of-the-Art Local RAG](../../research/state-of-the-art-local-rag.md) |
-| [F-022](./F-022-knowledge-graph.md) | Knowledge Graph | [State-of-the-Art RAG](../../research/state-of-the-art-rag.md) |
-
-## v0.7 Features (Privacy Foundation)
-
-| ID | Feature | Research |
-|----|---------|----------|
-| [F-023](./F-023-pii-detection.md) | PII Detection | [State-of-the-Art PII Removal](../../research/state-of-the-art-pii-removal.md) |
-
-### v0.7 Stretch Goals (Tagging Enhancements)
+## v0.7.5 Features (Privacy Polish + Tagging)
 
 | ID | Feature | Research |
 |----|---------|----------|
@@ -29,10 +16,12 @@ Features planned for future development.
 | [F-062](./F-062-tag-library-management.md) | Tag Library Management | [State-of-the-Art Tagging](../../research/state-of-the-art-tagging.md) |
 | [F-063](./F-063-smart-collections.md) | Smart Collections | [State-of-the-Art Tagging](../../research/state-of-the-art-tagging.md) |
 
-## v0.8 Features (Privacy & Compliance)
+## v0.8 Features (Intelligence + Storage Strategy)
 
 | ID | Feature | Research |
 |----|---------|----------|
+| [F-022](./F-022-knowledge-graph.md) | Knowledge Graph (Kuzu) | [State-of-the-Art Knowledge Graphs](../../research/state-of-the-art-knowledge-graphs.md) |
+| [F-075](./F-075-backend-migration-tool.md) | Backend Migration Tool | - |
 | [F-059](./F-059-embedding-privacy-protection.md) | Embedding Privacy Protection | [State-of-the-Art PII Removal](../../research/state-of-the-art-pii-removal.md) |
 | [F-060](./F-060-gdpr-compliant-deletion.md) | GDPR-Compliant Deletion | [State-of-the-Art PII Removal](../../research/state-of-the-art-pii-removal.md) |
 

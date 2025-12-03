@@ -119,13 +119,27 @@ Features are the primary unit of work. Each feature specification describes:
 
 ### v0.7 Features (Privacy & Security)
 
+#### Chat Improvements (Preliminary)
+
 | ID | Feature | Status | Research |
 |----|---------|--------|----------|
-| [F-015](./planned/F-015-database-encryption.md) | Database Encryption | 📅 Planned | ADR-0009 |
-| [F-016](./planned/F-016-session-management.md) | Session Management | 📅 Planned | ADR-0009 |
-| [F-017](./planned/F-017-secure-deletion.md) | Secure Deletion | 📅 Planned | ADR-0009 |
+| [F-065](./completed/F-065-chat-citation-display.md) | Chat Citation Display | ✅ Complete | - |
+| [F-066](./completed/F-066-configurable-chat-prompts.md) | Configurable Chat Prompts | ✅ Complete | - |
+
+#### Privacy Core
+
+| ID | Feature | Status | Research |
+|----|---------|--------|----------|
+| [F-015](./completed/F-015-database-encryption.md) | Database Encryption | ✅ Complete | ADR-0009 |
+| [F-016](./completed/F-016-session-management.md) | Session Management | ✅ Complete | ADR-0009 |
+| [F-017](./completed/F-017-secure-deletion.md) | Secure Deletion | ✅ Complete | ADR-0009 |
+| [F-023](./completed/F-023-pii-detection.md) | PII Detection | ✅ Complete | State-of-the-Art Privacy |
+
+#### Deferred to v0.7.5
+
+| ID | Feature | Status | Research |
+|----|---------|--------|----------|
 | [F-018](./planned/F-018-data-tiers.md) | Data Sensitivity Tiers | 📅 Planned | ADR-0010 |
-| [F-023](./planned/F-023-pii-detection.md) | PII Detection | 📅 Planned | State-of-the-Art Privacy |
 
 ### v0.8 Features (Intelligence)
 
@@ -193,6 +207,7 @@ Features are numbered sequentially with milestone-based ranges:
 | F-013, F-014, F-020, F-055 | v0.5 | Chat & Evaluation |
 | F-021, F-070 to F-074 | v0.6.0 | Storage |
 | F-076 to F-079 | v0.6.5 | Polish & Stability |
+| F-065, F-066 | v0.7 | Chat Improvements |
 | F-015 to F-018, F-023 | v0.7 | Privacy & Security |
 | F-022 | v0.8 | Intelligence |
 | F-024, F-056, F-057 | v1.0+ | Platform & Multi-Model Advanced |

@@ -4,8 +4,9 @@
 
 **Research**: [State-of-the-Art Privacy](../../research/state-of-the-art-privacy.md)
 **ADR**: [ADR-0009: Security Architecture](../../decisions/adrs/0009-security-architecture.md)
-**Milestone**: v0.7
+**Milestone**: v0.7.0
 **Priority**: P0
+**Status**: Completed
 
 ## Problem Statement
 
@@ -54,41 +55,48 @@ Session Locked
 
 ## Implementation Tasks
 
-- [ ] Implement session state machine
-- [ ] Implement inactivity timer
-- [ ] Implement key clearing on lock
-- [ ] Add `ragd unlock` command
-- [ ] Add `ragd lock` command
-- [ ] Add session status to `ragd status`
-- [ ] Implement failed attempt tracking
-- [ ] Add lockout after N failures
-- [ ] Add session persistence option
-- [ ] Write security tests
+- [x] Implement session state machine
+- [x] Implement inactivity timer
+- [x] Implement key clearing on lock
+- [x] Add `ragd unlock` command
+- [x] Add `ragd lock` command
+- [x] Add session status to `ragd status`
+- [x] Implement failed attempt tracking
+- [x] Add lockout after N failures
+- [x] Add session persistence option
+- [x] Write security tests
 
 ## Success Criteria
 
-- [ ] Auto-lock after configurable timeout
-- [ ] Keys cleared from memory on lock
-- [ ] Re-authentication required after lock
-- [ ] Failed attempt tracking and lockout
-- [ ] Session status visible in CLI
-- [ ] Graceful handling of locked state
+- [x] Auto-lock after configurable timeout
+- [x] Keys cleared from memory on lock
+- [x] Re-authentication required after lock
+- [x] Failed attempt tracking and lockout
+- [x] Session status visible in CLI
+- [x] Graceful handling of locked state
 
 ## Dependencies
 
 - F-015: Database Encryption
 
-## Technical Notes
+## Implementation Notes
+
+### Module Structure
+
+```
+src/ragd/security/
+└── session.py  # Session state machine
+```
 
 ### CLI Commands
 
 ```bash
 # Check session status
-ragd status
-Session: 🔓 Unlocked (4:32 remaining)
+ragd session status
+Session: Unlocked (4:32 remaining)
 
-ragd status
-Session: 🔒 Locked
+ragd session status
+Session: Locked
 
 # Manual unlock
 ragd unlock
@@ -182,3 +190,5 @@ def protect_key(key: bytes) -> None:
 - [State-of-the-Art Privacy Research](../../research/state-of-the-art-privacy.md)
 
 ---
+
+**Status**: Completed

@@ -4,8 +4,9 @@
 
 **Research**: [State-of-the-Art Privacy](../../research/state-of-the-art-privacy.md)
 **ADR**: [ADR-0009: Security Architecture](../../decisions/adrs/0009-security-architecture.md)
-**Milestone**: v0.7
+**Milestone**: v0.7.0
 **Priority**: P1
+**Status**: Completed
 
 ## Problem Statement
 
@@ -58,32 +59,39 @@ Traditional overwrite doesn't work on SSDs due to:
 
 ## Implementation Tasks
 
-- [ ] Implement standard deletion (remove from index)
-- [ ] Implement metadata overwrite
-- [ ] Implement cryptographic erasure (key rotation)
-- [ ] Add `ragd delete` command
-- [ ] Add `--secure` flag for secure deletion
-- [ ] Add `--purge` for cryptographic erasure
-- [ ] Add bulk deletion support
-- [ ] Add deletion confirmation prompts
-- [ ] Implement deletion audit log
-- [ ] Write tests
+- [x] Implement standard deletion (remove from index)
+- [x] Implement metadata overwrite
+- [x] Implement cryptographic erasure (key rotation)
+- [x] Add `ragd delete` command
+- [x] Add `--secure` flag for secure deletion
+- [x] Add `--purge` for cryptographic erasure
+- [x] Add bulk deletion support
+- [x] Add deletion confirmation prompts
+- [x] Implement deletion audit log
+- [x] Write tests
 
 ## Success Criteria
 
-- [ ] Documents removable from index
-- [ ] Secure deletion overwrites storage
-- [ ] Cryptographic erasure rotates keys
-- [ ] Deletion audit trail maintained
-- [ ] Bulk deletion supported
-- [ ] Clear user feedback on deletion type
+- [x] Documents removable from index
+- [x] Secure deletion overwrites storage
+- [x] Cryptographic erasure rotates keys
+- [x] Deletion audit trail maintained
+- [x] Bulk deletion supported
+- [x] Clear user feedback on deletion type
 
 ## Dependencies
 
 - F-015: Database Encryption
 - F-016: Session Management
 
-## Technical Notes
+## Implementation Notes
+
+### Module Structure
+
+```
+src/ragd/security/
+└── deletion.py  # Secure deletion with audit
+```
 
 ### CLI Commands
 
@@ -113,6 +121,11 @@ Enter password to confirm: ********
 # Bulk deletion
 ragd delete --all --source ~/old-docs/
 Delete 47 documents from ~/old-docs/? [y/N] y
+
+# View deletion audit log
+ragd delete audit
+ragd delete audit --all
+ragd delete audit -n 10
 ```
 
 ### Configuration
@@ -175,3 +188,5 @@ def purge_with_key_rotation(document_id: str, password: str):
 - [State-of-the-Art Privacy Research](../../research/state-of-the-art-privacy.md)
 
 ---
+
+**Status**: Completed
