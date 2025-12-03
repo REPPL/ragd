@@ -39,6 +39,7 @@ from ragd.ui.cli import (
     chat_command,
     models_list_command,
     evaluate_command,
+    quality_command,
 )
 
 app = typer.Typer(
@@ -684,6 +685,45 @@ def evaluate(
         limit=limit,
         threshold=threshold,
         save=not no_save,
+        output_format=output_format,  # type: ignore
+        no_color=no_color,
+    )
+
+
+@app.command()
+def quality(
+    document_id: Annotated[str | None, typer.Argument(help="Document ID to assess (omit for all).")] = None,
+    below: float = typer.Option(None, "--below", "-b", help="Only show documents below quality threshold (0-1)."),
+    file_type: str = typer.Option(None, "--type", "-t", help="Filter by file type (pdf, html, txt)."),
+    test_corpus: Path = typer.Option(None, "--test", help="Test corpus path for CI/batch testing."),
+    verbose: bool = typer.Option(False, "--verbose", "-V", help="Show detailed breakdown."),
+    output_format: FormatOption = "rich",
+    no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
+) -> None:
+    """Assess extraction quality for indexed documents.
+
+    Shows quality metrics including completeness, character quality,
+    structure preservation, and image/table handling.
+
+    Modes:
+      - No arguments: Report on all indexed documents
+      - With document_id: Detailed report for specific document
+      - With --test: Batch test a corpus (for CI)
+
+    Examples:
+        ragd quality                      # All documents summary
+        ragd quality doc-123              # Specific document
+        ragd quality --below 0.7          # Low-quality documents
+        ragd quality --type pdf           # Only PDFs
+        ragd quality --test ~/corpus/     # CI batch testing
+        ragd quality --verbose            # Detailed breakdown
+    """
+    quality_command(
+        document_id=document_id,
+        below=below,
+        file_type=file_type,
+        test_corpus=test_corpus,
+        verbose=verbose,
         output_format=output_format,  # type: ignore
         no_color=no_color,
     )

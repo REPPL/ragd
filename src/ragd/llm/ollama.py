@@ -7,13 +7,17 @@ and running separately: https://ollama.ai
 from __future__ import annotations
 
 import json
+import logging
 import urllib.error
 import urllib.request
 from collections.abc import Iterator
 from dataclasses import dataclass
 from typing import Any
+from urllib.parse import urlparse
 
 from ragd.llm.client import LLMClient, LLMResponse
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -67,6 +71,25 @@ class OllamaClient(LLMClient):
         self.base_url = base_url.rstrip("/")
         self.model = model
         self.timeout = timeout_seconds
+
+        # Security: Warn if using non-localhost URL without HTTPS
+        self._check_url_security(self.base_url)
+
+    def _check_url_security(self, url: str) -> None:
+        """Check URL security and warn if potentially insecure.
+
+        Security: Non-localhost HTTP connections are vulnerable to MITM attacks.
+        """
+        parsed = urlparse(url)
+        is_localhost = parsed.hostname in ("localhost", "127.0.0.1", "::1")
+        is_https = parsed.scheme == "https"
+
+        if not is_localhost and not is_https:
+            logger.warning(
+                "Ollama URL %s uses HTTP over network. "
+                "Consider using HTTPS for security.",
+                url,
+            )
 
     def generate(
         self,

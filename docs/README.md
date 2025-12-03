@@ -63,6 +63,8 @@ ragd status
 | v0.1.0 | Core RAG (index, search, status) | ✅ Released |
 | v0.2.0 | Messy PDFs (killer feature) | ✅ Released |
 | v0.3.0 | Advanced Search | ✅ Released |
+| v0.4.0 | Multi-Modal (vision embeddings) | ✅ Released |
+| v0.5.0 | Chat (LLM integration, agentic RAG) | ✅ Released |
 | v1.0.0 | Personal Platform + Basic WebUI | 📋 Planned |
 
 See [Milestones](./development/milestones/) for details.

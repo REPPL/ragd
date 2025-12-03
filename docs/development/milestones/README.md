@@ -11,7 +11,7 @@ Release planning and milestone tracking.
 | [v0.3.0](./v0.3.0.md) | Advanced Search & CLI | Hybrid search, text quality, complete CLI | ✅ Released |
 | [v0.3.2](./v0.3.2.md) | Tag Provenance | Schema v2.2, tag origin tracking | 📋 Planned |
 | [v0.4.0](./v0.4.0.md) | Multi-Modal | Vision embeddings, image queries | ✅ Released |
-| [v0.5.0](./v0.5.0.md) | Chat | LLM integration, conversation | 📋 Planned |
+| [v0.5.0](./v0.5.0.md) | Chat | LLM integration, conversation | ✅ Released |
 | [v0.6.0](./v0.6.0.md) | Storage | LEANN, backend switching | 📋 Planned |
 | [v0.7.0](./v0.7.0.md) | Privacy | PII detection, encryption | 📋 Planned |
 | [v0.8.0](./v0.8.0.md) | Intelligence | Personas, temporal, knowledge graph | 📋 Planned |

@@ -24,6 +24,7 @@ from ragd.ui.cli.commands import (
     chat_command,
     models_list_command,
     evaluate_command,
+    quality_command,
 )
 
 __all__ = [
@@ -50,4 +51,5 @@ __all__ = [
     "chat_command",
     "models_list_command",
     "evaluate_command",
+    "quality_command",
 ]

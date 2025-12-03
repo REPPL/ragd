@@ -69,7 +69,7 @@ class ChatSession:
 
         # Initialise components
         self._llm = OllamaClient(
-            base_url=self.config.llm.ollama_url,
+            base_url=self.config.llm.base_url,
             model=self.chat_config.model,
             timeout_seconds=120,
         )
@@ -344,7 +344,7 @@ def check_chat_available(config: RagdConfig | None = None) -> tuple[bool, str]:
 
     try:
         client = OllamaClient(
-            base_url=config.llm.ollama_url,
+            base_url=config.llm.base_url,
             model=config.llm.model,
         )
 

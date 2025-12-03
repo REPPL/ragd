@@ -1636,3 +1636,228 @@ def evaluate_command(
 
     finally:
         evaluator.close()
+
+
+def quality_command(
+    document_id: str | None = None,
+    below: float | None = None,
+    file_type: str | None = None,
+    test_corpus: Path | None = None,
+    verbose: bool = False,
+    output_format: OutputFormat = "rich",
+    no_color: bool = False,
+) -> None:
+    """Assess extraction quality for indexed documents.
+
+    Shows quality metrics for document extraction including completeness,
+    character quality, structure preservation, and image/table handling.
+    """
+    import json
+
+    from ragd.config import load_config
+    from ragd.quality import QualityScorer, score_document
+    from ragd.quality.report import (
+        generate_quality_report,
+        generate_corpus_report,
+        get_quality_summary,
+    )
+    from ragd.storage import ChromaStore
+
+    con = get_console(no_color)
+    config = load_config()
+
+    # Test corpus mode (CI/batch testing)
+    if test_corpus:
+        if not test_corpus.exists():
+            con.print(f"[red]Error: Corpus path does not exist: {test_corpus}[/red]")
+            raise typer.Exit(1)
+
+        con.print(f"[bold]Testing corpus: {test_corpus}[/bold]\n")
+
+        with Progress(
+            SpinnerColumn(),
+            TextColumn("[progress.description]{task.description}"),
+            BarColumn(),
+            MofNCompleteColumn(),
+            console=con,
+        ) as progress:
+            task = progress.add_task("Scoring documents...", total=None)
+
+            def progress_cb(current: int, total: int, filename: str) -> None:
+                progress.update(task, total=total, completed=current, description=f"Scoring {filename}...")
+
+            report = generate_corpus_report(
+                path=test_corpus,
+                config=config,
+                threshold=below or 0.7,
+                progress_callback=progress_cb,
+            )
+
+        if output_format == "json":
+            con.print_json(data=report.to_dict())
+        else:
+            con.print(get_quality_summary(report))
+
+            # CI exit code
+            if report.low_quality_count > 0 or report.errors:
+                con.print(f"\n[yellow]Warning: {report.low_quality_count} low-quality documents[/yellow]")
+                raise typer.Exit(1)
+        return
+
+    # Database mode - score indexed documents
+    store = ChromaStore(config.chroma_path)
+
+    try:
+        # Single document mode
+        if document_id:
+            scorer = QualityScorer(config)
+            result = scorer.score_stored_document(document_id, store)
+
+            if result is None:
+                con.print(f"[red]Document not found: {document_id}[/red]")
+                raise typer.Exit(1)
+
+            if output_format == "json":
+                con.print_json(data={
+                    "document_id": result.document_id,
+                    "filename": result.filename,
+                    "file_type": result.file_type,
+                    "success": result.success,
+                    "error": result.error,
+                    "metrics": result.metrics.to_dict(),
+                })
+            else:
+                _display_document_quality(con, result, verbose)
+            return
+
+        # All documents mode
+        with Progress(
+            SpinnerColumn(),
+            TextColumn("[progress.description]{task.description}"),
+            BarColumn(),
+            MofNCompleteColumn(),
+            console=con,
+        ) as progress:
+            task = progress.add_task("Analysing quality...", total=None)
+
+            def progress_cb(current: int, total: int, filename: str) -> None:
+                progress.update(task, total=total, completed=current, description=f"Scoring {filename}...")
+
+            report = generate_quality_report(
+                store=store,
+                config=config,
+                threshold=below or 0.7,
+                progress_callback=progress_cb,
+            )
+
+        # Filter by file type if specified
+        if file_type:
+            report.documents = [d for d in report.documents if d.file_type == file_type]
+
+        # Filter by threshold if specified
+        if below:
+            report.documents = [d for d in report.documents if d.metrics.overall < below]
+
+        if output_format == "json":
+            con.print_json(data=report.to_dict())
+        else:
+            con.print(get_quality_summary(report))
+
+            # Show worst documents
+            if report.documents and verbose:
+                con.print("\n[bold]Documents (worst first):[/bold]")
+                from rich.table import Table
+
+                table = Table()
+                table.add_column("Document", style="cyan")
+                table.add_column("Type")
+                table.add_column("Overall", justify="right")
+                table.add_column("Completeness", justify="right")
+                table.add_column("Chars", justify="right")
+                table.add_column("Structure", justify="right")
+
+                for doc in report.documents[:20]:  # Top 20 worst
+                    m = doc.metrics
+                    score_colour = "red" if m.overall < 0.5 else "yellow" if m.overall < 0.7 else "green"
+                    table.add_row(
+                        doc.filename[:40] + "..." if len(doc.filename) > 40 else doc.filename,
+                        doc.file_type,
+                        f"[{score_colour}]{m.overall:.0%}[/{score_colour}]",
+                        f"{m.completeness:.0%}",
+                        f"{m.character_quality:.0%}",
+                        f"{m.structure:.0%}",
+                    )
+
+                con.print(table)
+
+    finally:
+        pass  # Store doesn't need explicit close
+
+
+def _display_document_quality(
+    con: Console,
+    result,  # DocumentQuality
+    verbose: bool = False,
+) -> None:
+    """Display quality metrics for a single document."""
+    from rich.table import Table
+    from rich.panel import Panel
+
+    m = result.metrics
+
+    # Overall score with colour
+    score = m.overall
+    if score >= 0.9:
+        score_style = "bold green"
+        rating = "Excellent"
+    elif score >= 0.7:
+        score_style = "bold yellow"
+        rating = "Good"
+    elif score >= 0.5:
+        score_style = "bold orange1"
+        rating = "Fair"
+    else:
+        score_style = "bold red"
+        rating = "Poor"
+
+    con.print(f"\n[bold]Quality Report: {result.filename}[/bold]")
+    con.print(f"Document ID: [dim]{result.document_id}[/dim]")
+    con.print(f"File type: [dim]{result.file_type}[/dim]")
+    con.print(f"Overall: [{score_style}]{score:.0%}[/{score_style}] ({rating})")
+
+    if not result.success:
+        con.print(f"\n[red]Error: {result.error}[/red]")
+        return
+
+    # Metrics table
+    table = Table(title="Quality Metrics")
+    table.add_column("Metric", style="cyan")
+    table.add_column("Score", justify="right")
+    table.add_column("Assessment")
+
+    metrics_data = [
+        ("Completeness", m.completeness, m.details.get("completeness", {}).get("assessment", "")),
+        ("Character Quality", m.character_quality, m.details.get("character_quality", {}).get("assessment", "")),
+        ("Structure", m.structure, m.details.get("structure", {}).get("assessment", "")),
+        ("Image Handling", m.images, m.details.get("images", {}).get("assessment", "")),
+        ("Table Handling", m.tables, m.details.get("tables", {}).get("assessment", "")),
+    ]
+
+    for name, score_val, assessment in metrics_data:
+        colour = "green" if score_val >= 0.7 else "yellow" if score_val >= 0.5 else "red"
+        table.add_row(
+            name,
+            f"[{colour}]{score_val:.0%}[/{colour}]",
+            assessment[:50] if assessment else "",
+        )
+
+    con.print(table)
+
+    if verbose and m.details:
+        con.print("\n[bold]Detailed Analysis:[/bold]")
+        for key, detail in m.details.items():
+            if isinstance(detail, dict) and key != "extraction_method":
+                con.print(f"\n[cyan]{key}:[/cyan]")
+                for k, v in detail.items():
+                    if k != "assessment":
+                        con.print(f"  {k}: {v}")

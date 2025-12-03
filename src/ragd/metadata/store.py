@@ -287,15 +287,19 @@ class MetadataStore:
             # Each tag must be present in the tags array
             for tag in tags:
                 conditions.append(
-                    "json_extract(metadata, '$.ragd_tags') LIKE ?"
+                    "json_extract(metadata, '$.ragd_tags') LIKE ? ESCAPE '\\'"
                 )
-                params.append(f'%"{tag}"%')
+                # Escape LIKE wildcards in tag values for exact matching
+                escaped_tag = self._escape_like(tag)
+                params.append(f'%"{escaped_tag}"%')
 
         if source_path_contains:
             conditions.append(
-                "json_extract(metadata, '$.ragd_source_path') LIKE ?"
+                "json_extract(metadata, '$.ragd_source_path') LIKE ? ESCAPE '\\'"
             )
-            params.append(f"%{source_path_contains}%")
+            # Escape LIKE wildcards in search term
+            escaped_path = self._escape_like(source_path_contains)
+            params.append(f"%{escaped_path}%")
 
         if since:
             conditions.append(
@@ -337,6 +341,21 @@ class MetadataStore:
             conn.commit()
 
         return results
+
+    @staticmethod
+    def _escape_like(value: str) -> str:
+        """Escape SQL LIKE wildcards in a value.
+
+        Security: Prevents % and _ in user input from being interpreted
+        as LIKE wildcards, which could cause unexpected matches.
+
+        Args:
+            value: String to escape
+
+        Returns:
+            Escaped string safe for use in LIKE patterns
+        """
+        return value.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
 
     def _update_raw(
         self,

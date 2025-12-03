@@ -92,10 +92,10 @@ Features are the primary unit of work. Each feature specification describes:
 
 | ID | Feature | Status | Research |
 |----|---------|--------|----------|
-| [F-013](./planned/F-013-ragas-evaluation.md) | RAGAS Evaluation | 📅 Planned | ADR-0008 |
-| [F-014](./planned/F-014-agentic-rag.md) | Agentic RAG | 📅 Planned | State-of-the-Art RAG |
-| [F-020](./planned/F-020-ollama-llm-integration.md) | Ollama LLM Integration | 📅 Planned | State-of-the-Art Local RAG |
-| [F-055](./planned/F-055-multi-model-orchestration.md) | Multi-Model Orchestration | 📅 Planned | [State-of-the-Art Multi-Model RAG](../research/state-of-the-art-multi-model-rag.md) |
+| [F-013](./completed/F-013-ragas-evaluation.md) | RAGAS Evaluation | ✅ Complete | ADR-0008 |
+| [F-014](./completed/F-014-agentic-rag.md) | Agentic RAG | ✅ Complete | State-of-the-Art RAG |
+| [F-020](./completed/F-020-ollama-llm-integration.md) | Ollama LLM Integration | ✅ Complete | State-of-the-Art Local RAG |
+| [F-055](./completed/F-055-multi-model-orchestration.md) | Multi-Model Orchestration | ✅ Complete | [State-of-the-Art Multi-Model RAG](../research/state-of-the-art-multi-model-rag.md) |
 
 ### v0.6 Features (Storage)
 

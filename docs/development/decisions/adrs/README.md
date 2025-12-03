@@ -65,8 +65,6 @@ Lightweight documentation of significant technical decisions.
 
 | ADR | Title | Status |
 |-----|-------|--------|
-| 0020 | Memory Storage Architecture | 📋 Planned |
-| 0021 | Persona Agent Framework | 📋 Planned |
 | [0022](./0022-personal-vault-isolation.md) | Personal Vault Isolation | Accepted |
 
 ## ADR Template

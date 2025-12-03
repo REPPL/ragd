@@ -2,8 +2,11 @@
 
 from __future__ import annotations
 
+import logging
 from pathlib import Path
 from typing import Literal
+
+logger = logging.getLogger(__name__)
 
 FileType = Literal["pdf", "txt", "md", "html", "unknown"]
 
@@ -46,6 +49,8 @@ def is_supported_file(path: Path) -> bool:
 def discover_files(path: Path, recursive: bool = True) -> list[Path]:
     """Discover supported files in a path.
 
+    Symlinks are skipped for security (prevents path traversal attacks).
+
     Args:
         path: File or directory path
         recursive: Whether to search recursively
@@ -53,6 +58,11 @@ def discover_files(path: Path, recursive: bool = True) -> list[Path]:
     Returns:
         List of supported file paths
     """
+    # Security: Skip symlinks to prevent path traversal
+    if path.is_symlink():
+        logger.warning("Skipping symlink: %s", path)
+        return []
+
     if path.is_file():
         if is_supported_file(path):
             return [path]
@@ -65,6 +75,11 @@ def discover_files(path: Path, recursive: bool = True) -> list[Path]:
     pattern = "**/*" if recursive else "*"
 
     for ext in SUPPORTED_EXTENSIONS:
-        files.extend(path.glob(f"{pattern}{ext}"))
+        for file_path in path.glob(f"{pattern}{ext}"):
+            # Security: Skip symlinks in directory traversal
+            if file_path.is_symlink():
+                logger.warning("Skipping symlink: %s", file_path)
+                continue
+            files.append(file_path)
 
     return sorted(files)

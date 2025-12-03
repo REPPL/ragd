@@ -79,7 +79,9 @@ def index_document(
             filename=path.name,
             chunk_count=0,
             success=False,
-            error="No text extracted from document",
+            error=f"No text extracted from document (method: {result.extraction_method}, "
+                  f"file size: {path.stat().st_size} bytes). "
+                  "Document may be image-only, encrypted, or empty.",
         )
 
     # Apply text normalisation
@@ -126,13 +128,17 @@ def index_document(
     )
 
     if not chunks:
+        # Provide detailed diagnostics for why chunking failed
+        text_len = len(text)
+        min_size = config.chunking.min_chunk_size
         return IndexResult(
             document_id=document_id,
             path=str(path),
             filename=path.name,
             chunk_count=0,
             success=False,
-            error="No chunks generated from document",
+            error=f"No chunks generated (extracted {text_len} chars, min_chunk_size={min_size}). "
+                  f"Text too short or filtered out. Method: {result.extraction_method}",
         )
 
     # Determine if contextual retrieval is enabled

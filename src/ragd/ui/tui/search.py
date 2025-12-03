@@ -121,9 +121,9 @@ class SearchNavigator(App):
     """
 
     BINDINGS = [
-        Binding("j", "next", "Next"),
+        Binding("j", "prev", "Previous"),
         Binding("down", "next", "Next", show=False),
-        Binding("k", "prev", "Previous"),
+        Binding("k", "next", "Next"),
         Binding("up", "prev", "Previous", show=False),
         Binding("q", "quit", "Quit"),
         Binding("escape", "quit", "Quit", show=False),

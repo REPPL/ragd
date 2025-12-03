@@ -7,9 +7,9 @@ Documentation for contributors and developers.
 | Area | Status |
 |------|--------|
 | Use Cases | 6 P0 briefs defined |
-| Features | v0.1 (9), v0.2 (12), v0.3 (4), v0.4 (1) = 26 features complete |
+| Features | v0.1 (9), v0.2 (12), v0.3 (4), v0.4 (1), v0.5 (4) = 30 features complete |
 | Tutorials | Getting Started + 3 v0.2 tutorials |
-| Milestone | v0.4.0 released |
+| Milestone | v0.5.0 released |
 | ADRs | 29+ architecture decisions |
 
 ## Structure
@@ -44,7 +44,15 @@ Layer 3: TUTORIALS (How users experience it)
 - [Planned Features](./features/planned/)
 - [Milestones](./milestones/)
 
-### v0.4.0 (Latest Release)
+### v0.5.0 (Latest Release)
+- [v0.5.0 Milestone](./milestones/v0.5.0.md)
+- [v0.5.0 Implementation](./implementation/v0.5.0.md)
+- [F-013: RAGAS Evaluation](./features/completed/F-013-ragas-evaluation.md)
+- [F-014: Agentic RAG](./features/completed/F-014-agentic-rag.md)
+- [F-020: Ollama LLM Integration](./features/completed/F-020-ollama-llm-integration.md)
+- [F-055: Multi-Model Orchestration](./features/completed/F-055-multi-model-orchestration.md)
+
+### v0.4.0 (Released)
 - [v0.4.0 Milestone](./milestones/v0.4.0.md)
 - [v0.4.0 Implementation](./implementation/v0.4.0.md)
 - [F-019: Multi-Modal Support](./features/completed/F-019-multi-modal-support.md)

@@ -13,6 +13,7 @@ Tutorials help newcomers get started with ragd through hands-on learning experie
 | Tutorial | Description | Status |
 |----------|-------------|--------|
 | [Getting Started](./getting-started.md) | Index and search your first documents | 📝 Draft |
+| [Powerful Searching](./powerful-searching.md) | Advanced search techniques and filters | 📝 Draft |
 
 ### Document Processing (v0.2)
 
@@ -21,6 +22,12 @@ Tutorials help newcomers get started with ragd through hands-on learning experie
 | [Processing Difficult PDFs](./processing-difficult-pdfs.md) | Handle scanned and complex PDFs | 📝 Draft |
 | [Organising Your Knowledge Base](./organising-knowledge-base.md) | Use tags and metadata effectively | 📝 Draft |
 | [Backing Up Your Data](./backing-up-data.md) | Export and restore your knowledge base | 📝 Draft |
+
+### Chat Interface (v0.5)
+
+| Tutorial | Description | Status |
+|----------|-------------|--------|
+| [Chatting with Your Knowledge](./chatting-with-your-knowledge.md) | Have conversations about your documents | ✅ Complete |
 
 ## Tutorial Guidelines
 

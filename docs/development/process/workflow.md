@@ -224,7 +224,7 @@ ragd defines version in **two places** that must stay synchronised:
 
 **Always update BOTH files when changing version.**
 
-See `ragd/.claude/CLAUDE.md` for detailed version management instructions.
+See project documentation for detailed version management instructions.
 
 ### Rules
 

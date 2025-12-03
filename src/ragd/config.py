@@ -6,11 +6,16 @@ using Pydantic models and YAML storage.
 
 from __future__ import annotations
 
+import logging
+import os
+import stat
 from pathlib import Path
 from typing import Any
 
 import yaml
 from pydantic import BaseModel, Field
+
+logger = logging.getLogger(__name__)
 
 from ragd.hardware import HardwareTier, detect_hardware, get_recommendations
 
@@ -209,6 +214,30 @@ def create_default_config() -> RagdConfig:
     )
 
 
+def _check_config_permissions(path: Path) -> None:
+    """Check config file permissions and warn if too permissive.
+
+    Security: Config files should not be world-readable as they may
+    contain sensitive paths or future credentials.
+
+    Args:
+        path: Path to config file
+    """
+    try:
+        mode = os.stat(path).st_mode
+        # Warn if group or other have any permissions
+        if mode & (stat.S_IRWXG | stat.S_IRWXO):
+            logger.warning(
+                "Config file %s has permissive mode %s. "
+                "Consider: chmod 600 %s",
+                path,
+                oct(mode & 0o777),
+                path,
+            )
+    except OSError:
+        pass  # File may not exist or be inaccessible
+
+
 def load_config(config_path: Path | None = None) -> RagdConfig:
     """Load configuration from file or create defaults.
 
@@ -221,6 +250,7 @@ def load_config(config_path: Path | None = None) -> RagdConfig:
     path = config_path or DEFAULT_CONFIG_PATH
 
     if path.exists():
+        _check_config_permissions(path)
         with open(path) as f:
             data = yaml.safe_load(f) or {}
         return RagdConfig.model_validate(data)

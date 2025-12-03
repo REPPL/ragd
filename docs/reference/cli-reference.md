@@ -1,6 +1,6 @@
 # CLI Reference
 
-Complete command reference for ragd v0.1.0.
+Complete command reference for ragd v0.5.0.
 
 ## Synopsis
 
@@ -472,6 +472,292 @@ Suggestions:
 
 ---
 
+### ragd ask
+
+Ask a question and get an AI-generated answer from your knowledge base.
+
+#### Synopsis
+
+```
+ragd ask <QUERY> [OPTIONS]
+```
+
+#### Description
+
+Combines retrieval with LLM generation:
+1. Retrieves relevant chunks from the knowledge base
+2. Sends context and query to local LLM (Ollama)
+3. Returns AI-generated answer with citations
+
+Requires Ollama to be running with a compatible model.
+
+#### Arguments
+
+| Argument | Description | Required |
+|----------|-------------|----------|
+| `QUERY` | Natural language question | Yes |
+
+#### Options
+
+| Option | Short | Description | Default |
+|--------|-------|-------------|---------|
+| `--model` | `-m` | Override LLM model | Config value |
+| `--temperature` | `-t` | Sampling temperature (0.0-2.0) | `0.7` |
+| `--agentic` | | Enable agentic RAG (CRAG + Self-RAG) | Auto |
+| `--no-agentic` | | Disable agentic RAG | |
+| `--show-confidence` | | Display confidence scores | `false` |
+| `--cite` | | Citation style: `none`, `numbered`, `inline` | `numbered` |
+| `--limit` | `-n` | Max context chunks | `5` |
+
+#### Examples
+
+```bash
+# Basic question
+ragd ask "What authentication methods are used?"
+
+# Use specific model
+ragd ask "Summarise the security policy" --model llama3.2:8b
+
+# Enable agentic mode with confidence
+ragd ask "Explain the architecture" --agentic --show-confidence
+
+# Disable citations
+ragd ask "What is the conclusion?" --cite none
+```
+
+#### Output
+
+```
+ragd ask "What authentication methods are used?"
+
+Searching knowledge base...
+
+Based on your documents, the main authentication methods are:
+
+1. **OAuth 2.0** - Used for third-party integrations
+2. **JWT tokens** - For API authentication
+3. **Session cookies** - For web application state
+
+[Sources: security-policy.pdf:12, api-docs.md:45]
+```
+
+#### Exit Codes
+
+| Code | Meaning |
+|------|---------|
+| 0 | Success |
+| 1 | LLM error or generation failed |
+| 69 | Ollama unavailable |
+
+---
+
+### ragd chat
+
+Start an interactive chat session with your knowledge base.
+
+#### Synopsis
+
+```
+ragd chat [OPTIONS]
+```
+
+#### Description
+
+Opens an interactive REPL for conversational queries:
+- Maintains conversation history across turns
+- Context-aware follow-up questions
+- Streaming response output
+- Chat commands for session management
+
+#### Options
+
+| Option | Short | Description | Default |
+|--------|-------|-------------|---------|
+| `--model` | `-m` | Override LLM model | Config value |
+| `--session` | `-s` | Session name to resume | New session |
+| `--agentic` | | Force agentic mode | Auto |
+
+#### Chat Commands
+
+| Command | Description |
+|---------|-------------|
+| `/help` | Show available commands |
+| `/clear` | Clear conversation history |
+| `/history` | Show conversation history |
+| `/sources` | Show sources from last response |
+| `/model <name>` | Switch to different model |
+| `/exit` or `/quit` | Exit chat session |
+
+#### Examples
+
+```bash
+# Start new chat session
+ragd chat
+
+# Use specific model
+ragd chat --model qwen2.5:7b
+
+# Resume named session
+ragd chat --session project-research
+```
+
+#### Interactive Session
+
+```
+ragd chat
+
+Welcome to ragd chat! Type /help for commands, /exit to quit.
+Model: llama3.2:3b
+
+> What is the main topic of my documents?
+
+Based on your indexed documents, the main topics are software
+architecture and API design...
+
+> Tell me more about the API design
+
+The API design follows REST principles with these key patterns...
+
+> /sources
+[1] api-design.pdf:5-8
+[2] architecture.md:12
+
+> /exit
+Session saved. Goodbye!
+```
+
+---
+
+### ragd evaluate
+
+Evaluate retrieval and response quality.
+
+#### Synopsis
+
+```
+ragd evaluate [OPTIONS]
+```
+
+#### Description
+
+Runs evaluation metrics on queries:
+- Context Precision - How relevant are retrieved chunks
+- Context Recall - Ground truth comparison
+- Relevance Score - Position-weighted ranking
+- NDCG - Normalised discounted cumulative gain
+
+#### Options
+
+| Option | Short | Description | Default |
+|--------|-------|-------------|---------|
+| `--query` | `-q` | Single query to evaluate | |
+| `--test-file` | `-f` | YAML/JSON file with test queries | |
+| `--expected` | `-e` | Expected document(s) for recall | |
+| `--limit` | `-n` | Number of results to evaluate | `10` |
+| `--threshold` | | Relevance threshold | `0.3` |
+| `--no-save` | | Don't save results | `false` |
+
+#### Examples
+
+```bash
+# Evaluate single query
+ragd evaluate --query "What is machine learning?"
+
+# With expected documents
+ragd evaluate --query "security policy" --expected policy.pdf
+
+# Batch evaluation from file
+ragd evaluate --test-file tests/golden_queries.yaml
+```
+
+#### Test File Format
+
+```yaml
+# tests/golden_queries.yaml
+queries:
+  - query: "What is machine learning?"
+    expected_docs:
+      - intro.pdf
+      - ml-chapter.md
+  - query: "Authentication methods"
+    expected_docs:
+      - security.pdf
+```
+
+#### Output
+
+```
+ragd evaluate --query "What is machine learning?"
+
+Evaluating query...
+
+Query: "What is machine learning?"
+
+Metrics:
+  Context Precision: 0.85
+  Relevance Score: 0.78
+  NDCG@10: 0.82
+  Reciprocal Rank: 1.0
+
+Top Results:
+  [1] intro.pdf:12 (0.94) ✓
+  [2] ml-chapter.md:5 (0.87) ✓
+  [3] notes.txt:3 (0.72)
+```
+
+---
+
+### ragd models
+
+Manage LLM models via Ollama.
+
+#### Synopsis
+
+```
+ragd models <COMMAND> [OPTIONS]
+```
+
+#### Subcommands
+
+| Command | Description |
+|---------|-------------|
+| `list` | List available models |
+| `status` | Show loaded models and memory |
+| `pull <model>` | Download a model |
+| `set <key> <value>` | Set model configuration |
+
+#### Examples
+
+```bash
+# List available models
+ragd models list
+
+# Show what's loaded
+ragd models status
+
+# Pull a new model
+ragd models pull qwen2.5:3b
+
+# Set default model
+ragd models set default llama3.2:8b
+```
+
+#### Output (list)
+
+```
+ragd models list
+
+Available Models:
+  llama3.2:3b     2.0 GB  ✓ Loaded
+  llama3.2:8b     4.7 GB
+  qwen2.5:3b      1.9 GB  ✓ Loaded
+  qwen2.5:7b      4.4 GB
+
+Default: llama3.2:3b
+```
+
+---
+
 ## Exit Codes Reference
 
 ragd uses standard sysexits.h codes where applicable:
@@ -535,4 +821,4 @@ ragd config validate
 
 ---
 
-**Status**: Reference specification for v0.1.0
+**Status**: Reference specification for v0.5.0
