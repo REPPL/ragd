@@ -18,6 +18,10 @@ Implementation records capture technical details of completed features. They ans
 | [v0.6.0](./v0.6.0.md) | Storage - Backend abstraction, FAISS integration, score normalisation | Complete |
 | [v0.6.5](./v0.6.5.md) | Polish & Stability - RAGAS metrics, CLI improvements, config validation | Complete |
 | [v0.7.0](./v0.7.0.md) | Privacy & Security - Encryption, session management, secure deletion, PII detection | Complete |
+| [v0.8.0](./v0.8.0.md) | Intelligence Foundation - Tag provenance, data sensitivity tiers | Complete |
+| [v0.8.1](./v0.8.1.md) | Intelligent Tagging - Smart collections, auto-tag suggestions, tag library | Complete |
+| [v0.8.2](./v0.8.2.md) | Retrieval Enhancements - Cross-encoder reranking, query decomposition | Complete |
+| [v0.8.5](./v0.8.5.md) | Knowledge Graph - Entity extraction, graph storage, co-occurrence relationships | Complete |
 
 ## Record Template
 

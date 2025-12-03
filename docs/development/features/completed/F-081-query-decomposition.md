@@ -1,4 +1,4 @@
-# F-066: Query Decomposition
+# F-081: Query Decomposition
 
 ## Problem Statement
 
@@ -63,7 +63,7 @@ Results merged with provenance tracking.
 
 ## Related Documentation
 
-- [F-065: Cross-Encoder Reranking](./F-065-cross-encoder-reranking.md)
+- [F-080: Cross-Encoder Reranking](./F-080-cross-encoder-reranking.md)
 - [Query Parser](../../../reference/search/query.md)
 
 ---

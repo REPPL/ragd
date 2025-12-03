@@ -135,17 +135,35 @@ Features are the primary unit of work. Each feature specification describes:
 | [F-017](./completed/F-017-secure-deletion.md) | Secure Deletion | ✅ Complete | ADR-0009 |
 | [F-023](./completed/F-023-pii-detection.md) | PII Detection | ✅ Complete | State-of-the-Art Privacy |
 
-#### Deferred to v0.7.5
+### v0.8 Features (Intelligence & Organisation)
+
+#### v0.8.0 - Foundation
 
 | ID | Feature | Status | Research |
 |----|---------|--------|----------|
-| [F-018](./planned/F-018-data-tiers.md) | Data Sensitivity Tiers | 📅 Planned | ADR-0010 |
+| [F-064](./completed/F-064-tag-provenance.md) | Tag Provenance | ✅ Complete | - |
+| [F-018](./completed/F-018-data-tiers.md) | Data Sensitivity Tiers | ✅ Complete | ADR-0010 |
 
-### v0.8 Features (Intelligence)
+#### v0.8.1 - Intelligent Tagging
 
 | ID | Feature | Status | Research |
 |----|---------|--------|----------|
-| [F-022](./planned/F-022-knowledge-graph.md) | Knowledge Graph Integration | 📅 Planned | State-of-the-Art Knowledge Graphs |
+| [F-061](./completed/F-061-auto-tag-suggestions.md) | Auto-Tag Suggestions | ✅ Complete | - |
+| [F-062](./completed/F-062-tag-library.md) | Tag Library | ✅ Complete | - |
+| [F-063](./completed/F-063-smart-collections.md) | Smart Collections | ✅ Complete | - |
+
+#### v0.8.2 - Retrieval Enhancements
+
+| ID | Feature | Status | Research |
+|----|---------|--------|----------|
+| [F-080](./completed/F-080-cross-encoder-reranking.md) | Cross-Encoder Reranking | ✅ Complete | State-of-the-Art RAG |
+| [F-081](./completed/F-081-query-decomposition.md) | Query Decomposition | ✅ Complete | State-of-the-Art RAG |
+
+#### v0.8.5 - Knowledge Graph
+
+| ID | Feature | Status | Research |
+|----|---------|--------|----------|
+| [F-022](./completed/F-022-knowledge-graph.md) | Knowledge Graph Integration | ✅ Complete | State-of-the-Art Knowledge Graphs |
 
 ### v1.0 Features (Platform)
 
@@ -208,8 +226,11 @@ Features are numbered sequentially with milestone-based ranges:
 | F-021, F-070 to F-074 | v0.6.0 | Storage |
 | F-076 to F-079 | v0.6.5 | Polish & Stability |
 | F-065, F-066 | v0.7 | Chat Improvements |
-| F-015 to F-018, F-023 | v0.7 | Privacy & Security |
-| F-022 | v0.8 | Intelligence |
+| F-015 to F-017, F-023 | v0.7 | Privacy & Security |
+| F-064, F-018 | v0.8.0 | Intelligence Foundation |
+| F-061, F-062, F-063 | v0.8.1 | Intelligent Tagging |
+| F-080, F-081 | v0.8.2 | Retrieval Enhancements |
+| F-022 | v0.8.5 | Knowledge Graph |
 | F-024, F-056, F-057 | v1.0+ | Platform & Multi-Model Advanced |
 | F-040, F-043 | v2.0-alpha | Memory Layer |
 | F-041, F-042 | v2.0-beta | Persona Agents |
