@@ -58,6 +58,13 @@ from ragd.ui.cli import (
     # Deletion commands
     delete_command,
     delete_audit_command,
+    # Tier commands
+    tier_set_command,
+    tier_show_command,
+    tier_list_command,
+    tier_summary_command,
+    tier_promote_command,
+    tier_demote_command,
 )
 
 app = typer.Typer(
@@ -70,6 +77,7 @@ console = Console()
 # Subcommand groups
 meta_app = typer.Typer(help="Manage document metadata.")
 tag_app = typer.Typer(help="Manage document tags.")
+tier_app = typer.Typer(help="Manage data sensitivity tiers.")
 watch_app = typer.Typer(help="Watch folders for automatic indexing.")
 models_app = typer.Typer(help="Manage LLM models.")
 backend_app = typer.Typer(help="Manage vector store backends.")
@@ -77,6 +85,7 @@ password_app = typer.Typer(help="Manage encryption password.")
 session_app = typer.Typer(help="Manage encryption session.")
 app.add_typer(meta_app, name="meta")
 app.add_typer(tag_app, name="tag")
+app.add_typer(tier_app, name="tier")
 app.add_typer(watch_app, name="watch")
 app.add_typer(models_app, name="models")
 app.add_typer(backend_app, name="backend")
@@ -449,6 +458,122 @@ def tag_list(
         document_id=document_id,
         show_counts=show_counts,
         output_format=output_format,  # type: ignore
+        no_color=no_color,
+    )
+
+
+# --- Tier subcommands ---
+
+@tier_app.command("set")
+def tier_set(
+    document_id: Annotated[str, typer.Argument(help="Document ID to update.")],
+    tier: Annotated[str, typer.Argument(help="Tier: public, personal, sensitive, critical.")],
+    no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
+) -> None:
+    """Set the sensitivity tier for a document.
+
+    Tiers control access requirements:
+      - public: Always accessible
+      - personal: Default, requires basic auth
+      - sensitive: Requires active session
+      - critical: Requires session + confirmation
+
+    Examples:
+        ragd tier set doc-123 sensitive
+        ragd tier set doc-456 critical
+    """
+    tier_set_command(
+        document_id=document_id,
+        tier=tier,
+        no_color=no_color,
+    )
+
+
+@tier_app.command("show")
+def tier_show(
+    document_id: Annotated[str, typer.Argument(help="Document ID to query.")],
+    no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
+) -> None:
+    """Show the sensitivity tier for a document.
+
+    Examples:
+        ragd tier show doc-123
+    """
+    tier_show_command(
+        document_id=document_id,
+        no_color=no_color,
+    )
+
+
+@tier_app.command("list")
+def tier_list(
+    tier: Annotated[str | None, typer.Argument(help="Filter by tier (optional).")] = None,
+    output_format: FormatOption = "rich",
+    no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
+) -> None:
+    """List documents by tier.
+
+    Without a tier argument, shows counts for all tiers.
+    With a tier argument, lists documents in that tier.
+
+    Examples:
+        ragd tier list              # Show tier counts
+        ragd tier list sensitive    # List sensitive documents
+    """
+    tier_list_command(
+        tier=tier,
+        output_format=output_format,  # type: ignore
+        no_color=no_color,
+    )
+
+
+@tier_app.command("summary")
+def tier_summary(
+    output_format: FormatOption = "rich",
+    no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
+) -> None:
+    """Show tier distribution summary.
+
+    Displays a visual breakdown of document counts per tier.
+
+    Examples:
+        ragd tier summary
+        ragd tier summary --format json
+    """
+    tier_summary_command(
+        output_format=output_format,  # type: ignore
+        no_color=no_color,
+    )
+
+
+@tier_app.command("promote")
+def tier_promote(
+    document_id: Annotated[str, typer.Argument(help="Document ID to promote.")],
+    no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
+) -> None:
+    """Increase document sensitivity by one level.
+
+    Examples:
+        ragd tier promote doc-123  # personal -> sensitive
+    """
+    tier_promote_command(
+        document_id=document_id,
+        no_color=no_color,
+    )
+
+
+@tier_app.command("demote")
+def tier_demote(
+    document_id: Annotated[str, typer.Argument(help="Document ID to demote.")],
+    no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
+) -> None:
+    """Decrease document sensitivity by one level.
+
+    Examples:
+        ragd tier demote doc-123  # sensitive -> personal
+    """
+    tier_demote_command(
+        document_id=document_id,
         no_color=no_color,
     )
 

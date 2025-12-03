@@ -68,6 +68,14 @@ from ragd.security.deletion import (
     Overwriter,
     SecureDeleter,
 )
+from ragd.security.tiers import (
+    DataTier,
+    TierAccessError,
+    TierConfig,
+    TierManager,
+    get_tier_colour,
+    get_tier_icon,
+)
 
 __all__ = [
     # Crypto
@@ -110,4 +118,11 @@ __all__ = [
     "DeletionResult",
     "Overwriter",
     "SecureDeleter",
+    # Tiers
+    "DataTier",
+    "TierAccessError",
+    "TierConfig",
+    "TierManager",
+    "get_tier_colour",
+    "get_tier_icon",
 ]

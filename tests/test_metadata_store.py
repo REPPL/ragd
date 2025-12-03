@@ -14,12 +14,14 @@ from ragd.metadata import (
     SCHEMA_V1,
     SCHEMA_V2,
     SCHEMA_V2_1,
+    SCHEMA_V2_2,
     DocumentMetadata,
     MetadataStore,
     get_schema_version,
     migrate_to_current,
     migrate_v1_to_v2,
     migrate_v2_to_v2_1,
+    migrate_v2_1_to_v2_2,
     needs_migration,
 )
 
@@ -30,7 +32,7 @@ class TestDocumentMetadata:
     def test_default_values(self) -> None:
         """Test default values for DocumentMetadata."""
         meta = DocumentMetadata()
-        assert meta.ragd_schema_version == "2.1"
+        assert meta.ragd_schema_version == "2.2"  # Updated for v2.2
         assert meta.dc_title == ""
         assert meta.dc_creator == []
         assert meta.dc_language == "en"
@@ -39,6 +41,8 @@ class TestDocumentMetadata:
         assert meta.ragd_sensitivity == "public"
         assert meta.ragd_embedding_model == ""
         assert meta.ragd_embedding_dimension == 0
+        # v2.2 fields
+        assert meta.ragd_data_tier == "personal"
 
     def test_with_values(self) -> None:
         """Test creating DocumentMetadata with values."""
@@ -137,8 +141,13 @@ class TestMigration:
         assert needs_migration(data) is True
 
     def test_needs_migration_v2_1(self) -> None:
-        """Test no migration needed for v2.1 data."""
+        """Test migration needed for v2.1 data (upgrades to v2.2)."""
         data = {"ragd_schema_version": "2.1"}
+        assert needs_migration(data) is True
+
+    def test_needs_migration_v2_2(self) -> None:
+        """Test no migration needed for v2.2 data."""
+        data = {"ragd_schema_version": "2.2"}
         assert needs_migration(data) is False
 
     def test_migrate_v1_to_v2(self) -> None:

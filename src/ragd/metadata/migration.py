@@ -19,7 +19,8 @@ logger = logging.getLogger(__name__)
 SCHEMA_V1 = "1.0"
 SCHEMA_V2 = "2.0"
 SCHEMA_V2_1 = "2.1"
-CURRENT_SCHEMA = SCHEMA_V2_1
+SCHEMA_V2_2 = "2.2"
+CURRENT_SCHEMA = SCHEMA_V2_2
 
 
 def get_schema_version(data: dict[str, Any]) -> str:
@@ -155,6 +156,71 @@ def migrate_v2_to_v2_1(
     return DocumentMetadata.from_dict(v2_data)
 
 
+def migrate_v2_1_to_v2_2(v2_1_data: dict[str, Any]) -> DocumentMetadata:
+    """Migrate v2.1 metadata to v2.2 schema.
+
+    v2.2 adds:
+    - ragd_data_tier: str (data sensitivity tier: public/personal/sensitive/critical)
+    - ragd_tags: list[TagEntry] (provenance-tracked tags)
+
+    Args:
+        v2_1_data: Dictionary with v2.1 schema fields
+
+    Returns:
+        DocumentMetadata instance with v2.2 schema
+    """
+    # Update version
+    v2_1_data["ragd_schema_version"] = SCHEMA_V2_2
+
+    # Convert string tags to TagEntry format (with "legacy" source)
+    tags = v2_1_data.get("ragd_tags", [])
+    new_tags = []
+    for tag in tags:
+        if isinstance(tag, str):
+            # Legacy string tag - convert to TagEntry dict
+            new_tags.append({
+                "name": tag,
+                "source": "legacy",
+                "confidence": None,
+                "created_at": None,
+                "created_by": None,
+            })
+        elif isinstance(tag, dict):
+            # Already in new format or partial
+            if "source" not in tag:
+                tag["source"] = "legacy"
+            new_tags.append(tag)
+        else:
+            # Unknown format, convert to string then TagEntry
+            new_tags.append({
+                "name": str(tag),
+                "source": "legacy",
+                "confidence": None,
+                "created_at": None,
+                "created_by": None,
+            })
+
+    v2_1_data["ragd_tags"] = new_tags
+
+    # Map old sensitivity to new data tier
+    sensitivity = v2_1_data.get("ragd_sensitivity", "public")
+    tier_map = {
+        "public": "public",
+        "internal": "personal",
+        "confidential": "sensitive",
+    }
+    v2_1_data.setdefault("ragd_data_tier", tier_map.get(sensitivity, "personal"))
+
+    logger.debug(
+        "Migrating v2.1→v2.2: %s (tags=%d, tier=%s)",
+        v2_1_data.get("ragd_source_path", "")[:50],
+        len(new_tags),
+        v2_1_data.get("ragd_data_tier"),
+    )
+
+    return DocumentMetadata.from_dict(v2_1_data)
+
+
 def migrate_to_current(
     data: dict[str, Any],
     embedding_model: str = "",
@@ -179,20 +245,26 @@ def migrate_to_current(
         return DocumentMetadata.from_dict(data)
 
     if version == SCHEMA_V1:
-        # Chain migrations: v1 → v2 → v2.1
+        # Chain migrations: v1 → v2 → v2.1 → v2.2
         v2_metadata = migrate_v1_to_v2(data)
-        return migrate_v2_to_v2_1(
+        v2_1_metadata = migrate_v2_to_v2_1(
             v2_metadata.to_dict(),
             embedding_model=embedding_model,
             embedding_dimension=embedding_dimension,
         )
+        return migrate_v2_1_to_v2_2(v2_1_metadata.to_dict())
 
     if version == SCHEMA_V2:
-        return migrate_v2_to_v2_1(
+        # Chain migrations: v2 → v2.1 → v2.2
+        v2_1_metadata = migrate_v2_to_v2_1(
             data,
             embedding_model=embedding_model,
             embedding_dimension=embedding_dimension,
         )
+        return migrate_v2_1_to_v2_2(v2_1_metadata.to_dict())
+
+    if version == SCHEMA_V2_1:
+        return migrate_v2_1_to_v2_2(data)
 
     raise ValueError(f"Unknown schema version: {version}")
 

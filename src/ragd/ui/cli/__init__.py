@@ -51,6 +51,15 @@ from ragd.ui.cli.deletion import (
     delete_audit_command,
 )
 
+from ragd.ui.cli.tiers import (
+    tier_set_command,
+    tier_show_command,
+    tier_list_command,
+    tier_summary_command,
+    tier_promote_command,
+    tier_demote_command,
+)
+
 from ragd.ui.cli.errors import (
     handle_dependency_errors,
     format_error_for_cli,
@@ -99,6 +108,13 @@ __all__ = [
     # Deletion commands
     "delete_command",
     "delete_audit_command",
+    # Tier commands
+    "tier_set_command",
+    "tier_show_command",
+    "tier_list_command",
+    "tier_summary_command",
+    "tier_promote_command",
+    "tier_demote_command",
     # Error handling
     "handle_dependency_errors",
     "format_error_for_cli",

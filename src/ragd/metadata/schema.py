@@ -10,7 +10,10 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from ragd.metadata.provenance import TagEntry
 
 
 @dataclass
@@ -22,10 +25,14 @@ class DocumentMetadata:
 
     Schema version is tracked for forward/backward compatibility during
     upgrades. See ADR-0023 for migration strategy.
+
+    v2.2 Changes:
+    - ragd_tags: Changed from list[str] to list[TagEntry] for provenance tracking
+    - ragd_data_tier: New field for data sensitivity classification
     """
 
     # Schema version for migration handling
-    ragd_schema_version: str = "2.1"
+    ragd_schema_version: str = "2.2"
 
     # Dublin Core Core Elements
     dc_title: str = ""
@@ -44,19 +51,55 @@ class DocumentMetadata:
     ragd_chunk_count: int = 0
     ragd_ingestion_date: datetime | None = None
     ragd_quality_score: float = 0.0
-    ragd_tags: list[str] = field(default_factory=list)
+    ragd_tags: list[Any] = field(default_factory=list)  # list[TagEntry] with Any for flexibility
     ragd_project: str = ""
 
     # v2.1 Extensions
-    ragd_sensitivity: str = "public"  # public | internal | confidential
+    ragd_sensitivity: str = "public"  # Deprecated in v2.2, use ragd_data_tier
     ragd_embedding_model: str = ""  # e.g., "all-MiniLM-L6-v2"
     ragd_embedding_dimension: int = 0  # e.g., 384
+
+    # v2.2 Extensions
+    ragd_data_tier: str = "personal"  # public | personal | sensitive | critical
+
+    @property
+    def tag_names(self) -> list[str]:
+        """Get tag names only (for backward compatibility).
+
+        Returns:
+            List of tag name strings.
+        """
+        from ragd.metadata.provenance import TagEntry
+
+        names: list[str] = []
+        for tag in self.ragd_tags:
+            if isinstance(tag, TagEntry):
+                names.append(tag.name)
+            elif isinstance(tag, dict):
+                names.append(tag.get("name", str(tag)))
+            else:
+                names.append(str(tag))
+        return names
 
     def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary for JSON storage.
 
         Handles datetime serialisation to ISO format strings.
+        TagEntry objects are serialised to dictionaries.
         """
+        from ragd.metadata.provenance import TagEntry
+
+        # Serialise tags (handle both TagEntry and legacy strings)
+        serialised_tags: list[Any] = []
+        for tag in self.ragd_tags:
+            if isinstance(tag, TagEntry):
+                serialised_tags.append(tag.to_dict())
+            elif isinstance(tag, dict):
+                serialised_tags.append(tag)
+            else:
+                # Legacy string tag
+                serialised_tags.append(str(tag))
+
         data = {
             "ragd_schema_version": self.ragd_schema_version,
             "dc_title": self.dc_title,
@@ -77,12 +120,14 @@ class DocumentMetadata:
                 else None
             ),
             "ragd_quality_score": self.ragd_quality_score,
-            "ragd_tags": self.ragd_tags,
+            "ragd_tags": serialised_tags,
             "ragd_project": self.ragd_project,
             # v2.1 Extensions
             "ragd_sensitivity": self.ragd_sensitivity,
             "ragd_embedding_model": self.ragd_embedding_model,
             "ragd_embedding_dimension": self.ragd_embedding_dimension,
+            # v2.2 Extensions
+            "ragd_data_tier": self.ragd_data_tier,
         }
         return data
 
@@ -95,6 +140,7 @@ class DocumentMetadata:
         """Create from stored dictionary.
 
         Handles datetime deserialisation from ISO format strings.
+        Tags are kept as-is (dicts or strings) for lazy normalisation.
         """
         # Parse datetime fields
         dc_date = None
@@ -104,6 +150,18 @@ class DocumentMetadata:
         ingestion_date = None
         if data.get("ragd_ingestion_date"):
             ingestion_date = datetime.fromisoformat(data["ragd_ingestion_date"])
+
+        # Handle data tier - fall back to sensitivity for backward compat
+        data_tier = data.get("ragd_data_tier")
+        if not data_tier:
+            # Map old sensitivity to new tier
+            sensitivity = data.get("ragd_sensitivity", "public")
+            tier_map = {
+                "public": "public",
+                "internal": "personal",
+                "confidential": "sensitive",
+            }
+            data_tier = tier_map.get(sensitivity, "personal")
 
         return cls(
             ragd_schema_version=data.get("ragd_schema_version", "2.0"),
@@ -127,6 +185,8 @@ class DocumentMetadata:
             ragd_sensitivity=data.get("ragd_sensitivity", "public"),
             ragd_embedding_model=data.get("ragd_embedding_model", ""),
             ragd_embedding_dimension=data.get("ragd_embedding_dimension", 0),
+            # v2.2 Extensions
+            ragd_data_tier=data_tier,
         )
 
     @classmethod

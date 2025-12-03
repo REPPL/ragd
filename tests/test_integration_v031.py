@@ -93,11 +93,15 @@ class TestSchemaV21Integration:
         assert migrated.dc_title == "Legacy Document"
         assert migrated.dc_creator == ["Author One", "Author Two"]
         assert migrated.ragd_source_path == "/legacy/doc.pdf"
-        assert migrated.ragd_tags == ["important", "archived"]
+        # v2.2 converts string tags to TagEntry dicts with "legacy" source
+        assert migrated.tag_names == ["important", "archived"]
+        # Verify provenance tracking was added
+        assert all(isinstance(t, dict) for t in migrated.ragd_tags)
+        assert migrated.ragd_tags[0]["source"] == "legacy"
         assert migrated.ragd_project == "legacy-project"
 
-        # Verify new fields added
-        assert migrated.ragd_schema_version == "2.1"
+        # Verify new fields added (now migrates to v2.2)
+        assert migrated.ragd_schema_version == "2.2"
         assert migrated.ragd_sensitivity == "public"  # default
         assert migrated.ragd_embedding_model == "all-MiniLM-L6-v2"
         assert migrated.ragd_embedding_dimension == 384
@@ -418,7 +422,7 @@ class TestEndToEndWorkflow:
         # 3. Verify retrieval
         retrieved = store.get("doc-complete")
         assert retrieved is not None
-        assert retrieved.ragd_schema_version == "2.1"
+        assert retrieved.ragd_schema_version == "2.2"  # Updated for v2.2 schema
         assert retrieved.ragd_sensitivity == "internal"
         assert retrieved.ragd_embedding_model == "all-MiniLM-L6-v2"
 
