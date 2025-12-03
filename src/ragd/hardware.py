@@ -157,7 +157,7 @@ TIER_RECOMMENDATIONS: dict[HardwareTier, dict[str, str]] = {
     },
     HardwareTier.EXTREME: {
         "embedding_model": "all-mpnet-base-v2",
-        "llm_model": "qwen2.5:72b",
+        "llm_model": "llama3.1:70b",  # Fallback - init uses dynamic detection
         "chunk_size": "1024",
     },
 }
@@ -173,3 +173,49 @@ def get_recommendations(tier: HardwareTier) -> dict[str, str]:
         Dictionary of recommended settings
     """
     return TIER_RECOMMENDATIONS.get(tier, TIER_RECOMMENDATIONS[HardwareTier.STANDARD])
+
+
+# Extreme tier model candidates (in preference order)
+EXTREME_TIER_MODELS = [
+    "llama3.1:70b",
+    "qwen2.5:32b",
+    "mixtral:8x22b",
+    "command-r-plus",
+    "llama3.3:70b",
+    "deepseek-coder:33b",
+]
+
+
+def get_extreme_tier_model(installed_models: list[str] | None = None) -> str:
+    """Get the best LLM model for EXTREME tier.
+
+    Checks installed models first, returns first available extreme-tier model.
+    Falls back to llama3.1:70b (recommended for download) if none installed.
+
+    Args:
+        installed_models: List of installed model names (from Ollama).
+                         If None, returns default recommendation.
+
+    Returns:
+        Model name to use for EXTREME tier
+    """
+    if installed_models is None:
+        return TIER_RECOMMENDATIONS[HardwareTier.EXTREME]["llm_model"]
+
+    # Normalise model names for comparison (handle tags like :latest)
+    installed_base = {m.split(":")[0].lower() for m in installed_models}
+    installed_full = {m.lower() for m in installed_models}
+
+    # Check for installed extreme-tier models
+    for model in EXTREME_TIER_MODELS:
+        model_base = model.split(":")[0].lower()
+        # Check both full name and base name
+        if model.lower() in installed_full or model_base in installed_base:
+            # Return the actual installed name if we matched on base
+            for installed in installed_models:
+                if installed.lower().startswith(model_base):
+                    return installed
+            return model
+
+    # None installed, return default recommendation
+    return TIER_RECOMMENDATIONS[HardwareTier.EXTREME]["llm_model"]

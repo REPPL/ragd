@@ -52,7 +52,12 @@ def init_command(
         save_config,
         config_exists,
     )
-    from ragd.hardware import detect_hardware, get_recommendations
+    from ragd.hardware import (
+        detect_hardware,
+        get_recommendations,
+        get_extreme_tier_model,
+        HardwareTier,
+    )
 
     con = get_console(no_color)
 
@@ -79,9 +84,27 @@ def init_command(
 
     # Get recommendations
     recommendations = get_recommendations(hw_info.tier)
+
+    # For EXTREME tier, check installed models for dynamic selection
+    llm_model = recommendations["llm_model"]
+    if hw_info.tier == HardwareTier.EXTREME:
+        try:
+            from ragd.llm import OllamaClient, ModelRegistry
+
+            client = OllamaClient()
+            registry = ModelRegistry(client)
+            installed = registry.list_available(refresh=True)
+            installed_names = [m.name for m in installed] if installed else []
+            llm_model = get_extreme_tier_model(installed_names)
+            if installed_names and llm_model != recommendations["llm_model"]:
+                con.print(f"[dim]Found installed extreme-tier model: {llm_model}[/dim]")
+        except Exception:
+            # Ollama not running or error - use default
+            pass
+
     con.print(f"\n[bold]Recommended settings:[/bold]")
     con.print(f"  • Embedding model: {recommendations['embedding_model']}")
-    con.print(f"  • LLM model: {recommendations['llm_model']}")
+    con.print(f"  • LLM model: {llm_model}")
     con.print(f"  • Chunk size: {recommendations['chunk_size']} tokens")
 
     # Check if config exists
@@ -97,6 +120,47 @@ def init_command(
 
     con.print(f"\n[green]✓[/green] Configuration saved to ~/.ragd/config.yaml")
     con.print(f"[green]✓[/green] Data directory created at ~/.ragd/")
+
+    # Download required models and data
+    con.print("\n[bold]Downloading required models...[/bold]")
+
+    # Download embedding model
+    from ragd.embedding import is_model_cached, download_model
+
+    embedding_model = recommendations["embedding_model"]
+    if is_model_cached(embedding_model):
+        con.print(f"[green]✓[/green] Embedding model already cached: {embedding_model}")
+    else:
+        with Progress(
+            SpinnerColumn(),
+            TextColumn("[progress.description]{task.description}"),
+            console=con,
+        ) as progress:
+            task = progress.add_task(
+                f"Downloading embedding model ({embedding_model})...", total=None
+            )
+            download_model(embedding_model, device=hw_info.backend)
+            progress.update(task, completed=True)
+        con.print(f"[green]✓[/green] Downloaded embedding model: {embedding_model}")
+
+    # Download NLTK data
+    import nltk
+
+    try:
+        nltk.data.find("tokenizers/punkt")
+        con.print("[green]✓[/green] NLTK tokeniser data already available")
+    except LookupError:
+        with Progress(
+            SpinnerColumn(),
+            TextColumn("[progress.description]{task.description}"),
+            console=con,
+        ) as progress:
+            task = progress.add_task("Downloading NLTK tokeniser data...", total=None)
+            nltk.download("punkt", quiet=True)
+            nltk.download("punkt_tab", quiet=True)
+            progress.update(task, completed=True)
+        con.print("[green]✓[/green] Downloaded NLTK tokeniser data")
+
     con.print("\n[bold green]ragd is ready![/bold green]")
     con.print("\nNext steps:")
     con.print("  • Index documents: [cyan]ragd index <path>[/cyan]")
@@ -168,14 +232,17 @@ def index_command(
         ) as progress:
             task = progress.add_task("Indexing...", total=total_files)
 
-            def progress_callback(current: int, total: int, filename: str) -> None:
-                progress.update(
-                    task,
-                    completed=current,
-                    description=f"[dim]{filename[:40]}...[/dim]"
-                    if len(filename) > 40
-                    else f"[dim]{filename}[/dim]",
-                )
+            def progress_callback(completed: int, total: int, filename: str) -> None:
+                # completed = number of files finished, filename = current file (empty when done)
+                if filename:
+                    desc = (
+                        f"[dim]{filename[:40]}...[/dim]"
+                        if len(filename) > 40
+                        else f"[dim]{filename}[/dim]"
+                    )
+                else:
+                    desc = "[green]Complete[/green]"
+                progress.update(task, completed=completed, description=desc)
 
             results = index_path(
                 path,
@@ -184,9 +251,6 @@ def index_command(
                 skip_duplicates=skip_duplicates,
                 progress_callback=progress_callback,
                 contextual=use_contextual,
-            )
-            progress.update(
-                task, completed=total_files, description="[green]Complete[/green]"
             )
     else:
         # Verbose mode (old behaviour) or non-rich output
@@ -1326,7 +1390,7 @@ def models_list_command(
     config = load_config()
 
     # Check Ollama connection
-    client = OllamaClient(base_url=config.llm.ollama_url, model=config.llm.model)
+    client = OllamaClient(base_url=config.llm.base_url, model=config.llm.model)
 
     try:
         registry = ModelRegistry(client)

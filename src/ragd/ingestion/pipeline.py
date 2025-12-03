@@ -348,8 +348,9 @@ def index_path(
 
     try:
         for i, file_path in enumerate(files):
+            # Show current file being processed (completed count is i, not i+1)
             if progress_callback:
-                progress_callback(i + 1, total, file_path.name)
+                progress_callback(i, total, file_path.name)
 
             result = index_document(
                 file_path,
@@ -360,6 +361,10 @@ def index_path(
                 contextual=contextual,
             )
             results.append(result)
+
+        # Final callback to mark all complete
+        if progress_callback:
+            progress_callback(total, total, "")
     finally:
         bm25_index.close()
 

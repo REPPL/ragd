@@ -160,3 +160,62 @@ def get_embedder(
         )
 
     return _embedder
+
+
+def is_model_cached(model_name: str = "all-MiniLM-L6-v2") -> bool:
+    """Check if an embedding model is already cached locally.
+
+    Args:
+        model_name: Name of the sentence-transformers model
+
+    Returns:
+        True if model is available locally (no download needed)
+    """
+    from pathlib import Path
+    import os
+
+    # sentence-transformers uses huggingface_hub caching
+    # Check both the cache directory and the model-specific path
+    cache_dir = Path(os.environ.get("SENTENCE_TRANSFORMERS_HOME", "")) or (
+        Path.home() / ".cache" / "torch" / "sentence_transformers"
+    )
+
+    # Also check huggingface cache
+    hf_cache = Path(os.environ.get("HF_HOME", "")) or (
+        Path.home() / ".cache" / "huggingface" / "hub"
+    )
+
+    # Model names get normalised (/ replaced with --)
+    safe_name = model_name.replace("/", "--")
+
+    # Check sentence-transformers cache
+    if cache_dir.exists():
+        for item in cache_dir.iterdir():
+            if safe_name in item.name or model_name in item.name:
+                return True
+
+    # Check huggingface cache
+    if hf_cache.exists():
+        for item in hf_cache.iterdir():
+            if safe_name in item.name or model_name.replace("/", "_") in item.name:
+                return True
+
+    return False
+
+
+def download_model(
+    model_name: str = "all-MiniLM-L6-v2",
+    device: str | None = None,
+) -> None:
+    """Pre-download an embedding model.
+
+    This function downloads the model to the local cache so it's available
+    for offline use. Call during setup (ragd init) to avoid downloads
+    during indexing operations.
+
+    Args:
+        model_name: Name of the sentence-transformers model
+        device: Device to use (cuda, mps, cpu, or None for auto)
+    """
+    # Simply loading the model will download it if not cached
+    _ = SentenceTransformer(model_name, device=device)
