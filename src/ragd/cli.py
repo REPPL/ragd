@@ -90,6 +90,21 @@ from ragd.ui.cli import (
     library_promote_command,
     library_pending_command,
     library_stats_command,
+    # Config wizard (F-088)
+    run_config_wizard,
+    # Config debugging (F-097)
+    show_effective_config,
+    show_config_diff,
+    show_config_source,
+    validate_config,
+    # Config migration (F-096)
+    migrate_config,
+    rollback_config,
+    needs_migration,
+    # Help system (F-089)
+    show_extended_help,
+    show_examples,
+    list_help_topics,
 )
 
 app = typer.Typer(
@@ -333,15 +348,57 @@ def config(
     validate: bool = typer.Option(
         False, "--validate", "-v", help="Validate configuration and detect issues."
     ),
+    effective: bool = typer.Option(False, "--effective", "-e", help="Show effective config with defaults."),
+    diff: bool = typer.Option(False, "--diff", "-d", help="Show only non-default values."),
+    source: bool = typer.Option(False, "--source", help="Show config value sources."),
+    interactive: bool = typer.Option(False, "--interactive", "-i", help="Interactive configuration wizard."),
+    migrate: bool = typer.Option(False, "--migrate", help="Migrate config to current version."),
+    dry_run: bool = typer.Option(False, "--dry-run", help="Show migration changes without applying."),
+    rollback: bool = typer.Option(False, "--rollback", help="Rollback to previous config backup."),
+    output_format: FormatOption = "rich",
     no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
 ) -> None:
-    """Manage ragd configuration."""
-    config_command(
-        show=show,
-        path=path,
-        validate=validate,
-        no_color=no_color,
-    )
+    """Manage ragd configuration.
+
+    Configuration options:
+        --show           Show current configuration
+        --effective      Show config with all defaults
+        --diff           Show only changed values
+        --source         Show where values come from
+        --interactive    Launch configuration wizard
+        --migrate        Migrate to current schema version
+        --rollback       Restore from backup
+
+    Examples:
+        ragd config --show                 # Show config
+        ragd config --effective            # Show with defaults
+        ragd config --diff                 # Show customisations
+        ragd config --interactive          # Wizard mode
+        ragd config --migrate --dry-run    # Preview migration
+    """
+    con = get_console(no_color)
+
+    if interactive:
+        run_config_wizard(con)
+    elif effective:
+        show_effective_config(con, format=output_format)
+    elif diff:
+        show_config_diff(con, format=output_format)
+    elif source:
+        show_config_source(con)
+    elif migrate:
+        migrate_config(dry_run=dry_run, console=con)
+    elif rollback:
+        rollback_config(console=con)
+    elif validate:
+        validate_config(con)
+    else:
+        config_command(
+            show=show,
+            path=path,
+            validate=validate,
+            no_color=no_color,
+        )
 
 
 @app.command()
@@ -1665,6 +1722,30 @@ def library_stats_cmd() -> None:
         ragd library stats
     """
     library_stats_command()
+
+
+@app.command("help")
+def help_cmd(
+    topic: Annotated[str | None, typer.Argument(help="Help topic (command name).")] = None,
+    examples: bool = typer.Option(False, "--examples", "-e", help="Show only examples."),
+) -> None:
+    """Show extended help for commands.
+
+    View detailed documentation with examples for any command.
+
+    Examples:
+        ragd help                  # List all help topics
+        ragd help search           # Extended search help
+        ragd help search --examples  # Just search examples
+    """
+    con = Console()
+
+    if topic is None:
+        list_help_topics(con)
+    elif examples:
+        show_examples(topic, con)
+    else:
+        show_extended_help(topic, con)
 
 
 if __name__ == "__main__":

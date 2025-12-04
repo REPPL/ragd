@@ -96,6 +96,24 @@ from ragd.ui.cli.errors import (
     format_error_for_cli,
 )
 
+from ragd.ui.cli.config_wizard import run_config_wizard
+from ragd.ui.cli.config_debug import (
+    show_effective_config,
+    show_config_diff,
+    show_config_source,
+    validate_config,
+)
+from ragd.ui.cli.config_migration import (
+    migrate_config,
+    rollback_config,
+    needs_migration,
+)
+from ragd.ui.cli.help_system import (
+    show_extended_help,
+    show_examples,
+    list_help_topics,
+)
+
 __all__ = [
     "get_console",
     "init_command",
@@ -174,4 +192,19 @@ __all__ = [
     # Error handling
     "handle_dependency_errors",
     "format_error_for_cli",
+    # Config wizard (F-088)
+    "run_config_wizard",
+    # Config debugging (F-097)
+    "show_effective_config",
+    "show_config_diff",
+    "show_config_source",
+    "validate_config",
+    # Config migration (F-096)
+    "migrate_config",
+    "rollback_config",
+    "needs_migration",
+    # Help system (F-089)
+    "show_extended_help",
+    "show_examples",
+    "list_help_topics",
 ]

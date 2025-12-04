@@ -1,42 +1,45 @@
 # Tutorials
 
-Learning-oriented documentation for new users.
+Progressive learning guides for ragd, from installation to advanced usage.
 
-## Purpose
+## Learning Path
 
-Tutorials help newcomers get started with ragd through hands-on learning experiences. Each tutorial takes you through a complete workflow from start to finish.
+### Beginner
 
-## Available Tutorials
+| Tutorial | Time | Description |
+|----------|------|-------------|
+| [Getting Started](01-getting-started.md) | 15 min | Install ragd and index your first documents |
+| [Searching](02-searching.md) | 20 min | Master search queries and filters |
 
-### Getting Started (v0.1)
+### Intermediate
 
-| Tutorial | Description | Status |
-|----------|-------------|--------|
-| [Getting Started](./getting-started.md) | Index and search your first documents | 📝 Draft |
-| [Powerful Searching](./powerful-searching.md) | Advanced search techniques and filters | 📝 Draft |
+| Tutorial | Time | Description |
+|----------|------|-------------|
+| [Chat Interface](03-chat-interface.md) | 15 min | Interactive Q&A with your knowledge base |
+| [Organisation](04-organisation.md) | 25 min | Tags, collections, and metadata |
 
-### Document Processing (v0.2)
+### Advanced
 
-| Tutorial | Description | Status |
-|----------|-------------|--------|
-| [Processing Difficult PDFs](./processing-difficult-pdfs.md) | Handle scanned and complex PDFs | 📝 Draft |
-| [Organising Your Knowledge Base](./organising-knowledge-base.md) | Use tags and metadata effectively | 📝 Draft |
-| [Backing Up Your Data](./backing-up-data.md) | Export and restore your knowledge base | 📝 Draft |
+| Tutorial | Time | Description |
+|----------|------|-------------|
+| [Advanced Search](05-advanced-search.md) | 30 min | Hybrid search, scoring, contextual retrieval |
+| [Automation](06-automation.md) | 20 min | Scripts, JSON output, integrations |
 
-### Chat Interface (v0.5+)
+## Prerequisites
 
-| Tutorial | Description | Status |
-|----------|-------------|--------|
-| [Chatting with Your Knowledge](./chatting-with-your-knowledge.md) | Have conversations about your documents | ✅ Complete |
-| [Understanding Chat + Search](./chat-with-search.md) | How hybrid search powers your questions | ✅ Complete |
+- Python 3.12 or higher
+- pip or uv package manager
+- Some documents to index (PDF, TXT, MD, HTML)
 
 ## Tutorial Guidelines
 
-When writing tutorials:
-- Focus on learning, not accomplishing tasks
-- Guide users through a complete workflow
-- Explain the "why" as well as the "how"
-- Include expected outputs and checkpoints
+Each tutorial includes:
+- **Goal** - What you'll learn
+- **Prerequisites** - What you need to know
+- **Time estimate** - Expected duration
+- **Steps** - Numbered instructions
+- **Verification** - How to check success
+- **Next steps** - Where to go next
 
 ## What Doesn't Belong Here
 
@@ -50,4 +53,5 @@ When writing tutorials:
 
 - [Documentation Hub](../README.md)
 - [Guides](../guides/)
+- [Reference](../reference/)
 
