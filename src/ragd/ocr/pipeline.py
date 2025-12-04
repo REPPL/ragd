@@ -299,14 +299,16 @@ class OCRPipeline:
                 return result, False
 
             self._logger.warning(
-                "Page %d: low confidence (%.2f), trying fallback",
+                "%s page %d: low confidence (%.2f), trying fallback",
+                pdf_path.name,
                 page_number,
                 result.average_confidence,
             )
 
         except Exception as e:
             self._logger.warning(
-                "Page %d: primary OCR failed (%s), trying fallback",
+                "%s page %d: primary OCR failed (%s), trying fallback",
+                pdf_path.name,
                 page_number,
                 e,
             )
