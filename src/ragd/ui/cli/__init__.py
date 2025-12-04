@@ -120,6 +120,12 @@ from ragd.ui.cli.statistics import (
     format_statistics_json,
     format_statistics_plain,
 )
+from ragd.ui.cli.audit import (
+    audit_list_command,
+    audit_show_command,
+    audit_clear_command,
+    audit_stats_command,
+)
 
 __all__ = [
     "get_console",
@@ -220,4 +226,9 @@ __all__ = [
     "format_statistics_table",
     "format_statistics_json",
     "format_statistics_plain",
+    # Audit commands (F-112)
+    "audit_list_command",
+    "audit_show_command",
+    "audit_clear_command",
+    "audit_stats_command",
 ]

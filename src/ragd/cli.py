@@ -105,6 +105,11 @@ from ragd.ui.cli import (
     show_extended_help,
     show_examples,
     list_help_topics,
+    # Audit commands (F-112)
+    audit_list_command,
+    audit_show_command,
+    audit_clear_command,
+    audit_stats_command,
 )
 
 app = typer.Typer(
@@ -125,6 +130,7 @@ models_app = typer.Typer(help="Manage LLM models.")
 backend_app = typer.Typer(help="Manage vector store backends.")
 password_app = typer.Typer(help="Manage encryption password.")
 session_app = typer.Typer(help="Manage encryption session.")
+audit_app = typer.Typer(help="View operation audit log (F-112).")
 app.add_typer(meta_app, name="meta")
 app.add_typer(tag_app, name="tag")
 app.add_typer(tier_app, name="tier")
@@ -135,6 +141,7 @@ app.add_typer(models_app, name="models")
 app.add_typer(backend_app, name="backend")
 app.add_typer(password_app, name="password")
 app.add_typer(session_app, name="session")
+app.add_typer(audit_app, name="audit")
 
 
 # Output format option
@@ -1746,6 +1753,96 @@ def help_cmd(
         show_examples(topic, con)
     else:
         show_extended_help(topic, con)
+
+
+# --- Audit subcommands (F-112) ---
+
+@audit_app.command("list")
+def audit_list(
+    operation: str | None = typer.Option(None, "--operation", "-o", help="Filter by operation type."),
+    result: str | None = typer.Option(None, "--result", "-r", help="Filter by result."),
+    since: str | None = typer.Option(None, "--since", help="Show entries since date (YYYY-MM-DD)."),
+    until: str | None = typer.Option(None, "--until", help="Show entries until date (YYYY-MM-DD)."),
+    limit: int = typer.Option(20, "--limit", "-n", help="Maximum entries to show."),
+    output_json: bool = typer.Option(False, "--json", help="Output as JSON."),
+) -> None:
+    """List recent operations from the audit log.
+
+    Shows a table of recent operations with their results.
+
+    Examples:
+        ragd audit list
+        ragd audit list --operation index
+        ragd audit list --result failed --limit 50
+        ragd audit list --since 2024-01-01
+    """
+    audit_list_command(
+        console=Console(),
+        operation=operation,
+        result=result,
+        since=since,
+        until=until,
+        limit=limit,
+        output_json=output_json,
+    )
+
+
+@audit_app.command("show")
+def audit_show(
+    entry_id: Annotated[str, typer.Argument(help="Audit entry ID (or prefix).")],
+    output_json: bool = typer.Option(False, "--json", help="Output as JSON."),
+) -> None:
+    """Show details of a specific audit entry.
+
+    Displays full details including operation-specific metadata.
+
+    Examples:
+        ragd audit show abc123
+        ragd audit show abc123 --json
+    """
+    audit_show_command(
+        console=Console(),
+        entry_id=entry_id,
+        output_json=output_json,
+    )
+
+
+@audit_app.command("clear")
+def audit_clear(
+    before: str | None = typer.Option(None, "--before", help="Clear entries before date (YYYY-MM-DD)."),
+    force: bool = typer.Option(False, "--force", "-f", help="Skip confirmation prompt."),
+) -> None:
+    """Clear audit log entries.
+
+    Removes old entries from the audit log.
+
+    Examples:
+        ragd audit clear --before 2024-01-01
+        ragd audit clear --force
+    """
+    audit_clear_command(
+        console=Console(),
+        before=before,
+        force=force,
+    )
+
+
+@audit_app.command("stats")
+def audit_stats(
+    output_json: bool = typer.Option(False, "--json", help="Output as JSON."),
+) -> None:
+    """Show audit log statistics.
+
+    Displays summary of operations in the audit log.
+
+    Examples:
+        ragd audit stats
+        ragd audit stats --json
+    """
+    audit_stats_command(
+        console=Console(),
+        output_json=output_json,
+    )
 
 
 if __name__ == "__main__":
