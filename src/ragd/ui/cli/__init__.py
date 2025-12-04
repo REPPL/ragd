@@ -113,6 +113,13 @@ from ragd.ui.cli.help_system import (
     show_examples,
     list_help_topics,
 )
+from ragd.ui.cli.statistics import (
+    IndexStatistics,
+    get_index_statistics,
+    format_statistics_table,
+    format_statistics_json,
+    format_statistics_plain,
+)
 
 __all__ = [
     "get_console",
@@ -207,4 +214,10 @@ __all__ = [
     "show_extended_help",
     "show_examples",
     "list_help_topics",
+    # Statistics (F-109)
+    "IndexStatistics",
+    "get_index_statistics",
+    "format_statistics_table",
+    "format_statistics_json",
+    "format_statistics_plain",
 ]
