@@ -165,39 +165,152 @@ Features are the primary unit of work. Each feature specification describes:
 |----|---------|--------|----------|
 | [F-022](./completed/F-022-knowledge-graph.md) | Knowledge Graph Integration | ✅ Complete | State-of-the-Art Knowledge Graphs |
 
-### v1.0 Features (Platform)
+### v0.8.6 Features (Security Focus)
+
+| ID | Feature | Status | Description |
+|----|---------|--------|-------------|
+| F-082 | Security Hardening | 📅 Planned | Input validation, path traversal prevention |
+| F-083 | Secrets Management | 📅 Planned | Environment variables, encrypted config |
+| F-084 | Error Resilience | 📅 Planned | Graceful degradation, safe error messages |
+| F-085 | Test Coverage Boost | 📅 Planned | Target 85% coverage |
+| F-086 | Dependency Audit | 📅 Planned | Security scan, SBOM generation |
+
+### v0.8.7 Features (CLI Polish & Documentation I)
+
+| ID | Feature | Status | Description |
+|----|---------|--------|-------------|
+| F-087 | Shell Completion | 📅 Planned | Bash/Zsh/Fish auto-completion |
+| F-088 | Interactive Config | 📅 Planned | CLI wizard for configuration |
+| F-089 | Help System Enhancement | 📅 Planned | Better --help, examples, man pages |
+| F-090 | Output Mode Consistency | 📅 Planned | JSON/plain/rich everywhere |
+| F-091 | Tutorial Suite | 📅 Planned | Getting started to advanced guides |
+| F-092 | Configuration Reference | 📅 Planned | Complete config.yaml documentation |
+| F-093 | Troubleshooting Guide | 📅 Planned | Common issues and solutions |
+| F-094 | Use Case Gallery | 📅 Planned | Real-world examples |
+| F-095 | Video/GIF Demo Specs | 📅 Planned | Voice-over scripts, storyboards |
+| F-096 | Config Migration Tool | 📅 Planned | Migrate configs between versions |
+| F-097 | Config Debugging | 📅 Planned | `ragd config show --effective` |
+
+### v0.9.0 Features (Enhanced Indexing)
+
+| ID | Feature | Status | Description |
+|----|---------|--------|-------------|
+| F-098 | Advanced HTML Engine | 📅 Planned | JavaScript rendering, SPAs |
+| F-099 | PDF Layout Intelligence | 📅 Planned | Forms, annotations, multi-column |
+| F-100 | New File Type Support | 📅 Planned | EPUB, DOCX, XLSX |
+| F-101 | Smart Chunking v2 | 📅 Planned | Content-aware chunking |
+| F-102 | Indexing Resume | 📅 Planned | Resume interrupted operations |
+| F-103 | Content Hashing | 📅 Planned | Detect file changes |
+| F-104 | Duplicate Detection | 📅 Planned | Handle duplicate content |
+| F-105 | Indexing Self-Evaluation | 📅 Planned | Automated testing with feedback |
+
+### v0.9.1 Features (CLI Polish II)
+
+| ID | Feature | Status | Description |
+|----|---------|--------|-------------|
+| F-106 | Indexing Documentation | 📅 Planned | Docs for new indexing features |
+| F-107 | CLI Refinements I | 📅 Planned | UX improvements from v0.9.0 |
+| F-108 | Config Refinements | 📅 Planned | Additional config options |
+| F-109 | Index Statistics | 📅 Planned | `ragd status --detailed` |
+
+### v0.9.5 Features (Stability & Logging)
+
+| ID | Feature | Status | Description |
+|----|---------|--------|-------------|
+| F-110 | Structured Logging | 📅 Planned | JSON logs, log rotation |
+| F-111 | Error Logging & Recovery | 📅 Planned | Detailed error logs |
+| F-112 | Operation Audit Trail | 📅 Planned | Timestamps, durations |
+| F-113 | Exit Codes & Status | 📅 Planned | Consistent exit codes |
+| F-114 | CLI User Feedback | 📅 Planned | Progress, errors, hints |
+| F-115 | Source Quality Scoring | 📅 Planned | Confidence scores |
+| F-116 | Index Integrity Checks | 📅 Planned | `ragd doctor` |
+| F-117 | Self-Healing Index | 📅 Planned | Auto-repair issues |
+| F-118 | Dry-Run Mode | 📅 Planned | `--dry-run` for destructive ops |
+
+### v0.9.6 Features (CLI Polish III)
+
+| ID | Feature | Status | Description |
+|----|---------|--------|-------------|
+| F-119 | Early Adopter Doc Fixes | 📅 Planned | Address feedback |
+| F-120 | CLI Refinements II | 📅 Planned | Final UX polish |
+| F-121 | Troubleshooting Updates | 📅 Planned | Real issues encountered |
+| F-122 | Tutorial Refinements | 📅 Planned | User confusion points |
+
+### v1.0 Features (Performance & Polish)
+
+| ID | Feature | Status | Description |
+|----|---------|--------|-------------|
+| F-123 | Performance Profiling | 📅 Planned | Identify bottlenecks |
+| F-124 | Memory Optimisation | 📅 Planned | Reduce RAM usage |
+| F-125 | Startup Time | 📅 Planned | Faster CLI startup |
+| F-126 | Final Bug Fixes | 📅 Planned | Last fixes and polish |
+| F-127 | Performance Benchmarks | 📅 Planned | Published benchmarks |
+| [F-057](./planned/F-057-model-comparison.md) | Model Comparison Mode | 📅 Planned | Evaluate models side-by-side |
+| [F-075](./planned/F-075-backend-migration-tool.md) | Backend Migration Tool | 📅 Planned | Move between vector stores |
+
+### v1.1 Features (Graph & Automation)
+
+| ID | Feature | Status | Description |
+|----|---------|--------|-------------|
+| F-128 | Knowledge Graph CLI | 📅 Planned | `ragd graph query/explore/visualise` |
+| F-129 | Comparison Framework | 📅 Planned | A/B testing models/configs |
+| F-130 | Batch Operations | 📅 Planned | Process multiple queries |
+| F-131 | Results Export | 📅 Planned | Export to JSON/CSV |
+| F-132 | Timing & Metrics Output | 📅 Planned | `--timing` flag |
+
+### v1.5 Features (API & Onboarding)
+
+| ID | Feature | Status | Description |
+|----|---------|--------|-------------|
+| F-133 | API Server | 📅 Planned | REST API with OpenAPI |
+| F-134 | Onboarding Flow | 📅 Planned | Guided first-run |
+| F-135 | API Authentication | 📅 Planned | API keys, rate limiting |
+| F-136 | Webhooks | 📅 Planned | Event notifications |
+| F-137 | Health Endpoints | 📅 Planned | `/health`, `/ready`, `/metrics` |
+
+### v1.8 Features (WebUI Foundation)
+
+| ID | Feature | Status | Description |
+|----|---------|--------|-------------|
+| [F-024](./planned/F-024-basic-webui.md) | Basic WebUI | 📅 Planned | FastAPI + HTMX + Tailwind |
+| F-138 | WebUI Search | 📅 Planned | Search interface with filters |
+| F-139 | WebUI Chat | 📅 Planned | Chat in browser |
+| F-140 | WebUI Index | 📅 Planned | Upload and index documents |
+| F-141 | Mobile Responsive | 📅 Planned | Works on all devices |
+
+### v2.0 Features (Extensibility)
+
+| ID | Feature | Status | Description |
+|----|---------|--------|-------------|
+| F-200 | Plugin System | 📅 Planned | Extensibility framework |
+| F-201 | Workflow Automation | 📅 Planned | Scheduled indexing, triggers |
+| F-202 | Advanced Dashboard | 📅 Planned | Analytics, visualisations |
+| F-203 | Knowledge Graph Explorer | 📅 Planned | Visual graph navigation |
+| F-204 | Saved Searches | 📅 Planned | Bookmarks, history |
+| F-205 | Export Templates | 📅 Planned | Custom export formats |
+
+### v3.0 Features (Privacy Foundation)
 
 | ID | Feature | Status | Research |
 |----|---------|--------|----------|
-| [F-024](./planned/F-024-basic-webui.md) | Basic WebUI | 📅 Planned | State-of-the-Art User Interfaces |
-| [F-056](./planned/F-056-specialised-task-models.md) | Specialised Task Models | 📅 Planned | [State-of-the-Art Multi-Model RAG](../research/state-of-the-art-multi-model-rag.md) |
-| [F-057](./planned/F-057-model-comparison.md) | Model Comparison Mode | 📅 Planned | [State-of-the-Art Multi-Model RAG](../research/state-of-the-art-multi-model-rag.md) |
+| [F-058](./planned/F-058-fine-tuning-pipeline.md) | Fine-Tuning Pipeline | 📅 Planned | Local model fine-tuning |
+| [F-059](./planned/F-059-embedding-privacy-protection.md) | Embedding Privacy Protection | 📅 Planned | Differential privacy |
+| [F-060](./planned/F-060-gdpr-compliant-deletion.md) | GDPR-Compliant Deletion | 📅 Planned | Right to be forgotten |
+| F-300 | Privacy Dashboard | 📅 Planned | Privacy settings UI |
+| F-301 | Data Lineage Tracking | 📅 Planned | Data origin tracking |
+| F-302 | Anonymisation Engine | 📅 Planned | Auto-redact PII |
 
-### v2.0 Features (Personal Knowledge Assistant)
-
-v2.0 transforms ragd from a document RAG system into a personal knowledge assistant with persistent memory, user profiles, and a secure personal information vault.
-
-#### Memory Layer (v2.0-alpha)
+### v3.5 Features (Memory & Profiles)
 
 | ID | Feature | Status | Research |
 |----|---------|--------|----------|
 | [F-040](./planned/F-040-long-term-memory.md) | Long-Term Memory Store | 📅 Planned | [State-of-the-Art Personal RAG](../research/state-of-the-art-personal-rag.md) |
-| F-043 | Memory Consolidation | 📅 Planned | [State-of-the-Art Personal RAG](../research/state-of-the-art-personal-rag.md) |
-
-#### Persona Agents (v2.0-beta)
-
-| ID | Feature | Status | Research |
-|----|---------|--------|----------|
 | [F-041](./planned/F-041-user-profile-management.md) | User Profile Management | 📅 Planned | [State-of-the-Art Personal RAG](../research/state-of-the-art-personal-rag.md) |
 | F-042 | Persona Agent System | 📅 Planned | [State-of-the-Art Personal RAG](../research/state-of-the-art-personal-rag.md) |
-
-#### Personal Vault (v2.0)
-
-| ID | Feature | Status | Research |
-|----|---------|--------|----------|
+| F-043 | Memory Consolidation | 📅 Planned | [State-of-the-Art Personal RAG](../research/state-of-the-art-personal-rag.md) |
 | [F-044](./planned/F-044-personal-vault.md) | Personal Information Vault | 📅 Planned | [State-of-the-Art Personal RAG](../research/state-of-the-art-personal-rag.md) |
 
-### v2.x Features (Personal Data Connectors)
+### v3.x Features (Personal Data Connectors)
 
 | ID | Feature | Status | Research |
 |----|---------|--------|----------|
@@ -205,6 +318,31 @@ v2.0 transforms ragd from a document RAG system into a personal knowledge assist
 | F-046 | Communication Parser | 📅 Planned | [State-of-the-Art Personal RAG](../research/state-of-the-art-personal-rag.md) |
 | F-047 | Health Record Import (FHIR) | 📅 Planned | [State-of-the-Art Personal RAG](../research/state-of-the-art-personal-rag.md) |
 | F-048 | Financial Data Import | 📅 Planned | [State-of-the-Art Personal RAG](../research/state-of-the-art-personal-rag.md) |
+
+### v4.0 Features (Autonomous Agents)
+
+| ID | Feature | Status | Description |
+|----|---------|--------|-------------|
+| F-400 | Agent Framework | 📅 Planned | Core agent loop with planning |
+| F-401 | Tool Use System | 📅 Planned | File ops, web search, APIs |
+| F-402 | Multi-Step Reasoning | 📅 Planned | Complex task decomposition |
+| F-403 | Agent Collaboration | 📅 Planned | Multiple agents working together |
+| F-404 | MCP Integration | 📅 Planned | Model Context Protocol |
+| F-405 | Task Planning Engine | 📅 Planned | Break down goals into steps |
+| F-406 | Agent Memory | 📅 Planned | Persistent context |
+| F-407 | Safety Guardrails | 📅 Planned | Sandboxing, approval workflows |
+
+### v5.0 Features (Multi-User)
+
+| ID | Feature | Status | Description |
+|----|---------|--------|-------------|
+| F-500 | Multi-User Support | 📅 Planned | User accounts, authentication |
+| F-501 | Team Workspaces | 📅 Planned | Shared knowledge bases |
+| F-502 | Role-Based Access Control | 📅 Planned | Fine-grained permissions |
+| F-503 | SSO Integration | 📅 Planned | OAuth2, SAML, LDAP |
+| F-504 | Federated Search | 📅 Planned | Search across instances |
+| F-505 | API v2 | 📅 Planned | GraphQL, webhooks, SDK |
+| F-506 | Compliance Features | 📅 Planned | Audit reports, retention |
 
 ## Workflow
 
@@ -231,11 +369,22 @@ Features are numbered sequentially with milestone-based ranges:
 | F-061, F-062, F-063 | v0.8.1 | Intelligent Tagging |
 | F-080, F-081 | v0.8.2 | Retrieval Enhancements |
 | F-022 | v0.8.5 | Knowledge Graph |
-| F-024, F-056, F-057 | v1.0+ | Platform & Multi-Model Advanced |
-| F-040, F-043 | v2.0-alpha | Memory Layer |
-| F-041, F-042 | v2.0-beta | Persona Agents |
-| F-044 | v2.0 | Personal Vault |
-| F-045 to F-048 | v2.x | Personal Data Connectors |
+| F-082 to F-086 | v0.8.6 | Security Focus |
+| F-087 to F-097 | v0.8.7 | CLI Polish & Documentation I |
+| F-098 to F-105 | v0.9.0 | Enhanced Indexing |
+| F-106 to F-109 | v0.9.1 | CLI Polish II |
+| F-110 to F-118 | v0.9.5 | Stability & Logging |
+| F-119 to F-122 | v0.9.6 | CLI Polish III |
+| F-123 to F-127 | v1.0 | Performance & Polish |
+| F-128 to F-132 | v1.1 | Graph & Automation |
+| F-133 to F-137 | v1.5 | API & Onboarding |
+| F-138 to F-141 | v1.8 | WebUI Foundation |
+| F-200 to F-205 | v2.0 | Extensibility |
+| F-300 to F-302 | v3.0 | Privacy Foundation |
+| F-040 to F-044 | v3.5 | Memory & Profiles |
+| F-045 to F-048 | v3.x | Personal Data Connectors |
+| F-400 to F-407 | v4.0 | Autonomous Agents |
+| F-500 to F-506 | v5.0 | Multi-User |
 
 **Guidelines:**
 - Numbers are assigned sequentially as features are designed

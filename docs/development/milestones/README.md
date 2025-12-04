@@ -4,22 +4,60 @@ Release planning and milestone tracking.
 
 ## Milestone Overview
 
+### Released
+
 | Version | Name | Focus | Status |
 |---------|------|-------|--------|
 | [v0.1.0](./v0.1.0.md) | Core RAG | Index, search, status | ✅ Released |
 | [v0.2.0](./v0.2.0.md) | Killer Feature | Messy PDFs, metadata, export backends | ✅ Released |
 | [v0.3.0](./v0.3.0.md) | Advanced Search & CLI | Hybrid search, text quality, complete CLI | ✅ Released |
-| [v0.3.2](./v0.3.2.md) | Tag Provenance | Schema v2.2, tag origin tracking | 📋 Planned |
 | [v0.4.0](./v0.4.0.md) | Multi-Modal | Vision embeddings, image queries | ✅ Released |
 | [v0.4.1](./v0.4.1.md) | Boolean Search | Precision queries with AND/OR/NOT | ✅ Released |
 | [v0.5.0](./v0.5.0.md) | Chat | LLM integration, conversation | ✅ Released |
 | [v0.6.0](./v0.6.0.md) | Storage | Backend abstraction, FAISS | ✅ Released |
 | [v0.6.5](./v0.6.5.md) | Polish & Stability | Config validation, visual polish | ✅ Released |
 | [v0.7.0](./v0.7.0.md) | Privacy & Security | Chat citations, encryption, PII detection | ✅ Released |
-| [v0.7.5](./v0.7.5.md) | Privacy Polish + Tagging | Data tiers, tag provenance, smart collections | 📋 Planned |
-| [v0.8.0](./v0.8.0.md) | Intelligence | Personas, temporal, knowledge graph | 📋 Planned |
-| [v1.0.0](./v1.0.0.md) | Personal Platform | Basic WebUI, polish, stability | 📋 Planned |
-| [v2.0.0](./v2.0.0.md) | Personal Knowledge Assistant | Memory, profiles, personal vault | 📋 Planned |
+| [v0.8.0](./v0.8.0.md) | Intelligence Foundation | Tag provenance, data tiers | ✅ Released |
+| [v0.8.1](./v0.8.1.md) | Intelligent Tagging | Auto-tags, tag library, smart collections | ✅ Released |
+| [v0.8.2](./v0.8.2.md) | Retrieval Enhancements | Cross-encoder reranking, query decomposition | ✅ Released |
+| [v0.8.5](./v0.8.5.md) | Knowledge Graph | Knowledge graph foundation | ✅ Released |
+
+### Planned (Pre-1.0)
+
+| Version | Name | Focus | Features |
+|---------|------|-------|----------|
+| [v0.8.6](./v0.8.6.md) | Security Focus | Hardening, secrets, audit | F-082 to F-086 |
+| [v0.8.7](./v0.8.7.md) | CLI Polish & Docs I | Config system, tutorials, demos | F-087 to F-097 |
+| [v0.9.0](./v0.9.0.md) | Enhanced Indexing | HTML/PDF improvements, self-evaluation | F-098 to F-105 |
+| [v0.9.1](./v0.9.1.md) | CLI Polish & Docs II | Refinements from v0.9.0 | F-106 to F-109 |
+| [v0.9.5](./v0.9.5.md) | Stability & Logging | Early adopter release | F-110 to F-118 |
+| [v0.9.6](./v0.9.6.md) | CLI Polish & Docs III | Final polish for 1.0 | F-119 to F-122 |
+
+### Production & Platform (v1.x)
+
+| Version | Name | Focus | Features |
+|---------|------|-------|----------|
+| [v1.0.0](./v1.0.0.md) | Performance & Polish | Production ready | F-123 to F-127 |
+| [v1.1.0](./v1.1.0.md) | Graph & Automation | Knowledge graph CLI, scripting | F-128 to F-132 |
+| [v1.5.0](./v1.5.0.md) | API & Onboarding | REST API, guided setup | F-133 to F-137 |
+| [v1.8.0](./v1.8.0.md) | WebUI Foundation | Basic web interface | F-138 to F-141 |
+
+### Future Vision (v2.x+)
+
+| Version | Name | Focus | Theme |
+|---------|------|-------|-------|
+| [v2.0.0](./v2.0.0.md) | Extensibility | Plugins, workflows, dashboard | "Extend & Automate" |
+| [v3.0.0](./v3.0.0.md) | Privacy Foundation | GDPR, embedding privacy | "Privacy by Design" |
+| [v3.5.0](./v3.5.0.md) | Memory & Profiles | Personal knowledge assistant | "Remember Everything" |
+| [v4.0.0](./v4.0.0.md) | Autonomous Agents | Tool use, MCP, reasoning | "AI That Acts" |
+| [v5.0.0](./v5.0.0.md) | Multi-User | Teams, RBAC, SSO | "Shared Intelligence" |
+
+### Superseded
+
+| Version | Original Focus | Superseded By |
+|---------|----------------|---------------|
+| [v0.3.2](./v0.3.2.md) | Tag Provenance | v0.8.0 |
+| [v0.7.5](./v0.7.5.md) | Privacy Polish + Tagging | v0.8.x series |
 
 ## Milestone Workflow
 
