@@ -46,7 +46,11 @@ Features planned for future development. See [features/README.md](../README.md) 
 | ID | Feature | Version | Description |
 |----|---------|---------|-------------|
 | F-106 to F-109 | CLI Polish II | v0.9.1 | Docs, refinements, config, statistics |
-| F-110 to F-118 | Stability & Logging | v0.9.5 | Logging, exit codes, `ragd doctor` |
+| [F-110](./F-110-structured-logging.md) | Structured Logging | v0.9.5 | JSON logs, third-party suppression, rotation |
+| [F-111](./F-111-error-logging-recovery.md) | Error Logging & Recovery | v0.9.5 | Per-document stats, failure categories |
+| F-112 to F-113 | Audit & Exit Codes | v0.9.5 | Operation audit, consistent exit codes |
+| [F-114](./F-114-cli-user-feedback.md) | CLI User Feedback | v0.9.5 | Clean progress, quality stats, named failures |
+| F-115 to F-118 | Stability Features | v0.9.5 | Quality scoring, `ragd doctor`, dry-run |
 | F-119 to F-122 | CLI Polish III | v0.9.6 | Final polish for 1.0 |
 
 ## v1.x Features (Production & Platform)
