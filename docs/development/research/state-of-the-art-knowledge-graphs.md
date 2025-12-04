@@ -1,5 +1,7 @@
 # State-of-the-Art Knowledge Graphs for RAG
 
+> **Implementation Note:** This research informed the design of F-022 Knowledge Graph Integration. See [ADR-0031](../decisions/adrs/0031-knowledge-graph-storage.md) for the implementation decision to use SQLite instead of Kuzu, prioritising simplicity and dependency minimisation.
+
 ## Executive Summary
 
 **Key Recommendations for ragd:**
