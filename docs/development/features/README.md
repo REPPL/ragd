@@ -169,63 +169,63 @@ Features are the primary unit of work. Each feature specification describes:
 
 | ID | Feature | Status | Description |
 |----|---------|--------|-------------|
-| F-082 | Security Hardening | 📅 Planned | Input validation, path traversal prevention |
-| F-083 | Secrets Management | 📅 Planned | Environment variables, encrypted config |
-| F-084 | Error Resilience | 📅 Planned | Graceful degradation, safe error messages |
-| F-085 | Test Coverage Boost | 📅 Planned | Target 85% coverage |
-| F-086 | Dependency Audit | 📅 Planned | Security scan, SBOM generation |
+| [F-082](./completed/F-082-security-hardening.md) | Security Hardening | ✅ Complete | Input validation, path traversal prevention |
+| [F-083](./completed/F-083-secrets-management.md) | Secrets Management | ✅ Complete | Environment variables, encrypted config |
+| [F-084](./completed/F-084-error-resilience.md) | Error Resilience | ✅ Complete | Graceful degradation, safe error messages |
+| [F-085](./completed/F-085-test-coverage-boost.md) | Test Coverage Boost | ✅ Complete | Target 85% coverage |
+| [F-086](./completed/F-086-dependency-audit.md) | Dependency Audit | ✅ Complete | Security scan, SBOM generation |
 
 ### v0.8.7 Features (CLI Polish & Documentation I)
 
 | ID | Feature | Status | Description |
 |----|---------|--------|-------------|
-| F-087 | Shell Completion | 📅 Planned | Bash/Zsh/Fish auto-completion |
-| F-088 | Interactive Config | 📅 Planned | CLI wizard for configuration |
-| F-089 | Help System Enhancement | 📅 Planned | Better --help, examples, man pages |
-| F-090 | Output Mode Consistency | 📅 Planned | JSON/plain/rich everywhere |
-| F-091 | Tutorial Suite | 📅 Planned | Getting started to advanced guides |
-| F-092 | Configuration Reference | 📅 Planned | Complete config.yaml documentation |
-| F-093 | Troubleshooting Guide | 📅 Planned | Common issues and solutions |
-| F-094 | Use Case Gallery | 📅 Planned | Real-world examples |
-| F-095 | Video/GIF Demo Specs | 📅 Planned | Voice-over scripts, storyboards |
-| F-096 | Config Migration Tool | 📅 Planned | Migrate configs between versions |
-| F-097 | Config Debugging | 📅 Planned | `ragd config show --effective` |
+| [F-087](./completed/F-087-shell-completion.md) | Shell Completion | ✅ Complete | Bash/Zsh/Fish auto-completion |
+| [F-088](./completed/F-088-interactive-config.md) | Interactive Config | ✅ Complete | CLI wizard for configuration |
+| [F-089](./completed/F-089-help-system.md) | Help System Enhancement | ✅ Complete | Better --help, examples, man pages |
+| [F-090](./completed/F-090-output-modes.md) | Output Mode Consistency | ✅ Complete | JSON/plain/rich everywhere |
+| [F-091](./completed/F-091-tutorial-suite.md) | Tutorial Suite | ✅ Complete | Getting started to advanced guides |
+| [F-092](./completed/F-092-configuration-reference.md) | Configuration Reference | ✅ Complete | Complete config.yaml documentation |
+| [F-093](./completed/F-093-troubleshooting-guide.md) | Troubleshooting Guide | ✅ Complete | Common issues and solutions |
+| [F-094](./completed/F-094-use-case-gallery.md) | Use Case Gallery | ✅ Complete | Real-world examples |
+| [F-095](./completed/F-095-demo-specs.md) | Video/GIF Demo Specs | ✅ Complete | Voice-over scripts, storyboards |
+| [F-096](./completed/F-096-config-migration.md) | Config Migration Tool | ✅ Complete | Migrate configs between versions |
+| [F-097](./completed/F-097-config-debugging.md) | Config Debugging | ✅ Complete | `ragd config show --effective` |
 
 ### v0.9.0 Features (Enhanced Indexing)
 
 | ID | Feature | Status | Description |
 |----|---------|--------|-------------|
-| F-098 | Advanced HTML Engine | 📅 Planned | JavaScript rendering, SPAs |
-| F-099 | PDF Layout Intelligence | 📅 Planned | Forms, annotations, multi-column |
-| F-100 | New File Type Support | 📅 Planned | EPUB, DOCX, XLSX |
-| F-101 | Smart Chunking v2 | 📅 Planned | Content-aware chunking |
-| F-102 | Indexing Resume | 📅 Planned | Resume interrupted operations |
-| F-103 | Content Hashing | 📅 Planned | Detect file changes |
-| F-104 | Duplicate Detection | 📅 Planned | Handle duplicate content |
-| F-105 | Indexing Self-Evaluation | 📅 Planned | Automated testing with feedback |
+| [F-098](./planned/F-098-advanced-html-engine.md) | Advanced HTML Engine | 📅 Deferred | JavaScript rendering, SPAs |
+| [F-099](./planned/F-099-pdf-layout-intelligence.md) | PDF Layout Intelligence | 📅 Deferred | Forms, annotations, multi-column |
+| [F-100](./completed/F-100-new-file-types.md) | New File Type Support | ✅ Complete | EPUB, DOCX, XLSX |
+| [F-101](./completed/F-101-smart-chunking-v2.md) | Smart Chunking v2 | ✅ Complete | Content-aware chunking |
+| [F-102](./completed/F-102-indexing-resume.md) | Indexing Resume | ✅ Complete | Resume interrupted operations |
+| [F-103](./completed/F-103-content-hashing.md) | Content Hashing | ✅ Complete | Detect file changes |
+| [F-104](./completed/F-104-duplicate-detection.md) | Duplicate Detection | ✅ Complete | Handle duplicate content |
+| [F-105](./planned/F-105-indexing-self-evaluation.md) | Indexing Self-Evaluation | 📅 Deferred | Automated testing with feedback |
 
 ### v0.9.1 Features (CLI Polish II)
 
 | ID | Feature | Status | Description |
 |----|---------|--------|-------------|
-| F-106 | Indexing Documentation | 📅 Planned | Docs for new indexing features |
-| F-107 | CLI Refinements I | 📅 Planned | UX improvements from v0.9.0 |
-| F-108 | Config Refinements | 📅 Planned | Additional config options |
-| F-109 | Index Statistics | 📅 Planned | `ragd status --detailed` |
+| [F-106](./completed/F-106-indexing-documentation.md) | Indexing Documentation | ✅ Complete | Docs for new indexing features |
+| [F-107](./completed/F-107-cli-refinements.md) | CLI Refinements I | ✅ Complete | UX improvements from v0.9.0 |
+| [F-108](./completed/F-108-config-refinements.md) | Config Refinements | ✅ Complete | Additional config options |
+| [F-109](./completed/F-109-index-statistics.md) | Index Statistics | ✅ Complete | `ragd status --detailed` |
 
 ### v0.9.5 Features (Stability & Logging)
 
 | ID | Feature | Status | Description |
 |----|---------|--------|-------------|
-| F-110 | Structured Logging | 📅 Planned | JSON logs, log rotation |
-| F-111 | Error Logging & Recovery | 📅 Planned | Detailed error logs |
-| F-112 | Operation Audit Trail | 📅 Planned | Timestamps, durations |
-| F-113 | Exit Codes & Status | 📅 Planned | Consistent exit codes |
-| F-114 | CLI User Feedback | 📅 Planned | Progress, errors, hints |
-| F-115 | Source Quality Scoring | 📅 Planned | Confidence scores |
-| F-116 | Index Integrity Checks | 📅 Planned | `ragd doctor` |
-| F-117 | Self-Healing Index | 📅 Planned | Auto-repair issues |
-| F-118 | Dry-Run Mode | 📅 Planned | `--dry-run` for destructive ops |
+| [F-110](./completed/F-110-structured-logging.md) | Structured Logging | ✅ Complete | JSON logs, log rotation |
+| F-111 | Error Logging & Recovery | 📅 Deferred | Detailed error logs |
+| F-112 | Operation Audit Trail | 📅 Deferred | Timestamps, durations |
+| [F-113](./completed/F-113-exit-codes.md) | Exit Codes & Status | ✅ Complete | Consistent exit codes |
+| F-114 | CLI User Feedback | 📅 Deferred | Progress, errors, hints |
+| F-115 | Source Quality Scoring | 📅 Deferred | Confidence scores |
+| [F-116](./completed/F-116-index-integrity.md) | Index Integrity Checks | ✅ Complete | `ragd doctor` |
+| [F-117](./completed/F-117-self-healing.md) | Self-Healing Index | ✅ Complete | Auto-repair issues |
+| F-118 | Dry-Run Mode | 📅 Deferred | `--dry-run` for destructive ops |
 
 ### v0.9.6 Features (CLI Polish III)
 

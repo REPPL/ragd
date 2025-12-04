@@ -2,56 +2,25 @@
 
 Features planned for future development. See [features/README.md](../README.md) for the complete roadmap.
 
-## v0.8.6 Features (Security Focus)
+## v0.9.6 Features (Alpha Testing)
+
+High priority for alpha testing:
 
 | ID | Feature | Description |
 |----|---------|-------------|
-| F-082 | Security Hardening | Input validation, path traversal prevention |
-| F-083 | Secrets Management | Environment variables, encrypted config |
-| F-084 | Error Resilience | Graceful degradation, safe error messages |
-| F-085 | Test Coverage Boost | Target 85% coverage |
-| F-086 | Dependency Audit | Security scan, SBOM generation |
+| [F-111](./F-111-error-logging-recovery.md) | Error Logging & Recovery | Per-document stats, failure categories |
+| F-112 | Operation Audit Trail | Log all operations with timestamps |
+| [F-114](./F-114-cli-user-feedback.md) | CLI User Feedback | Clean progress, quality stats |
+| F-115 | Source Quality Scoring | Confidence scores for content |
+| F-118 | Dry-Run Mode | `--dry-run` for destructive operations |
 
-## v0.8.7 Features (CLI Polish & Documentation I)
+Deferred from prior versions:
 
-| ID | Feature | Description |
-|----|---------|-------------|
-| F-087 | Shell Completion | Bash/Zsh/Fish auto-completion |
-| F-088 | Interactive Config | CLI wizard for configuration |
-| F-089 | Help System Enhancement | Better --help, examples, man pages |
-| F-090 | Output Mode Consistency | JSON/plain/rich everywhere |
-| F-091 | Tutorial Suite | Getting started to advanced guides |
-| F-092 | Configuration Reference | Complete config.yaml documentation |
-| F-093 | Troubleshooting Guide | Common issues and solutions |
-| F-094 | Use Case Gallery | Real-world examples |
-| F-095 | Video/GIF Demo Specs | Voice-over scripts, storyboards |
-| F-096 | Config Migration Tool | Migrate configs between versions |
-| F-097 | Config Debugging | `ragd config show --effective` |
-
-## v0.9.0 Features (Enhanced Indexing)
-
-| ID | Feature | Description |
-|----|---------|-------------|
-| F-098 | Advanced HTML Engine | JavaScript rendering, SPAs |
-| F-099 | PDF Layout Intelligence | Forms, annotations, multi-column |
-| F-100 | New File Type Support | EPUB, DOCX, XLSX |
-| F-101 | Smart Chunking v2 | Content-aware chunking |
-| F-102 | Indexing Resume | Resume interrupted operations |
-| F-103 | Content Hashing | Detect file changes |
-| F-104 | Duplicate Detection | Handle duplicate content |
-| F-105 | Indexing Self-Evaluation | Automated testing with feedback |
-
-## v0.9.1-v0.9.6 Features (CLI Polish & Stability)
-
-| ID | Feature | Version | Description |
-|----|---------|---------|-------------|
-| F-106 to F-109 | CLI Polish II | v0.9.1 | Docs, refinements, config, statistics |
-| [F-110](./F-110-structured-logging.md) | Structured Logging | v0.9.5 | JSON logs, third-party suppression, rotation |
-| [F-111](./F-111-error-logging-recovery.md) | Error Logging & Recovery | v0.9.5 | Per-document stats, failure categories |
-| F-112 to F-113 | Audit & Exit Codes | v0.9.5 | Operation audit, consistent exit codes |
-| [F-114](./F-114-cli-user-feedback.md) | CLI User Feedback | v0.9.5 | Clean progress, quality stats, named failures |
-| F-115 to F-118 | Stability Features | v0.9.5 | Quality scoring, `ragd doctor`, dry-run |
-| F-119 to F-122 | CLI Polish III | v0.9.6 | Final polish for 1.0 |
+| ID | Feature | Deferred From |
+|----|---------|---------------|
+| [F-098](./F-098-advanced-html-engine.md) | Advanced HTML Engine | v0.9.0 |
+| [F-099](./F-099-pdf-layout-intelligence.md) | PDF Layout Intelligence | v0.9.0 |
+| [F-105](./F-105-indexing-self-evaluation.md) | Indexing Self-Evaluation | v0.9.0 |
 
 ## v1.x Features (Production & Platform)
 
@@ -97,14 +66,11 @@ The following features were previously planned and have been implemented:
 
 | ID | Feature | Implemented In |
 |----|---------|----------------|
-| F-018 | Data Sensitivity Tiers | v0.8.0 |
-| F-022 | Knowledge Graph Integration | v0.8.5 |
-| F-061 | Auto-Tag Suggestions | v0.8.1 |
-| F-062 | Tag Library | v0.8.1 |
-| F-063 | Smart Collections | v0.8.1 |
-| F-064 | Tag Provenance | v0.8.0 |
-| F-080 | Cross-Encoder Reranking | v0.8.2 |
-| F-081 | Query Decomposition | v0.8.2 |
+| F-082 to F-086 | Security Focus | v0.8.6 |
+| F-087 to F-097 | CLI Polish & Documentation I | v0.8.7 |
+| F-100 to F-104 | Enhanced Indexing | v0.9.0 |
+| F-106 to F-109 | CLI Polish II | v0.9.1 |
+| F-110, F-113, F-116, F-117 | Stability & Logging | v0.9.5 |
 
 ## Workflow
 

@@ -21,17 +21,17 @@ Release planning and milestone tracking.
 | [v0.8.1](./v0.8.1.md) | Intelligent Tagging | Auto-tags, tag library, smart collections | ✅ Released |
 | [v0.8.2](./v0.8.2.md) | Retrieval Enhancements | Cross-encoder reranking, query decomposition | ✅ Released |
 | [v0.8.5](./v0.8.5.md) | Knowledge Graph | Knowledge graph foundation | ✅ Released |
+| [v0.8.6](./v0.8.6.md) | Security Focus | Hardening, secrets, audit | ✅ Released |
+| [v0.8.7](./v0.8.7.md) | CLI Polish & Docs I | Config system, tutorials, demos | ✅ Released |
+| [v0.9.0](./v0.9.0.md) | Enhanced Indexing | HTML/PDF improvements | ✅ Released |
+| [v0.9.1](./v0.9.1.md) | CLI Polish & Docs II | Refinements, statistics | ✅ Released |
+| [v0.9.5](./v0.9.5.md) | Stability & Logging | Early adopter release | ✅ Released |
 
 ### Planned (Pre-1.0)
 
 | Version | Name | Focus | Features |
 |---------|------|-------|----------|
-| [v0.8.6](./v0.8.6.md) | Security Focus | Hardening, secrets, audit | F-082 to F-086 |
-| [v0.8.7](./v0.8.7.md) | CLI Polish & Docs I | Config system, tutorials, demos | F-087 to F-097 |
-| [v0.9.0](./v0.9.0.md) | Enhanced Indexing | HTML/PDF improvements, self-evaluation | F-098 to F-105 |
-| [v0.9.1](./v0.9.1.md) | CLI Polish & Docs II | Refinements from v0.9.0 | F-106 to F-109 |
-| [v0.9.5](./v0.9.5.md) | Stability & Logging | Early adopter release | F-110 to F-118 |
-| [v0.9.6](./v0.9.6.md) | CLI Polish & Docs III | Final polish for 1.0 | F-119 to F-122 |
+| [v0.9.6](./v0.9.6.md) | Alpha Testing | Error handling, dry-run | F-111, F-114, F-118 |
 
 ### Production & Platform (v1.x)
 
