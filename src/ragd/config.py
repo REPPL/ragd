@@ -284,25 +284,20 @@ def create_default_config() -> RagdConfig:
 
 
 def _check_config_permissions(path: Path) -> None:
-    """Check config file permissions and warn if too permissive.
+    """Ensure config file has secure permissions (owner-only).
 
     Security: Config files should not be world-readable as they may
-    contain sensitive paths or future credentials.
+    contain sensitive paths or future credentials. Auto-fixes to 0600.
 
     Args:
         path: Path to config file
     """
     try:
         mode = os.stat(path).st_mode
-        # Warn if group or other have any permissions
+        # Fix if group or other have any permissions
         if mode & (stat.S_IRWXG | stat.S_IRWXO):
-            logger.warning(
-                "Config file %s has permissive mode %s. "
-                "Consider: chmod 600 %s",
-                path,
-                oct(mode & 0o777),
-                path,
-            )
+            os.chmod(path, 0o600)
+            logger.debug("Fixed config file permissions: %s -> 0600", path)
     except OSError:
         pass  # File may not exist or be inaccessible
 
