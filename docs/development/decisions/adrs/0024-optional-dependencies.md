@@ -2,7 +2,10 @@
 
 ## Status
 
-Accepted
+Superseded by [ADR-0032](./0032-full-features-by-default.md)
+
+> **Note (v1.0)**: This ADR documented the v0.x approach. For v1.0, see ADR-0032
+> which inverts the model to "full features by default".
 
 ## Context
 
@@ -317,4 +320,4 @@ Implement fallback logic in PDF, OCR, and metadata modules.
 
 ---
 
-**Status**: Accepted
+**Status**: Superseded by [ADR-0032](./0032-full-features-by-default.md)

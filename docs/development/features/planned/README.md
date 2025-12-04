@@ -6,6 +6,7 @@ Features planned for future development. See [features/README.md](../README.md) 
 
 | ID | Feature | Version | Description |
 |----|---------|---------|-------------|
+| [F-119](./F-119-full-features-by-default.md) | Full Features by Default | v1.0 | All runtime deps in default install |
 | F-123 to F-127 | Performance & Polish | v1.0 | Profiling, memory, benchmarks |
 | [F-057](./F-057-model-comparison.md) | Model Comparison | v1.0 | Evaluate models side-by-side |
 | [F-075](./F-075-backend-migration-tool.md) | Backend Migration | v1.0 | Move between vector stores |
