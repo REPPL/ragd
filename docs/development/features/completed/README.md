@@ -2,6 +2,101 @@
 
 Features that have been implemented and released.
 
+## v0.9.6 - Alpha Testing Release (Released)
+
+| ID | Feature | Release |
+|----|---------|---------|
+| [F-098](./F-098-advanced-html-engine.md) | Advanced HTML Engine | v0.9.6 |
+| [F-099](./F-099-pdf-layout-intelligence.md) | PDF Layout Intelligence | v0.9.6 |
+| [F-105](./F-105-indexing-self-evaluation.md) | Indexing Self-Evaluation | v0.9.6 |
+| [F-111](./F-111-error-logging-recovery.md) | Error Logging & Recovery | v0.9.6 |
+| [F-112](./F-112-operation-audit-trail.md) | Operation Audit Trail | v0.9.6 |
+| [F-114](./F-114-cli-user-feedback.md) | CLI User Feedback | v0.9.6 |
+| [F-115](./F-115-source-quality-scoring.md) | Source Quality Scoring | v0.9.6 |
+| [F-118](./F-118-dry-run-mode.md) | Dry-Run Mode | v0.9.6 |
+
+## v0.9.5 - Stability & Logging (Released)
+
+| ID | Feature | Release |
+|----|---------|---------|
+| [F-110](./F-110-structured-logging.md) | Structured Logging | v0.9.5 |
+| [F-113](./F-113-exit-codes.md) | Exit Codes & Status | v0.9.5 |
+| [F-116](./F-116-index-integrity.md) | Index Integrity Checks | v0.9.5 |
+| [F-117](./F-117-self-healing.md) | Self-Healing Index | v0.9.5 |
+
+## v0.9.1 - CLI Polish II (Released)
+
+| ID | Feature | Release |
+|----|---------|---------|
+| [F-106](./F-106-indexing-documentation.md) | Indexing Documentation | v0.9.1 |
+| [F-107](./F-107-cli-refinements.md) | CLI Refinements | v0.9.1 |
+| [F-108](./F-108-config-refinements.md) | Config Refinements | v0.9.1 |
+| [F-109](./F-109-index-statistics.md) | Index Statistics | v0.9.1 |
+
+## v0.9.0 - Enhanced Indexing (Released)
+
+| ID | Feature | Release |
+|----|---------|---------|
+| [F-100](./F-100-new-file-types.md) | New File Type Support | v0.9.0 |
+| [F-101](./F-101-smart-chunking-v2.md) | Smart Chunking v2 | v0.9.0 |
+| [F-102](./F-102-indexing-resume.md) | Indexing Resume | v0.9.0 |
+| [F-103](./F-103-content-hashing.md) | Content Hashing | v0.9.0 |
+| [F-104](./F-104-duplicate-detection.md) | Duplicate Detection | v0.9.0 |
+
+## v0.8.7 - CLI Polish & Documentation I (Released)
+
+| ID | Feature | Release |
+|----|---------|---------|
+| [F-087](./F-087-shell-completion.md) | Shell Completion | v0.8.7 |
+| [F-088](./F-088-interactive-config.md) | Interactive Config | v0.8.7 |
+| [F-089](./F-089-help-system.md) | Help System Enhancement | v0.8.7 |
+| [F-090](./F-090-output-modes.md) | Output Mode Consistency | v0.8.7 |
+| [F-091](./F-091-tutorial-suite.md) | Tutorial Suite | v0.8.7 |
+| [F-092](./F-092-configuration-reference.md) | Configuration Reference | v0.8.7 |
+| [F-093](./F-093-troubleshooting-guide.md) | Troubleshooting Guide | v0.8.7 |
+| [F-094](./F-094-use-case-gallery.md) | Use Case Gallery | v0.8.7 |
+| [F-095](./F-095-demo-specs.md) | Video/GIF Demo Specs | v0.8.7 |
+| [F-096](./F-096-config-migration.md) | Config Migration Tool | v0.8.7 |
+| [F-097](./F-097-config-debugging.md) | Config Debugging | v0.8.7 |
+
+## v0.8.6 - Security Focus (Released)
+
+| ID | Feature | Release |
+|----|---------|---------|
+| [F-082](./F-082-security-hardening.md) | Security Hardening | v0.8.6 |
+| [F-083](./F-083-secrets-management.md) | Secrets Management | v0.8.6 |
+| [F-084](./F-084-error-resilience.md) | Error Resilience | v0.8.6 |
+| [F-085](./F-085-test-coverage-boost.md) | Test Coverage Boost | v0.8.6 |
+| [F-086](./F-086-dependency-audit.md) | Dependency Audit | v0.8.6 |
+
+## v0.8.5 - Knowledge Graph (Released)
+
+| ID | Feature | Release |
+|----|---------|---------|
+| [F-022](./F-022-knowledge-graph.md) | Knowledge Graph Integration | v0.8.5 |
+
+## v0.8.2 - Retrieval Enhancements (Released)
+
+| ID | Feature | Release |
+|----|---------|---------|
+| [F-080](./F-080-cross-encoder-reranking.md) | Cross-Encoder Reranking | v0.8.2 |
+| [F-081](./F-081-query-decomposition.md) | Query Decomposition | v0.8.2 |
+
+## v0.8.1 - Intelligent Tagging (Released)
+
+| ID | Feature | Release |
+|----|---------|---------|
+| [F-061](./F-061-auto-tag-suggestions.md) | Auto-Tag Suggestions | v0.8.1 |
+| [F-062](./F-062-tag-library.md) | Tag Library | v0.8.1 |
+| [F-063](./F-063-smart-collections.md) | Smart Collections | v0.8.1 |
+
+## v0.8.0 - Foundation (Released)
+
+| ID | Feature | Release |
+|----|---------|---------|
+| [F-018](./F-018-data-tiers.md) | Data Sensitivity Tiers | v0.8.0 |
+| [F-064](./F-064-tag-provenance.md) | Tag Provenance | v0.8.0 |
+
 ## v0.7.0 - Privacy & Security (Released)
 
 ### Chat Improvements

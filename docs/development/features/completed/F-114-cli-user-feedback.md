@@ -109,4 +109,4 @@ Consider future i18n:
 
 ---
 
-**Status**: Planned
+**Status**: Completed

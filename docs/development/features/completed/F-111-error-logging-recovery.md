@@ -108,4 +108,4 @@ Failed documents should be detectable by `ragd doctor` for later remediation att
 
 ---
 
-**Status**: Planned
+**Status**: Completed

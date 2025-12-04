@@ -2,26 +2,6 @@
 
 Features planned for future development. See [features/README.md](../README.md) for the complete roadmap.
 
-## v0.9.6 Features (Alpha Testing)
-
-High priority for alpha testing:
-
-| ID | Feature | Description |
-|----|---------|-------------|
-| [F-111](./F-111-error-logging-recovery.md) | Error Logging & Recovery | Per-document stats, failure categories |
-| F-112 | Operation Audit Trail | Log all operations with timestamps |
-| [F-114](./F-114-cli-user-feedback.md) | CLI User Feedback | Clean progress, quality stats |
-| F-115 | Source Quality Scoring | Confidence scores for content |
-| F-118 | Dry-Run Mode | `--dry-run` for destructive operations |
-
-Deferred from prior versions:
-
-| ID | Feature | Deferred From |
-|----|---------|---------------|
-| [F-098](./F-098-advanced-html-engine.md) | Advanced HTML Engine | v0.9.0 |
-| [F-099](./F-099-pdf-layout-intelligence.md) | PDF Layout Intelligence | v0.9.0 |
-| [F-105](./F-105-indexing-self-evaluation.md) | Indexing Self-Evaluation | v0.9.0 |
-
 ## v1.x Features (Production & Platform)
 
 | ID | Feature | Version | Description |
@@ -71,6 +51,7 @@ The following features were previously planned and have been implemented:
 | F-100 to F-104 | Enhanced Indexing | v0.9.0 |
 | F-106 to F-109 | CLI Polish II | v0.9.1 |
 | F-110, F-113, F-116, F-117 | Stability & Logging | v0.9.5 |
+| F-098, F-099, F-105, F-111, F-112, F-114, F-115, F-118 | Alpha Testing | v0.9.6 |
 
 ## Workflow
 

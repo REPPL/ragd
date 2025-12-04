@@ -195,14 +195,14 @@ Features are the primary unit of work. Each feature specification describes:
 
 | ID | Feature | Status | Description |
 |----|---------|--------|-------------|
-| [F-098](./planned/F-098-advanced-html-engine.md) | Advanced HTML Engine | 📅 Deferred | JavaScript rendering, SPAs |
-| [F-099](./planned/F-099-pdf-layout-intelligence.md) | PDF Layout Intelligence | 📅 Deferred | Forms, annotations, multi-column |
+| [F-098](./completed/F-098-advanced-html-engine.md) | Advanced HTML Engine | ✅ Complete | JavaScript rendering, SPAs |
+| [F-099](./completed/F-099-pdf-layout-intelligence.md) | PDF Layout Intelligence | ✅ Complete | Forms, annotations, multi-column |
 | [F-100](./completed/F-100-new-file-types.md) | New File Type Support | ✅ Complete | EPUB, DOCX, XLSX |
 | [F-101](./completed/F-101-smart-chunking-v2.md) | Smart Chunking v2 | ✅ Complete | Content-aware chunking |
 | [F-102](./completed/F-102-indexing-resume.md) | Indexing Resume | ✅ Complete | Resume interrupted operations |
 | [F-103](./completed/F-103-content-hashing.md) | Content Hashing | ✅ Complete | Detect file changes |
 | [F-104](./completed/F-104-duplicate-detection.md) | Duplicate Detection | ✅ Complete | Handle duplicate content |
-| [F-105](./planned/F-105-indexing-self-evaluation.md) | Indexing Self-Evaluation | 📅 Deferred | Automated testing with feedback |
+| [F-105](./completed/F-105-indexing-self-evaluation.md) | Indexing Self-Evaluation | ✅ Complete | Automated testing with feedback |
 
 ### v0.9.1 Features (CLI Polish II)
 
@@ -218,23 +218,22 @@ Features are the primary unit of work. Each feature specification describes:
 | ID | Feature | Status | Description |
 |----|---------|--------|-------------|
 | [F-110](./completed/F-110-structured-logging.md) | Structured Logging | ✅ Complete | JSON logs, log rotation |
-| F-111 | Error Logging & Recovery | 📅 Deferred | Detailed error logs |
-| F-112 | Operation Audit Trail | 📅 Deferred | Timestamps, durations |
 | [F-113](./completed/F-113-exit-codes.md) | Exit Codes & Status | ✅ Complete | Consistent exit codes |
-| F-114 | CLI User Feedback | 📅 Deferred | Progress, errors, hints |
-| F-115 | Source Quality Scoring | 📅 Deferred | Confidence scores |
 | [F-116](./completed/F-116-index-integrity.md) | Index Integrity Checks | ✅ Complete | `ragd doctor` |
 | [F-117](./completed/F-117-self-healing.md) | Self-Healing Index | ✅ Complete | Auto-repair issues |
-| F-118 | Dry-Run Mode | 📅 Deferred | `--dry-run` for destructive ops |
 
-### v0.9.6 Features (CLI Polish III)
+### v0.9.6 Features (Alpha Testing Release)
 
 | ID | Feature | Status | Description |
 |----|---------|--------|-------------|
-| F-119 | Early Adopter Doc Fixes | 📅 Planned | Address feedback |
-| F-120 | CLI Refinements II | 📅 Planned | Final UX polish |
-| F-121 | Troubleshooting Updates | 📅 Planned | Real issues encountered |
-| F-122 | Tutorial Refinements | 📅 Planned | User confusion points |
+| [F-098](./completed/F-098-advanced-html-engine.md) | Advanced HTML Engine | ✅ Complete | JavaScript rendering, SPAs |
+| [F-099](./completed/F-099-pdf-layout-intelligence.md) | PDF Layout Intelligence | ✅ Complete | Multi-column, forms, annotations |
+| [F-105](./completed/F-105-indexing-self-evaluation.md) | Indexing Self-Evaluation | ✅ Complete | Source-to-index comparison |
+| [F-111](./completed/F-111-error-logging-recovery.md) | Error Logging & Recovery | ✅ Complete | 17 error categories, hints |
+| [F-112](./completed/F-112-operation-audit-trail.md) | Operation Audit Trail | ✅ Complete | SQLite audit log |
+| [F-114](./completed/F-114-cli-user-feedback.md) | CLI User Feedback | ✅ Complete | Rich progress bars |
+| [F-115](./completed/F-115-source-quality-scoring.md) | Source Quality Scoring | ✅ Complete | Confidence metrics |
+| [F-118](./completed/F-118-dry-run-mode.md) | Dry-Run Mode | ✅ Complete | `--dry-run` for ops |
 
 ### v1.0 Features (Performance & Polish)
 
@@ -373,8 +372,8 @@ Features are numbered sequentially with milestone-based ranges:
 | F-087 to F-097 | v0.8.7 | CLI Polish & Documentation I |
 | F-098 to F-105 | v0.9.0 | Enhanced Indexing |
 | F-106 to F-109 | v0.9.1 | CLI Polish II |
-| F-110 to F-118 | v0.9.5 | Stability & Logging |
-| F-119 to F-122 | v0.9.6 | CLI Polish III |
+| F-110, F-113, F-116, F-117 | v0.9.5 | Stability & Logging |
+| F-098, F-099, F-105, F-111, F-112, F-114, F-115, F-118 | v0.9.6 | Alpha Testing Release |
 | F-123 to F-127 | v1.0 | Performance & Polish |
 | F-128 to F-132 | v1.1 | Graph & Automation |
 | F-133 to F-137 | v1.5 | API & Onboarding |
