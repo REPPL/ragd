@@ -76,6 +76,23 @@ from ragd.security.tiers import (
     get_tier_colour,
     get_tier_icon,
 )
+from ragd.security.validation import (
+    ValidationError,
+    validate_document_id,
+    validate_file_size,
+    validate_limit,
+    validate_path,
+    validate_tag_name,
+    sanitise_search_query,
+)
+from ragd.security.secrets import (
+    SecretString,
+    SecretsFilter,
+    get_all_secrets,
+    is_secret_env_var,
+    load_secret,
+    mask_secrets_in_string,
+)
 
 __all__ = [
     # Crypto
@@ -125,4 +142,19 @@ __all__ = [
     "TierManager",
     "get_tier_colour",
     "get_tier_icon",
+    # Validation (F-082)
+    "ValidationError",
+    "validate_document_id",
+    "validate_file_size",
+    "validate_limit",
+    "validate_path",
+    "validate_tag_name",
+    "sanitise_search_query",
+    # Secrets (F-083)
+    "SecretString",
+    "SecretsFilter",
+    "get_all_secrets",
+    "is_secret_env_var",
+    "load_secret",
+    "mask_secrets_in_string",
 ]
