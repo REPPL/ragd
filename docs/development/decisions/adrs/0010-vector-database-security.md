@@ -97,6 +97,6 @@ Combine encryption with access tiers:
 
 - [State-of-the-Art Privacy Research](../../research/state-of-the-art-privacy.md)
 - [ADR-0009: Security Architecture](./0009-security-architecture.md)
-- [F-018: Data Tiers](../../features/planned/F-018-data-tiers.md)
+- [F-018: Data Tiers](../../features/completed/F-018-data-tiers.md)
 
 ---
