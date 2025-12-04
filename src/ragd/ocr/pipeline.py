@@ -38,6 +38,7 @@ class OCRConfig:
     language: str = "en"  # OCR language
     fallback_enabled: bool = True  # Use fallback engine if primary fails
     dpi: int = 300  # Resolution for PDF rendering
+    max_consecutive_failures: int = 3  # Skip document after N complete failures
 
 
 @dataclass
@@ -49,6 +50,8 @@ class DocumentOCRResult:
     primary_engine: str = ""
     fallback_used: bool = False
     fallback_pages: list[int] = field(default_factory=list)
+    skipped: bool = False  # True if document was skipped due to failures
+    skip_reason: str = ""  # Reason for skipping
 
     @property
     def full_text(self) -> str:
@@ -209,6 +212,9 @@ class OCRPipeline:
         pages: list[PageOCRResult] = []
         fallback_pages: list[int] = []
         fallback_used = False
+        consecutive_failures = 0
+        skipped = False
+        skip_reason = ""
 
         for page_num in range(page_count):
             page_result, used_fallback = self._process_page(pdf_path, page_num)
@@ -218,6 +224,24 @@ class OCRPipeline:
                 fallback_used = True
                 fallback_pages.append(page_num)
 
+            # Track consecutive complete failures (no text from either engine)
+            if not page_result.results:
+                consecutive_failures += 1
+                if consecutive_failures >= self._config.max_consecutive_failures:
+                    skip_reason = (
+                        f"{consecutive_failures} consecutive OCR failures "
+                        f"(processed {page_num + 1}/{page_count} pages)"
+                    )
+                    self._logger.warning(
+                        "%s: skipping - %s",
+                        pdf_path.name,
+                        skip_reason,
+                    )
+                    skipped = True
+                    break
+            else:
+                consecutive_failures = 0  # Reset on success
+
         total_time = int((time.perf_counter() - start_time) * 1000)
 
         return DocumentOCRResult(
@@ -226,6 +250,8 @@ class OCRPipeline:
             primary_engine=self.primary_engine,
             fallback_used=fallback_used,
             fallback_pages=fallback_pages,
+            skipped=skipped,
+            skip_reason=skip_reason,
         )
 
     def process_pdf_streaming(
