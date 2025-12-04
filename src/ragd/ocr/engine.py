@@ -210,6 +210,25 @@ class PaddleOCREngine:
             self._logger.info("Loading PaddleOCR model (lang=%s)...", self._lang)
             start = time.perf_counter()
 
+            import warnings
+
+            # Suppress PaddlePaddle C++ extension ccache warning
+            warnings.filterwarnings(
+                "ignore",
+                message=".*ccache.*",
+                category=UserWarning,
+            )
+
+            # Suppress PaddleX verbose "Creating model" messages
+            paddle_loggers = [
+                "ppocr",
+                "paddlex",
+                "paddle",
+                "paddle.utils.cpp_extension.extension_utils",
+            ]
+            for logger_name in paddle_loggers:
+                logging.getLogger(logger_name).setLevel(logging.WARNING)
+
             from paddleocr import PaddleOCR
 
             # PaddleOCR 3.x API: show_log and use_gpu removed,
