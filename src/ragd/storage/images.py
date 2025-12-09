@@ -11,10 +11,12 @@ import logging
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-import chromadb
-from chromadb.config import Settings
+# Lazy import chromadb - it's heavy (~3-5 seconds)
+# Imported inside ImageStore.__init__ when actually needed
+if TYPE_CHECKING:
+    import chromadb
 
 logger = logging.getLogger(__name__)
 
@@ -56,6 +58,11 @@ class ImageStore:
             persist_directory: Directory for persistent storage
             dimension: Embedding dimension (default 128 for ColPali)
         """
+        # Lazy import chromadb - it's heavy (~3-5 seconds first time)
+        logger.info("Initialising image storage...")
+        import chromadb
+        from chromadb.config import Settings
+
         self.persist_directory = persist_directory
         self.dimension = dimension
         persist_directory.mkdir(parents=True, exist_ok=True)

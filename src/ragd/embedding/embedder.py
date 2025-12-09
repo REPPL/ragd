@@ -5,9 +5,15 @@ This module provides embedding generation for text chunks using local models.
 
 from __future__ import annotations
 
-from typing import Protocol
+import logging
+from typing import TYPE_CHECKING, Protocol
 
-from sentence_transformers import SentenceTransformer
+# Lazy import sentence_transformers - it's heavy (~1-2 seconds)
+# Imported inside methods when actually needed
+if TYPE_CHECKING:
+    from sentence_transformers import SentenceTransformer
+
+logger = logging.getLogger(__name__)
 
 
 class Embedder(Protocol):
@@ -71,7 +77,12 @@ class SentenceTransformerEmbedder:
             Loaded SentenceTransformer model
         """
         if self._model is None:
+            # Lazy import - sentence_transformers is heavy (~1-2 seconds first time)
+            logger.info("Loading embedding model: %s...", self._model_name)
+            from sentence_transformers import SentenceTransformer
+
             self._model = SentenceTransformer(self._model_name, device=self._device)
+            logger.info("Embedding model loaded")
         return self._model
 
     def embed(self, texts: list[str]) -> list[list[float]]:
@@ -217,5 +228,10 @@ def download_model(
         model_name: Name of the sentence-transformers model
         device: Device to use (cuda, mps, cpu, or None for auto)
     """
+    # Lazy import - sentence_transformers is heavy (~1-2 seconds first time)
+    logger.info("Downloading embedding model: %s...", model_name)
+    from sentence_transformers import SentenceTransformer
+
     # Simply loading the model will download it if not cached
     _ = SentenceTransformer(model_name, device=device)
+    logger.info("Embedding model downloaded")

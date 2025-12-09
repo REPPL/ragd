@@ -7,13 +7,18 @@ document embeddings with metadata.
 from __future__ import annotations
 
 import hashlib
+import logging
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-import chromadb
-from chromadb.config import Settings
+# Lazy import chromadb - it's heavy (~3-5 seconds)
+# Imported inside ChromaStore.__init__ when actually needed
+if TYPE_CHECKING:
+    import chromadb
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -47,6 +52,11 @@ class ChromaStore:
         Args:
             persist_directory: Directory for persistent storage
         """
+        # Lazy import chromadb - it's heavy (~3-5 seconds first time)
+        logger.info("Initialising vector database...")
+        import chromadb
+        from chromadb.config import Settings
+
         self.persist_directory = persist_directory
         persist_directory.mkdir(parents=True, exist_ok=True)
 

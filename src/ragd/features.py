@@ -417,15 +417,74 @@ def require(feature: str) -> None:
         )
 
 
-# Feature availability constants (evaluated at import time)
-DOCLING_AVAILABLE = _check_import("docling")
-PADDLEOCR_AVAILABLE = _check_import("paddleocr")
-EASYOCR_AVAILABLE = _check_import("easyocr")
-OCR_AVAILABLE = PADDLEOCR_AVAILABLE or EASYOCR_AVAILABLE
-KEYBERT_AVAILABLE = _check_import("keybert")
-SPACY_AVAILABLE = _check_import("spacy")
-LANGDETECT_AVAILABLE = _check_import("langdetect")
-PYARROW_AVAILABLE = _check_import("pyarrow")
-SELECTOLAX_AVAILABLE = _check_import("selectolax")
-TRAFILATURA_AVAILABLE = _check_import("trafilatura")
-WEB_AVAILABLE = SELECTOLAX_AVAILABLE and TRAFILATURA_AVAILABLE
+# Lazy feature availability - evaluated on first access, not at import time
+# This avoids loading heavy modules (paddleocr ~3.7s, torch ~0.4s) on CLI startup
+
+
+class _LazyFeatureCheck:
+    """Lazy evaluation wrapper for feature checks.
+
+    Defers the actual import check until the value is accessed,
+    avoiding heavy module loading during ragd startup.
+    """
+
+    def __init__(self, module_name: str) -> None:
+        self._module_name = module_name
+        self._checked = False
+        self._available = False
+
+    def __bool__(self) -> bool:
+        if not self._checked:
+            self._available = _check_import(self._module_name)
+            self._checked = True
+        return self._available
+
+    def __eq__(self, other: object) -> bool:
+        """Support equality comparison with booleans."""
+        if isinstance(other, bool):
+            return bool(self) == other
+        if isinstance(other, _LazyFeatureCheck):
+            return bool(self) == bool(other)
+        return NotImplemented
+
+    def __repr__(self) -> str:
+        return f"_LazyFeatureCheck({self._module_name!r}, checked={self._checked})"
+
+
+# Lazy feature checks - only import modules when these are actually used
+DOCLING_AVAILABLE = _LazyFeatureCheck("docling")
+PADDLEOCR_AVAILABLE = _LazyFeatureCheck("paddleocr")
+EASYOCR_AVAILABLE = _LazyFeatureCheck("easyocr")
+KEYBERT_AVAILABLE = _LazyFeatureCheck("keybert")
+SPACY_AVAILABLE = _LazyFeatureCheck("spacy")
+LANGDETECT_AVAILABLE = _LazyFeatureCheck("langdetect")
+PYARROW_AVAILABLE = _LazyFeatureCheck("pyarrow")
+SELECTOLAX_AVAILABLE = _LazyFeatureCheck("selectolax")
+TRAFILATURA_AVAILABLE = _LazyFeatureCheck("trafilatura")
+
+
+# Compound checks - also lazy
+class _LazyOrCheck:
+    """Lazy OR evaluation of two feature checks."""
+
+    def __init__(self, a: _LazyFeatureCheck, b: _LazyFeatureCheck) -> None:
+        self._a = a
+        self._b = b
+
+    def __bool__(self) -> bool:
+        return bool(self._a) or bool(self._b)
+
+
+class _LazyAndCheck:
+    """Lazy AND evaluation of two feature checks."""
+
+    def __init__(self, a: _LazyFeatureCheck, b: _LazyFeatureCheck) -> None:
+        self._a = a
+        self._b = b
+
+    def __bool__(self) -> bool:
+        return bool(self._a) and bool(self._b)
+
+
+OCR_AVAILABLE = _LazyOrCheck(PADDLEOCR_AVAILABLE, EASYOCR_AVAILABLE)
+WEB_AVAILABLE = _LazyAndCheck(SELECTOLAX_AVAILABLE, TRAFILATURA_AVAILABLE)

@@ -10,10 +10,12 @@ from __future__ import annotations
 import logging
 from datetime import datetime
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-import chromadb
-from chromadb.config import Settings
+# Lazy import chromadb - it's heavy (~3-5 seconds)
+# Imported inside ChromaDBAdapter.__init__ when actually needed
+if TYPE_CHECKING:
+    import chromadb
 
 from ragd.storage.types import (
     BackendHealth,
@@ -38,8 +40,8 @@ class ChromaDBAdapter:
     We normalise to similarity score: score = 1.0 - (distance / 2.0)
     """
 
-    COLLECTION_NAME = "ragd_vectors"
-    METADATA_COLLECTION = "ragd_documents"
+    COLLECTION_NAME = "ragd_documents"
+    METADATA_COLLECTION = "ragd_metadata"
 
     def __init__(
         self,
@@ -56,6 +58,11 @@ class ChromaDBAdapter:
             collection_name: Optional custom collection name
             **kwargs: Additional ChromaDB options
         """
+        # Lazy import chromadb - it's heavy (~3-5 seconds first time)
+        logger.info("Initialising vector database...")
+        import chromadb
+        from chromadb.config import Settings
+
         self._persist_directory = persist_directory
         self._dimension = dimension
         self._collection_name = collection_name or self.COLLECTION_NAME

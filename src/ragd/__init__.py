@@ -10,5 +10,5 @@ os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
 
 __version__ = "0.9.6"
 
-# Lazy imports for submodules
-from ragd import vision
+# Vision module is available via `from ragd.vision import ...`
+# Not imported here to avoid heavy chromadb/torch imports on every ragd command

@@ -82,7 +82,7 @@ llm:
   model: llama3.2:3b
   temperature: 0.7
   max_tokens: 1024
-  ollama_url: http://localhost:11434
+  base_url: http://localhost:11434
 
 chat:
   history_enabled: true

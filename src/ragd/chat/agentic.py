@@ -145,7 +145,7 @@ class AgenticRAG:
         self.agentic = agentic_config or AgenticConfig()
 
         self._llm = OllamaClient(
-            base_url=self.config.llm.ollama_url,
+            base_url=self.config.llm.base_url,
             model=self.config.llm.model,
             timeout_seconds=120,
         )

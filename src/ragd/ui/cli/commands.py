@@ -484,8 +484,8 @@ def stats_command(
 
     # Get basic stats
     stats = store.get_stats()
-    doc_count = stats.document_count
-    chunk_count = stats.chunk_count
+    doc_count = stats["document_count"]
+    chunk_count = stats["chunk_count"]
 
     # Get file type breakdown from metadata
     file_types: Counter[str] = Counter()
@@ -1647,7 +1647,7 @@ def models_list_command(
             # Show configuration
             con.print(f"\n[bold]Configuration:[/bold]")
             con.print(f"  Default model: {config.llm.model}")
-            con.print(f"  Ollama URL: {config.llm.ollama_url}")
+            con.print(f"  Ollama URL: {config.llm.base_url}")
 
     except Exception as e:
         con.print(f"[red]Error listing models: {e}[/red]")
