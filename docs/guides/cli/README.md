@@ -49,8 +49,7 @@ That's it! You now know the 4 essential commands.
 
 ## Related Documentation
 
-- [Getting Started Tutorial](../../tutorials/getting-started.md) - Hands-on learning
-- [ADR-0005: CLI Design Principles](../../development/decisions/adrs/0005-cli-design-principles.md) - Design rationale
-- [CLI Best Practices Research](../../development/research/cli-best-practices.md) - Background research
+- [Getting Started Tutorial](../../tutorials/01-getting-started.md) - Hands-on learning
+- [CLI Reference](../../reference/cli-reference.md) - Complete command specifications
 
 ---
