@@ -1,6 +1,6 @@
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Python 3.12](https://img.shields.io/badge/python-3.12-blue.svg)](https://www.python.org/downloads/)
-[![Status: Alpha](https://img.shields.io/badge/status-alpha-red.svg)]()
+[![Version: 1.0.0](https://img.shields.io/badge/version-1.0.0-green.svg)]()
 
 
 ![ragged logo](docs/assets/img/ragd-logo.png)
@@ -27,32 +27,24 @@ ragd is a reference implementation demonstrating best practices for:
 ### Installation
 
 ```bash
-# Clone the repository
-git clone git@github.com:REPPL/ragd.git
-cd ragd
-
-# Create virtual environment
-python3.12 -m venv .venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-
-# Install dependencies
-pip install -e ".[dev]"
-
-# Run guided setup (detects hardware, recommends models)
-ragd init
-
-# Verify installation
-ragd doctor
+pip install ragd
 ```
 
-### Docker Setup (Alternative)
-
-For containerised deployment:
+Then run the guided setup:
 
 ```bash
-docker-compose up -d        # Start services
-docker-compose logs -f      # View logs
-docker-compose down         # Stop services
+ragd init     # Detects hardware, recommends models
+ragd doctor   # Verify installation
+```
+
+### Install from Source (for contributors)
+
+```bash
+git clone git@github.com:REPPL/ragd.git
+cd ragd
+python3.12 -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+pip install -e ".[dev]"
 ```
 
 ## Usage
