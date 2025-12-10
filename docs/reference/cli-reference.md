@@ -1,6 +1,6 @@
 # CLI Reference
 
-Complete command reference for ragd v0.9.6.
+Complete command reference for ragd v1.0.0a1.
 
 ## Synopsis
 
@@ -201,6 +201,7 @@ Returns relevant document chunks using hybrid search. By default, opens an inter
 | `--min-score` | | Minimum similarity score (0-1) | `0.3` |
 | `--mode` | `-m` | Search mode: `hybrid`, `semantic`, `keyword` | `hybrid` |
 | `--cite` | | Citation style | `none` |
+| `--tag` | `-t` | Filter by tag (repeatable) | |
 | `--no-interactive` | | Print results directly | `false` |
 | `--format` | `-f` | Output format | `rich` |
 | `--no-color` | | Disable colour output | |
@@ -242,6 +243,12 @@ ragd search "revenue analysis" --cite apa
 
 # JSON output for scripting
 ragd search "quantum computing" --format json --no-interactive
+
+# Filter by tag
+ragd search "neural networks" --tag "topic:ml"
+
+# Multiple tags (all must match)
+ragd search "requirements" --tag "project:alpha" --tag "status:reviewed"
 ```
 
 ---
@@ -663,4 +670,4 @@ Environment variables use double underscore (`__`) for nested config keys.
 
 ---
 
-**Status**: Reference specification for v0.9.6
+**Status**: Reference specification for v1.0.0a1

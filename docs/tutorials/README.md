@@ -16,8 +16,7 @@ Progressive learning guides for ragd, from installation to advanced usage.
 | Tutorial | Time | Description |
 |----------|------|-------------|
 | [Chat Interface](03-chat-interface.md) | 15 min | Interactive Q&A with your knowledge base |
-| [Organisation](04-organisation.md) | 25 min | Tags, collections, and metadata |
-| [Organising Your Knowledge Base](organising-knowledge-base.md) | 20 min | Tags, collections, metadata taxonomy |
+| [Organising Your Knowledge Base](organising-knowledge-base.md) | 20 min | Tags, collections, and metadata |
 | [Backing Up Your Data](backing-up-data.md) | 15 min | Export, backup, and restore |
 
 ### Advanced

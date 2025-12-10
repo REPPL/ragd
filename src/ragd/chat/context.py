@@ -266,6 +266,27 @@ class ContextWindow:
 
         return added
 
+    def _group_by_document(self) -> "OrderedDict[str, list[RetrievedContext]]":
+        """Group contexts by document, preserving insertion order.
+
+        Documents are keyed by document_id, falling back to source name.
+        Order is determined by first occurrence of each document.
+
+        Returns:
+            OrderedDict mapping document keys to list of contexts
+        """
+        from collections import OrderedDict
+
+        doc_chunks: OrderedDict[str, list[RetrievedContext]] = OrderedDict()
+
+        for ctx in self._contexts:
+            doc_key = ctx.document_id or ctx.source
+            if doc_key not in doc_chunks:
+                doc_chunks[doc_key] = []
+            doc_chunks[doc_key].append(ctx)
+
+        return doc_chunks
+
     def format_context(self, include_scores: bool = False) -> str:
         """Format all context for prompt with citation guidance.
 
@@ -288,16 +309,8 @@ class ContextWindow:
             "Ignore (Author, Year) citations within text.\n\n"
         )
 
-        # Group chunks by document (document_id or source as fallback)
-        from collections import OrderedDict
-
-        doc_chunks: OrderedDict[str, list[RetrievedContext]] = OrderedDict()
-
-        for ctx in self._contexts:
-            doc_key = ctx.document_id or ctx.source
-            if doc_key not in doc_chunks:
-                doc_chunks[doc_key] = []
-            doc_chunks[doc_key].append(ctx)
+        # Group chunks by document (uses shared ordering logic)
+        doc_chunks = self._group_by_document()
 
         # Format each document as a single context block
         parts = []
@@ -336,28 +349,17 @@ class ContextWindow:
     def get_deduplicated_citations(self) -> list[Citation]:
         """Get unique citations, one per document.
 
-        Deduplicates by document_id, keeping first occurrence.
-        This prevents the same source appearing multiple times
-        in the reference list.
+        Uses the same document ordering as format_context() to ensure
+        citation numbers match between the LLM prompt and displayed sources.
 
         Returns:
-            List of unique Citation objects
+            List of unique Citation objects in consistent order
         """
-        seen_docs: set[str] = set()
-        unique: list[Citation] = []
+        # Use shared grouping to ensure consistent ordering with format_context
+        doc_chunks = self._group_by_document()
 
-        for ctx in self._contexts:
-            doc_id = ctx.document_id
-            if doc_id and doc_id not in seen_docs:
-                seen_docs.add(doc_id)
-                unique.append(ctx.to_citation())
-            elif not doc_id:
-                # No document_id, use source as fallback key
-                if ctx.source not in seen_docs:
-                    seen_docs.add(ctx.source)
-                    unique.append(ctx.to_citation())
-
-        return unique
+        # Return first citation from each document group
+        return [chunks[0].to_citation() for chunks in doc_chunks.values()]
 
     def clear(self) -> None:
         """Clear all context."""

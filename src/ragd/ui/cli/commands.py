@@ -40,6 +40,100 @@ def get_console(no_color: bool = False, max_width: int | None = None) -> Console
     return Console(no_color=no_color, width=max_width, soft_wrap=True)
 
 
+class StreamingWordWrapper:
+    """Buffers streaming output for word-boundary aware wrapping.
+
+    When streaming LLM responses character-by-character, Rich's soft_wrap
+    doesn't work because each chunk is printed immediately. This class
+    buffers partial words and wraps at word boundaries.
+    """
+
+    def __init__(
+        self,
+        console: Console,
+        max_width: int,
+        prefix_width: int = 3,
+    ) -> None:
+        """Initialise streaming wrapper.
+
+        Args:
+            console: Rich console for output
+            max_width: Maximum line width
+            prefix_width: Width of line prefix (e.g., "A: " = 3)
+        """
+        self.console = console
+        self.max_width = max_width
+        self.prefix_width = prefix_width
+        self.current_line_len = prefix_width
+        self.word_buffer = ""
+
+    def write(self, chunk: str) -> None:
+        """Write chunk with word-aware wrapping.
+
+        Args:
+            chunk: Text chunk to write (may be partial word)
+        """
+        for char in chunk:
+            if char in " \n\t":
+                # Whitespace: flush word buffer first
+                self._flush_word()
+                if char == "\n":
+                    self._newline()
+                elif char == " ":
+                    self._write_space()
+                # Tabs treated as spaces
+                elif char == "\t":
+                    self._write_space()
+            else:
+                self.word_buffer += char
+
+    def _flush_word(self) -> None:
+        """Flush buffered word to output."""
+        if not self.word_buffer:
+            return
+
+        word_len = len(self.word_buffer)
+
+        # Check if word fits on current line
+        if self.current_line_len + word_len > self.max_width:
+            # Word doesn't fit - wrap to new line
+            self._newline()
+
+        # Handle words longer than max_width (rare edge case)
+        if word_len > self.max_width:
+            # Split long word across lines
+            remaining = self.word_buffer
+            while remaining:
+                space_left = self.max_width - self.current_line_len
+                if space_left <= 0:
+                    self._newline()
+                    space_left = self.max_width
+                chunk = remaining[:space_left]
+                self.console.print(chunk, end="", markup=False)
+                self.current_line_len += len(chunk)
+                remaining = remaining[space_left:]
+        else:
+            self.console.print(self.word_buffer, end="", markup=False)
+            self.current_line_len += word_len
+
+        self.word_buffer = ""
+
+    def _write_space(self) -> None:
+        """Write a space if room on line."""
+        if self.current_line_len < self.max_width:
+            self.console.print(" ", end="", markup=False)
+            self.current_line_len += 1
+
+    def _newline(self) -> None:
+        """Output newline and reset line counter."""
+        self.console.print()
+        self.current_line_len = 0
+
+    def flush(self) -> None:
+        """Flush any remaining buffered content."""
+        self._flush_word()
+
+
 def init_command(
     no_color: bool = False,
 ) -> None:
@@ -294,6 +388,7 @@ def search_command(
     no_interactive: bool = False,
     output_format: OutputFormat = "rich",
     no_color: bool = False,
+    tags: list[str] | None = None,
 ) -> None:
     """Search indexed documents with natural language.
 
@@ -353,6 +448,21 @@ def search_command(
         raise typer.Exit(1)
     cite_style = cite.lower()
 
+    # Tag filtering: get allowed document IDs
+    allowed_doc_ids: set[str] | None = None
+    if tags:
+        from ragd.metadata.tags import TagManager
+        from ragd.storage.metadata import MetadataStore
+
+        store = MetadataStore(config.data_dir / "metadata.db")
+        tag_mgr = TagManager(store)
+        matching_ids = tag_mgr.find_by_tags(tags, match_all=True)
+        allowed_doc_ids = set(matching_ids)
+
+        if not allowed_doc_ids:
+            con.print(f"[yellow]No documents found with tags: {', '.join(tags)}[/yellow]")
+            return
+
     try:
         with Progress(
             SpinnerColumn(),
@@ -392,6 +502,10 @@ def search_command(
         )
         for hr in hybrid_results
     ]
+
+    # Filter by tags if specified
+    if allowed_doc_ids is not None:
+        results = [r for r in results if r.document_id in allowed_doc_ids]
 
     # Determine if we should use interactive mode
     # Interactive mode requires: TTY, rich format, not disabled, and results exist
@@ -1941,6 +2055,11 @@ def chat_command(
                 from rich.status import Status
                 response_started = False
 
+                # Use word-aware wrapper for proper line wrapping
+                wrapper = StreamingWordWrapper(
+                    con, config.display.max_width, prefix_width=3
+                )
+
                 with Status("[dim]Thinking...[/dim]", console=con, spinner="dots") as status:
                     response_chunks = []
                     for chunk in session.chat(user_input, stream=True):
@@ -1949,9 +2068,12 @@ def chat_command(
                             status.stop()
                             con.print("[bold green]A:[/bold green] ", end="")
                             response_started = True
-                        # Disable markup to prevent LLM output being interpreted as Rich markup
-                        con.print(chunk, end="", markup=False)
+                        # Use wrapper for word-boundary aware output
+                        wrapper.write(chunk)
                         response_chunks.append(chunk)
+
+                    # Flush any remaining buffered content
+                    wrapper.flush()
 
                 if not response_started:
                     # No response received
@@ -1960,6 +2082,7 @@ def chat_command(
                     con.print()  # End response line
 
                     # Display citations if enabled (deduplicated)
+                    # Skip for "no information" responses (citations will be empty)
                     if cite_mode != "none" and session.history.messages:
                         last_msg = session.history.messages[-1]
                         if last_msg.citations:

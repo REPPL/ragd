@@ -106,31 +106,26 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 | v0.3.0 | 📋 Planned | Advanced Search |
 | v1.0.0 | 📋 Planned | Personal Platform + WebUI |
 
-### Version Locations (CRITICAL)
+### Version Location
 
-ragd defines version in **TWO places** that MUST stay synchronised:
+ragd uses a **single source of truth** for version:
 
-| File | Line | Purpose |
-|------|------|---------|
-| `pyproject.toml` | 7 | Package metadata (pip install) |
-| `src/ragd/__init__.py` | 3 | Runtime `__version__` (CLI) |
+| File | Purpose |
+|------|---------|
+| `pyproject.toml` | Package metadata - the canonical version |
 
-**When updating version, ALWAYS update BOTH files:**
+The `__version__` in `src/ragd/__init__.py` is derived automatically from package metadata via `importlib.metadata`. When updating version, only edit `pyproject.toml`:
 
 ```bash
 # 1. Update pyproject.toml
 #    version = "X.Y.Z"
 
-# 2. Update src/ragd/__init__.py
-#    __version__ = "X.Y.Z"
+# 2. Reinstall package to update metadata
+pip install -e ".[all]"
 
-# 3. Verify sync
-grep 'version = ' pyproject.toml
-grep '__version__' src/ragd/__init__.py
-ragd --version  # Must match
+# 3. Verify
+ragd --version
 ```
-
-A pre-commit hook validates version consistency before commits.
 
 ---
 
@@ -139,7 +134,6 @@ A pre-commit hook validates version consistency before commits.
 ### Pre-Implementation (Before Starting)
 
 - [ ] `pyproject.toml` version matches target milestone
-- [ ] `src/ragd/__init__.py` `__version__` matches pyproject.toml
 - [ ] `ragd --version` displays expected version
 - [ ] `.venv/` activated with Python 3.12+
 - [ ] All dependencies installed (`pip install -e ".[all]"`)

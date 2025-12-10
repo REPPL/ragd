@@ -23,14 +23,6 @@ repos:
   # Local hooks
   - repo: local
     hooks:
-      # Version sync validation
-      - id: version-sync
-        name: Check version consistency
-        entry: python scripts/check-version-sync.py
-        language: python
-        pass_filenames: false
-        always_run: true
-
       # Block .work/ directory commits
       - id: no-work-commits
         name: Block .work/ commits

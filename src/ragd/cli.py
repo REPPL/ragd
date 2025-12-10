@@ -366,6 +366,9 @@ def search(
     ),
     output_format: FormatOption = "rich",
     no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
+    tag: list[str] = typer.Option(
+        [], "--tag", "-t", help="Filter by tag. Can be repeated for multiple tags."
+    ),
 ) -> None:
     """Search indexed documents with natural language.
 
@@ -385,6 +388,10 @@ def search(
       - chicago: Chicago notes-bibliography
       - bibtex: BibTeX for LaTeX
       - markdown: Markdown link format
+
+    Tag filtering:
+      Use --tag to filter results to documents with specific tags.
+      Multiple --tag options require ALL tags to match.
     """
     search_command(
         query=query,
@@ -395,6 +402,7 @@ def search(
         no_interactive=no_interactive,
         output_format=output_format,  # type: ignore
         no_color=no_color,
+        tags=tag if tag else None,
     )
 
 

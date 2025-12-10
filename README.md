@@ -1,6 +1,9 @@
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Python 3.12](https://img.shields.io/badge/python-3.12-blue.svg)](https://www.python.org/downloads/)
-[![Version: 1.0.0a1](https://img.shields.io/badge/version-1.0.0a1-orange.svg)]()
+[![Version](https://img.shields.io/badge/version-1.0.0a1-green.svg)](https://github.com/REPPL/ragd/releases)
+[![Requires Ollama](https://img.shields.io/badge/requires-Ollama-purple.svg)](https://ollama.ai/)
+[![macOS](https://img.shields.io/badge/macOS-supported-brightgreen.svg)]()
+[![Linux](https://img.shields.io/badge/Linux-supported-brightgreen.svg)]()
+[![Built with Claude Code](https://img.shields.io/badge/built%20with-Claude%20Code-orange.svg)](https://claude.ai/code)
 
 
 ![ragged logo](docs/assets/img/ragd-logo.png)

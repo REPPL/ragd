@@ -9,7 +9,7 @@ Documentation for contributors and developers.
 | Use Cases | 6 P0 briefs defined |
 | Features | 96 features complete, 11 planned |
 | Tutorials | Getting Started + 5 tutorials |
-| Milestone | v0.9.6 released (preparing v1.0.0) |
+| Milestone | v1.0.0a1 released |
 | ADRs | 32 architecture decisions |
 
 ## Structure
@@ -44,9 +44,9 @@ Layer 3: TUTORIALS (How users experience it)
 - [Planned Features](./features/planned/)
 - [Milestones](./milestones/)
 
-### v0.9.6 (Latest Release)
-- [v0.9.6 Milestone](./milestones/v0.9.6.md)
-- [v0.9.6 Implementation](./implementation/v0.9.6.md)
+### v1.0.0a1 (Latest Release)
+- [v1.0.0 Milestone](./milestones/v1.0.0.md)
+- [v0.9.6 Implementation](./implementation/v0.9.6.md) (last implementation record)
 - [F-098: Advanced HTML Engine](./features/completed/F-098-advanced-html-engine.md)
 - [F-099: PDF Layout Intelligence](./features/completed/F-099-pdf-layout-intelligence.md)
 - [F-105: Indexing Self-Evaluation](./features/completed/F-105-indexing-self-evaluation.md)
