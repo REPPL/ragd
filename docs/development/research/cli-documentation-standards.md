@@ -806,8 +806,8 @@ ragd search "neural networks" --json | jq '.results[0]'
 
 ## See Also
 
-- [ragd-index(1)](./ragd-index.md) - Index documents
-- [ragd-status(1)](./ragd-status.md) - View database status
+- ragd-index(1) - Index documents
+- ragd-info(1) - View database status
 ```
 
 ---

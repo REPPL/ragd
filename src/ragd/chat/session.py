@@ -239,6 +239,7 @@ class ChatSession:
         FOLLOW_UP_INDICATORS = [
             "it", "this", "that", "these", "those",
             "the concept", "the topic", "the subject",
+            "paper", "document", "article",  # Referenced sources
             "more about", "else about", "what else",
             "tell me more", "elaborate", "expand",
             "continue", "go on", "and",
@@ -262,10 +263,17 @@ class ChatSession:
         if not history_text.strip():
             return question
 
+        # Get cited documents from recent conversation for context
+        cited_docs = self._history.get_cited_documents(
+            n=self.chat_config.rewrite_history_turns
+        )
+        doc_context = "\n".join(f"- {f}" for f in cited_docs) if cited_docs else "None"
+
         # Use the configured query rewrite prompt
         prompt = self.config.chat.prompts.query_rewrite.format(
             history=history_text,
             question=question,
+            cited_documents=doc_context,
         )
 
         try:

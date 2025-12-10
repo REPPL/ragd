@@ -373,6 +373,85 @@ class TestChatHistory:
         assert history.session_id == "sess456"
         assert len(history) == 1
 
+    def test_get_cited_documents_returns_unique_filenames(self):
+        """Test get_cited_documents returns unique filenames from citations."""
+        history = ChatHistory()
+
+        # Add user message (no citations)
+        history.add_user_message("What is data sovereignty?")
+
+        # Add assistant message with citations
+        citations = [
+            Citation(document_id="doc1", filename="hummel-et-al-2021.pdf"),
+            Citation(document_id="doc2", filename="smith-2020.pdf"),
+        ]
+        history.add_assistant_message("Data sovereignty is...", citations=citations)
+
+        # Get cited documents
+        cited = history.get_cited_documents(n=4)
+
+        assert len(cited) == 2
+        assert "hummel-et-al-2021.pdf" in cited
+        assert "smith-2020.pdf" in cited
+
+    def test_get_cited_documents_preserves_order(self):
+        """Test get_cited_documents preserves first-seen order."""
+        history = ChatHistory()
+
+        # First exchange
+        history.add_user_message("Question 1")
+        history.add_assistant_message("Answer 1", citations=[
+            Citation(document_id="doc_a", filename="a.pdf"),
+        ])
+
+        # Second exchange
+        history.add_user_message("Question 2")
+        history.add_assistant_message("Answer 2", citations=[
+            Citation(document_id="doc_b", filename="b.pdf"),
+            Citation(document_id="doc_a", filename="a.pdf"),  # Duplicate
+        ])
+
+        cited = history.get_cited_documents(n=10)
+
+        # Should preserve first-seen order: a, b
+        assert len(cited) == 2
+        assert cited[0] == "a.pdf"
+        assert cited[1] == "b.pdf"
+
+    def test_get_cited_documents_empty_history(self):
+        """Test get_cited_documents on empty history."""
+        history = ChatHistory()
+        cited = history.get_cited_documents(n=4)
+        assert cited == []
+
+    def test_get_cited_documents_no_citations(self):
+        """Test get_cited_documents when messages have no citations."""
+        history = ChatHistory()
+        history.add_user_message("Hello")
+        history.add_assistant_message("Hi there!")
+
+        cited = history.get_cited_documents(n=4)
+        assert cited == []
+
+    def test_get_cited_documents_respects_n_limit(self):
+        """Test get_cited_documents respects the n parameter."""
+        history = ChatHistory()
+
+        # Add many messages with citations
+        for i in range(10):
+            history.add_user_message(f"Question {i}")
+            history.add_assistant_message(
+                f"Answer {i}",
+                citations=[Citation(document_id=f"doc_{i}", filename=f"doc_{i}.pdf")],
+            )
+
+        # Only look at last 2 messages (1 user + 1 assistant)
+        cited = history.get_cited_documents(n=2)
+
+        # Should only have citation from the last assistant message
+        assert len(cited) == 1
+        assert cited[0] == "doc_9.pdf"
+
 
 class TestHistoryPersistence:
     """Tests for history save/load."""
@@ -657,6 +736,112 @@ class TestQueryRewritingWithContext:
 
         # Should return original when LLM doesn't improve it
         assert result == "tell me more"
+
+    def test_rewrite_includes_cited_documents(self):
+        """Test that query rewriting includes cited document filenames.
+
+        This is the key fix for the "hummel et al paper" bug: when users
+        reference previously-cited documents by author name, the rewriter
+        now has access to the actual filenames to resolve the reference.
+        """
+        with patch("ragd.chat.session.OllamaClient") as MockClient, \
+             patch("ragd.chat.session.HybridSearcher") as MockSearcher:
+
+            mock_llm = MagicMock()
+            MockClient.return_value = mock_llm
+            MockSearcher.return_value = MagicMock()
+
+            mock_config = MagicMock()
+            # Use the new prompt format with {cited_documents}
+            mock_config.chat.prompts.query_rewrite = (
+                "Rewrite this follow-up question.\n\n"
+                "Conversation:\n{history}\n\n"
+                "Documents cited:\n{cited_documents}\n\n"
+                "Follow-up question: {question}\n\n"
+                "Rewritten question (use exact document filenames):"
+            )
+            mock_config.llm.base_url = "http://localhost:11434"
+
+            chat_config = ChatConfig(rewrite_history_turns=4)
+            session = ChatSession(config=mock_config, chat_config=chat_config)
+            session._llm = mock_llm
+
+            # Build conversation with a cited document
+            session._history.add_user_message("What is data sovereignty?")
+            session._history.add_assistant_message(
+                "Data sovereignty is...",
+                citations=[
+                    Citation(
+                        document_id="doc1",
+                        filename="hummel-et-al-2021-data-sovereignty.pdf",
+                    )
+                ],
+            )
+
+            captured_prompt = None
+
+            def capture_call(**kwargs):
+                nonlocal captured_prompt
+                captured_prompt = kwargs.get("prompt", "")
+                return LLMResponse(
+                    content="Summarise hummel-et-al-2021-data-sovereignty.pdf",
+                    model="test",
+                    tokens_used=10,
+                )
+
+            session._llm.generate.side_effect = capture_call
+
+            # User refers to document by author name - "the paper" triggers rewrite
+            result = session._rewrite_query_with_context(
+                "summarise the hummel et al paper"
+            )
+
+            # The cited document filename MUST appear in the rewrite prompt
+            assert captured_prompt is not None
+            assert "hummel-et-al-2021-data-sovereignty.pdf" in captured_prompt
+
+            # The rewritten query should include the filename
+            assert "hummel-et-al-2021-data-sovereignty.pdf" in result
+
+    def test_rewrite_with_no_citations_shows_none(self):
+        """Test that {cited_documents} shows 'None' when no citations exist."""
+        with patch("ragd.chat.session.OllamaClient") as MockClient, \
+             patch("ragd.chat.session.HybridSearcher") as MockSearcher:
+
+            mock_llm = MagicMock()
+            MockClient.return_value = mock_llm
+            MockSearcher.return_value = MagicMock()
+
+            mock_config = MagicMock()
+            mock_config.chat.prompts.query_rewrite = (
+                "Conversation:\n{history}\n\n"
+                "Documents cited:\n{cited_documents}\n\n"
+                "Question: {question}\nRewritten:"
+            )
+            mock_config.llm.base_url = "http://localhost:11434"
+
+            chat_config = ChatConfig(rewrite_history_turns=4)
+            session = ChatSession(config=mock_config, chat_config=chat_config)
+            session._llm = mock_llm
+
+            # Conversation without citations
+            session._history.add_user_message("What is RAG?")
+            session._history.add_assistant_message("RAG is...")  # No citations
+
+            captured_prompt = None
+
+            def capture_call(**kwargs):
+                nonlocal captured_prompt
+                captured_prompt = kwargs.get("prompt", "")
+                return LLMResponse(content="rewritten", model="test", tokens_used=5)
+
+            session._llm.generate.side_effect = capture_call
+
+            session._rewrite_query_with_context("tell me more")
+
+            # Should show "None" for cited documents
+            assert captured_prompt is not None
+            assert "Documents cited:\nNone" in captured_prompt
 
 
 class TestStreamingWordWrapper:

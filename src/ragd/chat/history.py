@@ -92,6 +92,28 @@ class ChatHistory:
         """
         return self.messages[-n:] if n > 0 else []
 
+    def get_cited_documents(self, n: int = 4) -> list[str]:
+        """Extract unique document filenames from recent citations.
+
+        This enables citation-aware query rewriting, allowing users to
+        reference previously-cited documents by author name or partial
+        filename (e.g., "the hummel et al paper").
+
+        Args:
+            n: Number of recent messages to scan for citations
+
+        Returns:
+            List of unique filenames from citations, preserving order
+        """
+        filenames: list[str] = []
+        seen: set[str] = set()
+        for msg in self.get_recent(n):
+            for cit in msg.citations:
+                if cit.filename and cit.filename not in seen:
+                    filenames.append(cit.filename)
+                    seen.add(cit.filename)
+        return filenames
+
     def format_for_prompt(
         self,
         n: int = 5,

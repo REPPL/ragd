@@ -95,3 +95,11 @@ You've succeeded if:
 **Slow indexing**
 - First run downloads models (one-time)
 - Large PDFs with images take longer
+
+---
+
+## Related Documentation
+
+- [CLI Essentials Guide](../guides/cli/essentials.md) - Quick reference for core commands
+- [CLI Reference](../reference/cli-reference.md) - Complete command specifications
+- [Configuration Reference](../reference/configuration.md) - Configuration options

@@ -140,3 +140,11 @@ You've succeeded if you can:
 - Try semantic mode for conceptual queries
 - Try keyword mode for error messages
 - Lower min-score if getting no results
+
+---
+
+## Related Documentation
+
+- [Powerful Searching Guide](powerful-searching.md) - Advanced search techniques
+- [CLI Intermediate Guide](../guides/cli/intermediate.md) - Task-specific workflows
+- [CLI Reference](../reference/cli-reference.md) - Complete command specifications

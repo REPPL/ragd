@@ -111,7 +111,7 @@ You've succeeded if you can:
 
 ## Next Steps
 
-- [Organisation](04-organisation.md) - Tags and collections
+- [Organising Your Knowledge Base](organising-knowledge-base.md) - Tags and collections
 - [Automation](06-automation.md) - Scripting
 
 ---
@@ -128,3 +128,10 @@ You've succeeded if you can:
 **Slow responses**
 - Try a smaller model
 - Reduce `--limit` for less context
+
+---
+
+## Related Documentation
+
+- [CLI Reference](../reference/cli-reference.md) - Complete command specifications
+- [Configuration Reference](../reference/configuration.md) - LLM and chat settings

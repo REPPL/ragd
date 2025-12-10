@@ -165,3 +165,11 @@ You've succeeded if you can:
 - Pipe JSON through jq for processing
 - Set RAGD_OUTPUT_FORMAT for session-wide JSON
 - Export regularly for backups
+
+---
+
+## Related Documentation
+
+- [CLI Advanced Guide](../guides/cli/advanced.md) - Configuration and debugging
+- [CLI Reference](../reference/cli-reference.md) - Complete command specifications
+- [Backing Up Your Data](backing-up-data.md) - Export and backup guide

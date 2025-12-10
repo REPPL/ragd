@@ -163,3 +163,12 @@ You've succeeded if you can:
 - Contextual retrieval increases indexing time
 - Start with default weights, tune based on results
 - Use batch evaluation to find optimal settings
+
+---
+
+## Related Documentation
+
+- [Searching Tutorial](02-searching.md) - Basic search techniques
+- [Powerful Searching Guide](powerful-searching.md) - Search modes and filters
+- [CLI Reference](../reference/cli-reference.md) - Complete command specifications
+- [Configuration Reference](../reference/configuration.md) - Search and retrieval settings

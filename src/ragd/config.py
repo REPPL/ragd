@@ -220,10 +220,11 @@ class ChatPromptsConfig(BaseModel):
 
     # Query rewriting prompt (for conversation context)
     query_rewrite: str = (
-        "Rewrite this follow-up question to be self-contained based on the conversation.\n\n"
+        "Rewrite this follow-up question to be self-contained.\n\n"
         "Conversation:\n{history}\n\n"
+        "Documents cited:\n{cited_documents}\n\n"
         "Follow-up question: {question}\n\n"
-        "Rewritten question (include the topic from context):"
+        "Rewritten question (use exact document filenames when referring to papers):"
     )
 
 
