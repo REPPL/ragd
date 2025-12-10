@@ -1,6 +1,6 @@
 # F-096: Config Migration Tool
 
-**Status:** Planned
+**Status:** Completed
 **Milestone:** v0.8.7
 
 ## Problem Statement
@@ -67,4 +67,4 @@ def migrate(config: dict) -> dict:
 
 ---
 
-**Status**: Planned
+**Status**: Completed

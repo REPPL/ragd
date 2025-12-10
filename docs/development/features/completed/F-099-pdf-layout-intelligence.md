@@ -1,6 +1,6 @@
 # F-099: PDF Layout Intelligence
 
-**Status:** Planned
+**Status:** Completed
 **Milestone:** v0.9.0
 
 ## Problem Statement

@@ -183,7 +183,7 @@ ragd search "requirements" --tag "project:alpha"
 ragd search "conclusions" --tag "status:reviewed"
 ```
 
-**Note:** Tag filtering uses the tags you've assigned with `ragd tag add`. See [Organising Your Knowledge Base](organising-knowledge-base.md) for tag management.
+**Note:** Tag filtering uses the tags you've assigned with `ragd tag add`. See [Organising Your Knowledge Base](04-organisation.md) for tag management.
 
 ## Search Strategies
 
@@ -252,7 +252,7 @@ ragd ask "What authentication methods does our system support?"
 
 ## Next Steps
 
-- [Organising Your Knowledge Base](organising-knowledge-base.md) - Create tags for filtered searches
+- [Organising Your Knowledge Base](04-organisation.md) - Create tags for filtered searches
 - [Processing Difficult PDFs](processing-difficult-pdfs.md) - Ensure PDFs are searchable
 
 ---

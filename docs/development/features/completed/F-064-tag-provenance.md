@@ -190,4 +190,4 @@ def tag_names(self) -> list[str]:
 
 ---
 
-**Status**: Planned (v0.3.2)
+**Status**: Completed

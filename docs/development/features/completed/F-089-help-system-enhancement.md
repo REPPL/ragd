@@ -1,6 +1,6 @@
 # F-089: Help System Enhancement
 
-**Status:** Planned
+**Status:** Completed
 **Milestone:** v0.8.7
 
 ## Problem Statement
@@ -69,4 +69,4 @@ $ ragd help search
 
 ---
 
-**Status**: Planned
+**Status**: Completed

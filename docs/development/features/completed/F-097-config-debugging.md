@@ -1,6 +1,6 @@
 # F-097: Config Debugging
 
-**Status:** Planned
+**Status:** Completed
 **Milestone:** v0.8.7
 
 ## Problem Statement
@@ -72,4 +72,4 @@ llm:
 
 ---
 
-**Status**: Planned
+**Status**: Completed

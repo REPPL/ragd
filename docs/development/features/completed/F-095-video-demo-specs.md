@@ -1,6 +1,6 @@
 # F-095: Video/GIF Demo Specs
 
-**Status:** Planned
+**Status:** Completed
 **Milestone:** v0.8.7
 
 ## Problem Statement
@@ -67,4 +67,4 @@ Each spec includes:
 
 ---
 
-**Status**: Planned
+**Status**: Completed

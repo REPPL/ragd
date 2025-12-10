@@ -1,6 +1,6 @@
 # F-092: Configuration Reference
 
-**Status:** Planned
+**Status:** Completed
 **Milestone:** v0.8.7
 
 ## Problem Statement
@@ -73,4 +73,4 @@ chunking:
 
 ---
 
-**Status**: Planned
+**Status**: Completed

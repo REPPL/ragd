@@ -1,6 +1,6 @@
 # F-093: Troubleshooting Guide
 
-**Status:** Planned
+**Status:** Completed
 **Milestone:** v0.8.7
 
 ## Problem Statement
@@ -79,4 +79,4 @@ Each issue includes:
 
 ---
 
-**Status**: Planned
+**Status**: Completed

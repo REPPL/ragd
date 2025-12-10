@@ -240,4 +240,4 @@ Smart collections enable powerful UI features:
 
 ---
 
-**Status**: Planned (v0.7.0 stretch goal)
+**Status**: Completed

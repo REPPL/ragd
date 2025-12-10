@@ -56,7 +56,7 @@ This matrix ensures every use case is:
 | **Use Case** | [UC-005-manage-metadata.md](./briefs/UC-005-manage-metadata.md) |
 | **Milestone** | v0.2 |
 | **Features** | F-029, F-030, F-031 |
-| **Tutorial** | [Organising Your Knowledge Base](../tutorials/organising-knowledge-base.md) |
+| **Tutorial** | [Organising Your Knowledge Base](../tutorials/04-organisation.md) |
 
 ### UC-006: Export & Backup
 

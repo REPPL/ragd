@@ -190,7 +190,7 @@ ragd quality doc-456
 
 ## Next Steps
 
-- [Organising Your Knowledge Base](organising-knowledge-base.md) - Tag and organise documents
+- [Organising Your Knowledge Base](04-organisation.md) - Tag and organise documents
 - [Powerful Searching](powerful-searching.md) - Search your indexed PDFs
 
 ---

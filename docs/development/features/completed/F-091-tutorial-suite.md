@@ -1,6 +1,6 @@
 # F-091: Tutorial Suite
 
-**Status:** Planned
+**Status:** Completed
 **Milestone:** v0.8.7
 
 ## Problem Statement
@@ -63,4 +63,4 @@ Each tutorial includes:
 
 ---
 
-**Status**: Planned
+**Status**: Completed

@@ -111,7 +111,7 @@ You've succeeded if you can:
 
 ## Next Steps
 
-- [Organising Your Knowledge Base](organising-knowledge-base.md) - Tags and collections
+- [Organising Your Knowledge Base](04-organisation.md) - Tags and collections
 - [Automation](06-automation.md) - Scripting
 
 ---

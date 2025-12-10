@@ -1,6 +1,6 @@
 # F-087: Shell Completion
 
-**Status:** Planned
+**Status:** Completed
 **Milestone:** v0.8.7
 
 ## Problem Statement
@@ -57,4 +57,4 @@ ragd completion bash > ~/.ragd/completions/ragd.bash
 
 ---
 
-**Status**: Planned
+**Status**: Completed

@@ -104,7 +104,7 @@ ragd collection create "Project Alpha" --include-all "project:alpha"
 ## Related Documentation
 
 - [Use Case: Personal Notes](personal-notes.md)
-- [Tutorial: Organising Your Knowledge Base](../tutorials/organising-knowledge-base.md)
+- [Tutorial: Organising Your Knowledge Base](../tutorials/04-organisation.md)
 - [F-031: Tag Management](../development/features/completed/F-031-tag-management.md)
 
 ---

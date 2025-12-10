@@ -113,7 +113,7 @@ ragd chat
 ## Related Documentation
 
 - [Tutorial: Getting Started](../tutorials/01-getting-started.md)
-- [Tutorial: Organising Your Knowledge Base](../tutorials/organising-knowledge-base.md)
+- [Tutorial: Organising Your Knowledge Base](../tutorials/04-organisation.md)
 - [F-037: Watch Folder](../development/features/completed/F-037-watch-folder.md)
 
 ## Related Use Cases

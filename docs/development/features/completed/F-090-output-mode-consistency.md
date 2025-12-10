@@ -1,6 +1,6 @@
 # F-090: Output Mode Consistency
 
-**Status:** Planned
+**Status:** Completed
 **Milestone:** v0.8.7
 
 ## Problem Statement
@@ -61,4 +61,4 @@ ragd search "query"  # Uses JSON
 
 ---
 
-**Status**: Planned
+**Status**: Completed

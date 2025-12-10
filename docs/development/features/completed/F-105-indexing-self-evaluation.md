@@ -1,6 +1,6 @@
 # F-105: Indexing Self-Evaluation
 
-**Status:** Planned
+**Status:** Completed
 **Milestone:** v0.9.0
 
 ## Problem Statement

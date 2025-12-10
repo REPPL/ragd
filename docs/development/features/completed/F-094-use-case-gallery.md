@@ -1,6 +1,6 @@
 # F-094: Use Case Gallery
 
-**Status:** Planned
+**Status:** Completed
 **Milestone:** v0.8.7
 
 ## Problem Statement
@@ -61,4 +61,4 @@ docs/use-cases/
 
 ---
 
-**Status**: Planned
+**Status**: Completed

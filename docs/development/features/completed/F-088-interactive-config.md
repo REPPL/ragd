@@ -1,6 +1,6 @@
 # F-088: Interactive Configuration
 
-**Status:** Planned
+**Status:** Completed
 **Milestone:** v0.8.7
 
 ## Problem Statement
@@ -61,4 +61,4 @@ $ ragd config
 
 ---
 
-**Status**: Planned
+**Status**: Completed

@@ -201,7 +201,7 @@ ragd export ~/backups/weekly/ragd-$(date +%Y%m%d).tar.gz
 
 ## Next Steps
 
-- [Organising Your Knowledge Base](organising-knowledge-base.md) - Tag and organise before backup
+- [Organising Your Knowledge Base](04-organisation.md) - Tag and organise before backup
 - [Powerful Searching](powerful-searching.md) - Find documents to backup by topic
 
 ---
