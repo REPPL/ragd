@@ -27,6 +27,11 @@ ragd is a reference implementation demonstrating best practices for:
 ### Installation
 
 ```bash
+# Create a virtual environment (recommended)
+python3.12 -m venv ~/.ragd-env
+source ~/.ragd-env/bin/activate  # On Windows: .ragd-env\Scripts\activate
+
+# Install ragd
 pip install ragd
 ```
 
