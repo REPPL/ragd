@@ -1,6 +1,6 @@
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Python 3.12](https://img.shields.io/badge/python-3.12-blue.svg)](https://www.python.org/downloads/)
-[![Version: 1.0.0](https://img.shields.io/badge/version-1.0.0-green.svg)]()
+[![Version: 1.0.0a1](https://img.shields.io/badge/version-1.0.0a1-orange.svg)]()
 
 
 ![ragged logo](docs/assets/img/ragd-logo.png)

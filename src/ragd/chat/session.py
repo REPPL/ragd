@@ -5,7 +5,10 @@ Provides the main ChatSession class for conversational RAG.
 
 from __future__ import annotations
 
+import logging
 import uuid
+
+logger = logging.getLogger(__name__)
 from collections.abc import Iterator
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -50,6 +53,7 @@ class ChatConfig:
         history_budget_ratio: Ratio of available tokens for history
         min_history_tokens: Minimum tokens for history
         min_context_tokens: Minimum tokens for context
+        rewrite_history_turns: History turns for query rewriting
     """
 
     model: str = "llama3.2:3b"
@@ -63,6 +67,7 @@ class ChatConfig:
     history_budget_ratio: float = 0.3
     min_history_tokens: int = 256
     min_context_tokens: int = 1024
+    rewrite_history_turns: int = 4
 
 
 class ChatSession:
@@ -251,7 +256,9 @@ class ChatSession:
             return question
 
         # Format history for the rewrite prompt
-        history_text = self._history.format_for_prompt(max_turns=2)
+        history_text = self._history.format_for_prompt(
+            n=self.chat_config.rewrite_history_turns
+        )
         if not history_text.strip():
             return question
 
@@ -271,6 +278,7 @@ class ChatSession:
 
             # Only use rewritten query if it's meaningfully different
             if rewritten and rewritten.lower() != question.lower():
+                logger.debug("Query rewritten: '%s' → '%s'", question, rewritten)
                 return rewritten
             return question
 

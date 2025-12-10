@@ -19,6 +19,8 @@ from ragd.chat.prompts import (
     register_template,
 )
 from ragd.citation import Citation
+from ragd.chat.session import ChatSession, ChatConfig
+from ragd.llm import LLMResponse, OllamaError
 
 
 class TestChatMessage:
@@ -413,3 +415,245 @@ class TestChatRole:
         assert ChatRole.USER.value == "user"
         assert ChatRole.ASSISTANT.value == "assistant"
         assert ChatRole.SYSTEM.value == "system"
+
+
+class TestQueryRewritingWithContext:
+    """Tests for query rewriting with conversation context."""
+
+    @pytest.fixture
+    def mock_session(self):
+        """Create a ChatSession with mocked dependencies."""
+        with patch("ragd.chat.session.OllamaClient") as MockClient, \
+             patch("ragd.chat.session.HybridSearcher") as MockSearcher:
+
+            mock_llm = MagicMock()
+            MockClient.return_value = mock_llm
+            MockSearcher.return_value = MagicMock()
+
+            # Mock config with query_rewrite prompt
+            mock_config = MagicMock()
+            mock_config.chat.prompts.query_rewrite = (
+                "Rewrite this follow-up question to be self-contained.\n\n"
+                "Conversation:\n{history}\n\n"
+                "Follow-up question: {question}\n\n"
+                "Rewritten question:"
+            )
+            mock_config.llm.base_url = "http://localhost:11434"
+
+            session = ChatSession(config=mock_config, chat_config=ChatConfig())
+            session._llm = mock_llm
+
+            yield session
+
+    def test_follow_up_triggers_rewrite(self, mock_session):
+        """Test that follow-up questions trigger query rewriting."""
+        # Setup: Add prior conversation about data sovereignty
+        mock_session._history.add_user_message("Tell me about data sovereignty")
+        mock_session._history.add_assistant_message(
+            "Data sovereignty refers to control over data..."
+        )
+
+        # Mock LLM to return rewritten query
+        mock_session._llm.generate.return_value = LLMResponse(
+            content="tell me more about data sovereignty",
+            model="test",
+            tokens_used=10,
+        )
+
+        # Follow-up question should be rewritten
+        result = mock_session._rewrite_query_with_context(
+            "what else can you tell me about the concept?"
+        )
+
+        assert "data sovereignty" in result.lower()
+        mock_session._llm.generate.assert_called_once()
+
+    def test_history_includes_original_topic(self, mock_session):
+        """Test that rewrite prompt includes the original topic question.
+
+        This is the key behavioural test: regardless of the specific
+        history window size, the topic from the original question must
+        be captured in the rewrite prompt.
+        """
+        # Setup: Conversation with topic in first message
+        mock_session._history.add_user_message("Tell me about data sovereignty")
+        mock_session._history.add_assistant_message("Data sovereignty is...")
+        mock_session._history.add_user_message("what else?")
+
+        # Capture the prompt sent to LLM
+        captured_prompt = None
+
+        def capture_call(**kwargs):
+            nonlocal captured_prompt
+            captured_prompt = kwargs.get("prompt", "")
+            return LLMResponse(content="rewritten query", model="test", tokens_used=5)
+
+        mock_session._llm.generate.side_effect = capture_call
+
+        mock_session._rewrite_query_with_context("what else?")
+
+        # The history in the prompt should contain "data sovereignty"
+        assert captured_prompt is not None
+        assert "data sovereignty" in captured_prompt.lower()
+
+    def test_insufficient_history_window_loses_original_question(self):
+        """Test that a small history window loses the original user question.
+
+        This test verifies the bug scenario: with rewrite_history_turns=2,
+        the original user question is lost (only assistant response + follow-up
+        are captured). The assistant's response may or may not contain the topic.
+        """
+        with patch("ragd.chat.session.OllamaClient") as MockClient, \
+             patch("ragd.chat.session.HybridSearcher") as MockSearcher:
+
+            mock_llm = MagicMock()
+            MockClient.return_value = mock_llm
+            MockSearcher.return_value = MagicMock()
+
+            mock_config = MagicMock()
+            mock_config.chat.prompts.query_rewrite = (
+                "Conversation:\n{history}\n\nQuestion: {question}\nRewritten:"
+            )
+            mock_config.llm.base_url = "http://localhost:11434"
+
+            # Configure with SMALL history window (the bug)
+            chat_config = ChatConfig(rewrite_history_turns=2)
+            session = ChatSession(config=mock_config, chat_config=chat_config)
+            session._llm = mock_llm
+
+            # Build conversation where the specific topic phrase is ONLY
+            # in the first user message (assistant gives generic response)
+            session._history.add_user_message("Tell me about quantum computing")
+            session._history.add_assistant_message("It's a fascinating field...")
+            session._history.add_user_message("what else?")
+
+            captured_prompt = None
+
+            def capture_call(**kwargs):
+                nonlocal captured_prompt
+                captured_prompt = kwargs.get("prompt", "")
+                return LLMResponse(content="rewritten", model="test", tokens_used=5)
+
+            session._llm.generate.side_effect = capture_call
+            session._rewrite_query_with_context("what else?")
+
+            # With n=2, we only get last 2 messages - original question is LOST
+            assert captured_prompt is not None
+            # The original user question should NOT be in the prompt
+            assert "quantum computing" not in captured_prompt.lower()
+
+    def test_adequate_history_window_captures_original_question(self):
+        """Test that adequate history window captures the original user question.
+
+        This test verifies the fix: with rewrite_history_turns=4 (default),
+        the original user question is captured.
+        """
+        with patch("ragd.chat.session.OllamaClient") as MockClient, \
+             patch("ragd.chat.session.HybridSearcher") as MockSearcher:
+
+            mock_llm = MagicMock()
+            MockClient.return_value = mock_llm
+            MockSearcher.return_value = MagicMock()
+
+            mock_config = MagicMock()
+            mock_config.chat.prompts.query_rewrite = (
+                "Conversation:\n{history}\n\nQuestion: {question}\nRewritten:"
+            )
+            mock_config.llm.base_url = "http://localhost:11434"
+
+            # Configure with ADEQUATE history window (the fix)
+            chat_config = ChatConfig(rewrite_history_turns=4)
+            session = ChatSession(config=mock_config, chat_config=chat_config)
+            session._llm = mock_llm
+
+            # Build conversation where the specific topic phrase is ONLY
+            # in the first user message (assistant gives generic response)
+            session._history.add_user_message("Tell me about quantum computing")
+            session._history.add_assistant_message("It's a fascinating field...")
+            session._history.add_user_message("what else?")
+
+            captured_prompt = None
+
+            def capture_call(**kwargs):
+                nonlocal captured_prompt
+                captured_prompt = kwargs.get("prompt", "")
+                return LLMResponse(content="rewritten", model="test", tokens_used=5)
+
+            session._llm.generate.side_effect = capture_call
+            session._rewrite_query_with_context("what else?")
+
+            # With n=4, we capture all messages including the original question
+            assert captured_prompt is not None
+            assert "quantum computing" in captured_prompt.lower()
+
+    def test_standalone_question_not_rewritten(self, mock_session):
+        """Test that standalone questions are not rewritten."""
+        result = mock_session._rewrite_query_with_context(
+            "What is machine learning?"
+        )
+
+        # Should return original - no LLM call needed
+        assert result == "What is machine learning?"
+        mock_session._llm.generate.assert_not_called()
+
+    def test_rewrite_with_various_follow_up_indicators(self, mock_session):
+        """Test various follow-up patterns trigger rewriting."""
+        mock_session._history.add_user_message("Tell me about RAG")
+        mock_session._history.add_assistant_message("RAG stands for...")
+
+        mock_session._llm.generate.return_value = LLMResponse(
+            content="rewritten", model="test", tokens_used=5,
+        )
+
+        follow_ups = [
+            "tell me more",
+            "what else about it?",
+            "elaborate on this",
+            "continue",
+            "and the challenges?",
+            "the concept seems interesting",
+        ]
+
+        for question in follow_ups:
+            mock_session._llm.reset_mock()
+            mock_session._rewrite_query_with_context(question)
+            assert mock_session._llm.generate.called, \
+                f"'{question}' should trigger rewrite"
+
+    def test_rewrite_error_returns_original(self, mock_session):
+        """Test that LLM errors fall back to original question."""
+        mock_session._history.add_user_message("Tell me about X")
+        mock_session._history.add_assistant_message("X is...")
+
+        mock_session._llm.generate.side_effect = OllamaError("Connection failed")
+
+        result = mock_session._rewrite_query_with_context("tell me more")
+
+        # Should return original question on error
+        assert result == "tell me more"
+
+    def test_empty_history_returns_original(self, mock_session):
+        """Test that empty history returns original question."""
+        # No prior conversation
+        result = mock_session._rewrite_query_with_context("tell me more")
+
+        # Should return original - no context to rewrite from
+        assert result == "tell me more"
+        mock_session._llm.generate.assert_not_called()
+
+    def test_rewrite_identical_returns_original(self, mock_session):
+        """Test that identical rewrites return original."""
+        mock_session._history.add_user_message("Tell me about X")
+        mock_session._history.add_assistant_message("X is...")
+
+        # LLM returns same question (no meaningful rewrite)
+        mock_session._llm.generate.return_value = LLMResponse(
+            content="tell me more",  # Same as input
+            model="test",
+            tokens_used=5,
+        )
+
+        result = mock_session._rewrite_query_with_context("tell me more")
+
+        # Should return original when LLM doesn't improve it
+        assert result == "tell me more"

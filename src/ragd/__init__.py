@@ -8,7 +8,7 @@ import os
 # ragd uses single-threaded indexing; parallelism causes fork deadlocks with OCR
 os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
 
-__version__ = "1.0.0"
+__version__ = "1.0.0a1"
 
 # Vision module is available via `from ragd.vision import ...`
 # Not imported here to avoid heavy chromadb/torch imports on every ragd command
