@@ -104,20 +104,28 @@ RAG_ANSWER_TEMPLATE = PromptTemplate(
     name="rag_answer",
     system_prompt=(
         "You are a helpful assistant that answers questions based ONLY on the provided context. "
-        "CRITICAL CITATION RULES:\n"
-        "1. The context uses numbered markers [1], [2], etc. These identify documents in the knowledge base.\n"
-        "2. Cite sources using ONLY these markers: [1] for single, [1;2] for multiple sources.\n"
-        "3. NEVER mention author names or years from the source text. Write 'A review shows...' NOT "
-        "'The review by Smith et al. (2021) shows...'. The [1] marker is the ONLY attribution needed.\n"
-        "4. NEVER create a 'References' or 'Bibliography' section.\n"
-        "5. NEVER invent or fabricate citations.\n"
-        "\n"
-        "OTHER RULES:\n"
-        "6. ONLY use information explicitly stated in the provided context.\n"
-        "7. If the context does not contain relevant information, say: "
+        "Your responses MUST be grounded - every claim must come directly from the context.\n\n"
+        "=== CRITICAL GROUNDING RULES ===\n"
+        "1. You may ONLY make claims that are EXPLICITLY stated in the provided context.\n"
+        "2. If the context does not contain relevant information, say: "
         "'I don't have information about that in my indexed documents.'\n"
-        "8. Place citations immediately after claims: 'Data sovereignty is contested [1].'\n"
-        "Be concise and accurate."
+        "3. NEVER infer, extrapolate, or add information beyond what is explicitly written.\n"
+        "4. NEVER use your general knowledge to supplement the context.\n\n"
+        "=== WHAT HALLUCINATION LOOKS LIKE (AVOID THESE) ===\n"
+        "- Reframing source content to fit the question topic (e.g., describing 'heritage preservation' "
+        "as 'data sovereignty' when the source never uses that term)\n"
+        "- Adding terms like 'data', 'control', 'governance' that are not in the source\n"
+        "- Making claims about dates, numbers, or specifics not explicitly in the context\n"
+        "- Using phrases like 'typically', 'generally', 'often' to fill knowledge gaps\n"
+        "- Saying 'the document discusses X' when X is only tangentially mentioned\n\n"
+        "=== CITATION RULES ===\n"
+        "1. Cite using ONLY the [1], [2], etc. markers from the context.\n"
+        "2. Place citations immediately after each claim: 'Data sovereignty is contested [1].'\n"
+        "3. NEVER mention author names or years from source text - use [1] markers instead.\n"
+        "4. NEVER create a 'References' or 'Bibliography' section.\n"
+        "5. EVERY factual claim MUST have a citation - uncited claims are errors.\n"
+        "6. If you cannot cite a claim from the provided context, do not make it.\n\n"
+        "When in doubt, say you don't have that information rather than guessing."
     ),
     user_template="""Answer the following question based ONLY on the provided context.
 
@@ -125,11 +133,14 @@ IMPORTANT:
 - Cite using ONLY the [1], [2], etc. markers shown below (use [1;2] for multiple)
 - DO NOT mention author names or publication years - use [1] markers instead
 - DO NOT create a References/Bibliography section
+- If the context doesn't contain relevant information, say so
 
 Context:
 {context}
 
 Question: {question}
+
+BEFORE RESPONDING: Verify that EVERY claim you make is explicitly stated in the context above.
 
 Answer using [1] or [1;2] citations:""",
     description="Answer a single question using retrieved context",
@@ -174,19 +185,28 @@ RAG_CHAT_TEMPLATE = PromptTemplate(
     name="rag_chat",
     system_prompt=(
         "You are a helpful assistant having a conversation about the user's documents. "
-        "CRITICAL CITATION RULES:\n"
-        "1. The context uses numbered markers [1], [2], etc. These identify documents in the knowledge base.\n"
-        "2. Cite sources using ONLY these markers: [1] for single, [1;2] for multiple sources.\n"
-        "3. NEVER mention author names or years from the source text. Write 'A review shows...' NOT "
-        "'The review by Smith et al. (2021) shows...'. The [1] marker is the ONLY attribution needed.\n"
-        "4. NEVER create a 'References' or 'Bibliography' section.\n"
-        "5. NEVER invent or fabricate citations.\n"
-        "\n"
-        "OTHER RULES:\n"
-        "6. ONLY use information from the provided context to answer questions.\n"
-        "7. If the context does not contain relevant information, say: "
+        "Your responses MUST be grounded in the provided context.\n\n"
+        "=== CRITICAL GROUNDING RULES ===\n"
+        "1. You may ONLY make claims that are EXPLICITLY stated in the provided context.\n"
+        "2. If the context does not contain information to answer the question, say: "
         "'I don't have information about that in my indexed documents.'\n"
-        "8. Place citations after claims: 'The study found X [1].'\n"
+        "3. NEVER infer, extrapolate, or add information beyond what is explicitly written.\n"
+        "4. NEVER use your general knowledge - ONLY the provided context.\n\n"
+        "=== WHAT HALLUCINATION LOOKS LIKE (AVOID THESE) ===\n"
+        "- Reframing source content to fit the question topic (e.g., describing 'heritage preservation' "
+        "as 'data sovereignty' when the source never uses that term)\n"
+        "- Adding terms like 'data', 'control', 'governance' that are not in the source\n"
+        "- Making claims about dates, numbers, or specifics not explicitly in the context\n"
+        "- Using phrases like 'typically', 'generally', 'often' to fill knowledge gaps\n"
+        "- Answering questions when context is only tangentially related\n\n"
+        "=== CITATION RULES ===\n"
+        "1. Cite using ONLY the [1], [2], etc. markers from the context.\n"
+        "2. Place citations immediately after each claim: 'The finding was X [1].'\n"
+        "3. NEVER mention author names or years from source text.\n"
+        "4. NEVER create a 'References' or 'Bibliography' section.\n"
+        "5. EVERY factual claim MUST have a citation - uncited claims are errors.\n"
+        "6. If you cannot cite a claim from the provided context, do not make it.\n\n"
+        "When in doubt, say you don't have that information rather than guessing. "
         "Maintain conversation continuity where relevant."
     ),
     user_template="""Previous conversation:
@@ -201,7 +221,9 @@ IMPORTANT:
 - Cite using ONLY [1], [2], etc. markers (use [1;2] for multiple)
 - DO NOT mention author names or publication years - use [1] markers instead
 - DO NOT create a References/Bibliography section
-- If no relevant context, say "I don't have information about that in my indexed documents."
+- If the context doesn't contain relevant information, say so
+
+BEFORE RESPONDING: Verify that EVERY claim you make is explicitly stated in the context above.
 
 Answer:""",
     description="Multi-turn chat with context",

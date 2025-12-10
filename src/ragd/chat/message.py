@@ -8,9 +8,12 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from ragd.citation import Citation
+
+if TYPE_CHECKING:
+    from ragd.citation import ValidationReport
 
 
 class ChatRole(str, Enum):
@@ -115,6 +118,7 @@ class CitedAnswer:
         model: The model used for generation
         tokens_used: Number of tokens used
         confidence: Confidence score (if available)
+        validation_report: Citation validation results (if validation enabled)
     """
 
     answer: str
@@ -122,11 +126,26 @@ class CitedAnswer:
     model: str | None = None
     tokens_used: int | None = None
     confidence: float | None = None
+    validation_report: "ValidationReport | None" = None
 
     @property
     def has_citations(self) -> bool:
         """Check if answer has citations."""
         return len(self.citations) > 0
+
+    @property
+    def citation_confidence(self) -> float | None:
+        """Get citation validation confidence score."""
+        if self.validation_report:
+            return self.validation_report.overall_confidence
+        return None
+
+    @property
+    def has_potential_hallucinations(self) -> bool:
+        """Check if any citations appear to be hallucinated."""
+        if self.validation_report:
+            return self.validation_report.has_hallucinations
+        return False
 
     def format_with_citations(self, style: str = "inline") -> str:
         """Format answer with inline citations.

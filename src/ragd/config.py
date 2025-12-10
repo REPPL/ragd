@@ -88,7 +88,7 @@ class RetrievalConfig(BaseModel):
     """Retrieval configuration."""
 
     default_limit: int = 10
-    min_score: float = 0.3  # Filter low-relevance results by default
+    min_score: float = 0.55  # Filter low-relevance results (raised to reduce hallucination)
     rerank: bool = False
     contextual: ContextualConfig = Field(default_factory=ContextualConfig)
 
@@ -206,8 +206,9 @@ class ChatPromptsConfig(BaseModel):
     """
 
     citation_instruction: str = (
-        "Cite sources using ONLY the numbered markers shown in the context. "
+        "EVERY factual claim MUST be cited using the numbered markers [1], [2], etc. "
         "Use [1] for single source, [1;2] for multiple sources. "
+        "Uncited claims are errors - if you cannot cite a claim from the context, do not make it. "
         "NEVER mention author names or publication years from the source text. "
         "NEVER create a References or Bibliography section."
     )
@@ -238,7 +239,7 @@ class ChatConfig(BaseModel):
     search_limit: int = 5
     auto_save: bool = True
     default_cite_mode: str = "numbered"  # numbered, none, inline
-    min_relevance: float = 0.3  # Minimum relevance score for context chunks
+    min_relevance: float = 0.55  # Minimum relevance score (raised to reduce hallucination)
     # Dynamic allocation settings
     history_budget_ratio: float = 0.3  # 30% of available tokens for history
     min_history_tokens: int = 256

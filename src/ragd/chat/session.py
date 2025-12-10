@@ -12,7 +12,10 @@ logger = logging.getLogger(__name__)
 from collections.abc import Iterator
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from ragd.citation import ValidationReport
 
 from ragd.chat.context import (
     ContextWindow,
@@ -63,11 +66,14 @@ class ChatConfig:
     history_turns: int = 5
     search_limit: int = 5
     auto_save: bool = True
-    min_relevance: float = 0.3
+    min_relevance: float = 0.55  # Raised from 0.3 to reduce hallucination
     history_budget_ratio: float = 0.3
     min_history_tokens: int = 256
     min_context_tokens: int = 1024
     rewrite_history_turns: int = 4
+    # Citation validation settings
+    validate_citations: bool = True  # Enable citation validation by default
+    validation_mode: str = "warn"  # warn | filter | strict
 
 
 class ChatSession:
@@ -329,11 +335,19 @@ class ChatSession:
                 max_tokens=self.chat_config.max_tokens,
             )
 
+            # Validate citations if enabled
+            validation_report = None
+            if self.chat_config.validate_citations and citations:
+                validation_report = self._validate_citations(
+                    response.content, citations
+                )
+
             answer = CitedAnswer(
                 answer=response.content,
                 citations=citations,
                 model=response.model,
                 tokens_used=response.tokens_used,
+                validation_report=validation_report,
             )
 
             # Add to history
@@ -439,6 +453,36 @@ class ChatSession:
             CitedAnswer or iterator of response chunks
         """
         return self.ask(topic, template="summarise", stream=stream)
+
+    def _validate_citations(
+        self,
+        response_text: str,
+        citations: list[Citation],
+    ) -> "ValidationReport":
+        """Validate citations in a response.
+
+        Uses keyword overlap to check if cited documents contain
+        content supporting the claims made.
+
+        Args:
+            response_text: LLM-generated response
+            citations: Source citations
+
+        Returns:
+            ValidationReport with results for each citation usage
+        """
+        from ragd.citation import (
+            CitationValidator,
+            ValidationMode,
+            extract_citation_markers,
+        )
+
+        extracted = extract_citation_markers(response_text)
+        validator = CitationValidator(
+            mode=ValidationMode(self.chat_config.validation_mode),
+            use_semantic=False,  # Keyword-only for performance
+        )
+        return validator.validate(response_text, citations, extracted)
 
     def _save_history(self) -> None:
         """Save history to file."""

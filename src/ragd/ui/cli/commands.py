@@ -8,7 +8,10 @@ from __future__ import annotations
 import os
 import sys
 from pathlib import Path
-from typing import Annotated, Optional
+from typing import TYPE_CHECKING, Annotated, Optional
+
+if TYPE_CHECKING:
+    from ragd.citation import Citation
 
 import typer
 from rich.console import Console
@@ -38,6 +41,27 @@ def get_console(no_color: bool = False, max_width: int | None = None) -> Console
     if os.environ.get("NO_COLOR"):
         no_color = True
     return Console(no_color=no_color, width=max_width, soft_wrap=True)
+
+
+def _format_citation_location(cit: "Citation") -> str:
+    """Format citation location with page range support.
+
+    Handles both single page numbers and aggregated page ranges
+    from multi-chunk citations.
+
+    Args:
+        cit: Citation object (may have all_pages in extra metadata)
+
+    Returns:
+        Location string like ", p. 5" or ", pp. 1-5" or ""
+    """
+    # Check for aggregated pages from multi-chunk citations
+    all_pages = cit.extra.get("all_pages", []) if cit.extra else []
+    if all_pages and len(all_pages) > 1:
+        return f", pp. {all_pages[0]}-{all_pages[-1]}"
+    elif cit.page_number:
+        return f", p. {cit.page_number}"
+    return ""
 
 
 class StreamingWordWrapper:
@@ -1657,7 +1681,7 @@ def ask_command(
                     unique_citations = deduplicate_citations(response.citations)
                     con.print("\n[bold]Sources:[/bold]")
                     for i, cit in enumerate(unique_citations, 1):
-                        loc = f", p. {cit.page_number}" if cit.page_number else ""
+                        loc = _format_citation_location(cit)
                         con.print(f"  [{i}] {cit.filename}{loc}")
             finally:
                 rag.close()
@@ -1699,7 +1723,7 @@ def ask_command(
                         unique_citations = deduplicate_citations(citations)
                         con.print("\n[bold]Sources:[/bold]")
                         for i, cit in enumerate(unique_citations, 1):
-                            loc = f", p. {cit.page_number}" if cit.page_number else ""
+                            loc = _format_citation_location(cit)
                             con.print(f"  [{i}] {cit.filename}{loc}")
                 else:
                     # Non-streaming output
@@ -1721,7 +1745,7 @@ def ask_command(
                         unique_citations = deduplicate_citations(answer.citations)
                         con.print("\n[bold]Sources:[/bold]")
                         for i, cit in enumerate(unique_citations, 1):
-                            loc = f", p. {cit.page_number}" if cit.page_number else ""
+                            loc = _format_citation_location(cit)
                             con.print(f"  [{i}] {cit.filename}{loc}")
             finally:
                 session.close()
@@ -2090,7 +2114,7 @@ def chat_command(
                             unique_citations = deduplicate_citations(last_msg.citations)
                             con.print("\n[bold]Sources:[/bold]")
                             for i, cit in enumerate(unique_citations, 1):
-                                loc = f", p. {cit.page_number}" if cit.page_number else ""
+                                loc = _format_citation_location(cit)
                                 con.print(f"  [{i}] {cit.filename}{loc}")
 
                     con.print()  # Extra line before next prompt

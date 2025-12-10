@@ -1093,3 +1093,115 @@ class TestCitationOrdering:
         # Should only have one citation
         assert len(citations) == 1
         assert citations[0].filename == "same.pdf"
+
+    def test_page_number_aggregation(self):
+        """Test that deduplicated citations aggregate page numbers from all chunks."""
+        window = ContextWindow()
+
+        # Add multiple chunks from same document with different page numbers
+        for i, page in enumerate([1, 5, 3]):  # Out of order to test sorting
+            window.add_context(RetrievedContext(
+                content=f"Content from page {page}",
+                source="multi_page.pdf",
+                score=0.9,
+                document_id="doc1",
+                chunk_index=i,
+                page_number=page,
+            ))
+
+        citations = window.get_deduplicated_citations()
+
+        # Should have one citation with all pages
+        assert len(citations) == 1
+        assert citations[0].filename == "multi_page.pdf"
+        # Pages should be sorted in extra metadata
+        assert citations[0].extra.get("all_pages") == [1, 3, 5]
+
+    def test_page_number_aggregation_single_page(self):
+        """Test that single page doesn't use all_pages."""
+        window = ContextWindow()
+
+        # Add multiple chunks from same page
+        for i in range(3):
+            window.add_context(RetrievedContext(
+                content=f"Chunk {i} from page 5",
+                source="same_page.pdf",
+                score=0.9,
+                document_id="doc1",
+                chunk_index=i,
+                page_number=5,
+            ))
+
+        citations = window.get_deduplicated_citations()
+
+        assert len(citations) == 1
+        assert citations[0].page_number == 5
+        # Single page should not set all_pages
+        assert "all_pages" not in (citations[0].extra or {})
+
+    def test_build_context_returns_deduplicated(self):
+        """Test that build_context_from_results returns deduplicated citations."""
+        from ragd.search.hybrid import HybridSearchResult, SourceLocation
+
+        # Create mock search results from different documents
+        results = [
+            HybridSearchResult(
+                content="Content from doc A",
+                combined_score=0.9,
+                semantic_score=0.9,
+                keyword_score=0.8,
+                semantic_rank=1,
+                keyword_rank=1,
+                rrf_score=0.9,
+                document_id="doc_a",
+                document_name="doc_a.pdf",
+                chunk_id="doc_a_0",
+                chunk_index=0,
+                metadata={"filename": "doc_a.pdf"},
+                location=SourceLocation(page_number=1),
+            ),
+            HybridSearchResult(
+                content="More from doc A",
+                combined_score=0.85,
+                semantic_score=0.85,
+                keyword_score=0.75,
+                semantic_rank=2,
+                keyword_rank=2,
+                rrf_score=0.85,
+                document_id="doc_a",
+                document_name="doc_a.pdf",
+                chunk_id="doc_a_1",
+                chunk_index=1,
+                metadata={"filename": "doc_a.pdf"},
+                location=SourceLocation(page_number=5),
+            ),
+            HybridSearchResult(
+                content="Content from doc B",
+                combined_score=0.8,
+                semantic_score=0.8,
+                keyword_score=0.7,
+                semantic_rank=3,
+                keyword_rank=3,
+                rrf_score=0.8,
+                document_id="doc_b",
+                document_name="doc_b.pdf",
+                chunk_id="doc_b_0",
+                chunk_index=0,
+                metadata={"filename": "doc_b.pdf"},
+                location=SourceLocation(page_number=3),
+            ),
+        ]
+
+        context, citations = build_context_from_results(results)
+
+        # Should have exactly 2 citations (one per document)
+        assert len(citations) == 2
+        assert citations[0].filename == "doc_a.pdf"
+        assert citations[1].filename == "doc_b.pdf"
+
+        # First citation should have aggregated pages
+        assert citations[0].extra.get("all_pages") == [1, 5]
+
+        # Context should have [1] and [2] markers
+        assert "[1] doc_a.pdf" in context
+        assert "[2] doc_b.pdf" in context

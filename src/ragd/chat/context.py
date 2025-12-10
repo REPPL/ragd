@@ -14,8 +14,9 @@ from ragd.search.hybrid import HybridSearchResult
 
 logger = logging.getLogger(__name__)
 
-# Default minimum relevance score to include in context (v0.7.6)
-DEFAULT_MIN_RELEVANCE = 0.3
+# Default minimum relevance score to include in context
+# Raised from 0.3 to 0.55 to reduce hallucination from tangentially related docs
+DEFAULT_MIN_RELEVANCE = 0.55
 
 
 @dataclass
@@ -346,11 +347,47 @@ class ContextWindow:
         """
         return [ctx.to_citation() for ctx in self._contexts]
 
+    def _create_document_citation(
+        self, chunks: list[RetrievedContext]
+    ) -> Citation:
+        """Create a consolidated citation from multiple chunks of same document.
+
+        Aggregates page numbers from all chunks into a single citation,
+        matching the page information shown in format_context().
+
+        Args:
+            chunks: List of chunks from the same document
+
+        Returns:
+            Citation with aggregated page information
+        """
+        first_chunk = chunks[0]
+        base_citation = first_chunk.to_citation()
+
+        # Collect all unique page numbers (matching format_context logic)
+        page_numbers = sorted(set(
+            c.page_number for c in chunks if c.page_number is not None
+        ))
+
+        # Store all pages in extra metadata for display
+        if len(page_numbers) > 1:
+            # Copy extra dict to avoid mutating original
+            base_citation.extra = {
+                **(base_citation.extra or {}),
+                "all_pages": page_numbers,
+            }
+        elif len(page_numbers) == 1:
+            # Ensure single page is set (may already be from first chunk)
+            base_citation.page_number = page_numbers[0]
+
+        return base_citation
+
     def get_deduplicated_citations(self) -> list[Citation]:
         """Get unique citations, one per document.
 
         Uses the same document ordering as format_context() to ensure
         citation numbers match between the LLM prompt and displayed sources.
+        Aggregates page numbers from all chunks of each document.
 
         Returns:
             List of unique Citation objects in consistent order
@@ -358,8 +395,11 @@ class ContextWindow:
         # Use shared grouping to ensure consistent ordering with format_context
         doc_chunks = self._group_by_document()
 
-        # Return first citation from each document group
-        return [chunks[0].to_citation() for chunks in doc_chunks.values()]
+        # Create consolidated citation for each document group
+        return [
+            self._create_document_citation(chunks)
+            for chunks in doc_chunks.values()
+        ]
 
     def clear(self) -> None:
         """Clear all context."""
@@ -411,6 +451,9 @@ def build_context_from_results(
 
     Convenience function for simple context assembly.
 
+    Returns deduplicated citations that match the document ordering in
+    the formatted context, ensuring [1], [2] markers align correctly.
+
     Args:
         results: Search results
         max_tokens: Maximum context tokens
@@ -419,7 +462,7 @@ def build_context_from_results(
         min_relevance: Minimum relevance score for context chunks
 
     Returns:
-        Tuple of (formatted_context, citations)
+        Tuple of (formatted_context, deduplicated_citations)
     """
     window = ContextWindow(max_tokens=max_tokens, reserved_tokens=reserved_tokens)
     window.add_search_results(
@@ -427,4 +470,5 @@ def build_context_from_results(
         max_results=max_results,
         min_relevance=min_relevance,
     )
-    return window.format_context(), window.get_citations()
+    # Return deduplicated citations to match format_context ordering
+    return window.format_context(), window.get_deduplicated_citations()
