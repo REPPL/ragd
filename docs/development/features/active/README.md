@@ -4,7 +4,7 @@ Features currently under development.
 
 ## Currently Active
 
-*No active features - v0.7.0 complete. See [v0.7.5 Milestone](../../milestones/v0.7.5.md) for planned work.*
+*No active features - v0.9.6 complete. See [v1.0.0 Milestone](../../milestones/v1.0.0.md) for planned work.*
 
 ## Workflow
 

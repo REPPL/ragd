@@ -200,8 +200,8 @@ class EmbeddingProtector:
 - [State-of-the-Art PII Removal](../../research/state-of-the-art-pii-removal.md) - Research basis
 - [State-of-the-Art Privacy](../../research/state-of-the-art-privacy.md) - Threat model
 - [ADR-0029: Privacy-Preserving Embedding Strategy](../../decisions/adrs/0029-embedding-privacy-strategy.md)
-- [F-023: PII Detection](./F-023-pii-detection.md) - Primary protection layer
-- [F-015: Database Encryption](./F-015-database-encryption.md) - Storage encryption
+- [F-023: PII Detection](../completed/F-023-pii-detection.md) - Primary protection layer
+- [F-015: Database Encryption](../completed/F-015-database-encryption.md) - Storage encryption
 - [F-004: Embedding Generation](../completed/F-004-embedding-generation.md) - Base capability
 
 ---

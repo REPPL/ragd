@@ -56,7 +56,7 @@ ragd index ~/Documents/research
 Check what's indexed:
 
 ```bash
-ragd status
+ragd info
 ```
 
 ## Step 4: Search Your Knowledge Base
@@ -73,7 +73,7 @@ Use the interactive navigator (j/k to move, Enter to view, q to quit).
 
 You've succeeded if:
 - [ ] `ragd --version` shows version number
-- [ ] `ragd status` shows indexed documents
+- [ ] `ragd info` shows indexed documents
 - [ ] `ragd search` returns relevant results
 
 ## Next Steps

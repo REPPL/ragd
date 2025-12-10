@@ -109,6 +109,12 @@ ragd search "benchmark datasets used in papers"
 
 ---
 
+## Related Documentation
+
+- [Tutorial: Processing Difficult PDFs](../tutorials/processing-difficult-pdfs.md)
+- [Tutorial: Powerful Searching](../tutorials/powerful-searching.md)
+- [F-027: OCR Pipeline](../development/features/completed/F-027-ocr-pipeline.md)
+
 ## Related Use Cases
 
 - [Personal Notes](personal-notes.md) - Note management

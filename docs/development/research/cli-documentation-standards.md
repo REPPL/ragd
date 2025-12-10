@@ -454,7 +454,7 @@ From GitHub CLI man page:
 EXIT CODES
     0: Successful execution
     1: General error
-    2: Command canceled by user (e.g., when prompted)
+    2: Command cancelled by user (e.g., when prompted)
     4: Authentication required or failed
 ```
 

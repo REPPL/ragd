@@ -335,7 +335,7 @@ Small local models (7B and under) fail 30-50% of evaluation calls due to:
 
 **This section provides alternatives optimised for local deployment with small models.**
 
-### Alternative 1: Binary Judgment Evaluation
+### Alternative 1: Binary Judgement Evaluation
 
 **Concept:** Replace numerical scores with yes/no decisions.
 
@@ -425,7 +425,7 @@ def mcq_relevancy(question: str, answer: str, model) -> float:
 
 ### Alternative 3: Reference-Free Evaluation
 
-**Concept:** Use embedding similarity instead of LLM judgment.
+**Concept:** Use embedding similarity instead of LLM judgement.
 
 ```python
 from sentence_transformers import SentenceTransformer
@@ -458,7 +458,7 @@ def embedding_faithfulness(context: str, answer: str) -> float:
 
 ### Alternative 4: Hybrid LLM + Embedding
 
-**Concept:** Use embeddings for filtering, LLM for final judgment.
+**Concept:** Use embeddings for filtering, LLM for final judgement.
 
 ```python
 def hybrid_faithfulness(
@@ -584,7 +584,7 @@ def geval_simple(question: str, context: str, answer: str, model) -> float:
 | Method | Success Rate | Speed | Accuracy | Offline |
 |--------|--------------|-------|----------|---------|
 | RAGAS (7B model) | 30-50% | Slow | High* | Yes |
-| Binary judgment | 90%+ | Fast | Medium | Yes |
+| Binary judgement | 90%+ | Fast | Medium | Yes |
 | Multiple choice | 85%+ | Fast | Medium | Yes |
 | Embedding only | 100% | Very fast | Low-medium | Yes |
 | Hybrid | 95%+ | Medium | Medium-high | Yes |
@@ -1041,7 +1041,7 @@ testset = generator.generate_with_langchain_docs(
 
 - [State-of-the-Art Embeddings](./state-of-the-art-embeddings.md) - Embedding model selection
 - [State-of-the-Art Local RAG](./state-of-the-art-local-rag.md) - Performance optimisation
-- [F-013: RAGAS Evaluation](../features/planned/F-013-ragas-evaluation.md) - Feature specification
+- [F-013: RAGAS Evaluation](../features/completed/F-013-ragas-evaluation.md) - Feature specification
 - [ADR-0008: Evaluation Framework](../decisions/adrs/0008-evaluation-framework.md) - Architecture decision
 
 ---

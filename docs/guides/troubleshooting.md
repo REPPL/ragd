@@ -80,7 +80,7 @@ Common issues and solutions for ragd.
 **Cause:** No indexed documents match the query.
 
 **Solutions:**
-1. Check you have indexed documents: `ragd status`
+1. Check you have indexed documents: `ragd info`
 2. Try broader or different search terms
 3. Verify the topic exists in your indexed documents
 4. Use keywords that appear in your documents
@@ -186,6 +186,6 @@ If you've tried the solutions above and still have problems:
 
 ## Related Documentation
 
-- [Getting Started Tutorial](../tutorials/getting-started.md)
+- [Getting Started Tutorial](../tutorials/01-getting-started.md)
 - [Reference Documentation](../reference/)
 

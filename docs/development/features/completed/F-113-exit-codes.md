@@ -53,6 +53,11 @@ Define standard exit codes matching Unix conventions and common CLI tools.
 - 3 tests in `tests/test_stability.py`
 - All tests passing
 
+## Related Documentation
+
+- [F-110: Structured Logging](./F-110-structured-logging.md)
+- [v0.9.5 Implementation](../../implementation/v0.9.5.md)
+
 ---
 
 **Status**: Completed

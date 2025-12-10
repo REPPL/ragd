@@ -236,7 +236,7 @@ Smart collections enable powerful UI features:
 - [State-of-the-Art Tagging](../../research/state-of-the-art-tagging.md)
 - [F-031: Tag Management](../completed/F-031-tag-management.md)
 - [F-061: Auto-Tag Suggestions](./F-061-auto-tag-suggestions.md)
-- [F-062: Tag Library Management](./F-062-tag-library-management.md)
+- [F-062: Tag Library](./F-062-tag-library.md)
 
 ---
 

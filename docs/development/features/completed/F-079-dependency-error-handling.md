@@ -69,7 +69,7 @@ When optional dependencies are missing, users see raw Python tracebacks. They ne
 
 ## Related Documentation
 
-- [Installation Guide](../../../tutorials/getting-started.md)
+- [Installation Guide](../../../tutorials/01-getting-started.md)
 
 ---
 

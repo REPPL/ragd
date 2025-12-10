@@ -64,7 +64,7 @@ Results merged with provenance tracking.
 ## Related Documentation
 
 - [F-080: Cross-Encoder Reranking](./F-080-cross-encoder-reranking.md)
-- [Query Parser](../../../reference/search/query.md)
+- [Search Syntax Reference](../../../reference/search-syntax.md)
 
 ---
 

@@ -14,7 +14,7 @@ The 4 commands you need to be productive with ragd.
 | `ragd doctor` | Run health checks |
 | `ragd index` | Add documents |
 | `ragd search` | Find information |
-| `ragd status` | View statistics |
+| `ragd info` | View statistics |
 
 ---
 
@@ -124,12 +124,12 @@ ragd search "neural networks" --format json
 
 ---
 
-## 4. ragd status
+## 4. ragd info
 
 **View the state of your knowledge base.**
 
 ```bash
-ragd status
+ragd info
 ```
 
 **What it does:**

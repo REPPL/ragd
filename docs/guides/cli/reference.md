@@ -13,7 +13,7 @@ The most commonly used commands:
 | `ragd search <query>` | Search knowledge base |
 | `ragd ask <question>` | Ask a question (LLM-powered) |
 | `ragd chat` | Interactive chat mode |
-| `ragd status` | Show index status |
+| `ragd info` | Show index status |
 | `ragd doctor` | Run health checks |
 
 ## Global Options

@@ -53,6 +53,11 @@ html:
 - playwright (optional)
 - v0.8.7 (CLI Polish)
 
+## Related Documentation
+
+- [F-039: Advanced HTML Processing](./F-039-advanced-html-processing.md)
+- [v0.9.6 Implementation](../../implementation/v0.9.6.md)
+
 ---
 
 **Status**: Completed

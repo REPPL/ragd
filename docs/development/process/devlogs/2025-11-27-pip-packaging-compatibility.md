@@ -56,6 +56,6 @@ Debugging required:
 
 ## Lesson Learned
 
-- Keep `__version__` in `__init__.py` synced with `pyproject.toml`
+- Keep `__version__` in `__init__.py` synchronised with `pyproject.toml`
 - Self-referential extras (`pkg[extra1,extra2]`) are fragile across pip versions
 - Always test `pip install -e .` after releases

@@ -81,6 +81,11 @@ chunking:
 
 - v0.8.7 (CLI Polish)
 
+## Related Documentation
+
+- [F-003: Chunking Engine](./F-003-chunking-engine.md)
+- [v0.9.0 Implementation](../../implementation/v0.9.0.md)
+
 ---
 
 **Status**: Completed

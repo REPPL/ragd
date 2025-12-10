@@ -274,8 +274,8 @@ def gdpr_delete(document_id: str, reason: str) -> DeletionCertificate:
 
 - [State-of-the-Art PII Removal](../../research/state-of-the-art-pii-removal.md) - GDPR research
 - [ADR-0028: PII Handling Architecture](../../decisions/adrs/0028-pii-handling-architecture.md)
-- [F-017: Secure Deletion](./F-017-secure-deletion.md) - Base deletion capability
-- [F-023: PII Detection](./F-023-pii-detection.md) - PII scanning
+- [F-017: Secure Deletion](../completed/F-017-secure-deletion.md) - Base deletion capability
+- [F-023: PII Detection](../completed/F-023-pii-detection.md) - PII scanning
 - [GDPR Article 17](https://gdpr-info.eu/art-17-gdpr/) - Legal requirement
 
 ---

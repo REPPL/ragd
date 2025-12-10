@@ -382,8 +382,8 @@ async def memory_enhanced_search(
 ## Related Documentation
 
 - [State-of-the-Art Personal RAG](../../research/state-of-the-art-personal-rag.md) - Research basis
-- [F-015: Database Encryption](./F-015-database-encryption.md) - Security integration
-- [F-022: Knowledge Graph](./F-022-knowledge-graph.md) - Graph store reuse
+- [F-015: Database Encryption](../completed/F-015-database-encryption.md) - Security integration
+- [F-022: Knowledge Graph](../completed/F-022-knowledge-graph.md) - Graph store reuse
 - [F-041: User Profile Management](./F-041-user-profile-management.md) - Profile integration
 - [v2.0.0 Milestone](../../milestones/v2.0.0.md) - Release planning
 

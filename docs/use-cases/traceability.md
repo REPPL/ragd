@@ -20,7 +20,7 @@ This matrix ensures every use case is:
 | **Use Case** | [UC-001-index-documents.md](./briefs/UC-001-index-documents.md) |
 | **Milestone** | v0.1 |
 | **Features** | F-001, F-002, F-003, F-004 |
-| **Tutorial** | [Getting Started: Index Your First Document](../tutorials/getting-started.md) |
+| **Tutorial** | [Getting Started: Index Your First Document](../tutorials/01-getting-started.md) |
 
 ### UC-002: Search Knowledge
 
@@ -29,7 +29,7 @@ This matrix ensures every use case is:
 | **Use Case** | [UC-002-search-knowledge.md](./briefs/UC-002-search-knowledge.md) |
 | **Milestone** | v0.1 |
 | **Features** | F-005, F-006, F-009 |
-| **Tutorial** | [Getting Started: Search Your Documents](../tutorials/getting-started.md) |
+| **Tutorial** | [Getting Started: Search Your Documents](../tutorials/01-getting-started.md) |
 
 ### UC-003: View System Status
 
@@ -38,7 +38,7 @@ This matrix ensures every use case is:
 | **Use Case** | [UC-003-view-system-status.md](./briefs/UC-003-view-system-status.md) |
 | **Milestone** | v0.1 |
 | **Features** | F-007, F-035 |
-| **Tutorial** | [Getting Started: Check Status](../tutorials/getting-started.md) |
+| **Tutorial** | [Getting Started: Check Status](../tutorials/01-getting-started.md) |
 
 ### UC-004: Process Messy PDFs
 
@@ -108,13 +108,19 @@ Quick reference for all features derived from P0 use cases:
 
 ## Validation Status
 
-| Use Case | Features Spec'd | Tutorial Written | Acceptance Tests |
-|----------|-----------------|------------------|------------------|
-| UC-001 | ✅ F-001 to F-004 | ✅ Draft | ⏳ Pending |
-| UC-002 | ✅ F-005, F-006, F-009 | ✅ Draft | ⏳ Pending |
-| UC-003 | ✅ F-007, F-035 | ✅ Draft | ⏳ Pending |
-| UC-004 | ✅ F-025 to F-028 | ✅ Draft | ⏳ Pending |
-| UC-005 | ✅ F-029 to F-031 | ✅ Draft | ⏳ Pending |
-| UC-006 | ✅ F-032 to F-034 | ✅ Draft | ⏳ Pending |
+| Use Case | Features Spec'd | Tutorial | Tests |
+|----------|-----------------|----------|-------|
+| UC-001 | ✅ F-001 to F-004 | ✅ | ✅ Unit + Integration |
+| UC-002 | ✅ F-005, F-006, F-009 | ✅ | ✅ Unit + Integration |
+| UC-003 | ✅ F-007, F-035 | ✅ | ✅ Unit + Integration |
+| UC-004 | ✅ F-025 to F-028 | ✅ | ✅ Unit + Integration |
+| UC-005 | ✅ F-029 to F-031 | ✅ | ✅ Unit + Integration |
+| UC-006 | ✅ F-032 to F-034 | ✅ | ✅ Unit + Integration |
 
 ---
+
+## Related Documentation
+
+- [Feature Specifications](../development/features/)
+- [Use Case Briefs](./briefs/)
+- [Tutorials](../tutorials/)

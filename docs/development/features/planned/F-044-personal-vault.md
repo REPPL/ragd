@@ -457,8 +457,8 @@ class BrowserHistoryConnector(VaultConnector):
 
 - [State-of-the-Art Personal RAG](../../research/state-of-the-art-personal-rag.md) - Research basis
 - [State-of-the-Art Privacy](../../research/state-of-the-art-privacy.md) - Security architecture
-- [F-015: Database Encryption](./F-015-database-encryption.md) - Encryption foundation
-- [F-023: PII Detection](./F-023-pii-detection.md) - Redaction pipeline
+- [F-015: Database Encryption](../completed/F-015-database-encryption.md) - Encryption foundation
+- [F-023: PII Detection](../completed/F-023-pii-detection.md) - Redaction pipeline
 - [F-040: Long-Term Memory](./F-040-long-term-memory.md) - Memory integration
 - [ADR-0022: Personal Vault Isolation](../../decisions/adrs/0022-personal-vault-isolation.md) - Architecture decision
 

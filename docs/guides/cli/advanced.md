@@ -278,7 +278,7 @@ tar -czf ragd-data.tar.gz ~/.ragd/data
 ### Slow searches
 
 1. Reduce result limit: `--limit 3`
-2. Check index size: `ragd status`
+2. Check index size: `ragd info`
 3. Consider smaller embedding model
 
 ---

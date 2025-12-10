@@ -48,6 +48,11 @@ ragd quality compare doc-123
 
 - v0.8.7 (CLI Polish)
 
+## Related Documentation
+
+- [F-115: Source Quality Scoring](./F-115-source-quality-scoring.md)
+- [v0.9.6 Implementation](../../implementation/v0.9.6.md)
+
 ---
 
 **Status**: Completed

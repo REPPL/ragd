@@ -38,12 +38,12 @@ ragd index ~/Documents/notes/
 ragd search "how does authentication work"
 
 # Check status
-ragd status
+ragd info
 ```
 
 ## For Users
 
-- **New to ragd?** Start with [Getting Started Tutorial](./tutorials/getting-started.md)
+- **New to ragd?** Start with [Getting Started Tutorial](./tutorials/01-getting-started.md)
 - **Need to accomplish a task?** Check [Guides](./guides/)
 - **Looking for API details?** See [Reference](./reference/)
 - **Want to understand concepts?** Read [Explanation](./explanation/)
@@ -68,7 +68,11 @@ ragd status
 | v0.6.0 | Storage Abstraction (FAISS, backends) | ✅ Released |
 | v0.6.5 | Polish & Stability | ✅ Released |
 | v0.7.0 | Privacy & Security (encryption, PII) | ✅ Released |
-| v1.0.0 | Personal Platform + Basic WebUI | 📋 Planned |
+| v0.8.x | Metadata & Organisation | ✅ Released |
+| v0.9.0 | Enhanced Indexing | ✅ Released |
+| v0.9.5 | Stability & Logging | ✅ Released |
+| v0.9.6 | Alpha Testing Release | ✅ Released |
+| v1.0.0 | Personal Platform + WebUI | 📋 Planned |
 
 See [Milestones](./development/milestones/) for details.
 

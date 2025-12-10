@@ -181,13 +181,13 @@ Features are the primary unit of work. Each feature specification describes:
 |----|---------|--------|-------------|
 | [F-087](./completed/F-087-shell-completion.md) | Shell Completion | ✅ Complete | Bash/Zsh/Fish auto-completion |
 | [F-088](./completed/F-088-interactive-config.md) | Interactive Config | ✅ Complete | CLI wizard for configuration |
-| [F-089](./completed/F-089-help-system.md) | Help System Enhancement | ✅ Complete | Better --help, examples, man pages |
-| [F-090](./completed/F-090-output-modes.md) | Output Mode Consistency | ✅ Complete | JSON/plain/rich everywhere |
+| [F-089](./completed/F-089-help-system-enhancement.md) | Help System Enhancement | ✅ Complete | Better --help, examples, man pages |
+| [F-090](./completed/F-090-output-mode-consistency.md) | Output Mode Consistency | ✅ Complete | JSON/plain/rich everywhere |
 | [F-091](./completed/F-091-tutorial-suite.md) | Tutorial Suite | ✅ Complete | Getting started to advanced guides |
 | [F-092](./completed/F-092-configuration-reference.md) | Configuration Reference | ✅ Complete | Complete config.yaml documentation |
 | [F-093](./completed/F-093-troubleshooting-guide.md) | Troubleshooting Guide | ✅ Complete | Common issues and solutions |
 | [F-094](./completed/F-094-use-case-gallery.md) | Use Case Gallery | ✅ Complete | Real-world examples |
-| [F-095](./completed/F-095-demo-specs.md) | Video/GIF Demo Specs | ✅ Complete | Voice-over scripts, storyboards |
+| [F-095](./completed/F-095-video-demo-specs.md) | Video/GIF Demo Specs | ✅ Complete | Voice-over scripts, storyboards |
 | [F-096](./completed/F-096-config-migration.md) | Config Migration Tool | ✅ Complete | Migrate configs between versions |
 | [F-097](./completed/F-097-config-debugging.md) | Config Debugging | ✅ Complete | `ragd config show --effective` |
 
@@ -211,7 +211,7 @@ Features are the primary unit of work. Each feature specification describes:
 | [F-106](./completed/F-106-indexing-documentation.md) | Indexing Documentation | ✅ Complete | Docs for new indexing features |
 | [F-107](./completed/F-107-cli-refinements.md) | CLI Refinements I | ✅ Complete | UX improvements from v0.9.0 |
 | [F-108](./completed/F-108-config-refinements.md) | Config Refinements | ✅ Complete | Additional config options |
-| [F-109](./completed/F-109-index-statistics.md) | Index Statistics | ✅ Complete | `ragd status --detailed` |
+| [F-109](./completed/F-109-index-statistics.md) | Index Statistics | ✅ Complete | `ragd info --detailed` |
 
 ### v0.9.5 Features (Stability & Logging)
 

@@ -84,7 +84,7 @@ ragd evaluate --metrics precision,recall
 ## Related Documentation
 
 - [State-of-the-Art RAG Research](../../research/state-of-the-art-rag.md)
-- [F-013: RAGAS Evaluation](../../features/planned/F-013-ragas-evaluation.md)
+- [F-013: RAGAS Evaluation](../../features/completed/F-013-ragas-evaluation.md)
 - [RAGAS Documentation](https://docs.ragas.io/)
 
 ---

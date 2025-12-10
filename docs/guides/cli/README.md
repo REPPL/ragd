@@ -28,7 +28,7 @@ ragd index ~/Documents/notes/
 ragd search "your question here"
 
 # 4. Check your index
-ragd status
+ragd info
 ```
 
 That's it! You now know the 4 essential commands.

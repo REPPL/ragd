@@ -71,6 +71,11 @@ Create comprehensive documentation for:
 
 - v0.9.0 (Enhanced Indexing)
 
+## Related Documentation
+
+- [Guide: Advanced Indexing](../../../guides/indexing-advanced.md)
+- [v0.9.1 Implementation](../../implementation/v0.9.1.md)
+
 ---
 
 **Status**: Completed

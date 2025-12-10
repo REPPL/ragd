@@ -216,5 +216,6 @@ retrieval:
 
 ## Related Documentation
 
+- [Model Purposes Explained](../explanation/model-purposes.md) — Understanding chat, summary, embedding, contextual, and classification models
 - [Troubleshooting Guide](../guides/troubleshooting.md)
 - [Tutorials](../tutorials/)

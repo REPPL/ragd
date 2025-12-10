@@ -8,7 +8,15 @@ Explanation documentation helps users understand concepts, architecture, and des
 
 ## Available Explanations
 
-*No explanations yet - this project is in early development.*
+### Core Concepts
+
+- [Hybrid Search](./hybrid-search.md) — How ragd combines semantic and keyword search using Reciprocal Rank Fusion
+- [Chunking Strategies](./chunking-strategies.md) — How documents are split into searchable pieces
+- [Contextual Retrieval](./contextual-retrieval.md) — Adding document context to chunks for better search
+
+### Configuration
+
+- [Model Purposes](./model-purposes.md) — Understanding the five model types (chat, summary, classification, embedding, contextual)
 
 ## Explanation Guidelines
 

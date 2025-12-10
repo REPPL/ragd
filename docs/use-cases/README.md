@@ -44,6 +44,15 @@ Layer 3: TUTORIALS (How users experience it)
 | UC-012 | Switch Personas | P2 | v0.8 |
 | UC-013 | Upload via Web | P2 | v1.0 |
 
+## Example Use Cases
+
+| Use Case | Description |
+|----------|-------------|
+| [Personal Notes](personal-notes.md) | Managing Obsidian vaults and note collections |
+| [Research Papers](research-papers.md) | Academic research and paper management |
+| [Code Documentation](code-documentation.md) | Technical documentation search |
+| [Meeting Notes](meeting-notes.md) | Work meeting notes management |
+
 ## Directory Contents
 
 | Directory | Purpose |

@@ -664,8 +664,8 @@ ragd extract entities doc.pdf
 - [State-of-the-Art Local RAG](./state-of-the-art-local-rag.md) - Performance, caching, vector storage
 - [State-of-the-Art RAG](./state-of-the-art-rag.md) - General retrieval techniques
 - [State-of-the-Art Embeddings](./state-of-the-art-embeddings.md) - Embedding model selection
-- [F-020: Ollama LLM Integration](../features/planned/F-020-ollama-llm-integration.md) - Generation feature
-- [F-055: Multi-Model Orchestration](../features/planned/F-055-multi-model-orchestration.md) - Routing feature
+- [F-020: Ollama LLM Integration](../features/completed/F-020-ollama-llm-integration.md) - Generation feature
+- [F-055: Multi-Model Orchestration](../features/completed/F-055-multi-model-orchestration.md) - Routing feature
 - [F-056: Specialised Task Models](../features/planned/F-056-specialised-task-models.md) - SLIM models
 - [F-057: Model Comparison](../features/planned/F-057-model-comparison.md) - LLM-as-Judge
 - [ADR-0026: Multi-Model Architecture](../decisions/adrs/0026-multi-model-architecture.md) - Decision record

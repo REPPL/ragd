@@ -365,8 +365,8 @@ def select_quantisation(
 - [ADR-0030: Model Quantisation Strategy](../decisions/adrs/0030-model-quantisation-strategy.md) - Default quantisation settings
 - [State-of-the-Art Multi-Model RAG](./state-of-the-art-multi-model-rag.md) - Multi-model orchestration
 - [State-of-the-Art Local RAG](./state-of-the-art-local-rag.md) - Local deployment patterns
-- [F-020: Ollama LLM Integration](../features/planned/F-020-ollama-llm-integration.md) - Ollama integration feature
-- [F-055: Multi-Model Orchestration](../features/planned/F-055-multi-model-orchestration.md) - Multi-model memory planning
+- [F-020: Ollama LLM Integration](../features/completed/F-020-ollama-llm-integration.md) - Ollama integration feature
+- [F-055: Multi-Model Orchestration](../features/completed/F-055-multi-model-orchestration.md) - Multi-model memory planning
 
 ---
 

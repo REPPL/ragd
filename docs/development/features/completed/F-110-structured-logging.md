@@ -72,6 +72,11 @@ JSON-formatted logging with configurable levels and third-party suppression.
 - 10 tests in `tests/test_stability.py`
 - All tests passing
 
+## Related Documentation
+
+- [F-111: Error Logging & Recovery](./F-111-error-logging-recovery.md)
+- [v0.9.5 Implementation](../../implementation/v0.9.5.md)
+
 ---
 
 **Status**: Completed

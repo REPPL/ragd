@@ -17,12 +17,16 @@ Progressive learning guides for ragd, from installation to advanced usage.
 |----------|------|-------------|
 | [Chat Interface](03-chat-interface.md) | 15 min | Interactive Q&A with your knowledge base |
 | [Organisation](04-organisation.md) | 25 min | Tags, collections, and metadata |
+| [Organising Your Knowledge Base](organising-knowledge-base.md) | 20 min | Tags, collections, metadata taxonomy |
+| [Backing Up Your Data](backing-up-data.md) | 15 min | Export, backup, and restore |
 
 ### Advanced
 
 | Tutorial | Time | Description |
 |----------|------|-------------|
 | [Advanced Search](05-advanced-search.md) | 30 min | Hybrid search, scoring, contextual retrieval |
+| [Powerful Searching](powerful-searching.md) | 25 min | Search modes, filters, and syntax |
+| [Processing Difficult PDFs](processing-difficult-pdfs.md) | 20 min | OCR, scans, complex layouts |
 | [Automation](06-automation.md) | 20 min | Scripts, JSON output, integrations |
 
 ## Prerequisites

@@ -46,6 +46,12 @@ pdf:
 - PyMuPDF (existing)
 - v0.8.7 (CLI Polish)
 
+## Related Documentation
+
+- [F-027: OCR Pipeline](./F-027-ocr-pipeline.md)
+- [F-025: PDF Quality Detection](./F-025-pdf-quality-detection.md)
+- [v0.9.6 Implementation](../../implementation/v0.9.6.md)
+
 ---
 
 **Status**: Completed

@@ -259,7 +259,7 @@ Breakdown:
 
 - [State-of-the-Art Multi-Model RAG](../../research/state-of-the-art-multi-model-rag.md) - SLIM research
 - [ADR-0026: Multi-Model Architecture](../../decisions/adrs/0026-multi-model-architecture.md) - Decision
-- [F-055: Multi-Model Orchestration](./F-055-multi-model-orchestration.md) - Model registry
+- [F-055: Multi-Model Orchestration](../completed/F-055-multi-model-orchestration.md) - Model registry
 - [F-030: Metadata Extraction](../completed/F-030-metadata-extraction.md) - Metadata storage
 - [LLMWare SLIM Models](https://llmware.ai/resources/slims-small-specialized-models-function-calling-and-multi-model-agents) - External
 

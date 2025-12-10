@@ -106,7 +106,7 @@ ragd delete document.pdf --secure
 Secure delete "document.pdf"? This cannot be undone. [y/N] y
   ├─ Removing from vector index... done
   ├─ Overwriting chunk storage... done
-  └─ Syncing to disk... done
+  └─ Synchronising to disk... done
 ✓ Securely deleted
 
 # Cryptographic erasure (maximum security)

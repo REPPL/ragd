@@ -110,6 +110,12 @@ ragd chat
 
 ---
 
+## Related Documentation
+
+- [Tutorial: Getting Started](../tutorials/01-getting-started.md)
+- [Tutorial: Organising Your Knowledge Base](../tutorials/organising-knowledge-base.md)
+- [F-037: Watch Folder](../development/features/completed/F-037-watch-folder.md)
+
 ## Related Use Cases
 
 - [Research Papers](research-papers.md) - Academic research

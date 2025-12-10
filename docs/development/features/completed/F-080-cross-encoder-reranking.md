@@ -55,7 +55,7 @@ Default to cross-encoder models from sentence-transformers:
 
 ## Related Documentation
 
-- [HybridSearcher](../../../reference/search/hybrid.md)
+- [Search Syntax Reference](../../../reference/search-syntax.md)
 - [State-of-the-Art RAG](../../research/state-of-the-art-rag.md)
 
 ---

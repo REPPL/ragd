@@ -83,7 +83,7 @@ ragd config --validate
 ## Related Documentation
 
 - [F-036: Guided Setup](../completed/F-036-guided-setup.md)
-- [Configuration Guide](../../../guides/configuration.md)
+- [Configuration Reference](../../../reference/configuration.md)
 
 ---
 

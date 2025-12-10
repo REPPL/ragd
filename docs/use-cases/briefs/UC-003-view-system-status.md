@@ -10,7 +10,7 @@ As an end user, I want to see the status of my ragd installation, so that I can 
 
 ## Trigger
 
-CLI command: `ragd status`
+CLI command: `ragd info`
 
 ## Priority
 

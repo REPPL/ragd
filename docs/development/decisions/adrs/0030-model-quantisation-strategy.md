@@ -110,8 +110,8 @@ OLLAMA_MAX_LOADED_MODELS=3       # Multi-model support
 - [State-of-the-Art Quantisation](../../research/state-of-the-art-quantisation.md) - Research informing this decision
 - [ADR-0011: Hardware Detection](./0011-hardware-detection.md) - Hardware tier system
 - [ADR-0026: Multi-Model Architecture](./0026-multi-model-architecture.md) - Multi-model memory planning
-- [F-020: Ollama LLM Integration](../../features/planned/F-020-ollama-llm-integration.md) - Implementation feature
-- [F-055: Multi-Model Orchestration](../../features/planned/F-055-multi-model-orchestration.md) - Multi-model memory requirements
+- [F-020: Ollama LLM Integration](../../features/completed/F-020-ollama-llm-integration.md) - Implementation feature
+- [F-055: Multi-Model Orchestration](../../features/completed/F-055-multi-model-orchestration.md) - Multi-model memory requirements
 
 ---
 

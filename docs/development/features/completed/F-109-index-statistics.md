@@ -97,6 +97,11 @@ Documents by Type
 
 - v0.9.0 (Enhanced Indexing)
 
+## Related Documentation
+
+- [F-107: CLI Refinements](./F-107-cli-refinements.md)
+- [v0.9.1 Implementation](../../implementation/v0.9.1.md)
+
 ---
 
 **Status**: Completed

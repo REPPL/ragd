@@ -7,10 +7,10 @@ Documentation for contributors and developers.
 | Area | Status |
 |------|--------|
 | Use Cases | 6 P0 briefs defined |
-| Features | v0.1 (9), v0.2 (12), v0.3 (4), v0.4 (1), v0.5 (4), v0.6 (10), v0.7 (6) = 46 features complete |
-| Tutorials | Getting Started + 3 v0.2 tutorials + Chat tutorial |
-| Milestone | v0.7.0 released |
-| ADRs | 29+ architecture decisions |
+| Features | 96 features complete, 11 planned |
+| Tutorials | Getting Started + 5 tutorials |
+| Milestone | v0.9.6 released (preparing v1.0.0) |
+| ADRs | 32 architecture decisions |
 
 ## Structure
 
@@ -44,57 +44,67 @@ Layer 3: TUTORIALS (How users experience it)
 - [Planned Features](./features/planned/)
 - [Milestones](./milestones/)
 
-### v0.7.0 (Latest Release)
+### v0.9.6 (Latest Release)
+- [v0.9.6 Milestone](./milestones/v0.9.6.md)
+- [v0.9.6 Implementation](./implementation/v0.9.6.md)
+- [F-098: Advanced HTML Engine](./features/completed/F-098-advanced-html-engine.md)
+- [F-099: PDF Layout Intelligence](./features/completed/F-099-pdf-layout-intelligence.md)
+- [F-105: Indexing Self-Evaluation](./features/completed/F-105-indexing-self-evaluation.md)
+- [F-111: Error Logging & Recovery](./features/completed/F-111-error-logging-recovery.md)
+- [F-112: Operation Audit Trail](./features/completed/F-112-operation-audit-trail.md)
+- [F-114: CLI User Feedback](./features/completed/F-114-cli-user-feedback.md)
+- [F-115: Source Quality Scoring](./features/completed/F-115-source-quality-scoring.md)
+- [F-118: Dry-Run Mode](./features/completed/F-118-dry-run-mode.md)
+
+### v0.9.5 (Released)
+- [v0.9.5 Milestone](./milestones/v0.9.5.md)
+- [v0.9.5 Implementation](./implementation/v0.9.5.md)
+- [F-110: Structured Logging](./features/completed/F-110-structured-logging.md)
+- [F-113: Exit Codes](./features/completed/F-113-exit-codes.md)
+- [F-116: Index Integrity](./features/completed/F-116-index-integrity.md)
+- [F-117: Self-Healing](./features/completed/F-117-self-healing.md)
+
+### v0.9.1 (Released)
+- [v0.9.1 Milestone](./milestones/v0.9.1.md)
+- [v0.9.1 Implementation](./implementation/v0.9.1.md)
+- [F-106: Indexing Documentation](./features/completed/F-106-indexing-documentation.md)
+- [F-107: CLI Refinements](./features/completed/F-107-cli-refinements.md)
+- [F-108: Config Refinements](./features/completed/F-108-config-refinements.md)
+- [F-109: Index Statistics](./features/completed/F-109-index-statistics.md)
+
+### v0.9.0 (Released)
+- [v0.9.0 Milestone](./milestones/v0.9.0.md)
+- [v0.9.0 Implementation](./implementation/v0.9.0.md)
+- [F-100: New File Types](./features/completed/F-100-new-file-types.md)
+- [F-101: Smart Chunking v2](./features/completed/F-101-smart-chunking-v2.md)
+- [F-102: Indexing Resume](./features/completed/F-102-indexing-resume.md)
+- [F-103: Content Hashing](./features/completed/F-103-content-hashing.md)
+- [F-104: Duplicate Detection](./features/completed/F-104-duplicate-detection.md)
+
+### v0.8.x Series (Released)
+- [v0.8.7 Milestone](./milestones/v0.8.7.md) - CLI Polish & Documentation
+- [v0.8.6 Milestone](./milestones/v0.8.6.md) - Contextual Retrieval v2
+- [v0.8.5 Milestone](./milestones/v0.8.5.md) - Dual-Index Architecture
+- [v0.8.2 Milestone](./milestones/v0.8.2.md) - Retrieval Enhancement
+- [v0.8.1 Milestone](./milestones/v0.8.1.md) - Intelligent Tagging
+- [v0.8.0 Milestone](./milestones/v0.8.0.md) - Metadata Foundation
+
+### v0.7.0 (Released)
 - [v0.7.0 Milestone](./milestones/v0.7.0.md)
 - [v0.7.0 Implementation](./implementation/v0.7.0.md)
 - [F-015: Database Encryption](./features/completed/F-015-database-encryption.md)
 - [F-016: Session Management](./features/completed/F-016-session-management.md)
 - [F-017: Secure Deletion](./features/completed/F-017-secure-deletion.md)
 - [F-023: PII Detection](./features/completed/F-023-pii-detection.md)
-- [F-065: Chat Citation Display](./features/completed/F-065-chat-citation-display.md)
-- [F-066: Configurable Chat Prompts](./features/completed/F-066-configurable-chat-prompts.md)
 
-### v0.6.5 (Released)
-- [v0.6.5 Milestone](./milestones/v0.6.5.md)
-- [v0.6.5 Implementation](./implementation/v0.6.5.md)
-- [F-076: RAGAS Evaluation Metrics](./features/completed/F-076-ragas-evaluation-metrics.md)
-- [F-077: CLI Visual Polish](./features/completed/F-077-cli-visual-polish.md)
-- [F-078: Configuration Validation](./features/completed/F-078-configuration-validation.md)
-- [F-079: Dependency Error Handling](./features/completed/F-079-dependency-error-handling.md)
-
-### v0.6.0 (Released)
-- [v0.6.0 Milestone](./milestones/v0.6.0.md)
-- [F-021: Vector Store Abstraction](./features/completed/F-021-vector-store-abstraction.md)
-- [F-070: Backend Recommendation](./features/completed/F-070-backend-recommendation.md)
-
-### v0.5.0 (Released)
-- [v0.5.0 Milestone](./milestones/v0.5.0.md)
-- [v0.5.0 Implementation](./implementation/v0.5.0.md)
-- [F-013: RAGAS Evaluation](./features/completed/F-013-ragas-evaluation.md)
-- [F-014: Agentic RAG](./features/completed/F-014-agentic-rag.md)
-- [F-020: Ollama LLM Integration](./features/completed/F-020-ollama-llm-integration.md)
-- [F-055: Multi-Model Orchestration](./features/completed/F-055-multi-model-orchestration.md)
-
-### v0.4.0 (Released)
-- [v0.4.0 Milestone](./milestones/v0.4.0.md)
-- [v0.4.0 Implementation](./implementation/v0.4.0.md)
-- [F-019: Multi-Modal Support](./features/completed/F-019-multi-modal-support.md)
-
-### v0.3.0 (Released)
-- [v0.3.0 Milestone](./milestones/v0.3.0.md)
-- [v0.3.0 Implementation](./implementation/v0.3.0.md)
-- [F-009: Citation Output](./features/completed/F-009-citation-output.md)
-- [F-010: Contextual Retrieval](./features/completed/F-010-contextual-retrieval.md)
-- [F-011: Late Chunking](./features/completed/F-011-late-chunking.md)
-- [F-012: Hybrid Search](./features/completed/F-012-hybrid-search.md)
-
-### v0.2.0 (Released)
-- [v0.2.0 Milestone](./milestones/v0.2.0.md)
-- [v0.2.0 Implementation](./implementation/v0.2.0.md)
-
-### v0.1.0 (Released)
-- [v0.1.0 Milestone](./milestones/v0.1.0.md)
-- [v0.1.0 Implementation](./implementation/v0.1.0.md)
+### Earlier Releases
+- [v0.6.5 Milestone](./milestones/v0.6.5.md) - RAGAS & Polish
+- [v0.6.0 Milestone](./milestones/v0.6.0.md) - Vector Store Abstraction
+- [v0.5.0 Milestone](./milestones/v0.5.0.md) - LLM Integration
+- [v0.4.0 Milestone](./milestones/v0.4.0.md) - Multi-Modal
+- [v0.3.0 Milestone](./milestones/v0.3.0.md) - Advanced Search
+- [v0.2.0 Milestone](./milestones/v0.2.0.md) - Messy PDFs
+- [v0.1.0 Milestone](./milestones/v0.1.0.md) - Core RAG Pipeline
 
 ### History
 - [Completed Features](./features/completed/)

@@ -304,7 +304,7 @@ $ ragd ask "What is RAG?" --compare llama3.2:3b,qwen2.5:3b --judge llama3.1:8b
 
 - [State-of-the-Art Multi-Model RAG](../../research/state-of-the-art-multi-model-rag.md) - LLM-as-Judge research
 - [ADR-0026: Multi-Model Architecture](../../decisions/adrs/0026-multi-model-architecture.md) - Decision
-- [F-055: Multi-Model Orchestration](./F-055-multi-model-orchestration.md) - Model registry
-- [F-020: Ollama LLM Integration](./F-020-ollama-llm-integration.md) - Generation
+- [F-055: Multi-Model Orchestration](../completed/F-055-multi-model-orchestration.md) - Model registry
+- [F-020: Ollama LLM Integration](../completed/F-020-ollama-llm-integration.md) - Generation
 
 ---

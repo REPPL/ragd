@@ -262,7 +262,7 @@ class FineTunedEmbedder:
 - [State-of-the-Art Fine-Tuning](../../research/state-of-the-art-fine-tuning.md) - Research basis
 - [State-of-the-Art Embeddings](../../research/state-of-the-art-embeddings.md) - Model selection
 - [ADR-0027: Fine-Tuning Strategy](../../decisions/adrs/0027-fine-tuning-strategy.md) - Architecture decision
-- [F-013: RAGAS Evaluation](./F-013-ragas-evaluation.md) - Evaluation framework
-- [F-020: Ollama LLM Integration](./F-020-ollama-llm-integration.md) - LLM for data generation
+- [F-013: RAGAS Evaluation](../completed/F-013-ragas-evaluation.md) - Evaluation framework
+- [F-020: Ollama LLM Integration](../completed/F-020-ollama-llm-integration.md) - LLM for data generation
 
 ---

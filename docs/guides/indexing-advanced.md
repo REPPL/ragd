@@ -118,7 +118,7 @@ Long indexing operations can be resumed after interruption.
 ragd index ~/LargeLibrary/ --checkpoint
 
 # View progress
-ragd status --checkpoint
+ragd info --detailed
 ```
 
 ### Resume After Interruption
@@ -186,7 +186,7 @@ indexing:
 
 ```bash
 # Show duplicate statistics
-ragd status --duplicates
+ragd info --detailed
 ```
 
 ## Best Practices
@@ -195,7 +195,7 @@ ragd status --duplicates
 
 1. **Use checkpoints** for collections over 1000 files
 2. **Run overnight** for very large collections
-3. **Monitor progress** with `ragd status --checkpoint`
+3. **Monitor progress** with `ragd info --detailed`
 
 ### Mixed File Types
 
@@ -215,7 +215,7 @@ ragd status --duplicates
 
 - [Getting Started](../tutorials/01-getting-started.md)
 - [Configuration Reference](../reference/configuration.md)
-- [CLI Reference](../reference/cli.md)
+- [CLI Reference](../reference/cli-reference.md)
 
 ---
 

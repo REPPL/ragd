@@ -84,6 +84,11 @@ class XLSXExtractor:
 - python-docx (optional)
 - openpyxl (optional)
 
+## Related Documentation
+
+- [F-002: Text Extraction](./F-002-text-extraction.md)
+- [v0.9.0 Implementation](../../implementation/v0.9.0.md)
+
 ---
 
 **Status**: Completed

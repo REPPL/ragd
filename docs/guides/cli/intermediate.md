@@ -23,7 +23,7 @@ ragd will:
 ### Check what's indexed
 
 ```bash
-ragd status
+ragd info
 ```
 
 ### Index specific file types only
@@ -121,13 +121,13 @@ ragd doctor
 ### View detailed statistics
 
 ```bash
-ragd status --verbose
+ragd info --detailed
 ```
 
 ### Get JSON status for monitoring
 
 ```bash
-ragd status --format json
+ragd info --format json
 ```
 
 ---
@@ -195,7 +195,7 @@ ragd search "machine learning" --bibliography bibtex > refs.bib
 | JSON output | `ragd search "query" --format json` |
 | Plain output | `ragd search "query" --plain` |
 | Run health checks | `ragd doctor` |
-| Detailed status | `ragd status --verbose` |
+| Detailed status | `ragd info --detailed` |
 
 ---
 

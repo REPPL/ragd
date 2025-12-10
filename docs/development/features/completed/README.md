@@ -49,13 +49,13 @@ Features that have been implemented and released.
 |----|---------|---------|
 | [F-087](./F-087-shell-completion.md) | Shell Completion | v0.8.7 |
 | [F-088](./F-088-interactive-config.md) | Interactive Config | v0.8.7 |
-| [F-089](./F-089-help-system.md) | Help System Enhancement | v0.8.7 |
-| [F-090](./F-090-output-modes.md) | Output Mode Consistency | v0.8.7 |
+| [F-089](./F-089-help-system-enhancement.md) | Help System Enhancement | v0.8.7 |
+| [F-090](./F-090-output-mode-consistency.md) | Output Mode Consistency | v0.8.7 |
 | [F-091](./F-091-tutorial-suite.md) | Tutorial Suite | v0.8.7 |
 | [F-092](./F-092-configuration-reference.md) | Configuration Reference | v0.8.7 |
 | [F-093](./F-093-troubleshooting-guide.md) | Troubleshooting Guide | v0.8.7 |
 | [F-094](./F-094-use-case-gallery.md) | Use Case Gallery | v0.8.7 |
-| [F-095](./F-095-demo-specs.md) | Video/GIF Demo Specs | v0.8.7 |
+| [F-095](./F-095-video-demo-specs.md) | Video/GIF Demo Specs | v0.8.7 |
 | [F-096](./F-096-config-migration.md) | Config Migration Tool | v0.8.7 |
 | [F-097](./F-097-config-debugging.md) | Config Debugging | v0.8.7 |
 

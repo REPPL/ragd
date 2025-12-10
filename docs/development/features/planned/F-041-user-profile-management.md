@@ -422,8 +422,7 @@ ragd profile reset --behavioural
 
 - [State-of-the-Art Personal RAG](../../research/state-of-the-art-personal-rag.md) - Research basis
 - [F-040: Long-Term Memory](./F-040-long-term-memory.md) - Memory integration
-- [F-042: Persona Agent System](./F-042-persona-agent-system.md) - Agent integration
-- [F-015: Database Encryption](./F-015-database-encryption.md) - Security
+- [F-015: Database Encryption](../completed/F-015-database-encryption.md) - Security
 - [v2.0.0 Milestone](../../milestones/v2.0.0.md) - Release planning
 
 ---
