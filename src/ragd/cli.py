@@ -8,6 +8,9 @@ Command implementations are in ragd.ui.cli.commands.
 
 from __future__ import annotations
 
+import difflib
+import os
+import sys
 from pathlib import Path
 from typing import Annotated
 
@@ -15,13 +18,28 @@ import typer
 from rich.console import Console
 
 from ragd import __version__
+
+
+def is_admin_mode() -> bool:
+    """Check if admin mode is requested via flag or environment.
+
+    Admin mode shows additional commands for advanced users.
+    Can be enabled via:
+    - --admin flag: ragd --admin --help
+    - RAGD_ADMIN environment variable: RAGD_ADMIN=1 ragd --help
+    """
+    if os.environ.get("RAGD_ADMIN", "").lower() in ("1", "true", "yes"):
+        return True
+    return "--admin" in sys.argv
+
+
+ADMIN_MODE = is_admin_mode()
 from ragd.ui.cli import (
     get_console,
     init_command,
     index_command,
     search_command,
-    status_command,
-    stats_command,
+    info_command,
     doctor_command,
     config_command,
     reindex_command,
@@ -41,6 +59,7 @@ from ragd.ui.cli import (
     models_list_command,
     models_recommend_command,
     models_show_command,
+    models_set_command,
     evaluate_command,
     quality_command,
     # Backend commands
@@ -65,20 +84,20 @@ from ragd.ui.cli import (
     tier_summary_command,
     tier_promote_command,
     tier_demote_command,
-    # Collection commands (F-063)
+    # Collection commands
     collection_create_command,
     collection_list_command,
     collection_show_command,
     collection_update_command,
     collection_delete_command,
     collection_export_command,
-    # Suggestion commands (F-061)
+    # Suggestion commands
     suggestions_show_command,
     suggestions_pending_command,
     suggestions_confirm_command,
     suggestions_reject_command,
     suggestions_stats_command,
-    # Library commands (F-062)
+    # Library commands
     library_show_command,
     library_create_command,
     library_add_command,
@@ -90,22 +109,22 @@ from ragd.ui.cli import (
     library_promote_command,
     library_pending_command,
     library_stats_command,
-    # Config wizard (F-088)
+    # Config wizard
     run_config_wizard,
-    # Config debugging (F-097)
+    # Config debugging
     show_effective_config,
     show_config_diff,
     show_config_source,
     validate_config,
-    # Config migration (F-096)
+    # Config migration
     migrate_config,
     rollback_config,
     needs_migration,
-    # Help system (F-089)
+    # Help system
     show_extended_help,
     show_examples,
     list_help_topics,
-    # Audit commands (F-112)
+    # Audit commands
     audit_list_command,
     audit_show_command,
     audit_clear_command,
@@ -114,34 +133,73 @@ from ragd.ui.cli import (
 
 app = typer.Typer(
     name="ragd",
-    help="Local RAG for personal knowledge management.",
+    help="Your Private Intelligent Document Assistant.",
     no_args_is_help=True,
 )
 console = Console()
 
 # Subcommand groups
+# User groups (always visible)
 meta_app = typer.Typer(help="Manage document metadata.")
 tag_app = typer.Typer(help="Manage document tags.")
+collection_app = typer.Typer(help="Manage smart collections.")
+
+# Admin groups (hidden unless ADMIN_MODE)
 tier_app = typer.Typer(help="Manage data sensitivity tiers.")
-collection_app = typer.Typer(help="Manage smart collections (F-063).")
-library_app = typer.Typer(help="Manage tag library (F-062).")
+library_app = typer.Typer(help="Manage tag library.")
 watch_app = typer.Typer(help="Watch folders for automatic indexing.")
 models_app = typer.Typer(help="Manage LLM models.")
 backend_app = typer.Typer(help="Manage vector store backends.")
 password_app = typer.Typer(help="Manage encryption password.")
 session_app = typer.Typer(help="Manage encryption session.")
-audit_app = typer.Typer(help="View operation audit log (F-112).")
-app.add_typer(meta_app, name="meta")
-app.add_typer(tag_app, name="tag")
-app.add_typer(tier_app, name="tier")
-app.add_typer(collection_app, name="collection")
-app.add_typer(library_app, name="library")
-app.add_typer(watch_app, name="watch")
-app.add_typer(models_app, name="models")
-app.add_typer(backend_app, name="backend")
-app.add_typer(password_app, name="password")
-app.add_typer(session_app, name="session")
-app.add_typer(audit_app, name="audit")
+audit_app = typer.Typer(help="View operation audit log.")
+
+# Register user subcommand groups (always visible)
+app.add_typer(collection_app, name="collection", rich_help_panel="Organisation")
+app.add_typer(meta_app, name="meta", rich_help_panel="Organisation")
+app.add_typer(tag_app, name="tag", rich_help_panel="Organisation")
+
+# Register admin subcommand groups (hidden unless ADMIN_MODE)
+app.add_typer(
+    library_app, name="library",
+    hidden=not ADMIN_MODE,
+    rich_help_panel="Administration" if ADMIN_MODE else None,
+)
+app.add_typer(
+    tier_app, name="tier",
+    hidden=not ADMIN_MODE,
+    rich_help_panel="Administration" if ADMIN_MODE else None,
+)
+app.add_typer(
+    backend_app, name="backend",
+    hidden=not ADMIN_MODE,
+    rich_help_panel="Infrastructure" if ADMIN_MODE else None,
+)
+app.add_typer(
+    models_app, name="models",
+    hidden=not ADMIN_MODE,
+    rich_help_panel="Infrastructure" if ADMIN_MODE else None,
+)
+app.add_typer(
+    password_app, name="password",
+    hidden=not ADMIN_MODE,
+    rich_help_panel="Security" if ADMIN_MODE else None,
+)
+app.add_typer(
+    session_app, name="session",
+    hidden=not ADMIN_MODE,
+    rich_help_panel="Security" if ADMIN_MODE else None,
+)
+app.add_typer(
+    watch_app, name="watch",
+    hidden=not ADMIN_MODE,
+    rich_help_panel="Automation" if ADMIN_MODE else None,
+)
+app.add_typer(
+    audit_app, name="audit",
+    hidden=not ADMIN_MODE,
+    rich_help_panel="Maintenance" if ADMIN_MODE else None,
+)
 
 
 # Output format option
@@ -162,8 +220,26 @@ def version_callback(value: bool) -> None:
         raise typer.Exit()
 
 
-@app.callback()
+# All available commands for fuzzy matching
+ALL_COMMANDS = [
+    # Top-level commands
+    "init", "index", "search", "info", "doctor", "config", "reindex",
+    "list", "export", "import", "ask", "chat", "evaluate", "quality",
+    "unlock", "lock", "help", "delete",
+    # Subcommand groups
+    "meta", "tag", "tier", "collection", "library", "watch", "models",
+    "backend", "password", "session", "audit",
+]
+
+
+def suggest_command(unknown: str) -> list[str]:
+    """Find similar commands using fuzzy matching."""
+    return difflib.get_close_matches(unknown, ALL_COMMANDS, n=3, cutoff=0.6)
+
+
+@app.callback(invoke_without_command=True)
 def main(
+    ctx: typer.Context,
     version: bool = typer.Option(
         None,
         "--version",
@@ -172,11 +248,37 @@ def main(
         callback=version_callback,
         is_eager=True,
     ),
+    admin: bool = typer.Option(
+        False,
+        "--admin",
+        help="Show administration commands.",
+        is_eager=True,
+        hidden=True,  # Don't clutter basic help
+    ),
 ) -> None:
-    """ragd - Local RAG for personal knowledge management."""
+    """Your Private Intelligent Document Assistant.
+
+    Use --admin to see administration commands.
+    """
+    # Handle unknown commands with fuzzy suggestions
+    if ctx.invoked_subcommand is None and len(sys.argv) > 1:
+        arg = sys.argv[1]
+        # Skip if it's a flag
+        if not arg.startswith("-"):
+            suggestions = suggest_command(arg)
+            if suggestions:
+                if len(suggestions) == 1:
+                    console.print(f"[red]Unknown command: '{arg}'. Did you mean '{suggestions[0]}'?[/red]")
+                else:
+                    options = ", ".join(f"'{s}'" for s in suggestions)
+                    console.print(f"[red]Unknown command: '{arg}'. Did you mean one of: {options}?[/red]")
+            else:
+                console.print(f"[red]Unknown command: '{arg}'[/red]")
+            console.print("\nRun [cyan]ragd --help[/cyan] for available commands.")
+            raise typer.Exit(1)
 
 
-@app.command()
+@app.command(rich_help_panel="Setup & Help")
 def init(
     no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
 ) -> None:
@@ -187,7 +289,7 @@ def init(
     init_command(no_color=no_color)
 
 
-@app.command()
+@app.command(rich_help_panel="Document Management")
 def index(
     path: Annotated[Path, typer.Argument(help="File or directory to index.")],
     recursive: bool = typer.Option(
@@ -250,7 +352,7 @@ CitationOption = Annotated[
 ]
 
 
-@app.command()
+@app.command(rich_help_panel="Core Commands")
 def search(
     query: Annotated[str, typer.Argument(help="Search query.")],
     limit: int = typer.Option(10, "--limit", "-n", help="Maximum number of results."),
@@ -296,44 +398,33 @@ def search(
     )
 
 
-@app.command()
-def status(
+@app.command(rich_help_panel="Setup & Help")
+def info(
+    detailed: bool = typer.Option(False, "--detailed", "-d", help="Show comprehensive statistics."),
     output_format: FormatOption = "rich",
     no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
 ) -> None:
-    """Show ragd status and statistics."""
-    status_command(
-        output_format=output_format,  # type: ignore
-        no_color=no_color,
-    )
+    """Show ragd status and statistics.
 
-
-@app.command()
-def stats(
-    output_format: FormatOption = "rich",
-    no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
-) -> None:
-    """Show comprehensive index statistics.
-
-    Displays detailed information about indexed content including:
-    - Document and chunk counts
-    - File type breakdown
-    - Storage size and backend info
-    - Embedding model and retrieval health
-
-    Use this to verify what content is indexed before querying.
+    By default shows a quick status overview. Use --detailed for
+    comprehensive index statistics.
 
     Examples:
-        ragd stats                # Rich output
-        ragd stats --format json  # JSON for scripting
+        ragd info             # Quick status
+        ragd info --detailed  # Full statistics
+        ragd info -d          # Short form
     """
-    stats_command(
+    info_command(
+        detailed=detailed,
         output_format=output_format,  # type: ignore
         no_color=no_color,
     )
 
 
-@app.command()
+@app.command(
+    hidden=not ADMIN_MODE,
+    rich_help_panel="Administration" if ADMIN_MODE else None,
+)
 def doctor(
     output_format: FormatOption = "rich",
     no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
@@ -348,7 +439,10 @@ def doctor(
     )
 
 
-@app.command()
+@app.command(
+    hidden=not ADMIN_MODE,
+    rich_help_panel="Administration" if ADMIN_MODE else None,
+)
 def config(
     show: bool = typer.Option(False, "--show", "-s", help="Show current configuration."),
     path: bool = typer.Option(False, "--path", "-p", help="Show configuration file path."),
@@ -408,14 +502,14 @@ def config(
         )
 
 
-@app.command()
+@app.command(rich_help_panel="Document Management")
 def reindex(
     document_id: Annotated[
         str | None, typer.Argument(help="Specific document ID to re-index.")
     ] = None,
     all_docs: bool = typer.Option(False, "--all", "-a", help="Re-index all documents."),
     file_type: str = typer.Option(None, "--type", "-t", help="Re-index by file type (pdf, html)."),
-    force: bool = typer.Option(False, "--force", "-f", help="Skip confirmation prompt."),
+    force: bool = typer.Option(False, "--force", "-F", help="Skip confirmation prompt."),
     verbose: bool = typer.Option(False, "--verbose", "-V", help="Show per-file progress."),
     output_format: FormatOption = "rich",
     no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
@@ -673,7 +767,7 @@ def tier_demote(
 
 # --- List command ---
 
-@app.command("list")
+@app.command("list", rich_help_panel="Document Management")
 def list_docs(
     tag: str = typer.Option(None, "--tag", "-t", help="Filter by tag."),
     project: str = typer.Option(None, "--project", "-p", help="Filter by project."),
@@ -702,7 +796,7 @@ def list_docs(
 
 # --- Export/Import commands ---
 
-@app.command("export")
+@app.command("export", rich_help_panel="Knowledge Base")
 def export_archive(
     output_path: Annotated[Path, typer.Argument(help="Path for output archive (.tar.gz).")],
     no_embeddings: bool = typer.Option(False, "--no-embeddings", help="Exclude embeddings (smaller archive)."),
@@ -733,7 +827,7 @@ def export_archive(
     )
 
 
-@app.command("import")
+@app.command("import", rich_help_panel="Knowledge Base")
 def import_archive_cmd(
     archive_path: Annotated[Path, typer.Argument(help="Path to archive (.tar.gz).")],
     skip_conflicts: bool = typer.Option(False, "--skip-conflicts", help="Skip documents that already exist."),
@@ -901,14 +995,138 @@ def models_show(
     )
 
 
+@models_app.command("set")
+def models_set(
+    chat: str = typer.Option(None, "--chat", help="Set chat/generation model."),
+    summary: str = typer.Option(None, "--summary", help="Set summary model."),
+    classification: str = typer.Option(None, "--classification", help="Set classification model."),
+    embedding: str = typer.Option(None, "--embedding", help="Set embedding model."),
+    contextual: str = typer.Option(None, "--contextual", help="Set contextual retrieval model."),
+    no_validate: bool = typer.Option(False, "--no-validate", help="Skip Ollama validation."),
+    no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
+) -> None:
+    """Set models for specific purposes.
+
+    Configures which model to use for each RAG function.
+    Models are validated against Ollama before setting.
+
+    Purposes:
+      --chat          Main chat/generation model (ragd ask, ragd chat)
+      --summary       Document summary generation
+      --classification Document type classification
+      --embedding     Vector embedding model (local, not Ollama)
+      --contextual    Contextual retrieval augmentation
+
+    Examples:
+        ragd models set --chat llama3.1:8b
+        ragd models set --summary llama3.2:3b --classification llama3.2:3b
+        ragd models set --embedding nomic-embed-text
+    """
+    models_set_command(
+        chat=chat,
+        summary=summary,
+        classification=classification,
+        embedding=embedding,
+        contextual=contextual,
+        no_validate=no_validate,
+        no_color=no_color,
+    )
+
+
+@models_app.command("discover")
+def models_discover(
+    model_id: Annotated[str, typer.Argument(help="Model ID to discover (e.g., 'llama3.2:3b').")],
+    no_interactive: bool = typer.Option(False, "--no-interactive", help="Skip interactive confirmation."),
+    force: bool = typer.Option(False, "--force", "-f", help="Overwrite existing card."),
+    no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
+) -> None:
+    """Discover and create a model card.
+
+    Fetches metadata from available sources (Ollama API, HuggingFace Hub,
+    heuristics) and creates a model card. By default, prompts for
+    confirmation before saving.
+
+    Sources (in priority order):
+      1. Ollama API (local installation)
+      2. HuggingFace Hub (if internet available)
+      3. Heuristics (name pattern inference, always available)
+
+    Examples:
+        ragd models discover llama3.2:3b
+        ragd models discover qwen2.5:14b --no-interactive
+        ragd models discover mistral:7b --force
+    """
+    from ragd.ui.cli import models_discover_command
+
+    models_discover_command(
+        model_id=model_id,
+        interactive=not no_interactive,
+        force=force,
+        no_color=no_color,
+    )
+
+
+@models_app.command("cards")
+def models_cards(
+    show_all: bool = typer.Option(False, "--all", "-a", help="Include cached (auto-discovered) cards."),
+    output_format: FormatOption = "rich",
+    no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
+) -> None:
+    """List all available model cards.
+
+    Shows bundled and user-confirmed cards by default. Use --all to also
+    include cached (auto-discovered) cards that haven't been confirmed.
+
+    Card sources:
+      - Bundled: Shipped with ragd
+      - User: Confirmed and saved by user
+      - Cached: Auto-discovered but not yet confirmed
+
+    Examples:
+        ragd models cards
+        ragd models cards --all
+        ragd models cards --format json
+    """
+    from ragd.ui.cli import models_cards_command
+
+    models_cards_command(
+        show_all=show_all,
+        output_format=output_format,  # type: ignore
+        no_color=no_color,
+    )
+
+
+@models_app.command("card-edit")
+def models_card_edit(
+    model_id: Annotated[str, typer.Argument(help="Model ID to edit.")],
+    no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
+) -> None:
+    """Edit an existing model card.
+
+    Opens an interactive editor for modifying model card fields.
+    Changes are saved to user storage (~/.ragd/model_cards/).
+
+    Examples:
+        ragd models card-edit llama3.2:3b
+        ragd models card-edit qwen2.5:7b
+    """
+    from ragd.ui.cli import models_card_edit_command
+
+    models_card_edit_command(
+        model_id=model_id,
+        no_color=no_color,
+    )
+
+
 # --- Ask/Chat commands ---
 
-@app.command()
+@app.command(rich_help_panel="Core Commands")
 def ask(
     question: Annotated[str, typer.Argument(help="Question to ask.")],
     model: str = typer.Option(None, "--model", "-m", help="LLM model to use (default: from config)."),
     temperature: float = typer.Option(0.7, "--temperature", "-t", help="Sampling temperature (0.0-1.0)."),
     limit: int = typer.Option(5, "--limit", "-n", help="Maximum search results for context."),
+    min_relevance: float = typer.Option(None, "--min-relevance", "-r", help="Minimum relevance score (0.0-1.0, default: from config)."),
     no_stream: bool = typer.Option(False, "--no-stream", help="Disable streaming output."),
     agentic: bool = typer.Option(None, "--agentic/--no-agentic", help="Enable/disable agentic RAG (CRAG + Self-RAG)."),
     show_confidence: bool = typer.Option(False, "--show-confidence", "-c", help="Show confidence score."),
@@ -936,6 +1154,7 @@ def ask(
         model=model,
         temperature=temperature,
         limit=limit,
+        min_relevance=min_relevance,
         stream=not no_stream,
         agentic=agentic,
         show_confidence=show_confidence,
@@ -946,11 +1165,12 @@ def ask(
     )
 
 
-@app.command()
+@app.command(rich_help_panel="Core Commands")
 def chat(
     model: str = typer.Option(None, "--model", "-m", help="LLM model to use (default: from config)."),
     temperature: float = typer.Option(0.7, "--temperature", "-t", help="Sampling temperature (0.0-1.0)."),
     limit: int = typer.Option(5, "--limit", "-n", help="Maximum search results per query."),
+    min_relevance: float = typer.Option(None, "--min-relevance", "-r", help="Minimum relevance score (0.0-1.0, default: from config)."),
     session_id: str = typer.Option(None, "--session", "-s", help="Resume a previous chat session."),
     cite: str = typer.Option(None, "--cite", "-c", help="Citation style: none, numbered (default from config)."),
     output_format: FormatOption = "rich",
@@ -979,6 +1199,7 @@ def chat(
         model=model,
         temperature=temperature,
         limit=limit,
+        min_relevance=min_relevance,
         session_id=session_id,
         cite=cite,
         output_format=output_format,  # type: ignore
@@ -986,10 +1207,13 @@ def chat(
     )
 
 
-@app.command()
+@app.command(
+    hidden=not ADMIN_MODE,
+    rich_help_panel="Maintenance" if ADMIN_MODE else None,
+)
 def evaluate(
     query: Annotated[str | None, typer.Option("--query", "-q", help="Single query to evaluate.")] = None,
-    test_file: Annotated[Path | None, typer.Option("--test-file", "-f", help="YAML/JSON file with test queries.")] = None,
+    test_file: Annotated[Path | None, typer.Option("--test-file", "-t", help="YAML/JSON file with test queries.")] = None,
     expected: str = typer.Option(None, "--expected", "-e", help="Expected answer for recall computation."),
     limit: int = typer.Option(5, "--limit", "-n", help="Maximum search results."),
     threshold: float = typer.Option(0.5, "--threshold", help="Relevance threshold (0-1)."),
@@ -1038,7 +1262,10 @@ def evaluate(
     )
 
 
-@app.command()
+@app.command(
+    hidden=not ADMIN_MODE,
+    rich_help_panel="Maintenance" if ADMIN_MODE else None,
+)
 def quality(
     document_id: Annotated[str | None, typer.Argument(help="Document ID to assess (omit for all).")] = None,
     below: float = typer.Option(None, "--below", "-b", help="Only show documents below quality threshold (0-1)."),
@@ -1203,7 +1430,11 @@ def backend_benchmark(
 # --- Delete command ---
 
 delete_app = typer.Typer(help="Delete documents from knowledge base.")
-app.add_typer(delete_app, name="delete")
+app.add_typer(
+    delete_app, name="delete",
+    hidden=not ADMIN_MODE,
+    rich_help_panel="Maintenance" if ADMIN_MODE else None,
+)
 
 
 @delete_app.callback(invoke_without_command=True)
@@ -1275,7 +1506,10 @@ def delete_audit(
 
 # --- Security commands ---
 
-@app.command()
+@app.command(
+    hidden=not ADMIN_MODE,
+    rich_help_panel="Security" if ADMIN_MODE else None,
+)
 def unlock(
     extend: bool = typer.Option(False, "--extend", "-e", help="Extend existing session timer."),
     no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
@@ -1292,7 +1526,10 @@ def unlock(
     unlock_command(no_color=no_color, extend=extend)
 
 
-@app.command()
+@app.command(
+    hidden=not ADMIN_MODE,
+    rich_help_panel="Security" if ADMIN_MODE else None,
+)
 def lock(
     no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
 ) -> None:
@@ -1361,7 +1598,7 @@ def session_status(
     session_status_command(no_color=no_color)
 
 
-# --- Collection subcommands (F-063) ---
+# --- Collection subcommands ---
 
 @collection_app.command("create")
 def collection_create(
@@ -1495,7 +1732,7 @@ def collection_export(
     collection_export_command(name=name, output=output, format=format)
 
 
-# --- Tag suggestions subcommands (F-061) ---
+# --- Tag suggestions subcommands ---
 
 @tag_app.command("suggestions")
 def tag_suggestions(
@@ -1574,7 +1811,7 @@ def tag_stats() -> None:
     suggestions_stats_command()
 
 
-# --- Library subcommands (F-062) ---
+# --- Library subcommands ---
 
 @library_app.command("show")
 def library_show_cmd() -> None:
@@ -1731,7 +1968,7 @@ def library_stats_cmd() -> None:
     library_stats_command()
 
 
-@app.command("help")
+@app.command("help", rich_help_panel="Setup & Help")
 def help_cmd(
     topic: Annotated[str | None, typer.Argument(help="Help topic (command name).")] = None,
     examples: bool = typer.Option(False, "--examples", "-e", help="Show only examples."),
@@ -1755,7 +1992,7 @@ def help_cmd(
         show_extended_help(topic, con)
 
 
-# --- Audit subcommands (F-112) ---
+# --- Audit subcommands ---
 
 @audit_app.command("list")
 def audit_list(

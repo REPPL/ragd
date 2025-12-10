@@ -36,10 +36,12 @@ class AgenticConfig:
     Attributes:
         crag_enabled: Enable Corrective RAG (query rewriting)
         self_rag_enabled: Enable Self-RAG (response assessment)
-        relevance_threshold: Minimum relevance score
+        relevance_threshold: Minimum relevance score for CRAG evaluation
         faithfulness_threshold: Minimum faithfulness score
         max_rewrites: Maximum query rewrite attempts
         max_refinements: Maximum response refinement attempts
+        context_window: Max context tokens (None = auto-detect)
+        min_relevance: Minimum relevance for context chunks
     """
 
     crag_enabled: bool = True
@@ -48,6 +50,8 @@ class AgenticConfig:
     faithfulness_threshold: float = 0.7
     max_rewrites: int = 2
     max_refinements: int = 1
+    context_window: int | None = None  # None = auto-detect from model card
+    min_relevance: float = 0.3  # For context chunk filtering
 
 
 @dataclass
@@ -144,12 +148,33 @@ class AgenticRAG:
         self.config = config or load_config()
         self.agentic = agentic_config or AgenticConfig()
 
+        # Auto-detect context window from model card if not set
+        if self.agentic.context_window is None:
+            self.agentic.context_window = self._resolve_context_window()
+
         self._llm = OllamaClient(
             base_url=self.config.llm.base_url,
             model=self.config.llm.model,
             timeout_seconds=120,
         )
         self._searcher = HybridSearcher(config=self.config)
+
+    def _resolve_context_window(self) -> int:
+        """Resolve context window size from model card or fallback.
+
+        Returns:
+            Context window size in tokens
+        """
+        try:
+            from ragd.models.cards import load_model_card
+
+            card = load_model_card(self.config.llm.model)
+            if card and card.context_length:
+                return card.context_length
+        except Exception:
+            pass  # Fall back to default
+
+        return 4096  # Default fallback
 
     def ask(
         self,
@@ -178,7 +203,10 @@ class AgenticRAG:
             return self._no_results_response(question)
 
         context, citations = build_context_from_results(
-            results, max_results=max_results
+            results,
+            max_tokens=self.agentic.context_window,
+            max_results=max_results,
+            min_relevance=self.agentic.min_relevance,
         )
 
         # CRAG: Evaluate and potentially rewrite query
@@ -200,7 +228,10 @@ class AgenticRAG:
                     results = self._retrieve(rewritten, max_results)
                     if results:
                         context, citations = build_context_from_results(
-                            results, max_results=max_results
+                            results,
+                            max_tokens=self.agentic.context_window,
+                            max_results=max_results,
+                            min_relevance=self.agentic.min_relevance,
                         )
                         relevance_score = self._evaluate_relevance(rewritten, context)
                 else:

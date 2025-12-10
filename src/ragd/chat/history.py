@@ -96,12 +96,14 @@ class ChatHistory:
         self,
         n: int = 5,
         include_system: bool = False,
+        max_tokens: int | None = None,
     ) -> str:
         """Format recent history for inclusion in prompt.
 
         Args:
             n: Number of recent messages to include
             include_system: Include system messages
+            max_tokens: Maximum tokens for history (truncates from oldest)
 
         Returns:
             Formatted history string
@@ -113,12 +115,23 @@ class ChatHistory:
         if not messages:
             return ""
 
-        parts = []
-        for msg in messages:
-            role = msg.role.value.capitalize()
-            parts.append(f"{role}: {msg.content}")
+        def format_messages(msgs: list[ChatMessage]) -> str:
+            parts = []
+            for msg in msgs:
+                role = msg.role.value.capitalize()
+                parts.append(f"{role}: {msg.content}")
+            return "\n".join(parts)
 
-        return "\n".join(parts)
+        result = format_messages(messages)
+
+        # Truncate from oldest if over budget
+        if max_tokens is not None:
+            max_chars = max_tokens * 4  # 4 chars per token estimate
+            while len(result) > max_chars and len(messages) > 1:
+                messages = messages[1:]  # Drop oldest
+                result = format_messages(messages)
+
+        return result
 
     def clear(self) -> None:
         """Clear all messages."""

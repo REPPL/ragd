@@ -26,8 +26,7 @@ def test_help() -> None:
     assert "init" in result.stdout
     assert "index" in result.stdout
     assert "search" in result.stdout
-    assert "status" in result.stdout
-    assert "doctor" in result.stdout
+    assert "info" in result.stdout  # Renamed from status
 
 
 def test_init_help() -> None:

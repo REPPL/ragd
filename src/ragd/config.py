@@ -184,11 +184,46 @@ class MultiModalConfig(BaseModel):
     thumbnail_max_size: int = 256  # Max dimension for thumbnails
 
 
+class DisplayConfig(BaseModel):
+    """Display configuration for CLI output."""
+
+    max_width: int = Field(default=120, ge=40, le=300)
+    word_wrap: bool = True
+
+
+class PromptOverrideConfig(BaseModel):
+    """Custom prompt template override."""
+
+    system: str | None = None
+    user: str | None = None
+
+
 class ChatPromptsConfig(BaseModel):
-    """Configurable prompt settings for chat."""
+    """Configurable prompt settings for chat.
+
+    Prompts can be customised via config.yaml to enable persona/role customisation.
+    Built-in defaults serve as fallback when overrides are not specified.
+    """
 
     citation_instruction: str = (
-        "Always cite your sources by referencing document names and page numbers."
+        "Cite sources using ONLY the numbered markers shown in the context. "
+        "Use [1] for single source, [1;2] for multiple sources. "
+        "NEVER mention author names or publication years from the source text. "
+        "NEVER create a References or Bibliography section."
+    )
+
+    # Template overrides: "template_name" → {system, user}
+    overrides: dict[str, PromptOverrideConfig] = Field(
+        default_factory=dict,
+        description="Custom prompts per template (answer, chat, summarise, compare, refine)",
+    )
+
+    # Query rewriting prompt (for conversation context)
+    query_rewrite: str = (
+        "Rewrite this follow-up question to be self-contained based on the conversation.\n\n"
+        "Conversation:\n{history}\n\n"
+        "Follow-up question: {question}\n\n"
+        "Rewritten question (include the topic from context):"
     )
 
 
@@ -197,12 +232,28 @@ class ChatConfig(BaseModel):
 
     temperature: float = 0.7
     max_tokens: int = 1024
-    context_window: int = 4096
+    context_window: int | None = None  # None = auto-detect from model card
     history_turns: int = 5
     search_limit: int = 5
     auto_save: bool = True
     default_cite_mode: str = "numbered"  # numbered, none, inline
+    min_relevance: float = 0.3  # Minimum relevance score for context chunks
+    # Dynamic allocation settings
+    history_budget_ratio: float = 0.3  # 30% of available tokens for history
+    min_history_tokens: int = 256
+    min_context_tokens: int = 1024
     prompts: ChatPromptsConfig = Field(default_factory=ChatPromptsConfig)
+
+
+class ModelDiscoveryConfig(BaseModel):
+    """Model card auto-discovery configuration."""
+
+    enabled: bool = True  # Enable auto-discovery for missing model cards
+    auto_save_cache: bool = True  # Cache discovered cards to disk
+    interactive_by_default: bool = False  # Prompt for confirmation (CLI only)
+    enable_huggingface: bool = True  # Enable HuggingFace Hub fetching
+    huggingface_timeout_seconds: int = 10  # HF API request timeout
+    cache_ttl_days: int = 30  # Days before cached cards are refreshed
 
 
 class RagdConfig(BaseModel):
@@ -222,6 +273,8 @@ class RagdConfig(BaseModel):
     multi_modal: MultiModalConfig = Field(default_factory=MultiModalConfig)
     security: SecurityConfig = Field(default_factory=SecurityConfig)
     chat: ChatConfig = Field(default_factory=ChatConfig)
+    display: DisplayConfig = Field(default_factory=DisplayConfig)
+    model_discovery: ModelDiscoveryConfig = Field(default_factory=ModelDiscoveryConfig)
 
     @property
     def chroma_path(self) -> Path:

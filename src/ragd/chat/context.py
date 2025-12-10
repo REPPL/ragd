@@ -19,6 +19,85 @@ DEFAULT_MIN_RELEVANCE = 0.3
 
 
 @dataclass
+class TokenBudget:
+    """Token allocation for a chat turn.
+
+    Provides calculated allocations for history and context based on
+    total available tokens and actual content sizes.
+
+    Attributes:
+        total: Total context window tokens
+        reserved_for_response: Tokens reserved for LLM response
+        history: Tokens allocated for conversation history
+        context: Tokens allocated for retrieved context
+    """
+
+    total: int
+    reserved_for_response: int
+    history: int
+    context: int
+
+    @property
+    def available(self) -> int:
+        """Get total available tokens (total minus reserved)."""
+        return self.total - self.reserved_for_response
+
+
+def calculate_token_budget(
+    context_window: int,
+    reserved_tokens: int,
+    history_ratio: float,
+    actual_history_chars: int,
+    min_history: int,
+    min_context: int,
+) -> TokenBudget:
+    """Calculate optimal token allocation based on actual history size.
+
+    Dynamically allocates tokens between history and context, respecting
+    the configured ratio while adapting to actual content sizes.
+
+    Args:
+        context_window: Total context window size in tokens
+        reserved_tokens: Tokens reserved for LLM response
+        history_ratio: Target ratio of available tokens for history (0.0-1.0)
+        actual_history_chars: Actual character count of history to include
+        min_history: Minimum tokens to allocate for history
+        min_context: Minimum tokens to allocate for context
+
+    Returns:
+        TokenBudget with calculated allocations
+    """
+    available = context_window - reserved_tokens
+
+    # Estimate tokens from actual history (4 chars per token)
+    history_tokens_needed = actual_history_chars // 4
+
+    # Calculate max history based on ratio
+    max_history_from_ratio = int(available * history_ratio)
+
+    # History gets the minimum of what it needs and what the ratio allows
+    # but at least min_history
+    history_budget = min(history_tokens_needed, max_history_from_ratio)
+    history_budget = max(history_budget, min_history)
+
+    # Context gets the rest, but at least min_context
+    context_budget = available - history_budget
+    context_budget = max(context_budget, min_context)
+
+    # If we've over-allocated, reduce history (context is more important)
+    if history_budget + context_budget > available:
+        history_budget = available - context_budget
+        history_budget = max(history_budget, 0)
+
+    return TokenBudget(
+        total=context_window,
+        reserved_for_response=reserved_tokens,
+        history=history_budget,
+        context=context_budget,
+    )
+
+
+@dataclass
 class RetrievedContext:
     """A piece of retrieved context with metadata.
 
@@ -188,29 +267,63 @@ class ContextWindow:
         return added
 
     def format_context(self, include_scores: bool = False) -> str:
-        """Format all context for prompt.
+        """Format all context for prompt with citation guidance.
+
+        Consolidates chunks by document - each document gets ONE citation number
+        with all its chunks combined into a single context block.
 
         Args:
             include_scores: Include relevance scores
 
         Returns:
-            Formatted context string
+            Formatted context string with citation guidance header
         """
         if not self._contexts:
             return "[No relevant context found]"
 
+        # Citation guidance header
+        header = (
+            "=== KNOWLEDGE BASE SOURCES ===\n"
+            "Cite using [1] or [1;2] for multiple. "
+            "Ignore (Author, Year) citations within text.\n\n"
+        )
+
+        # Group chunks by document (document_id or source as fallback)
+        from collections import OrderedDict
+
+        doc_chunks: OrderedDict[str, list[RetrievedContext]] = OrderedDict()
+
+        for ctx in self._contexts:
+            doc_key = ctx.document_id or ctx.source
+            if doc_key not in doc_chunks:
+                doc_chunks[doc_key] = []
+            doc_chunks[doc_key].append(ctx)
+
+        # Format each document as a single context block
         parts = []
-        for i, ctx in enumerate(self._contexts, 1):
-            header = f"[Source {i}: {ctx.source}"
-            if ctx.page_number:
-                header += f", p. {ctx.page_number}"
+        for citation_num, (doc_key, chunks) in enumerate(doc_chunks.items(), 1):
+            # Use first chunk for source name, collect all page numbers
+            first_chunk = chunks[0]
+            page_numbers = sorted(set(
+                c.page_number for c in chunks if c.page_number is not None
+            ))
+
+            # Build source header
+            source_header = f"[{citation_num}] {first_chunk.source}"
+            if page_numbers:
+                if len(page_numbers) == 1:
+                    source_header += f", page {page_numbers[0]}"
+                else:
+                    source_header += f", pages {page_numbers[0]}-{page_numbers[-1]}"
             if include_scores:
-                header += f", score: {ctx.score:.2f}"
-            header += "]"
+                avg_score = sum(c.score for c in chunks) / len(chunks)
+                source_header += f" (avg score: {avg_score:.2f})"
 
-            parts.append(f"{header}\n{ctx.content}")
+            # Combine all chunk content with separator
+            combined_content = "\n\n[...]\n\n".join(c.content for c in chunks)
+            parts.append(f"{source_header}\n{combined_content}")
 
-        return "\n\n".join(parts)
+        return header + "\n\n---\n\n".join(parts)
 
     def get_citations(self) -> list[Citation]:
         """Get citations for all context.
@@ -219,6 +332,32 @@ class ContextWindow:
             List of Citation objects
         """
         return [ctx.to_citation() for ctx in self._contexts]
+
+    def get_deduplicated_citations(self) -> list[Citation]:
+        """Get unique citations, one per document.
+
+        Deduplicates by document_id, keeping first occurrence.
+        This prevents the same source appearing multiple times
+        in the reference list.
+
+        Returns:
+            List of unique Citation objects
+        """
+        seen_docs: set[str] = set()
+        unique: list[Citation] = []
+
+        for ctx in self._contexts:
+            doc_id = ctx.document_id
+            if doc_id and doc_id not in seen_docs:
+                seen_docs.add(doc_id)
+                unique.append(ctx.to_citation())
+            elif not doc_id:
+                # No document_id, use source as fallback key
+                if ctx.source not in seen_docs:
+                    seen_docs.add(ctx.source)
+                    unique.append(ctx.to_citation())
+
+        return unique
 
     def clear(self) -> None:
         """Clear all context."""
@@ -233,11 +372,38 @@ class ContextWindow:
         return iter(self._contexts)
 
 
+def deduplicate_citations(citations: list[Citation]) -> list[Citation]:
+    """Deduplicate citations by document_id.
+
+    Keeps first occurrence of each document.
+
+    Args:
+        citations: List of citations (may contain duplicates)
+
+    Returns:
+        List of unique citations
+    """
+    seen_docs: set[str] = set()
+    unique: list[Citation] = []
+
+    for cit in citations:
+        key = cit.document_id or cit.filename
+        if key and key not in seen_docs:
+            seen_docs.add(key)
+            unique.append(cit)
+        elif not key:
+            # Fallback: include if no identifier
+            unique.append(cit)
+
+    return unique
+
+
 def build_context_from_results(
     results: list[HybridSearchResult],
     max_tokens: int = 4096,
     reserved_tokens: int = 1024,
     max_results: int | None = None,
+    min_relevance: float = DEFAULT_MIN_RELEVANCE,
 ) -> tuple[str, list[Citation]]:
     """Build context string from search results.
 
@@ -248,10 +414,15 @@ def build_context_from_results(
         max_tokens: Maximum context tokens
         reserved_tokens: Tokens reserved for response
         max_results: Maximum results to include
+        min_relevance: Minimum relevance score for context chunks
 
     Returns:
         Tuple of (formatted_context, citations)
     """
     window = ContextWindow(max_tokens=max_tokens, reserved_tokens=reserved_tokens)
-    window.add_search_results(results, max_results=max_results)
+    window.add_search_results(
+        results,
+        max_results=max_results,
+        min_relevance=min_relevance,
+    )
     return window.format_context(), window.get_citations()

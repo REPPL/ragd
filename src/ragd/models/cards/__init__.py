@@ -218,20 +218,90 @@ class ModelCard:
 _model_cards_cache: dict[str, ModelCard] = {}
 
 
-def load_model_card(model_id: str) -> ModelCard | None:
+def load_model_card(
+    model_id: str,
+    auto_discover: bool = True,
+    interactive: bool = False,
+) -> ModelCard | None:
     """Load a model card by ID.
+
+    Search order:
+    1. In-memory cache
+    2. User cards (~/.ragd/model_cards/)
+    3. User cache (~/.ragd/model_cards/_cache/)
+    4. Bundled cards (src/ragd/models/cards/)
+    5. Auto-discovery (if enabled)
 
     Args:
         model_id: Model identifier (e.g., 'llama3.2:3b')
+        auto_discover: Enable auto-discovery for missing cards
+        interactive: Prompt for confirmation (requires auto_discover)
+
+    Returns:
+        ModelCard if found or discovered, None otherwise
+    """
+    # Check in-memory cache
+    if model_id in _model_cards_cache:
+        return _model_cards_cache[model_id]
+
+    # Try user cards first (confirmed and cached)
+    try:
+        from ragd.models.discovery.storage import UserCardStorage
+
+        user_storage = UserCardStorage()
+        card = user_storage.load_card(model_id)
+        if card:
+            _model_cards_cache[model_id] = card
+            return card
+    except ImportError:
+        pass  # Discovery module not available
+
+    # Try bundled cards
+    card = _load_bundled_card(model_id)
+    if card:
+        _model_cards_cache[model_id] = card
+        return card
+
+    # Auto-discovery fallback
+    if auto_discover:
+        try:
+            from ragd.models.discovery import AutoDiscoveryService
+
+            service = AutoDiscoveryService()
+            console = None
+            if interactive:
+                try:
+                    from rich.console import Console
+
+                    console = Console()
+                except ImportError:
+                    interactive = False
+
+            card = service.discover(
+                model_id,
+                interactive=interactive,
+                console=console,
+            )
+            if card:
+                _model_cards_cache[model_id] = card
+                return card
+        except ImportError:
+            logger.debug("Auto-discovery not available")
+        except Exception as e:
+            logger.debug("Auto-discovery failed for %s: %s", model_id, e)
+
+    return None
+
+
+def _load_bundled_card(model_id: str) -> ModelCard | None:
+    """Load a bundled model card.
+
+    Args:
+        model_id: Model identifier
 
     Returns:
         ModelCard if found, None otherwise
     """
-    # Check cache
-    if model_id in _model_cards_cache:
-        return _model_cards_cache[model_id]
-
-    # Try to load from file
     # Normalise model ID to filename (replace : with -)
     filename = model_id.replace(":", "-").replace("/", "-") + ".yaml"
     card_path = CARDS_DIR / filename
@@ -240,9 +310,7 @@ def load_model_card(model_id: str) -> ModelCard | None:
         try:
             with open(card_path) as f:
                 data = yaml.safe_load(f)
-            card = ModelCard.from_dict(data)
-            _model_cards_cache[model_id] = card
-            return card
+            return ModelCard.from_dict(data)
         except Exception as e:
             logger.warning("Failed to load model card %s: %s", model_id, e)
 
@@ -253,13 +321,48 @@ def load_model_card(model_id: str) -> ModelCard | None:
             with open(combined_path) as f:
                 all_cards = yaml.safe_load(f) or {}
             if model_id in all_cards:
-                card = ModelCard.from_dict(all_cards[model_id])
-                _model_cards_cache[model_id] = card
-                return card
+                return ModelCard.from_dict(all_cards[model_id])
         except Exception as e:
             logger.warning("Failed to load combined cards: %s", e)
 
     return None
+
+
+def infer_model_type(model_name: str) -> ModelType:
+    """Infer model type from name using model cards or heuristics.
+
+    Uses a hybrid approach:
+    1. Try loading model card if available
+    2. Fall back to name-based heuristics
+
+    Args:
+        model_name: Model identifier (e.g., 'llama3.2:3b', 'nomic-embed-text')
+
+    Returns:
+        Inferred ModelType
+    """
+    # Try model card first
+    card = load_model_card(model_name)
+    if card:
+        return card.model_type
+
+    # Heuristic fallback based on name patterns
+    name_lower = model_name.lower()
+
+    # Embedding patterns
+    if any(p in name_lower for p in ["embed", "minilm", "bge", "e5-", "nomic"]):
+        return ModelType.EMBEDDING
+
+    # Vision patterns
+    if any(p in name_lower for p in ["llava", "vision", "moondream", "bakllava"]):
+        return ModelType.VISION
+
+    # Reranker patterns
+    if any(p in name_lower for p in ["rerank", "cross-encoder"]):
+        return ModelType.RERANKER
+
+    # Default to LLM
+    return ModelType.LLM
 
 
 def list_model_cards(model_type: ModelType | None = None) -> list[ModelCard]:

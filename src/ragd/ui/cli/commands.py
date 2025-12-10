@@ -24,11 +24,12 @@ from ragd import __version__
 from ragd.ui import OutputFormat
 
 
-def get_console(no_color: bool = False) -> Console:
-    """Get console with colour settings.
+def get_console(no_color: bool = False, max_width: int | None = None) -> Console:
+    """Get console with colour and width settings.
 
     Args:
         no_color: Whether to disable colour
+        max_width: Maximum output width (None = use terminal width)
 
     Returns:
         Console instance
@@ -36,7 +37,7 @@ def get_console(no_color: bool = False) -> Console:
     # Check NO_COLOR environment variable
     if os.environ.get("NO_COLOR"):
         no_color = True
-    return Console(no_color=no_color)
+    return Console(no_color=no_color, width=max_width, soft_wrap=True)
 
 
 def init_command(
@@ -415,11 +416,27 @@ def search_command(
             con.print(output)
 
 
+def info_command(
+    detailed: bool = False,
+    output_format: OutputFormat = "rich",
+    no_color: bool = False,
+) -> None:
+    """Show ragd status and statistics.
+
+    In brief mode (default): Quick status overview
+    In detailed mode: Comprehensive index statistics
+    """
+    if detailed:
+        stats_command(output_format=output_format, no_color=no_color)
+    else:
+        status_command(output_format=output_format, no_color=no_color)
+
+
 def status_command(
     output_format: OutputFormat = "rich",
     no_color: bool = False,
 ) -> None:
-    """Show ragd status and statistics."""
+    """Show ragd status and statistics (brief mode)."""
     from ragd.config import load_config, config_exists
     from ragd.storage import ChromaStore
     from ragd.ui import format_status
@@ -515,8 +532,9 @@ def stats_command(
 
     # Get storage size
     storage_mb = None
-    if stats.index_size_bytes:
-        storage_mb = stats.index_size_bytes / (1024 * 1024)
+    index_size = stats.get("index_size_bytes") if isinstance(stats, dict) else getattr(stats, "index_size_bytes", None)
+    if index_size:
+        storage_mb = index_size / (1024 * 1024)
 
     # Get date range
     date_range = None
@@ -535,8 +553,8 @@ def stats_command(
             },
             "file_types": dict(file_types.most_common()),
             "storage": {
-                "backend": stats.backend.value if stats.backend else "chromadb",
-                "dimension": stats.dimension,
+                "backend": stats.get("backend", "chromadb") if isinstance(stats, dict) else (stats.backend.value if hasattr(stats, 'backend') and stats.backend else "chromadb"),
+                "dimension": stats.get("dimension", 384) if isinstance(stats, dict) else getattr(stats, "dimension", 384),
                 "size_mb": round(storage_mb, 1) if storage_mb else None,
             },
             "retrieval": {
@@ -577,10 +595,12 @@ def stats_command(
     # Retrieval health section
     con.print("[bold cyan]Retrieval Health[/bold cyan]")
     con.print(f"  Embedding model: {config.embedding.model}")
-    con.print(f"  Vector dimension: {stats.dimension or 384}")
+    dimension = stats.get("dimension", 384) if isinstance(stats, dict) else getattr(stats, "dimension", 384)
+    con.print(f"  Vector dimension: {dimension or 384}")
     con.print(f"  Late chunking: {'enabled' if config.embedding.late_chunking else 'disabled'}")
-    if stats.last_modified:
-        con.print(f"  Last indexed: {stats.last_modified.strftime('%Y-%m-%d %H:%M')}")
+    last_modified = stats.get("last_modified") if isinstance(stats, dict) else getattr(stats, "last_modified", None)
+    if last_modified:
+        con.print(f"  Last indexed: {last_modified.strftime('%Y-%m-%d %H:%M')}")
     con.print()
 
     # Tips section
@@ -1436,6 +1456,7 @@ def ask_command(
     model: str | None = None,
     temperature: float = 0.7,
     limit: int = 5,
+    min_relevance: float | None = None,
     stream: bool = True,
     agentic: bool | None = None,
     show_confidence: bool = False,
@@ -1452,8 +1473,13 @@ def ask_command(
     from ragd.chat import AgenticRAG, AgenticConfig
     from ragd.config import load_config
 
-    con = get_console(no_color)
     config = load_config()
+    con = get_console(no_color, max_width=config.display.max_width)
+
+    # Use config value as fallback for min_relevance
+    effective_min_relevance = (
+        min_relevance if min_relevance is not None else config.chat.min_relevance
+    )
 
     # Check LLM availability
     available, message = check_chat_available(config)
@@ -1481,6 +1507,7 @@ def ask_command(
             agentic_config = AgenticConfig(
                 crag_enabled=True,
                 self_rag_enabled=True,
+                min_relevance=effective_min_relevance,
             )
             rag = AgenticRAG(config=config, agentic_config=agentic_config)
 
@@ -1510,10 +1537,12 @@ def ask_command(
                     if response.rewrites_attempted > 0:
                         con.print(f"[dim]Query rewrites: {response.rewrites_attempted}[/dim]")
 
-                # Print citations
+                # Print citations (deduplicated)
                 if response.citations and cite != "none":
+                    from ragd.chat.context import deduplicate_citations
+                    unique_citations = deduplicate_citations(response.citations)
                     con.print("\n[bold]Sources:[/bold]")
-                    for i, cit in enumerate(response.citations, 1):
+                    for i, cit in enumerate(unique_citations, 1):
                         loc = f", p. {cit.page_number}" if cit.page_number else ""
                         con.print(f"  [{i}] {cit.filename}{loc}")
             finally:
@@ -1525,6 +1554,7 @@ def ask_command(
                 model=model or config.llm.model,
                 temperature=temperature,
                 search_limit=limit,
+                min_relevance=effective_min_relevance,
                 auto_save=False,
             )
 
@@ -1549,10 +1579,12 @@ def ask_command(
 
                     con.print("\n")  # Newline after streaming
 
-                    # Print citations
+                    # Print citations (deduplicated)
                     if citations and cite != "none":
+                        from ragd.chat.context import deduplicate_citations
+                        unique_citations = deduplicate_citations(citations)
                         con.print("\n[bold]Sources:[/bold]")
-                        for i, cit in enumerate(citations, 1):
+                        for i, cit in enumerate(unique_citations, 1):
                             loc = f", p. {cit.page_number}" if cit.page_number else ""
                             con.print(f"  [{i}] {cit.filename}{loc}")
                 else:
@@ -1569,10 +1601,12 @@ def ask_command(
                     con.print("[bold]Answer:[/bold]\n")
                     con.print(answer.answer)
 
-                    # Print citations
+                    # Print citations (deduplicated)
                     if answer.citations and cite != "none":
+                        from ragd.chat.context import deduplicate_citations
+                        unique_citations = deduplicate_citations(answer.citations)
                         con.print("\n[bold]Sources:[/bold]")
-                        for i, cit in enumerate(answer.citations, 1):
+                        for i, cit in enumerate(unique_citations, 1):
                             loc = f", p. {cit.page_number}" if cit.page_number else ""
                             con.print(f"  [{i}] {cit.filename}{loc}")
             finally:
@@ -1587,78 +1621,228 @@ def models_list_command(
     output_format: OutputFormat = "rich",
     no_color: bool = False,
 ) -> None:
-    """List available LLM models from Ollama.
+    """List models by purpose and show Ollama availability.
 
-    Shows all downloaded models and their status.
+    Shows configured models for each purpose (chat, summary, etc.)
+    and available Ollama models grouped by type.
     """
     from ragd.config import load_config
     from ragd.llm import ModelRegistry, OllamaClient
+    from ragd.models.cards import infer_model_type, ModelType
 
     con = get_console(no_color)
     config = load_config()
 
-    # Check Ollama connection
-    client = OllamaClient(base_url=config.llm.base_url, model=config.llm.model)
-
+    # Get installed Ollama models
+    ollama_models: list = []
+    ollama_available = True
     try:
+        client = OllamaClient(base_url=config.llm.base_url, model=config.llm.model)
         registry = ModelRegistry(client)
-        models = registry.list_available(refresh=True)
+        ollama_models = registry.list_available(refresh=True)
+    except Exception:
+        ollama_available = False
 
-        if not models:
-            con.print("[yellow]No models found.[/yellow]")
-            con.print("\nOllama may not be running or no models installed.")
-            con.print("Start Ollama: [cyan]ollama serve[/cyan]")
-            con.print("Pull a model: [cyan]ollama pull llama3.2:3b[/cyan]")
-            return
+    installed_names = {m.name for m in ollama_models}
 
-        if output_format == "json":
-            import json
-            data = [
-                {
-                    "name": m.name,
-                    "size_bytes": m.size_bytes,
-                    "size_display": m.display_size,
-                    "family": m.family,
-                    "parameters": m.parameters,
-                    "quantisation": m.quantisation,
-                }
-                for m in models
-            ]
-            con.print(json.dumps(data, indent=2))
+    # Define purposes and their config locations
+    purposes = {
+        "Chat": config.llm.model,
+        "Summary": config.metadata.summary_model,
+        "Classification": config.metadata.classification_model,
+        "Embedding": config.embedding.model,
+        "Contextual": config.retrieval.contextual.model,
+    }
+
+    if output_format == "json":
+        import json
+
+        # Group Ollama models by type
+        models_by_type: dict[str, list[dict]] = {}
+        for m in ollama_models:
+            mt = infer_model_type(m.name)
+            if mt.value not in models_by_type:
+                models_by_type[mt.value] = []
+            models_by_type[mt.value].append({
+                "name": m.name,
+                "size_bytes": m.size_bytes,
+                "size_display": m.display_size,
+                "parameters": m.parameters,
+                "quantisation": m.quantisation,
+            })
+
+        data = {
+            "configured_models": purposes,
+            "ollama_available": ollama_available,
+            "ollama_url": config.llm.base_url,
+            "installed_models": models_by_type,
+        }
+        con.print(json.dumps(data, indent=2))
+        return
+
+    # Rich output
+    from rich.table import Table
+
+    # Purpose table - show configured models
+    purpose_table = Table(title="Configured Models by Purpose")
+    purpose_table.add_column("Purpose", style="cyan")
+    purpose_table.add_column("Model")
+    purpose_table.add_column("Status")
+
+    for purpose, model in purposes.items():
+        # Check if installed
+        is_embedding = purpose == "Embedding"
+        if is_embedding:
+            # Embedding models are local (sentence-transformers)
+            status = "[dim]Local[/dim]"
+        elif model in installed_names:
+            status = "[green]✓ Installed[/green]"
+        elif any(m.startswith(model.split(":")[0]) for m in installed_names):
+            # Partial match (e.g., "llama3.2" matches "llama3.2:3b")
+            status = "[green]✓ Installed[/green]"
+        elif not ollama_available:
+            status = "[yellow]? Ollama offline[/yellow]"
         else:
-            from rich.table import Table
+            status = "[red]✗ Not installed[/red]"
 
-            table = Table(title="Available Models (Ollama)")
-            table.add_column("Model", style="cyan")
-            table.add_column("Size", justify="right")
-            table.add_column("Parameters")
-            table.add_column("Quantisation")
+        purpose_table.add_row(purpose, model, status)
 
-            for m in sorted(models, key=lambda x: x.name):
-                table.add_row(
+    con.print(purpose_table)
+
+    # Ollama models table (grouped by type)
+    if ollama_models:
+        con.print()
+
+        # Group by type
+        by_type: dict[ModelType, list] = {}
+        for m in ollama_models:
+            mt = infer_model_type(m.name)
+            if mt not in by_type:
+                by_type[mt] = []
+            by_type[mt].append(m)
+
+        ollama_table = Table(title="Available Ollama Models")
+        ollama_table.add_column("Model", style="cyan")
+        ollama_table.add_column("Type")
+        ollama_table.add_column("Size", justify="right")
+        ollama_table.add_column("Parameters")
+
+        # Order: LLM, Embedding, Vision, Reranker
+        type_order = [ModelType.LLM, ModelType.EMBEDDING, ModelType.VISION, ModelType.RERANKER]
+        for mt in type_order:
+            for m in sorted(by_type.get(mt, []), key=lambda x: x.name):
+                ollama_table.add_row(
                     m.name,
+                    mt.value.capitalize(),
                     m.display_size,
                     m.parameters or "-",
-                    m.quantisation or "-",
                 )
 
-            con.print(table)
+        con.print(ollama_table)
+        con.print(f"\n[dim]Ollama URL: {config.llm.base_url}[/dim]")
 
-            # Show configuration
-            con.print(f"\n[bold]Configuration:[/bold]")
-            con.print(f"  Default model: {config.llm.model}")
-            con.print(f"  Ollama URL: {config.llm.base_url}")
+    elif not ollama_available:
+        con.print("\n[yellow]Ollama not available. Start with: ollama serve[/yellow]")
+    else:
+        con.print("\n[yellow]No Ollama models installed.[/yellow]")
+        con.print("Pull a model: [cyan]ollama pull llama3.2:3b[/cyan]")
 
-    except Exception as e:
-        con.print(f"[red]Error listing models: {e}[/red]")
-        con.print("\nIs Ollama running? Start with: [cyan]ollama serve[/cyan]")
-        raise typer.Exit(1)
+
+def models_set_command(
+    chat: str | None = None,
+    summary: str | None = None,
+    classification: str | None = None,
+    embedding: str | None = None,
+    contextual: str | None = None,
+    no_validate: bool = False,
+    no_color: bool = False,
+) -> None:
+    """Set models for specific purposes.
+
+    Updates the configuration file with the specified model assignments.
+    Validates that Ollama models are installed (unless --no-validate).
+    """
+    from ragd.config import load_config, save_config
+    from ragd.llm import OllamaClient
+
+    con = get_console(no_color)
+    config = load_config()
+
+    # Track changes
+    changes: list[str] = []
+
+    # Get installed models for validation
+    installed_models: set[str] = set()
+    if not no_validate:
+        try:
+            client = OllamaClient(base_url=config.llm.base_url, model=config.llm.model)
+            models = client.list_models()
+            installed_models = set(models)
+        except Exception:
+            con.print("[yellow]Warning: Could not verify models (Ollama unavailable)[/yellow]")
+            no_validate = True
+
+    def validate_ollama_model(model: str, purpose: str) -> bool:
+        """Validate model exists in Ollama."""
+        if no_validate:
+            return True
+        if model in installed_models:
+            return True
+        # Check prefix match (e.g., "llama3.2" matches "llama3.2:3b")
+        base = model.split(":")[0]
+        if any(m.startswith(base) for m in installed_models):
+            return True
+        con.print(f"[red]Model '{model}' not installed in Ollama.[/red]")
+        con.print(f"Install with: [cyan]ollama pull {model}[/cyan]")
+        return False
+
+    # Process each purpose
+    if chat:
+        if validate_ollama_model(chat, "chat"):
+            config.llm.model = chat
+            changes.append(f"Chat: {chat}")
+
+    if summary:
+        if validate_ollama_model(summary, "summary"):
+            config.metadata.summary_model = summary
+            changes.append(f"Summary: {summary}")
+
+    if classification:
+        if validate_ollama_model(classification, "classification"):
+            config.metadata.classification_model = classification
+            changes.append(f"Classification: {classification}")
+
+    if embedding:
+        # Embedding models are local (sentence-transformers), no Ollama validation
+        config.embedding.model = embedding
+        changes.append(f"Embedding: {embedding}")
+
+    if contextual:
+        if validate_ollama_model(contextual, "contextual"):
+            config.retrieval.contextual.model = contextual
+            changes.append(f"Contextual: {contextual}")
+
+    if not changes:
+        con.print("[yellow]No model changes specified.[/yellow]")
+        con.print("\nUsage:")
+        con.print("  ragd models set --chat llama3.1:8b")
+        con.print("  ragd models set --summary llama3.2:3b")
+        con.print("  ragd models set --embedding nomic-embed-text")
+        return
+
+    # Save configuration
+    save_config(config)
+
+    con.print("[green]✓[/green] Model configuration updated:")
+    for change in changes:
+        con.print(f"  • {change}")
 
 
 def chat_command(
     model: str | None = None,
     temperature: float = 0.7,
     limit: int = 5,
+    min_relevance: float | None = None,
     session_id: str | None = None,
     cite: str | None = None,
     output_format: OutputFormat = "rich",
@@ -1671,11 +1855,16 @@ def chat_command(
     from ragd.chat import ChatSession, ChatConfig, check_chat_available
     from ragd.config import load_config
 
-    con = get_console(no_color)
     config = load_config()
+    con = get_console(no_color, max_width=config.display.max_width)
 
     # Get citation mode from config or parameter
     cite_mode = cite if cite is not None else config.chat.default_cite_mode
+
+    # Use config value as fallback for min_relevance
+    effective_min_relevance = (
+        min_relevance if min_relevance is not None else config.chat.min_relevance
+    )
 
     # Check LLM availability
     available, message = check_chat_available(config)
@@ -1692,6 +1881,7 @@ def chat_command(
         model=model or config.llm.model,
         temperature=temperature,
         search_limit=limit,
+        min_relevance=effective_min_relevance,
         auto_save=True,
     )
 
@@ -1757,9 +1947,10 @@ def chat_command(
                         if not response_started:
                             # First chunk received - stop spinner and show prefix
                             status.stop()
-                            con.print("[bold green]Assistant:[/bold green] ", end="")
+                            con.print("[bold green]A:[/bold green] ", end="")
                             response_started = True
-                        con.print(chunk, end="")
+                        # Disable markup to prevent LLM output being interpreted as Rich markup
+                        con.print(chunk, end="", markup=False)
                         response_chunks.append(chunk)
 
                 if not response_started:
@@ -1768,12 +1959,14 @@ def chat_command(
                 else:
                     con.print()  # End response line
 
-                    # Display citations if enabled
+                    # Display citations if enabled (deduplicated)
                     if cite_mode != "none" and session.history.messages:
                         last_msg = session.history.messages[-1]
                         if last_msg.citations:
+                            from ragd.chat.context import deduplicate_citations
+                            unique_citations = deduplicate_citations(last_msg.citations)
                             con.print("\n[bold]Sources:[/bold]")
-                            for i, cit in enumerate(last_msg.citations, 1):
+                            for i, cit in enumerate(unique_citations, 1):
                                 loc = f", p. {cit.page_number}" if cit.page_number else ""
                                 con.print(f"  [{i}] {cit.filename}{loc}")
 
@@ -2401,3 +2594,217 @@ def models_show_command(
             con.print(f"  Parameters: {card.parameters:.1f}B")
         if card.licence:
             con.print(f"  Licence: {card.licence}")
+
+
+def models_discover_command(
+    model_id: str,
+    interactive: bool = True,
+    force: bool = False,
+    no_color: bool = False,
+) -> None:
+    """Discover and create a model card for a model.
+
+    Fetches metadata from available sources (Ollama API, HuggingFace Hub,
+    heuristics) and optionally prompts for confirmation before saving.
+
+    Args:
+        model_id: Model identifier (e.g., 'llama3.2:3b', 'qwen2.5:14b')
+        interactive: Prompt for confirmation before saving (default: True)
+        force: Overwrite existing card if present
+        no_color: Disable colour output
+    """
+    from ragd.models import load_model_card
+    from ragd.models.discovery import AutoDiscoveryService
+    from ragd.models.discovery.connectivity import is_internet_available, is_ollama_available
+
+    con = get_console(no_color)
+
+    # Check if card already exists (unless force)
+    if not force:
+        existing = load_model_card(model_id, auto_discover=False)
+        if existing:
+            con.print(f"[yellow]Model card already exists for {model_id}[/yellow]")
+            con.print(f"Use [cyan]ragd models show {model_id}[/cyan] to view it")
+            con.print("Use [cyan]--force[/cyan] to overwrite")
+            raise typer.Exit(0)
+
+    # Show connectivity status
+    con.print(f"\n[bold]Discovering metadata for {model_id}...[/bold]\n")
+
+    ollama_up = is_ollama_available()
+    internet_up = is_internet_available()
+
+    con.print(f"  Ollama:    {'[green]✓[/green]' if ollama_up else '[dim]✗ offline[/dim]'}")
+    con.print(f"  Internet:  {'[green]✓[/green]' if internet_up else '[dim]✗ offline[/dim]'}")
+    con.print()
+
+    # Run discovery
+    service = AutoDiscoveryService()
+
+    try:
+        card = service.discover(
+            model_id,
+            interactive=interactive,
+            console=con if interactive else None,
+        )
+    except Exception as e:
+        con.print(f"[red]Discovery failed: {e}[/red]")
+        raise typer.Exit(1)
+
+    if card:
+        con.print()
+        con.print(f"[green]✓[/green] Model card {'saved' if interactive else 'cached'} for {card.id}")
+
+        # Show card location
+        storage = service.get_storage()
+        filename = card.id.replace(":", "-").replace("/", "-") + ".yaml"
+        if interactive:
+            card_path = storage.base_dir / filename
+        else:
+            card_path = storage.cache_dir / filename
+        if card_path.exists():
+            con.print(f"[dim]Location: {card_path}[/dim]")
+
+        con.print(f"\nView with: [cyan]ragd models show {model_id}[/cyan]")
+    else:
+        con.print("[yellow]No model card created.[/yellow]")
+
+
+def models_cards_command(
+    show_all: bool = False,
+    output_format: OutputFormat = "rich",
+    no_color: bool = False,
+) -> None:
+    """List all available model cards.
+
+    Shows bundled and user-confirmed cards by default.
+    Use --all to also include cached (auto-discovered) cards.
+
+    Args:
+        show_all: Include cached (unconfirmed) cards
+        output_format: Output format (rich, json, plain)
+        no_color: Disable colour output
+    """
+    from ragd.models import list_model_cards
+    from ragd.models.discovery.storage import UserCardStorage
+
+    con = get_console(no_color)
+
+    # Get bundled cards
+    bundled_cards = list_model_cards()
+
+    # Get user cards (list_cards returns list of (card, is_confirmed) tuples)
+    storage = UserCardStorage()
+    user_card_tuples = storage.list_cards(include_cache=show_all)
+
+    # Track user card status
+    user_cards_map: dict[str, tuple] = {}  # id -> (card, is_confirmed)
+    for card, is_confirmed in user_card_tuples:
+        user_cards_map[card.id] = (card, is_confirmed)
+
+    user_ids = set(user_cards_map.keys())
+
+    # Cards only in bundled (not overridden by user)
+    bundled_only = [c for c in bundled_cards if c.id not in user_ids]
+
+    # All cards combined
+    all_cards = [t[0] for t in user_card_tuples] + bundled_only
+
+    if output_format == "json":
+        import json
+
+        data = {
+            "cards": [
+                {
+                    "id": c.id,
+                    "name": c.name,
+                    "type": c.model_type.value,
+                    "source": (
+                        "user" if c.id in user_ids and user_cards_map[c.id][1]
+                        else "cached" if c.id in user_ids
+                        else "bundled"
+                    ),
+                    "context_length": c.context_length,
+                    "parameters": c.parameters,
+                }
+                for c in sorted(all_cards, key=lambda x: x.id)
+            ],
+            "count": len(all_cards),
+        }
+        con.print(json.dumps(data, indent=2))
+        return
+
+    # Rich output
+    from rich.table import Table
+
+    table = Table(title="Available Model Cards")
+    table.add_column("Model ID", style="cyan")
+    table.add_column("Type")
+    table.add_column("Parameters")
+    table.add_column("Context")
+    table.add_column("Source")
+
+    for card in sorted(all_cards, key=lambda x: x.id):
+        if card.id in user_ids:
+            is_confirmed = user_cards_map[card.id][1]
+            source = "[green]User[/green]" if is_confirmed else "[yellow]Cached[/yellow]"
+        else:
+            source = "[dim]Bundled[/dim]"
+
+        params = f"{card.parameters}B" if card.parameters else "-"
+        ctx = f"{card.context_length // 1000}K" if card.context_length else "-"
+
+        table.add_row(
+            card.id,
+            card.model_type.value,
+            params,
+            ctx,
+            source,
+        )
+
+    con.print(table)
+    con.print(f"\n[dim]Total: {len(all_cards)} cards[/dim]")
+
+    if not show_all:
+        con.print("[dim]Use --all to include cached (auto-discovered) cards[/dim]")
+
+
+def models_card_edit_command(
+    model_id: str,
+    no_color: bool = False,
+) -> None:
+    """Edit an existing model card interactively.
+
+    Opens the card for editing, allowing you to modify fields
+    and save changes to user storage.
+
+    Args:
+        model_id: Model identifier to edit
+        no_color: Disable colour output
+    """
+    from ragd.models import load_model_card
+    from ragd.models.discovery.prompts import prompt_card_confirmation
+    from ragd.models.discovery.storage import UserCardStorage
+
+    con = get_console(no_color)
+
+    # Load existing card
+    card = load_model_card(model_id, auto_discover=False)
+    if not card:
+        con.print(f"[red]Model card not found: {model_id}[/red]")
+        con.print(f"\nDiscover with: [cyan]ragd models discover {model_id}[/cyan]")
+        raise typer.Exit(1)
+
+    con.print(f"\n[bold]Editing model card: {model_id}[/bold]")
+
+    # Use the confirmation prompt (which includes editing)
+    edited_card = prompt_card_confirmation(card, con)
+
+    if edited_card:
+        # Save to user storage (confirmed)
+        storage = UserCardStorage()
+        path = storage.save_card(edited_card, confirmed=True)
+        con.print()
+        con.print(f"[green]✓[/green] Saved to {path}")
+    else:
+        con.print("\n[yellow]No changes saved.[/yellow]")

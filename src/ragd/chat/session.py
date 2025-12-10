@@ -11,7 +11,11 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any
 
-from ragd.chat.context import ContextWindow, build_context_from_results
+from ragd.chat.context import (
+    ContextWindow,
+    build_context_from_results,
+    calculate_token_budget,
+)
 from ragd.chat.history import ChatHistory, get_history_path, save_history
 from ragd.chat.message import ChatMessage, ChatRole, CitedAnswer
 from ragd.chat.prompts import PromptTemplate, get_prompt_template
@@ -38,19 +42,27 @@ class ChatConfig:
         model: LLM model to use
         temperature: Sampling temperature
         max_tokens: Maximum response tokens
-        context_window: Max context tokens
+        context_window: Max context tokens (None = auto-detect from model card)
         history_turns: Previous turns to include in prompt
         search_limit: Maximum search results
         auto_save: Auto-save history after each response
+        min_relevance: Minimum relevance score for context chunks
+        history_budget_ratio: Ratio of available tokens for history
+        min_history_tokens: Minimum tokens for history
+        min_context_tokens: Minimum tokens for context
     """
 
     model: str = "llama3.2:3b"
     temperature: float = 0.7
     max_tokens: int = 1024
-    context_window: int = 4096
+    context_window: int | None = None  # None = auto-detect from model card
     history_turns: int = 5
     search_limit: int = 5
     auto_save: bool = True
+    min_relevance: float = 0.3
+    history_budget_ratio: float = 0.3
+    min_history_tokens: int = 256
+    min_context_tokens: int = 1024
 
 
 class ChatSession:
@@ -76,6 +88,10 @@ class ChatSession:
         self.chat_config = chat_config or ChatConfig()
         self.session_id = session_id or str(uuid.uuid4())[:8]
 
+        # Auto-detect context window from model card if not explicitly set
+        if self.chat_config.context_window is None:
+            self.chat_config.context_window = self._resolve_context_window()
+
         # Initialise components
         self._llm = OllamaClient(
             base_url=self.config.llm.base_url,
@@ -87,6 +103,23 @@ class ChatSession:
             session_id=self.session_id,
             created_at=datetime.now(),
         )
+
+    def _resolve_context_window(self) -> int:
+        """Resolve context window size from model card or fallback.
+
+        Returns:
+            Context window size in tokens
+        """
+        try:
+            from ragd.models.cards import load_model_card
+
+            card = load_model_card(self.chat_config.model)
+            if card and card.context_length:
+                return card.context_length
+        except Exception:
+            pass  # Fall back to default
+
+        return 4096  # Default fallback
 
     @property
     def history(self) -> ChatHistory:
@@ -120,22 +153,40 @@ class ChatSession:
         # Add user message to history
         self._history.add_user_message(question)
 
-        # Retrieve relevant context
-        results = self._retrieve(question)
-        context, citations = build_context_from_results(
-            results,
-            max_tokens=self.chat_config.context_window,
-            max_results=self.chat_config.search_limit,
+        # Calculate token budget based on actual history size
+        preliminary_history = self._history.format_for_prompt(
+            n=self.chat_config.history_turns - 1  # Exclude current message
+        )
+        budget = calculate_token_budget(
+            context_window=self.chat_config.context_window,
+            reserved_tokens=self.chat_config.max_tokens,
+            history_ratio=self.chat_config.history_budget_ratio,
+            actual_history_chars=len(preliminary_history),
+            min_history=self.chat_config.min_history_tokens,
+            min_context=self.chat_config.min_context_tokens,
         )
 
-        # Get prompt template with citation instruction from config
-        if isinstance(template, str):
-            citation_instruction = self.config.chat.prompts.citation_instruction
-            template = get_prompt_template(template, citation_instruction)
+        # Rewrite follow-up queries to include conversation context
+        enhanced_query = self._rewrite_query_with_context(question)
 
-        # Format prompt
+        # Retrieve relevant context with allocated budget
+        results = self._retrieve(enhanced_query)
+        context, citations = build_context_from_results(
+            results,
+            max_tokens=budget.context + self.chat_config.max_tokens,
+            reserved_tokens=self.chat_config.max_tokens,
+            max_results=self.chat_config.search_limit,
+            min_relevance=self.chat_config.min_relevance,
+        )
+
+        # Get prompt template with config (overrides and citation instruction)
+        if isinstance(template, str):
+            template = get_prompt_template(template, config=self.config.chat.prompts)
+
+        # Format history with token budget truncation
         history_text = self._history.format_for_prompt(
-            n=self.chat_config.history_turns - 1  # Exclude current message
+            n=self.chat_config.history_turns - 1,
+            max_tokens=budget.history,
         )
         system_prompt, user_prompt = template.format(
             context=context,
@@ -166,6 +217,66 @@ class ChatSession:
             limit=self.chat_config.search_limit * 2,  # Fetch extra for filtering
             mode=SearchMode.HYBRID,
         )
+
+    def _rewrite_query_with_context(self, question: str) -> str:
+        """Rewrite ambiguous follow-up queries using LLM.
+
+        Uses conversation history to make the query self-contained.
+        E.g., "tell me more" → "tell me more about data sovereignty"
+
+        Args:
+            question: User's question
+
+        Returns:
+            Enhanced query with context, or original if no enhancement needed
+        """
+        # Indicators that suggest the query needs context from conversation
+        FOLLOW_UP_INDICATORS = [
+            "it", "this", "that", "these", "those",
+            "the concept", "the topic", "the subject",
+            "more about", "else about", "what else",
+            "tell me more", "elaborate", "expand",
+            "continue", "go on", "and",
+        ]
+
+        question_lower = question.lower()
+        needs_rewrite = any(ind in question_lower for ind in FOLLOW_UP_INDICATORS)
+
+        if not needs_rewrite:
+            return question
+
+        # Get recent history - need at least one previous exchange
+        recent = self._history.get_recent(4)
+        if not recent:
+            return question
+
+        # Format history for the rewrite prompt
+        history_text = self._history.format_for_prompt(max_turns=2)
+        if not history_text.strip():
+            return question
+
+        # Use the configured query rewrite prompt
+        prompt = self.config.chat.prompts.query_rewrite.format(
+            history=history_text,
+            question=question,
+        )
+
+        try:
+            response = self._llm.generate(
+                prompt=prompt,
+                temperature=0.3,  # Low temperature for deterministic rewriting
+                max_tokens=100,
+            )
+            rewritten = response.content.strip()
+
+            # Only use rewritten query if it's meaningfully different
+            if rewritten and rewritten.lower() != question.lower():
+                return rewritten
+            return question
+
+        except OllamaError:
+            # Fall back to original on error
+            return question
 
     def _generate_response(
         self,

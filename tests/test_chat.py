@@ -226,7 +226,7 @@ class TestContextWindow:
         assert len(window) == 0
 
     def test_format_context(self):
-        """Test formatting context."""
+        """Test formatting context with numbered citations."""
         window = ContextWindow()
         ctx = RetrievedContext(
             content="Test content here",
@@ -236,8 +236,8 @@ class TestContextWindow:
         )
         window.add_context(ctx)
         formatted = window.format_context()
-        assert "[Source 1: test.pdf" in formatted
-        assert "p. 5" in formatted
+        assert "[1] test.pdf" in formatted
+        assert "page 5" in formatted
         assert "Test content here" in formatted
 
     def test_format_empty_context(self):
