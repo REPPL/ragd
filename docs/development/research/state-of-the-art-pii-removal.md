@@ -40,7 +40,7 @@ Research demonstrates that [text embeddings reveal almost as much as the origina
 
 #### Privacy Leakage Through Retrieval
 
-[Zeng et al. (ACL 2024)](https://aclanthology.org/2024.findings-acl.267/) demonstrate that RAG "reshapes the inherent behaviors of LLM generation, posing new privacy issues":
+[Zeng et al. (ACL 2024)](https://aclanthology.org/2024.findings-acl.267/) demonstrate that RAG "reshapes the inherent behaviours of LLM generation, posing new privacy issues":
 
 - Retrieved documents may contain PII from other users
 - LLMs can memorise and disclose sensitive information from context

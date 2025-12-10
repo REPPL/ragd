@@ -72,7 +72,7 @@ ragd info
 | v0.9.0 | Enhanced Indexing | ✅ Released |
 | v0.9.5 | Stability & Logging | ✅ Released |
 | v0.9.6 | Alpha Testing Release | ✅ Released |
-| v1.0.0 | Personal Platform + WebUI | 📋 Planned |
+| v1.0.0 | Personal Platform + WebUI | ✅ Released |
 
 See [Milestones](./development/milestones/) for details.
 

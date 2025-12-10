@@ -205,3 +205,11 @@ ragd search "machine learning" --bibliography bibtex > refs.bib
 - **[Reference](./reference.md)** - Complete flag specifications
 
 ---
+
+## Related Documentation
+
+- [CLI Essentials](./essentials.md) - Core commands overview
+- [CLI Reference](../../reference/cli-reference.md) - Complete command specifications
+- [Advanced Indexing Guide](../indexing-advanced.md) - Complex indexing scenarios
+
+---

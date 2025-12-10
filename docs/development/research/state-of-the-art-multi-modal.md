@@ -342,7 +342,7 @@ Recent research shows that using VLMs for chunking decisions produces better res
 async def vision_guided_chunk(pages: list[Image.Image]) -> list[dict]:
     """Use VLM to intelligently chunk document pages."""
 
-    prompt = """Analyze this document page and identify semantic chunks.
+    prompt = """Analyse this document page and identify semantic chunks.
     For each chunk, provide:
     1. Type: text, table, figure, or mixed
     2. Bounding box coordinates [x1, y1, x2, y2]
