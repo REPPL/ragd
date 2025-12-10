@@ -18,11 +18,17 @@ AI-assisted commits include:
 Co-Authored-By: Claude <noreply@anthropic.com>
 ```
 
-## AI Assistant Used
+## AI Assistant: Images
+
+- **Assistant:** Gemini (Google)
+- **Interface:** Web (ad-hoc)
+- **Model:** Various
+
+## AI Assistant: Coding
 
 - **Assistant:** Claude (Anthropic)
 - **Interface:** Claude Code CLI
-- **Model:** Various (Opus, Sonnet, Haiku depending on task)
+- **Model:** Various *(Opus, Sonnet, Haiku depending on task)*
 
 ## Scope of AI Assistance
 
