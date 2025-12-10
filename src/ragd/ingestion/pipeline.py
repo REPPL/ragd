@@ -384,6 +384,19 @@ def index_document(
         )
         embeddings = embedder.embed(embedding_texts)
 
+    # Extract PDF metadata for document reference resolution
+    pdf_metadata = {}
+    if result.metadata:
+        # Pass through author, author_hint, and publication_year from extraction
+        if result.metadata.get("author"):
+            pdf_metadata["author"] = result.metadata["author"]
+        if result.metadata.get("author_hint"):
+            pdf_metadata["author_hint"] = result.metadata["author_hint"]
+        if result.metadata.get("publication_year"):
+            pdf_metadata["publication_year"] = result.metadata["publication_year"]
+        if result.metadata.get("title"):
+            pdf_metadata["title"] = result.metadata["title"]
+
     # Prepare metadata for each chunk
     metadatas = []
     for i, chunk in enumerate(chunks):
@@ -395,6 +408,7 @@ def index_document(
             "source": str(path),
             "filename": path.name,
             "file_type": file_type,
+            **pdf_metadata,  # Include author, author_hint, publication_year
         }
         if result.pages:
             metadata["pages"] = result.pages

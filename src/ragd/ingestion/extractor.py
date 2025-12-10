@@ -67,11 +67,15 @@ class PDFExtractor:
 
                 text = "\n\n".join(text_parts)
 
+                # Extract PDF metadata (author, creation date, etc.)
+                pdf_metadata = self._extract_pdf_metadata(doc)
+
             return ExtractionResult(
                 text=text,
                 metadata={
                     "source": str(path),
                     "format": "pdf",
+                    **pdf_metadata,
                 },
                 pages=page_count,
                 extraction_method="pymupdf",
@@ -83,6 +87,137 @@ class PDFExtractor:
                 success=False,
                 error=str(e),
             )
+
+    def _extract_pdf_metadata(self, doc: fitz.Document) -> dict[str, Any]:
+        """Extract metadata from PDF document.
+
+        Extracts author and publication year for document reference resolution.
+
+        Args:
+            doc: PyMuPDF document object
+
+        Returns:
+            Dictionary with author, publication_year, and other metadata
+        """
+        import re
+
+        metadata: dict[str, Any] = {}
+
+        try:
+            pdf_meta = doc.metadata
+            if not pdf_meta:
+                return metadata
+
+            # Extract author
+            author = pdf_meta.get("author", "")
+            if author:
+                metadata["author"] = author
+                # Extract first author surname for matching
+                metadata["author_hint"] = self._extract_author_hint(author)
+
+            # Extract title
+            title = pdf_meta.get("title", "")
+            if title:
+                metadata["title"] = title
+
+            # Extract publication year from creation date
+            # Format: D:YYYYMMDDHHmmSS or D:YYYYMMDD etc.
+            creation_date = pdf_meta.get("creationDate", "") or pdf_meta.get(
+                "creation_date", ""
+            )
+            if creation_date:
+                metadata["creation_date"] = creation_date
+                year = self._extract_year(creation_date)
+                if year:
+                    metadata["publication_year"] = year
+
+            # Also try modification date as fallback
+            if "publication_year" not in metadata:
+                mod_date = pdf_meta.get("modDate", "") or pdf_meta.get(
+                    "modification_date", ""
+                )
+                if mod_date:
+                    year = self._extract_year(mod_date)
+                    if year:
+                        metadata["publication_year"] = year
+
+        except Exception:
+            # Don't fail extraction if metadata parsing fails
+            pass
+
+        return metadata
+
+    def _extract_author_hint(self, author: str) -> str | None:
+        """Extract first author surname for matching.
+
+        Handles various author formats:
+        - "Smith, John" -> "smith"
+        - "John Smith" -> "smith"
+        - "Smith et al." -> "smith"
+        - "John Smith and Jane Doe" -> "smith"
+
+        Args:
+            author: Author string from PDF metadata
+
+        Returns:
+            Lowercase first author surname, or None if parsing fails
+        """
+        import re
+
+        if not author:
+            return None
+
+        # Clean up the string
+        author = author.strip()
+
+        # Handle "et al." by taking only what's before it
+        if "et al" in author.lower():
+            author = re.split(r"\s+et\s+al", author, flags=re.IGNORECASE)[0].strip()
+
+        # Handle multiple authors (take first)
+        for sep in [" and ", " & ", ";", ","]:
+            if sep in author:
+                author = author.split(sep)[0].strip()
+                break
+
+        # Handle "Surname, First" format
+        if "," in author:
+            surname = author.split(",")[0].strip()
+            return surname.lower() if surname else None
+
+        # Handle "First Surname" format - take last word
+        parts = author.split()
+        if parts:
+            # Last word is typically surname
+            return parts[-1].lower()
+
+        return None
+
+    def _extract_year(self, date_string: str) -> str | None:
+        """Extract 4-digit year from PDF date string.
+
+        Handles formats like:
+        - D:20210315123456
+        - D:2021
+        - 2021-03-15
+
+        Args:
+            date_string: Date string from PDF metadata
+
+        Returns:
+            4-digit year string, or None if not found
+        """
+        import re
+
+        if not date_string:
+            return None
+
+        # Look for 4-digit year (between 1900 and 2099)
+        match = re.search(r"(19|20)\d{2}", date_string)
+        if match:
+            return match.group(0)
+
+        return None
 
 
 class PlainTextExtractor:

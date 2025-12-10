@@ -235,6 +235,9 @@ class ChatSession:
         Uses conversation history to make the query self-contained.
         E.g., "tell me more" → "tell me more about data sovereignty"
 
+        Also performs deterministic document reference resolution to match
+        partial references like "the hummel paper" to exact filenames.
+
         Args:
             question: User's question
 
@@ -275,11 +278,15 @@ class ChatSession:
         )
         doc_context = "\n".join(f"- {f}" for f in cited_docs) if cited_docs else "None"
 
+        # Resolve document references deterministically (e.g., "hummel paper" -> filename)
+        resolved_refs = self._resolve_document_references(question)
+
         # Use the configured query rewrite prompt
         prompt = self.config.chat.prompts.query_rewrite.format(
             history=history_text,
             question=question,
             cited_documents=doc_context,
+            resolved_references=resolved_refs,
         )
 
         try:
@@ -299,6 +306,40 @@ class ChatSession:
         except OllamaError:
             # Fall back to original on error
             return question
+
+    def _resolve_document_references(self, question: str) -> str:
+        """Resolve partial document references to exact filenames.
+
+        Uses citation metadata (author_hint, year) from recent conversation
+        to match references like "the hummel paper" to exact filenames.
+
+        Args:
+            question: User's question
+
+        Returns:
+            Formatted string of resolved references, or "None"
+        """
+        from ragd.chat.reference_resolver import resolve_document_references
+
+        # Get full Citation objects (not just filenames) for metadata
+        recent_citations = self._history.get_recent_citations(
+            n=self.chat_config.rewrite_history_turns
+        )
+
+        if not recent_citations:
+            return "None"
+
+        resolutions = resolve_document_references(question, recent_citations)
+
+        if not resolutions:
+            return "None"
+
+        # Format as: "hummel paper" -> hummel-et-al-2021-data-sovereignty.pdf
+        return "\n".join(
+            f'- "{r.original_text}" → {r.matched_filename}'
+            for r in resolutions
+            if r.original_text  # Skip token-match-only results
+        ) or "None"
 
     def _generate_response(
         self,

@@ -43,6 +43,8 @@ class Citation:
     # Document metadata
     title: str | None = None
     author: str | None = None
+    author_hint: str | None = None  # First author surname (lowercase) for matching
+    year: str | None = None  # Publication year (4 digits)
     file_type: str | None = None
     file_path: str | None = None
 
@@ -113,6 +115,8 @@ class Citation:
             char_end=char_end,
             title=metadata.get("title") or _derive_title(metadata.get("filename", "")),
             author=metadata.get("author"),
+            author_hint=metadata.get("author_hint"),
+            year=metadata.get("publication_year"),
             file_type=metadata.get("file_type"),
             file_path=metadata.get("source"),
             indexed_at=metadata.get("indexed_at"),

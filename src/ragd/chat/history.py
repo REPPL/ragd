@@ -114,6 +114,28 @@ class ChatHistory:
                     seen.add(cit.filename)
         return filenames
 
+    def get_recent_citations(self, n: int = 4) -> list:
+        """Extract unique Citation objects from recent messages.
+
+        Unlike get_cited_documents() which returns only filenames,
+        this returns full Citation objects with metadata (author_hint, year)
+        needed for document reference resolution.
+
+        Args:
+            n: Number of recent messages to scan for citations
+
+        Returns:
+            List of unique Citation objects (deduplicated by filename)
+        """
+        citations: list = []
+        seen: set[str] = set()
+        for msg in self.get_recent(n):
+            for cit in msg.citations:
+                if cit.filename and cit.filename not in seen:
+                    citations.append(cit)
+                    seen.add(cit.filename)
+        return citations
+
     def format_for_prompt(
         self,
         n: int = 5,

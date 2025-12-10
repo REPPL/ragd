@@ -224,8 +224,12 @@ class ChatPromptsConfig(BaseModel):
         "Rewrite this follow-up question to be self-contained.\n\n"
         "Conversation:\n{history}\n\n"
         "Documents cited:\n{cited_documents}\n\n"
+        "Resolved document references:\n{resolved_references}\n\n"
         "Follow-up question: {question}\n\n"
-        "Rewritten question (use exact document filenames when referring to papers):"
+        "IMPORTANT: When the user refers to a document (e.g., 'the hummel paper'), "
+        "use the EXACT filename from 'Resolved document references' in your rewritten query. "
+        "This is critical for search accuracy.\n\n"
+        "Rewritten question:"
     )
 
 
