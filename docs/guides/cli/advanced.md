@@ -18,15 +18,19 @@ Configuration, debugging, and power user features.
 ### View current configuration
 
 ```bash
-ragd config show
+ragd config --show
 ```
 
-### Set configuration values
+### Modify configuration
+
+Use the interactive wizard or edit the YAML file directly:
 
 ```bash
-ragd config set embedding.model all-MiniLM-L6-v2
-ragd config set chunking.size 512
-ragd config set output.theme high-contrast
+# Interactive configuration wizard
+ragd config --interactive
+
+# Or edit the file directly
+nano ~/.ragd/config.yaml
 ```
 
 ### Example configuration
@@ -139,21 +143,23 @@ Shows:
 
 ## Scripting and Automation
 
-### Disable interactive prompts
+### Non-interactive output
+
+For scripts and automation, use plain or JSON output:
 
 ```bash
-ragd index ~/Documents/ --no-input
+# Plain text output (no progress bars or colours)
+ragd index ~/Documents/ --format plain
+
+# JSON output for parsing
+ragd info --format json
 ```
 
-Never prompts for confirmation; uses defaults.
-
-### Quiet mode for cron jobs
+### Search without interactive navigator
 
 ```bash
-ragd index ~/Documents/ --quiet
+ragd search "query" --format json --no-interactive
 ```
-
-Only outputs errors.
 
 ### Exit codes
 

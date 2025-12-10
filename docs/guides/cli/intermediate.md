@@ -26,15 +26,17 @@ ragd will:
 ragd info
 ```
 
-### Index specific file types only
+### Index specific directories
 
 ```bash
-# PDFs only
-ragd index ~/Documents/ --include "*.pdf"
+# Index your documents folder
+ragd index ~/Documents/
 
-# Markdown only
-ragd index ~/Notes/ --include "*.md"
+# Index your notes folder
+ragd index ~/Notes/
 ```
+
+> **Note:** File type filtering is handled automatically. ragd indexes PDF, TXT, MD, and HTML files.
 
 ---
 
@@ -71,11 +73,11 @@ ragd search "authentication" --format plain
 ### Search with citations
 
 ```bash
-# Show source with page numbers
-ragd search "privacy regulations"
+# Show source with page numbers (inline format)
+ragd search "privacy regulations" --cite inline
 
-# Include direct quotes (v0.3+)
-ragd search "privacy regulations" --quotes
+# APA-style citations
+ragd search "privacy regulations" --cite apa
 ```
 
 ---
@@ -96,8 +98,6 @@ For scripts, piping, or accessibility:
 
 ```bash
 ragd search "machine learning" --format plain
-# or
-ragd search "machine learning" --plain
 ```
 
 ### JSON output
@@ -171,17 +171,17 @@ Every search result shows its source:
    └────────────────────────────────┘
 ```
 
-### Academic citation formats (v0.3+)
+### Academic citation formats
 
 ```bash
 # APA style
-ragd search "climate change" --cite-style apa
+ragd search "climate change" --cite apa
 
-# IEEE style
-ragd search "neural networks" --cite-style ieee
+# Chicago style
+ragd search "neural networks" --cite chicago
 
-# Export bibliography
-ragd search "machine learning" --bibliography bibtex > refs.bib
+# BibTeX format for LaTeX
+ragd search "machine learning" --cite bibtex --no-interactive > refs.bib
 ```
 
 ---
@@ -193,7 +193,7 @@ ragd search "machine learning" --bibliography bibtex > refs.bib
 | Index a folder | `ragd index ~/Documents/` |
 | Search with limit | `ragd search "query" --limit 5` |
 | JSON output | `ragd search "query" --format json` |
-| Plain output | `ragd search "query" --plain` |
+| Plain output | `ragd search "query" --format plain` |
 | Run health checks | `ragd doctor` |
 | Detailed status | `ragd info --detailed` |
 
