@@ -15,7 +15,7 @@ Progressive learning guides for ragd, from installation to advanced usage.
 
 | Tutorial | Time | Description |
 |----------|------|-------------|
-| [Chat Interface](03-chat-interface.md) | 15 min | Interactive Q&A with your knowledge base |
+| [Chat Interface](03-chat-interface.md) | 15 min | Interactive Q&A with your knowledge base (requires Ollama) |
 | [Organising Your Knowledge Base](04-organisation.md) | 20 min | Tags, collections, and metadata |
 | [Backing Up Your Data](backing-up-data.md) | 15 min | Export, backup, and restore |
 
@@ -54,6 +54,8 @@ Each tutorial includes:
 
 ## Related Documentation
 
+- [What is RAG?](../explanation/what-is-rag.md) - Understand how RAG works
+- [Command Comparison](../guides/cli/command-comparison.md) - When to use search vs ask vs chat
 - [Documentation Hub](../README.md)
 - [Guides](../guides/)
 - [Reference](../reference/)

@@ -110,6 +110,81 @@ ragd index notes/ --no-recursive
 - Already-indexed files are skipped by default
 """,
 
+    "ask": """
+# ragd ask
+
+Get AI-generated answers from your knowledge base.
+
+## Usage
+
+```
+ragd ask QUESTION [OPTIONS]
+```
+
+## How It Works
+
+1. Retrieves relevant document chunks (like `search`)
+2. Sends chunks + your question to an Ollama LLM
+3. Generates an answer grounded in your documents
+4. Returns the answer with source citations
+
+## Examples
+
+**Basic question:**
+```
+ragd ask "What are the main findings?"
+```
+
+**With a specific model:**
+```
+ragd ask "Summarise the methodology" --model llama3.2:8b
+```
+
+**Enable agentic mode for complex questions:**
+```
+ragd ask "What security measures are recommended?" --agentic
+```
+
+**Show confidence score:**
+```
+ragd ask "What is the conclusion?" --show-confidence
+```
+
+**Without citations:**
+```
+ragd ask "Brief summary" --cite none
+```
+
+## Agentic Mode
+
+With `--agentic`, ragd uses advanced techniques:
+
+- **CRAG (Corrective RAG)**: Evaluates if retrieved documents are relevant.
+  If not, rewrites the query and retrieves again.
+- **Self-RAG**: Assesses if the answer is faithful to the sources.
+  If confidence is low, refines the answer.
+
+Use agentic mode when:
+- The question is complex or ambiguous
+- You need high confidence in accuracy
+- Initial results seem poor
+
+## Difference from search and chat
+
+| Command | Returns | Multi-turn | LLM Required |
+|---------|---------|------------|--------------|
+| `search` | Raw document excerpts | No | No |
+| `ask` | AI-generated answer | No | Yes |
+| `chat` | Conversation | Yes | Yes |
+
+## Tips
+
+- Use `--cite numbered` for source references
+- Use `--verbose` to see retrieval progress
+- Try `--agentic` for complex questions
+- Adjust `--temperature` for more/less creative answers
+""",
+
     "chat": """
 # ragd chat
 

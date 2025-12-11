@@ -8,6 +8,11 @@ Explanation documentation helps users understand concepts, architecture, and des
 
 ## Available Explanations
 
+### Getting Started
+
+- [What is RAG?](./what-is-rag.md) — Introduction to Retrieval-Augmented Generation for non-experts
+- [Agentic RAG](./agentic-rag.md) — Self-correcting RAG with CRAG and Self-RAG
+
 ### Core Concepts
 
 - [Hybrid Search](./hybrid-search.md) — How ragd combines semantic and keyword search using Reciprocal Rank Fusion

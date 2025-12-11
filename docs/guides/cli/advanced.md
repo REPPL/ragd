@@ -7,6 +7,35 @@ Configuration, debugging, and power user features.
 
 ---
 
+## Administration Mode
+
+ragd hides advanced commands by default to keep the interface simple for everyday use. To see all commands:
+
+```bash
+ragd --admin --help
+```
+
+Or set the environment variable:
+
+```bash
+export RAGD_ADMIN=1
+ragd --help
+```
+
+### Hidden Commands
+
+| Command | Purpose |
+|---------|---------|
+| `ragd models recommend` | Get hardware-based model recommendations |
+| `ragd models list` | List installed and available models |
+| `ragd models set` | Set default models for chat/embedding |
+| `ragd doctor` | Run comprehensive health checks |
+| `ragd config` | Configuration management |
+| `ragd evaluate` | RAG evaluation metrics |
+| `ragd tier` | Hardware tier information |
+
+---
+
 ## Configuration
 
 ### Configuration file location

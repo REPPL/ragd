@@ -8,9 +8,10 @@ ragd's CLI documentation follows a **progressive disclosure** model. Start with 
 
 | Level | Audience | Time | Content |
 |-------|----------|------|---------|
-| [Essentials](./essentials.md) | New users | 15 min | Core commands to get productive |
+| [Essentials](./essentials.md) | New users | 20 min | 6 core commands to get productive |
+| [Command Comparison](./command-comparison.md) | All users | 5 min | When to use search vs ask vs chat |
 | [Intermediate](./intermediate.md) | Regular users | 20 min | Task-specific workflows |
-| [Advanced](./advanced.md) | Power users | 15 min | Configuration, debugging |
+| [Advanced](./advanced.md) | Power users | 15 min | Configuration, debugging, admin mode |
 | [Reference](./reference.md) | All users | As needed | Complete command specifications |
 
 ## Quick Start
@@ -24,14 +25,20 @@ ragd doctor
 # 2. Index some documents
 ragd index ~/Documents/notes/
 
-# 3. Search your knowledge
+# 3. Search your knowledge (retrieval only)
 ragd search "your question here"
 
-# 4. Check your index
+# 4. Get AI answers (requires Ollama)
+ragd ask "What are the main points?"
+
+# 5. Have a conversation
+ragd chat
+
+# 6. Check your index
 ragd info
 ```
 
-That's it! You now know the 4 essential commands.
+**Not sure when to use search, ask, or chat?** See [Command Comparison](./command-comparison.md).
 
 ## Choosing the Right Guide
 
@@ -49,6 +56,7 @@ That's it! You now know the 4 essential commands.
 
 ## Related Documentation
 
+- [What is RAG?](../../explanation/what-is-rag.md) - Understanding retrieval-augmented generation
 - [Getting Started Tutorial](../../tutorials/01-getting-started.md) - Hands-on learning
 - [CLI Reference](../../reference/cli-reference.md) - Complete command specifications
 

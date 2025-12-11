@@ -1,6 +1,6 @@
 # CLI Reference
 
-Complete command reference for ragd v1.0.0a1.
+Complete command reference for ragd v1.0.0a5.
 
 ## Synopsis
 
@@ -670,4 +670,4 @@ Environment variables use double underscore (`__`) for nested config keys.
 
 ---
 
-**Status**: Reference specification for v1.0.0a1
+**Status**: Reference specification for v1.0.0a5
