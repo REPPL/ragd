@@ -35,9 +35,12 @@ ragd init
 
 ragd will:
 1. Detect your hardware capabilities
-2. Recommend optimal settings
-3. Create configuration at `~/.ragd/config.yaml`
-4. Download required embedding models
+2. Recommend optimal settings (including the best LLM for your hardware)
+3. Detect context window size from model card
+4. Create configuration at `~/.ragd/config.yaml`
+5. Download required embedding models
+
+> **Note:** If you skip this step and run `ragd chat` or `ragd ask` directly, ragd will automatically run initialisation for you on first use.
 
 ## Step 3: Index Your Documents
 

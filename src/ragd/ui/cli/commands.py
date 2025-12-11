@@ -242,6 +242,17 @@ def init_command(
     if config.llm.model != llm_model:
         config.llm.model = llm_model
 
+    # Detect and store context window from model card
+    try:
+        from ragd.models import load_model_card
+
+        card = load_model_card(llm_model, auto_discover=True, interactive=False)
+        if card and card.context_length:
+            config.chat.context_window = card.context_length
+            con.print(f"[dim]Detected context window: {card.context_length:,} tokens[/dim]")
+    except Exception:
+        pass  # Model card not available, use default
+
     ensure_data_dir(config)
     save_config(config)
 
@@ -1609,7 +1620,16 @@ def ask_command(
     """
     from ragd.chat import ChatSession, ChatConfig, check_chat_available
     from ragd.chat import AgenticRAG, AgenticConfig
-    from ragd.config import load_config
+    from ragd.config import load_config, config_exists
+
+    # Auto-init if config doesn't exist
+    if not config_exists():
+        con = get_console(no_color)
+        con.print("[yellow]ragd not initialised. Running first-time setup...[/yellow]\n")
+
+        # Run init to detect hardware and create config
+        init_command(no_color=no_color)
+        con.print()  # Add spacing after init
 
     config = load_config()
     con = get_console(no_color, max_width=config.display.max_width)
@@ -1991,7 +2011,16 @@ def chat_command(
     Multi-turn conversation with your knowledge base.
     """
     from ragd.chat import ChatSession, ChatConfig, check_chat_available
-    from ragd.config import load_config
+    from ragd.config import load_config, config_exists
+
+    # Auto-init if config doesn't exist
+    if not config_exists():
+        con = get_console(no_color)
+        con.print("[yellow]ragd not initialised. Running first-time setup...[/yellow]\n")
+
+        # Run init to detect hardware and create config
+        init_command(no_color=no_color)
+        con.print()  # Add spacing after init
 
     config = load_config()
     con = get_console(no_color, max_width=config.display.max_width)

@@ -70,3 +70,43 @@ def test_index_nonexistent_path() -> None:
     result = runner.invoke(app, ["index", "/nonexistent/path"])
     assert result.exit_code == 1
     assert "not found" in result.stdout.lower()
+
+
+class TestAutoInit:
+    """Tests for auto-init feature on first chat/ask."""
+
+    def test_config_exists_function(self, tmp_path: Path) -> None:
+        """Test config_exists function."""
+        from ragd.config import config_exists
+
+        # Test with non-existent config
+        assert config_exists(tmp_path / "nonexistent.yaml") is False
+
+        # Test with existing config
+        config_file = tmp_path / "config.yaml"
+        config_file.write_text("version: 1\n")
+        assert config_exists(config_file) is True
+
+    def test_chat_help_without_init(self) -> None:
+        """Test chat help works without init."""
+        result = runner.invoke(app, ["chat", "--help"])
+        assert result.exit_code == 0
+        assert "chat" in result.stdout.lower()
+
+    def test_ask_help_without_init(self) -> None:
+        """Test ask help works without init."""
+        result = runner.invoke(app, ["ask", "--help"])
+        assert result.exit_code == 0
+        assert "ask" in result.stdout.lower()
+
+    def test_models_recommend_help(self) -> None:
+        """Test models recommend help - this command exists."""
+        result = runner.invoke(app, ["models", "recommend", "--help"])
+        assert result.exit_code == 0
+        assert "Recommend" in result.stdout or "recommend" in result.stdout.lower()
+
+    def test_models_set_help(self) -> None:
+        """Test models set help - this command exists."""
+        result = runner.invoke(app, ["models", "set", "--help"])
+        assert result.exit_code == 0
+        assert "Set" in result.stdout or "model" in result.stdout.lower()

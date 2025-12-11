@@ -34,6 +34,8 @@ ollama pull llama3.2:3b
 ragd chat
 ```
 
+> **First Time?** If you haven't run `ragd init` yet, ragd will automatically detect your hardware and configure optimal settings on first launch.
+
 You'll see a prompt where you can ask questions:
 
 ```
@@ -46,11 +48,24 @@ While in chat mode:
 
 | Command | Description |
 |---------|-------------|
+| `/search <query> [-n N]` | Search documents (use `-n` to limit results, default 5) |
 | `/help` | Show available commands |
 | `/clear` | Clear conversation history |
 | `/history` | Show conversation history |
 | `/quit` or `/exit` | Exit chat |
 | `Ctrl+C` | Exit chat |
+
+### Searching Within Chat
+
+Use `/search` to explore what's indexed without leaving the chat:
+
+```
+You: /search machine learning
+[5 results shown]
+
+You: /search neural networks -n 10
+[10 results shown]
+```
 
 ## Using Citations
 
@@ -77,6 +92,21 @@ References:
 
 ```bash
 ragd chat --model llama3.2:8b
+```
+
+### Model Management
+
+To see which models are available and get hardware-based recommendations:
+
+```bash
+# List available models
+ragd models list
+
+# Get model recommendations for your hardware
+ragd models recommend
+
+# Set the default chat model
+ragd models set --chat llama3.1:8b
 ```
 
 ### Adjust Temperature
