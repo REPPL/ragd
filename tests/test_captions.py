@@ -90,8 +90,12 @@ Overall, the event was deemed a significant success by all stakeholders involved
         assert "event attracted thousands" in result
         assert "event was deemed a significant success" in result
 
-    def test_removes_media_attributions(self) -> None:
-        """Test removal of agency attributions."""
+    def test_preserves_media_attributions(self) -> None:
+        """Test that agency attributions are preserved (no longer removed).
+
+        In v1.0.0a4, media attribution patterns (Getty, Reuters, AP, etc.) were
+        removed due to high false positive risk - "AP" matches words like "Chapter".
+        """
         text = """Breaking news from the international summit today as world leaders
 gathered to discuss pressing economic concerns. The meeting lasted several
 hours with multiple sessions covering trade agreements and climate policy.
@@ -116,9 +120,10 @@ and a commitment to future collaboration between participating nations."""
 
         result = remove_captions(text)
 
-        assert "(Getty Images)" not in result
-        assert "/ Reuters" not in result
-        assert "(AP)" not in result
+        # Media attributions are now PRESERVED (no longer removed)
+        assert "(Getty Images)" in result
+        assert "/ Reuters" in result
+        assert "(AP)" in result
         assert "Breaking news from the international summit" in result
         assert "summit concluded with a joint statement" in result
 
@@ -198,9 +203,9 @@ class TestHasCaptionContent:
         text = "Photo credit: John Smith"
         assert has_caption_content(text) is True
 
-    def test_detects_agency_attribution(self) -> None:
-        """Test detection of agency attributions."""
-        text = "(Getty Images)"
+    def test_detects_image_marker(self) -> None:
+        """Test detection of image markers."""
+        text = "(Image)"
         assert has_caption_content(text) is True
 
     def test_no_false_positive_for_regular_text(self) -> None:

@@ -13,7 +13,8 @@ logger = logging.getLogger(__name__)
 
 
 # Caption and attribution patterns
-# Note: Patterns should be precise to avoid false positives on long lines
+# Note: Media attribution patterns (Getty, Reuters, AP, etc.) were removed in v1.0.0a4
+# due to false positive risk - patterns like "AP" match words like "Chapter" and "Report"
 CAPTION_PATTERNS = [
     # Figure/table captions (academic style)
     r"^Figure\s+\d+[.:\-]\s*.+$",
@@ -23,20 +24,13 @@ CAPTION_PATTERNS = [
     r"^Graph\s+\d+[.:\-]\s*.+$",
     r"^Exhibit\s+\d+[.:\-]\s*.+$",
     r"^Diagram\s+\d+[.:\-]\s*.+$",
-    # Photo credits
+    # Photo credits (explicit label patterns only - safe)
     r"^Photo(?:\s+credit)?:\s*.+$",
     r"^Image:\s*.+$",
     r"^Credit:\s*.+$",
-    r"^Source:\s*.+$",
     r"^Illustration(?:\s+by)?:\s*.+$",
     r"^Photograph(?:\s+by)?:\s*.+$",
     r"^Picture:\s*.+$",
-    # Media attribution (inline) - use word boundaries and limit line length
-    # Matches: "Photo / Getty Images", "Reuters/AP", etc.
-    # Requires "/" within first 100 chars and word boundary on agency names
-    r"^.{0,100}/\s*(?:Getty\s*Images?|Reuters|\bAP\b|\bAFP\b|\bEPA\b|Shutterstock|iStock|Alamy)(?:\s|$|[,.])",
-    r"^\((?:Getty\s*Images?|Reuters|AP|AFP|EPA|Shutterstock|iStock|Alamy)\)$",
-    r"^©\s*.+(?:Getty|Reuters|\bAP\b|\bAFP\b|\bEPA\b).*$",
     # Alt text leakage
     r"^Image\s+description:\s*.+$",
     r"^\[Image:.*\]$",
@@ -108,17 +102,17 @@ def remove_captions(text: str) -> str:
 def _is_attribution_line(line: str) -> bool:
     """Check if line appears to be a standalone attribution.
 
+    Note: Media attribution detection was removed in v1.0.0a4 due to
+    false positive risk. This function now always returns False but is
+    kept for potential future use with more precise patterns.
+
     Args:
         line: Line to check
 
     Returns:
-        True if line looks like an attribution
+        Always False (attribution detection disabled)
     """
-    # Very short lines ending with common agency names
-    if len(line) < 50:
-        agencies = ["Getty", "Reuters", "AP", "AFP", "EPA", "Shutterstock"]
-        return any(line.endswith(agency) or line.endswith(f"({agency})") for agency in agencies)
-
+    # Disabled in v1.0.0a4 - "AP" matches "Chapter", "Report", etc.
     return False
 
 
