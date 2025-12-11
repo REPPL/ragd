@@ -768,7 +768,7 @@ embedding:
   # Device placement
   device: auto                    # auto | cpu | cuda | mps | cuda:0
 
-  # Memory optimization
+  # Memory optimisation
   torch_dtype: auto              # auto | float32 | float16 | bfloat16
 
   # Trust remote code (security risk)
