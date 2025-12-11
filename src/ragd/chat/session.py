@@ -30,13 +30,41 @@ from ragd.config import RagdConfig, load_config
 from ragd.llm import LLMResponse, OllamaClient, OllamaError, StreamChunk
 from ragd.search.hybrid import HybridSearcher, HybridSearchResult, SearchMode
 
+
+@dataclass
+class RetrievalResult:
+    """Result of retrieval with strategy tracking.
+
+    Tracks which retrieval strategy succeeded for debugging and logging.
+
+    Attributes:
+        results: Raw search results from hybrid search
+        citations: Parsed citations from results
+        context: Formatted context string for LLM
+        strategy_used: Which strategy succeeded:
+            - "rewritten": Enhanced query with context
+            - "original": Original query (rewrite fallback)
+            - "lowered_threshold": Lower min_relevance (final fallback)
+            - "none": No results found
+        original_query: The user's original question
+        rewritten_query: The enhanced query (if different from original)
+    """
+
+    results: list[HybridSearchResult]
+    citations: list[Citation]
+    context: str
+    strategy_used: str
+    original_query: str
+    rewritten_query: str | None = None
+
+
 # Response when no relevant context is found
 NO_CONTEXT_RESPONSE = (
-    "I don't have information about that in my indexed documents.\n\n"
-    "Suggestions:\n"
-    "- Try rephrasing your question with different keywords\n"
-    "- Run 'ragd search \"your query\"' to check if relevant content exists\n"
-    "- Run 'ragd stats' to see what topics are indexed"
+    "I couldn't find relevant information in the indexed documents.\n\n"
+    "Try:\n"
+    "- Rephrasing with different keywords\n"
+    "- Using /search <query> to explore what's indexed\n"
+    "- Asking about a different aspect of the topic"
 )
 
 
@@ -57,6 +85,10 @@ class ChatConfig:
         min_history_tokens: Minimum tokens for history
         min_context_tokens: Minimum tokens for context
         rewrite_history_turns: History turns for query rewriting
+        validate_citations: Enable citation validation
+        validation_mode: Citation validation mode (warn | filter | strict)
+        fallback_min_relevance: Lower threshold for fallback retry (default 0.35)
+        enable_fallback_retrieval: Enable cascading retrieval fallbacks
     """
 
     model: str = "llama3.2:3b"
@@ -74,6 +106,9 @@ class ChatConfig:
     # Citation validation settings
     validate_citations: bool = True  # Enable citation validation by default
     validation_mode: str = "warn"  # warn | filter | strict
+    # Fallback retrieval settings
+    fallback_min_relevance: float = 0.35  # Lower threshold for retry
+    enable_fallback_retrieval: bool = True  # Enable cascading fallbacks
 
 
 class ChatSession:
@@ -177,18 +212,10 @@ class ChatSession:
             min_context=self.chat_config.min_context_tokens,
         )
 
-        # Rewrite follow-up queries to include conversation context
-        enhanced_query = self._rewrite_query_with_context(question)
-
-        # Retrieve relevant context with allocated budget
-        results = self._retrieve(enhanced_query)
-        context, citations = build_context_from_results(
-            results,
-            max_tokens=budget.context + self.chat_config.max_tokens,
-            reserved_tokens=self.chat_config.max_tokens,
-            max_results=self.chat_config.search_limit,
-            min_relevance=self.chat_config.min_relevance,
-        )
+        # Retrieve context with cascading fallback strategies
+        retrieval = self._retrieve_with_fallback(question, budget.context)
+        context = retrieval.context
+        citations = retrieval.citations
 
         # Get prompt template with config (overrides and citation instruction)
         if isinstance(template, str):
@@ -227,6 +254,126 @@ class ChatSession:
             query=query,
             limit=self.chat_config.search_limit * 2,  # Fetch extra for filtering
             mode=SearchMode.HYBRID,
+        )
+
+    def _retrieve_with_fallback(
+        self,
+        question: str,
+        budget_context: int,
+    ) -> RetrievalResult:
+        """Retrieve context with cascading fallback strategies.
+
+        Tries multiple retrieval strategies in order:
+        1. Rewritten query with standard min_relevance
+        2. Original query with standard min_relevance (if rewrite changed it)
+        3. Original query with lowered min_relevance
+
+        Args:
+            question: User's original question
+            budget_context: Token budget for context
+
+        Returns:
+            RetrievalResult with citations and strategy tracking
+        """
+        max_tokens = budget_context + self.chat_config.max_tokens
+        reserved_tokens = self.chat_config.max_tokens
+        max_results = self.chat_config.search_limit
+        min_relevance = self.chat_config.min_relevance
+
+        # Step 1: Try rewritten query with standard threshold
+        enhanced_query = self._rewrite_query_with_context(question)
+        results = self._retrieve(enhanced_query)
+        context, citations = build_context_from_results(
+            results,
+            max_tokens=max_tokens,
+            reserved_tokens=reserved_tokens,
+            max_results=max_results,
+            min_relevance=min_relevance,
+        )
+
+        if citations:
+            logger.debug(
+                "Retrieval succeeded with rewritten query: %d citations",
+                len(citations),
+            )
+            return RetrievalResult(
+                results=results,
+                citations=citations,
+                context=context,
+                strategy_used="rewritten",
+                original_query=question,
+                rewritten_query=enhanced_query if enhanced_query != question else None,
+            )
+
+        # Step 2: Try original query (if different from rewritten)
+        if (
+            enhanced_query != question
+            and self.chat_config.enable_fallback_retrieval
+        ):
+            logger.debug("Fallback: trying original query '%s'", question)
+            results = self._retrieve(question)
+            context, citations = build_context_from_results(
+                results,
+                max_tokens=max_tokens,
+                reserved_tokens=reserved_tokens,
+                max_results=max_results,
+                min_relevance=min_relevance,
+            )
+
+            if citations:
+                logger.debug(
+                    "Retrieval succeeded with original query: %d citations",
+                    len(citations),
+                )
+                return RetrievalResult(
+                    results=results,
+                    citations=citations,
+                    context=context,
+                    strategy_used="original",
+                    original_query=question,
+                    rewritten_query=enhanced_query,
+                )
+
+        # Step 3: Lower threshold and retry
+        if self.chat_config.enable_fallback_retrieval:
+            lower_threshold = self.chat_config.fallback_min_relevance
+            logger.debug(
+                "Fallback: lowering min_relevance from %.2f to %.2f",
+                min_relevance,
+                lower_threshold,
+            )
+            # Reuse last search results, just filter with lower threshold
+            context, citations = build_context_from_results(
+                results,
+                max_tokens=max_tokens,
+                reserved_tokens=reserved_tokens,
+                max_results=max_results,
+                min_relevance=lower_threshold,
+            )
+
+            if citations:
+                logger.debug(
+                    "Retrieval succeeded with lowered threshold: %d citations",
+                    len(citations),
+                )
+                return RetrievalResult(
+                    results=results,
+                    citations=citations,
+                    context=context,
+                    strategy_used="lowered_threshold",
+                    original_query=question,
+                    rewritten_query=enhanced_query if enhanced_query != question else None,
+                )
+
+        # No results found with any strategy
+        logger.debug("Retrieval failed: no results with any strategy")
+        return RetrievalResult(
+            results=[],
+            citations=[],
+            context="",
+            strategy_used="none",
+            original_query=question,
+            rewritten_query=enhanced_query if enhanced_query != question else None,
         )
 
     def _rewrite_query_with_context(self, question: str) -> str:

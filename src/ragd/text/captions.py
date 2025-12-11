@@ -6,10 +6,14 @@ attributions that pollute content text.
 
 from __future__ import annotations
 
+import logging
 import re
+
+logger = logging.getLogger(__name__)
 
 
 # Caption and attribution patterns
+# Note: Patterns should be precise to avoid false positives on long lines
 CAPTION_PATTERNS = [
     # Figure/table captions (academic style)
     r"^Figure\s+\d+[.:\-]\s*.+$",
@@ -27,10 +31,12 @@ CAPTION_PATTERNS = [
     r"^Illustration(?:\s+by)?:\s*.+$",
     r"^Photograph(?:\s+by)?:\s*.+$",
     r"^Picture:\s*.+$",
-    # Media attribution (inline)
-    r"^.+/\s*(?:Getty\s*Images?|Reuters|AP|AFP|EPA|Shutterstock|iStock|Alamy).*$",
+    # Media attribution (inline) - use word boundaries and limit line length
+    # Matches: "Photo / Getty Images", "Reuters/AP", etc.
+    # Requires "/" within first 100 chars and word boundary on agency names
+    r"^.{0,100}/\s*(?:Getty\s*Images?|Reuters|\bAP\b|\bAFP\b|\bEPA\b|Shutterstock|iStock|Alamy)(?:\s|$|[,.])",
     r"^\((?:Getty\s*Images?|Reuters|AP|AFP|EPA|Shutterstock|iStock|Alamy)\)$",
-    r"^©\s*.+(?:Getty|Reuters|AP|AFP|EPA).*$",
+    r"^©\s*.+(?:Getty|Reuters|\bAP\b|\bAFP\b|\bEPA\b).*$",
     # Alt text leakage
     r"^Image\s+description:\s*.+$",
     r"^\[Image:.*\]$",
@@ -81,7 +87,22 @@ def remove_captions(text: str) -> str:
         if not is_caption:
             filtered.append(line)
 
-    return "\n".join(filtered)
+    result = "\n".join(filtered)
+
+    # Safety check: don't remove more than 50% of content
+    # This protects against overly aggressive pattern matching
+    original_len = len(text.strip())
+    result_len = len(result.strip())
+
+    if original_len > 0 and result_len < original_len * 0.5:
+        logger.warning(
+            "Caption removal would delete >50%% of content (%d -> %d chars), skipping",
+            original_len,
+            result_len,
+        )
+        return text
+
+    return result
 
 
 def _is_attribution_line(line: str) -> bool:

@@ -280,11 +280,13 @@ def fix_ocr_spelling(text: str) -> str:
 def _fix_unrecognised_words(text: str) -> str:
     """Try to fix unrecognised words using OCR substitutions.
 
+    Processes text line-by-line to preserve document structure.
+
     Args:
         text: Text with potential OCR errors
 
     Returns:
-        Text with some errors fixed
+        Text with some errors fixed, preserving newlines
     """
     # OCR character substitutions
     substitutions = {
@@ -295,32 +297,39 @@ def _fix_unrecognised_words(text: str) -> str:
         "nn": "m",
     }
 
-    words = text.split()
-    fixed_words = []
+    # Process line-by-line to preserve newlines
+    lines = text.split("\n")
+    fixed_lines = []
 
-    for word in words:
-        # Skip short words and words with non-alpha characters
-        if len(word) < 4 or not word.isalpha():
-            fixed_words.append(word)
-            continue
+    for line in lines:
+        words = line.split()
+        fixed_words = []
 
-        # Skip if already a valid word
-        if is_valid_word(word.lower()):
-            fixed_words.append(word)
-            continue
+        for word in words:
+            # Skip short words and words with non-alpha characters
+            if len(word) < 4 or not word.isalpha():
+                fixed_words.append(word)
+                continue
 
-        # Try substitutions
-        fixed = word
-        for wrong, right in substitutions.items():
-            if wrong in word.lower():
-                candidate = re.sub(wrong, right, word, flags=re.IGNORECASE)
-                if is_valid_word(candidate.lower()):
-                    fixed = candidate
-                    break
+            # Skip if already a valid word
+            if is_valid_word(word.lower()):
+                fixed_words.append(word)
+                continue
 
-        fixed_words.append(fixed)
+            # Try substitutions
+            fixed = word
+            for wrong, right in substitutions.items():
+                if wrong in word.lower():
+                    candidate = re.sub(wrong, right, word, flags=re.IGNORECASE)
+                    if is_valid_word(candidate.lower()):
+                        fixed = candidate
+                        break
 
-    return " ".join(fixed_words)
+            fixed_words.append(fixed)
+
+        fixed_lines.append(" ".join(fixed_words))
+
+    return "\n".join(fixed_lines)
 
 
 @lru_cache(maxsize=1)

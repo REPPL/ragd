@@ -2050,10 +2050,11 @@ def chat_command(
                 break
             elif user_input.lower() == "/help":
                 con.print("\n[bold]Commands:[/bold]")
-                con.print("  /exit, /quit, /q - Exit chat")
-                con.print("  /clear          - Clear conversation history")
-                con.print("  /history        - Show conversation history")
-                con.print("  /help           - Show this help\n")
+                con.print("  /search <query> [-n N]  - Search documents (default 5 results)")
+                con.print("  /exit, /quit, /q        - Exit chat")
+                con.print("  /clear                  - Clear conversation history")
+                con.print("  /history                - Show conversation history")
+                con.print("  /help                   - Show this help\n")
                 continue
             elif user_input.lower() == "/clear":
                 session.history.clear()
@@ -2069,6 +2070,62 @@ def chat_command(
                         content = msg.content[:100] + "..." if len(msg.content) > 100 else msg.content
                         con.print(f"  [{role}] {content}")
                     con.print()
+                continue
+            elif user_input.lower().startswith("/search"):
+                # Parse /search <query> [-n N] or [--limit N]
+                search_text = user_input[7:].strip()
+
+                if not search_text:
+                    con.print("[yellow]Usage: /search <query> [-n N][/yellow]")
+                    con.print("Example: /search machine learning")
+                    con.print("Example: /search \"exact phrase\" -n 10\n")
+                    continue
+
+                # Parse optional limit argument
+                search_limit = 5  # Default
+                import re
+                limit_match = re.search(r'(?:-n|--limit)\s+(\d+)', search_text)
+                if limit_match:
+                    search_limit = int(limit_match.group(1))
+                    # Remove the limit argument from the query
+                    search_text = re.sub(r'\s*(?:-n|--limit)\s+\d+', '', search_text).strip()
+
+                # Remove surrounding quotes if present
+                if (search_text.startswith('"') and search_text.endswith('"')) or \
+                   (search_text.startswith("'") and search_text.endswith("'")):
+                    search_text = search_text[1:-1]
+
+                if not search_text:
+                    con.print("[yellow]Please provide a search query.[/yellow]\n")
+                    continue
+
+                con.print(f"\n[dim]Searching for: {search_text} (limit: {search_limit})[/dim]\n")
+
+                try:
+                    from ragd.search import hybrid_search, SearchMode
+
+                    results = hybrid_search(
+                        search_text,
+                        limit=search_limit,
+                        mode=SearchMode.HYBRID,
+                        config=config,
+                    )
+
+                    if not results:
+                        con.print("[yellow]No results found.[/yellow]\n")
+                    else:
+                        con.print("[bold]Results:[/bold]")
+                        for i, result in enumerate(results, 1):
+                            score = f"{result.combined_score:.2f}"
+                            doc = result.document_name or "Unknown"
+                            preview = result.content[:80].replace("\n", " ")
+                            if len(result.content) > 80:
+                                preview += "..."
+                            con.print(f"  [{i}] {doc} (score: {score})")
+                            con.print(f"      [dim]{preview}[/dim]")
+                        con.print()
+                except Exception as e:
+                    con.print(f"[red]Search error: {e}[/red]\n")
                 continue
 
             # Generate response with thinking indicator

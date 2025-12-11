@@ -19,7 +19,7 @@ from ragd.chat.prompts import (
     register_template,
 )
 from ragd.citation import Citation
-from ragd.chat.session import ChatSession, ChatConfig
+from ragd.chat.session import ChatSession, ChatConfig, RetrievalResult
 from ragd.llm import LLMResponse, OllamaError
 
 
@@ -1205,3 +1205,301 @@ class TestCitationOrdering:
         # Context should have [1] and [2] markers
         assert "[1] doc_a.pdf" in context
         assert "[2] doc_b.pdf" in context
+
+
+class TestCascadingRetrievalFallback:
+    """Tests for cascading retrieval fallback strategies."""
+
+    @pytest.fixture
+    def mock_session(self):
+        """Create a ChatSession with mocked dependencies."""
+        with patch("ragd.chat.session.OllamaClient") as MockClient, \
+             patch("ragd.chat.session.HybridSearcher") as MockSearcher:
+
+            mock_llm = MagicMock()
+            MockClient.return_value = mock_llm
+            mock_searcher = MagicMock()
+            MockSearcher.return_value = mock_searcher
+
+            mock_config = MagicMock()
+            mock_config.chat.prompts.query_rewrite = (
+                "Rewrite: {history}\n{question}\n{cited_documents}\n{resolved_references}"
+            )
+            mock_config.llm.base_url = "http://localhost:11434"
+
+            chat_config = ChatConfig(
+                min_relevance=0.55,
+                fallback_min_relevance=0.35,
+                enable_fallback_retrieval=True,
+            )
+            session = ChatSession(config=mock_config, chat_config=chat_config)
+            session._llm = mock_llm
+            session._searcher = mock_searcher
+
+            yield session
+
+    def test_retrieval_result_dataclass(self):
+        """Test RetrievalResult dataclass creation."""
+        result = RetrievalResult(
+            results=[],
+            citations=[],
+            context="test context",
+            strategy_used="rewritten",
+            original_query="test query",
+            rewritten_query="enhanced test query",
+        )
+        assert result.strategy_used == "rewritten"
+        assert result.original_query == "test query"
+        assert result.rewritten_query == "enhanced test query"
+
+    def test_rewritten_query_succeeds(self, mock_session):
+        """Test that rewritten query is tried first."""
+        from ragd.search.hybrid import HybridSearchResult, SourceLocation
+
+        # Mock searcher to return results
+        mock_session._searcher.search.return_value = [
+            HybridSearchResult(
+                content="Test content",
+                combined_score=0.6,  # Above min_relevance of 0.55
+                semantic_score=0.6,
+                keyword_score=0.5,
+                semantic_rank=1,
+                keyword_rank=1,
+                rrf_score=0.6,
+                document_id="doc1",
+                document_name="test.pdf",
+                chunk_id="doc1_0",
+                chunk_index=0,
+                metadata={},
+                location=SourceLocation(page_number=1),
+            )
+        ]
+
+        result = mock_session._retrieve_with_fallback("test query", budget_context=2000)
+
+        assert result.strategy_used == "rewritten"
+        assert len(result.citations) == 1
+        assert mock_session._searcher.search.call_count == 1
+
+    def test_fallback_to_original_query(self, mock_session):
+        """Test fallback to original query when rewritten returns no results."""
+        from ragd.search.hybrid import HybridSearchResult, SourceLocation
+
+        # Add history so query gets rewritten
+        mock_session._history.add_user_message("previous question")
+        mock_session._history.add_assistant_message("previous answer")
+
+        # Mock LLM to return different rewritten query
+        mock_session._llm.generate.return_value = LLMResponse(
+            content="completely different rewritten query",
+            model="test",
+            tokens_used=10,
+        )
+
+        # First call (rewritten) returns low score, second call (original) returns high score
+        call_count = [0]
+
+        def search_side_effect(query, **kwargs):
+            call_count[0] += 1
+            if call_count[0] == 1:
+                # Rewritten query returns low score (filtered out)
+                return [HybridSearchResult(
+                    content="Low score result",
+                    combined_score=0.3,  # Below min_relevance
+                    semantic_score=0.3,
+                    keyword_score=0.3,
+                    semantic_rank=1,
+                    keyword_rank=1,
+                    rrf_score=0.3,
+                    document_id="doc1",
+                    document_name="test.pdf",
+                    chunk_id="doc1_0",
+                    chunk_index=0,
+                    metadata={},
+                    location=SourceLocation(page_number=1),
+                )]
+            else:
+                # Original query returns high score
+                return [HybridSearchResult(
+                    content="High score result",
+                    combined_score=0.7,  # Above min_relevance
+                    semantic_score=0.7,
+                    keyword_score=0.6,
+                    semantic_rank=1,
+                    keyword_rank=1,
+                    rrf_score=0.7,
+                    document_id="doc2",
+                    document_name="better.pdf",
+                    chunk_id="doc2_0",
+                    chunk_index=0,
+                    metadata={},
+                    location=SourceLocation(page_number=1),
+                )]
+
+        mock_session._searcher.search.side_effect = search_side_effect
+
+        result = mock_session._retrieve_with_fallback(
+            "tell me more about it", budget_context=2000
+        )
+
+        assert result.strategy_used == "original"
+        assert len(result.citations) == 1
+        assert mock_session._searcher.search.call_count == 2
+
+    def test_fallback_to_lower_threshold(self, mock_session):
+        """Test fallback to lower threshold when both queries return low scores."""
+        from ragd.search.hybrid import HybridSearchResult, SourceLocation
+
+        # Mock searcher to return results with score between 0.35 and 0.55
+        mock_session._searcher.search.return_value = [
+            HybridSearchResult(
+                content="Medium score result",
+                combined_score=0.45,  # Below 0.55 but above 0.35
+                semantic_score=0.45,
+                keyword_score=0.4,
+                semantic_rank=1,
+                keyword_rank=1,
+                rrf_score=0.45,
+                document_id="doc1",
+                document_name="test.pdf",
+                chunk_id="doc1_0",
+                chunk_index=0,
+                metadata={},
+                location=SourceLocation(page_number=1),
+            )
+        ]
+
+        result = mock_session._retrieve_with_fallback("test query", budget_context=2000)
+
+        assert result.strategy_used == "lowered_threshold"
+        assert len(result.citations) == 1
+
+    def test_no_results_with_any_strategy(self, mock_session):
+        """Test that 'none' is returned when all strategies fail."""
+        from ragd.search.hybrid import HybridSearchResult, SourceLocation
+
+        # Mock searcher to return very low scores
+        mock_session._searcher.search.return_value = [
+            HybridSearchResult(
+                content="Very low score result",
+                combined_score=0.1,  # Below even fallback_min_relevance
+                semantic_score=0.1,
+                keyword_score=0.1,
+                semantic_rank=1,
+                keyword_rank=1,
+                rrf_score=0.1,
+                document_id="doc1",
+                document_name="test.pdf",
+                chunk_id="doc1_0",
+                chunk_index=0,
+                metadata={},
+                location=SourceLocation(page_number=1),
+            )
+        ]
+
+        result = mock_session._retrieve_with_fallback("test query", budget_context=2000)
+
+        assert result.strategy_used == "none"
+        assert len(result.citations) == 0
+
+    def test_fallback_disabled(self, mock_session):
+        """Test that fallback is skipped when disabled."""
+        from ragd.search.hybrid import HybridSearchResult, SourceLocation
+
+        # Disable fallback
+        mock_session.chat_config.enable_fallback_retrieval = False
+
+        # Mock searcher to return low scores
+        mock_session._searcher.search.return_value = [
+            HybridSearchResult(
+                content="Low score result",
+                combined_score=0.45,  # Below min_relevance but above fallback
+                semantic_score=0.45,
+                keyword_score=0.4,
+                semantic_rank=1,
+                keyword_rank=1,
+                rrf_score=0.45,
+                document_id="doc1",
+                document_name="test.pdf",
+                chunk_id="doc1_0",
+                chunk_index=0,
+                metadata={},
+                location=SourceLocation(page_number=1),
+            )
+        ]
+
+        result = mock_session._retrieve_with_fallback("test query", budget_context=2000)
+
+        # Should fail without trying lower threshold
+        assert result.strategy_used == "none"
+        assert len(result.citations) == 0
+
+    def test_retrieval_result_tracks_queries(self, mock_session):
+        """Test that RetrievalResult correctly tracks original and rewritten queries."""
+        from ragd.search.hybrid import HybridSearchResult, SourceLocation
+
+        # Add history to trigger rewriting
+        mock_session._history.add_user_message("What is RAG?")
+        mock_session._history.add_assistant_message("RAG is...")
+
+        # Mock LLM to return rewritten query
+        mock_session._llm.generate.return_value = LLMResponse(
+            content="tell me more about RAG systems",
+            model="test",
+            tokens_used=10,
+        )
+
+        # Mock successful search
+        mock_session._searcher.search.return_value = [
+            HybridSearchResult(
+                content="Content",
+                combined_score=0.7,
+                semantic_score=0.7,
+                keyword_score=0.6,
+                semantic_rank=1,
+                keyword_rank=1,
+                rrf_score=0.7,
+                document_id="doc1",
+                document_name="test.pdf",
+                chunk_id="doc1_0",
+                chunk_index=0,
+                metadata={},
+                location=SourceLocation(page_number=1),
+            )
+        ]
+
+        result = mock_session._retrieve_with_fallback(
+            "tell me more", budget_context=2000
+        )
+
+        assert result.original_query == "tell me more"
+        assert result.rewritten_query == "tell me more about RAG systems"
+
+
+class TestRetrievalResultDataclass:
+    """Tests for RetrievalResult dataclass."""
+
+    def test_create_with_defaults(self):
+        """Test creating RetrievalResult with optional rewritten_query."""
+        result = RetrievalResult(
+            results=[],
+            citations=[],
+            context="",
+            strategy_used="none",
+            original_query="test",
+        )
+        assert result.rewritten_query is None
+
+    def test_create_with_all_fields(self):
+        """Test creating RetrievalResult with all fields."""
+        citation = Citation(document_id="doc1", filename="test.pdf")
+        result = RetrievalResult(
+            results=[],
+            citations=[citation],
+            context="test context",
+            strategy_used="rewritten",
+            original_query="original",
+            rewritten_query="enhanced",
+        )
+        assert len(result.citations) == 1
+        assert result.context == "test context"
