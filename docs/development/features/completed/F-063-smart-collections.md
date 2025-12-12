@@ -238,6 +238,3 @@ Smart collections enable powerful UI features:
 - [F-061: Auto-Tag Suggestions](./F-061-auto-tag-suggestions.md)
 - [F-062: Tag Library](./F-062-tag-library.md)
 
----
-
-**Status**: Completed

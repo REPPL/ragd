@@ -77,6 +77,3 @@ JSON-formatted logging with configurable levels and third-party suppression.
 - [F-111: Error Logging & Recovery](./F-111-error-logging-recovery.md)
 - [v0.9.5 Implementation](../../implementation/v0.9.5.md)
 
----
-
-**Status**: Completed

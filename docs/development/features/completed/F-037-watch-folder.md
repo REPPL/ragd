@@ -217,6 +217,3 @@ def should_index(path: str, patterns: list[str], excludes: list[str]) -> bool:
 - [F-001: Document Ingestion](./F-001-document-ingestion.md)
 - [UC-001: Index Documents](../../../use-cases/briefs/UC-001-index-documents.md)
 
----
-
-**Status**: Completed

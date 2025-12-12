@@ -78,6 +78,3 @@ ragd doctor --fix
 - [F-117: Self-Healing Index](./F-117-self-healing.md)
 - [v0.9.5 Implementation](../../implementation/v0.9.5.md)
 
----
-
-**Status**: Completed

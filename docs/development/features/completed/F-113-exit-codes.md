@@ -58,6 +58,3 @@ Define standard exit codes matching Unix conventions and common CLI tools.
 - [F-110: Structured Logging](./F-110-structured-logging.md)
 - [v0.9.5 Implementation](../../implementation/v0.9.5.md)
 
----
-
-**Status**: Completed

@@ -6,7 +6,6 @@
 **ADR**: [ADR-0028: PII Handling Architecture](../../decisions/adrs/0028-pii-handling-architecture.md)
 **Milestone**: v0.7.0
 **Priority**: P1
-**Status**: Completed
 
 ## Problem Statement
 
@@ -204,6 +203,3 @@ def redact_pii(text: str, entities: list[PIIEntity], redaction_char: str = "█"
 - [F-015: Database Encryption](./F-015-database-encryption.md) - Related privacy feature
 - [F-017: Secure Deletion](./F-017-secure-deletion.md) - For removing PII later
 
----
-
-**Status**: Completed

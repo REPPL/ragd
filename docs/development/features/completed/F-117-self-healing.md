@@ -62,6 +62,3 @@ ragd doctor --fix
 - [F-116: Index Integrity Checks](./F-116-index-integrity.md)
 - [v0.9.5 Implementation](../../implementation/v0.9.5.md)
 
----
-
-**Status**: Completed

@@ -70,13 +70,3 @@ Each issue includes:
 
 - v0.8.6 (Security Focus)
 
----
-
-## Related Documentation
-
-- [v0.8.7 Milestone](../../milestones/v0.8.7.md)
-- [F-091 Tutorial Suite](./F-091-tutorial-suite.md)
-
----
-
-**Status**: Completed

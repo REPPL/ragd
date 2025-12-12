@@ -93,6 +93,3 @@ app.add_typer(tag_app, name="tag")
 - [F-031: Tag Management](./F-031-tag-management.md)
 - [v0.3.0 Milestone](../../milestones/v0.3.0.md)
 
----
-
-**Status**: Completed

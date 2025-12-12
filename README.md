@@ -36,15 +36,15 @@ ragd is a reference implementation demonstrating best practices for:
 python3.12 -m venv ~/.ragd-env
 source ~/.ragd-env/bin/activate  # On Windows: .ragd-env\Scripts\activate
 
-# Downgrade pip (required due to bug in pip 24.2+)
-pip install pip==24.1.2
+# Downgrade pip (required due to bug in pip 24.1+)
+pip install pip==24.0
 
 # Install ragd (includes all runtime features)
 pip install ragd
 ```
 
-> **Note:** The pip downgrade is required due to a [bug in pip 24.2+](https://github.com/pypa/pip/issues)
-> that causes `InvalidVersion` errors when evaluating optional dependency markers.
+> **Note:** The pip downgrade is required due to a [breaking change in packaging 24.0](https://packaging.pypa.io/en/stable/changelog.html)
+> (bundled with pip 24.1+) that causes `InvalidVersion` errors when evaluating optional dependency markers.
 
 Then run the guided setup:
 
@@ -62,30 +62,9 @@ For CI pipelines or resource-constrained environments:
 RAGD_MINIMAL=1 pip install ragd
 ```
 
-#### System-Dependent Extras
+### Contributing
 
-Some features require system-level dependencies:
-
-```bash
-# Database encryption (requires SQLCipher)
-# macOS: brew install sqlcipher
-# Linux: apt install sqlcipher libsqlcipher-dev
-pip install 'ragd[encryption]'
-
-# FAISS vector store (alternative backend)
-pip install 'ragd[faiss]'
-```
-
-### Install from Source (for contributors)
-
-```bash
-git clone git@github.com:REPPL/ragd.git
-cd ragd
-python3.12 -m venv .venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-pip install pip==24.1.2    # Required: downgrade pip first (see note above)
-pip install -e ".[all]"    # Includes dev, test, and security tools
-```
+See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup instructions.
 
 ## Usage
 

@@ -102,6 +102,3 @@ Quality scores should be validated:
 - [F-101 Smart Chunking v2](../completed/F-101-smart-chunking-v2.md)
 - [v0.9.6 Milestone](../../milestones/v0.9.6.md)
 
----
-
-**Status**: Completed

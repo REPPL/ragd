@@ -107,6 +107,3 @@ Consider future i18n:
 - [F-111 Error Logging & Recovery](./F-111-error-logging-recovery.md)
 - [v0.9.6 Milestone](../../milestones/v0.9.6.md)
 
----
-
-**Status**: Completed

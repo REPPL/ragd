@@ -119,6 +119,3 @@ pq.write_table(table, "embeddings.parquet", compression="zstd")
 - [F-034: Archive Format](./F-034-archive-format.md)
 - [UC-006: Export & Backup](../../../use-cases/briefs/UC-006-export-backup.md)
 
----
-
-**Status**: Completed

@@ -161,6 +161,3 @@ def check_ollama() -> HealthCheck:
 - [State-of-the-Art Apple Silicon](../../research/state-of-the-art-apple-silicon.md)
 - [F-036: Guided Setup](./F-036-guided-setup.md)
 
----
-
-**Status**: Completed

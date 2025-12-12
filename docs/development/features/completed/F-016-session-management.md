@@ -6,7 +6,6 @@
 **ADR**: [ADR-0009: Security Architecture](../../decisions/adrs/0009-security-architecture.md)
 **Milestone**: v0.7.0
 **Priority**: P0
-**Status**: Completed
 
 ## Problem Statement
 
@@ -189,6 +188,3 @@ def protect_key(key: bytes) -> None:
 - [F-017: Secure Deletion](./F-017-secure-deletion.md)
 - [State-of-the-Art Privacy Research](../../research/state-of-the-art-privacy.md)
 
----
-
-**Status**: Completed

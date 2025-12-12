@@ -188,6 +188,3 @@ def tag_names(self) -> list[str]:
 - [F-031: Tag Management](../completed/F-031-tag-management.md) - Core tag operations
 - [F-061: Auto-Tag Suggestions](./F-061-auto-tag-suggestions.md) - Uses provenance
 
----
-
-**Status**: Completed

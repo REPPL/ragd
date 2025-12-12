@@ -122,6 +122,3 @@ results = collection.query(
 - [Dublin Core Wikipedia](https://en.wikipedia.org/wiki/Dublin_Core)
 - [F-030: Metadata Extraction](./F-030-metadata-extraction.md)
 
----
-
-**Status**: Completed

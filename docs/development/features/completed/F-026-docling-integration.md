@@ -99,6 +99,3 @@ for element in result.document.iterate_items():
 - [Docling GitHub](https://github.com/docling-project/docling)
 - [F-028: Table Extraction](./F-028-table-extraction.md)
 
----
-
-**Status**: Completed

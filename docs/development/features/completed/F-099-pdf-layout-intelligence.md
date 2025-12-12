@@ -52,6 +52,3 @@ pdf:
 - [F-025: PDF Quality Detection](./F-025-pdf-quality-detection.md)
 - [v0.9.6 Implementation](../../implementation/v0.9.6.md)
 
----
-
-**Status**: Completed

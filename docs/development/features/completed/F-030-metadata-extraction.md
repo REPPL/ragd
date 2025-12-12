@@ -128,6 +128,3 @@ metadata:
 - [KeyBERT GitHub](https://github.com/MaartenGr/KeyBERT)
 - [F-029: Metadata Storage](./F-029-metadata-storage.md)
 
----
-
-**Status**: Completed

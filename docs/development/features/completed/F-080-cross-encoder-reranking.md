@@ -58,6 +58,3 @@ Default to cross-encoder models from sentence-transformers:
 - [Search Syntax Reference](../../../reference/search-syntax.md)
 - [State-of-the-Art RAG](../../research/state-of-the-art-rag.md)
 
----
-
-**Status**: Completed

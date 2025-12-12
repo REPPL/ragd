@@ -6,7 +6,6 @@
 **ADR**: [ADR-0009: Security Architecture](../../decisions/adrs/0009-security-architecture.md)
 **Milestone**: v0.7.0
 **Priority**: P1
-**Status**: Completed
 
 ## Problem Statement
 
@@ -187,6 +186,3 @@ def purge_with_key_rotation(document_id: str, password: str):
 - [F-016: Session Management](./F-016-session-management.md)
 - [State-of-the-Art Privacy Research](../../research/state-of-the-art-privacy.md)
 
----
-
-**Status**: Completed

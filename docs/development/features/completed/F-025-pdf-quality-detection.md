@@ -84,6 +84,3 @@ else:
 - [F-026: Docling Integration](./F-026-docling-integration.md)
 - [F-027: OCR Pipeline](./F-027-ocr-pipeline.md)
 
----
-
-**Status**: Completed

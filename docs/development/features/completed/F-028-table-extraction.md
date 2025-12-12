@@ -109,6 +109,3 @@ def table_to_markdown(table):
 - [LangChain Table RAG Benchmark](https://blog.langchain.com/benchmarking-rag-on-tables/)
 - [F-026: Docling Integration](./F-026-docling-integration.md)
 
----
-
-**Status**: Completed

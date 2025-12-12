@@ -349,6 +349,3 @@ WEB_ARCHIVE_FIELDS = {
 - [F-001: Document Ingestion](./F-001-document-ingestion.md) - Base ingestion pipeline
 - [F-037: Watch Folder](./F-037-watch-folder.md) - Auto-indexing for archive folders
 
----
-
-**Status**: Completed

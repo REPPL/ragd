@@ -6,7 +6,6 @@
 **ADR**: [ADR-0009: Security Architecture](../../decisions/adrs/0009-security-architecture.md)
 **Milestone**: v0.7.0
 **Priority**: P0
-**Status**: Completed
 
 ## Problem Statement
 
@@ -156,6 +155,3 @@ security:
 - [ADR-0010: Vector Database Security](../../decisions/adrs/0010-vector-database-security.md)
 - [State-of-the-Art Privacy Research](../../research/state-of-the-art-privacy.md)
 
----
-
-**Status**: Completed

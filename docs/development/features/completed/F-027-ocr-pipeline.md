@@ -115,6 +115,3 @@ def process_with_ocr(image):
 - [OHRBench Paper](https://arxiv.org/abs/2412.02592)
 - [F-026: Docling Integration](./F-026-docling-integration.md)
 
----
-
-**Status**: Completed

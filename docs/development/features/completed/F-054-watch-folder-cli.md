@@ -100,6 +100,3 @@ Queue: 0 files pending
 - [F-037: Watch Folder Auto-Indexing](./F-037-watch-folder.md)
 - [v0.3.0 Milestone](../../milestones/v0.3.0.md)
 
----
-
-**Status**: Completed

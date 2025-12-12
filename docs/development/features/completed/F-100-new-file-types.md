@@ -89,6 +89,3 @@ class XLSXExtractor:
 - [F-002: Text Extraction](./F-002-text-extraction.md)
 - [v0.9.0 Implementation](../../implementation/v0.9.0.md)
 
----
-
-**Status**: Completed

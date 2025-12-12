@@ -106,6 +106,3 @@ Failed documents should be detectable by `ragd doctor` for later remediation att
 - [F-113 Exit Codes](../completed/F-113-exit-codes.md)
 - [v0.9.6 Milestone](../../milestones/v0.9.6.md)
 
----
-
-**Status**: Completed

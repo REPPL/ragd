@@ -62,13 +62,3 @@ def validate_path(path: Path, base_dir: Path | None = None) -> Path:
 
 - v0.8.5 (Knowledge Graph Foundation)
 
----
-
-## Related Documentation
-
-- [v0.8.6 Milestone](../../milestones/v0.8.6.md)
-- [ADR-0009 Security Architecture](../../decisions/adrs/0009-security-architecture.md)
-
----
-
-**Status**: Completed

@@ -87,6 +87,3 @@ class ConflictResolution(Enum):
 - [F-034: Archive Format](./F-034-archive-format.md)
 - [v0.3.0 Milestone](../../milestones/v0.3.0.md)
 
----
-
-**Status**: Completed

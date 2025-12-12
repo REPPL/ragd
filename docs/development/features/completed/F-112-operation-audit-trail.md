@@ -113,6 +113,3 @@ Audit log may contain file paths and search queries. Consider:
 - [F-113 Exit Codes](../completed/F-113-exit-codes.md)
 - [v0.9.6 Milestone](../../milestones/v0.9.6.md)
 
----
-
-**Status**: Completed

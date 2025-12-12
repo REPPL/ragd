@@ -63,13 +63,3 @@ llm:
 
 - v0.8.6 (Security Focus)
 
----
-
-## Related Documentation
-
-- [v0.8.7 Milestone](../../milestones/v0.8.7.md)
-- [F-092 Configuration Reference](./F-092-configuration-reference.md)
-
----
-
-**Status**: Completed

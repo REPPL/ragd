@@ -50,13 +50,3 @@ Even in debug mode, secrets must not appear in logs.
 - v0.8.5 (Knowledge Graph Foundation)
 - ADR-0013: Configuration Schema
 
----
-
-## Related Documentation
-
-- [v0.8.6 Milestone](../../milestones/v0.8.6.md)
-- [ADR-0013 Configuration Schema](../../decisions/adrs/0013-configuration-schema.md)
-
----
-
-**Status**: Completed

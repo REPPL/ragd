@@ -68,6 +68,3 @@ All configuration options documented in:
 - [Configuration Reference](../../../reference/configuration.md)
 - [v0.9.1 Implementation](../../implementation/v0.9.1.md)
 
----
-
-**Status**: Completed

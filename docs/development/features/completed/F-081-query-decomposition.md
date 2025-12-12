@@ -66,6 +66,3 @@ Results merged with provenance tracking.
 - [F-080: Cross-Encoder Reranking](./F-080-cross-encoder-reranking.md)
 - [Search Syntax Reference](../../../reference/search-syntax.md)
 
----
-
-**Status**: Completed

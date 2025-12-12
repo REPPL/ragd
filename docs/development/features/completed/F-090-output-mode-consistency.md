@@ -52,13 +52,3 @@ ragd search "query"  # Uses JSON
 
 - v0.8.6 (Security Focus)
 
----
-
-## Related Documentation
-
-- [v0.8.7 Milestone](../../milestones/v0.8.7.md)
-- [CLI Reference](../../../reference/)
-
----
-
-**Status**: Completed

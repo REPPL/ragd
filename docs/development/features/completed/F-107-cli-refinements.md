@@ -53,6 +53,3 @@ All existing commands continue to work as before.
 - [F-109: Index Statistics](./F-109-index-statistics.md)
 - [v0.9.1 Implementation](../../implementation/v0.9.1.md)
 
----
-
-**Status**: Completed

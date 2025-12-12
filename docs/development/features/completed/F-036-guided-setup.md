@@ -173,6 +173,3 @@ ragd init --defaults
 - [State-of-the-Art Apple Silicon](../../research/state-of-the-art-apple-silicon.md)
 - [F-035: Health Check](./F-035-health-check.md)
 
----
-
-**Status**: Completed

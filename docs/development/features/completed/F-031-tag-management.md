@@ -136,6 +136,3 @@ def validate_tag_name(name: str) -> str:
 - [F-029: Metadata Storage](./F-029-metadata-storage.md)
 - [UC-005: Manage Metadata](../../../use-cases/briefs/UC-005-manage-metadata.md)
 
----
-
-**Status**: Completed

@@ -93,6 +93,3 @@ LIGATURE_PATTERNS = [
 - [F-039: Advanced HTML Processing](./F-039-advanced-html-processing.md)
 - [v0.3.0 Milestone](../../milestones/v0.3.0.md)
 
----
-
-**Status**: Completed

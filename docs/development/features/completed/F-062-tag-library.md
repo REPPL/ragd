@@ -195,6 +195,3 @@ tagging:
 - [F-061: Auto-Tag Suggestions](./F-061-auto-tag-suggestions.md)
 - [F-063: Smart Collections](./F-063-smart-collections.md)
 
----
-
-**Status**: Completed

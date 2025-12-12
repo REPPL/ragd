@@ -49,12 +49,3 @@ Focus on high-risk areas:
 - v0.8.5 (Knowledge Graph Foundation)
 - pytest-cov installed
 
----
-
-## Related Documentation
-
-- [v0.8.6 Milestone](../../milestones/v0.8.6.md)
-
----
-
-**Status**: Completed

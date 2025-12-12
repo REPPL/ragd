@@ -102,6 +102,3 @@ Documents by Type
 - [F-107: CLI Refinements](./F-107-cli-refinements.md)
 - [v0.9.1 Implementation](../../implementation/v0.9.1.md)
 
----
-
-**Status**: Completed

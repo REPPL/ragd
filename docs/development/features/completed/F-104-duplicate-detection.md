@@ -110,6 +110,3 @@ class DuplicateHandler:
 - [F-103: Content Hashing](./F-103-content-hashing.md)
 - [v0.9.0 Implementation](../../implementation/v0.9.0.md)
 
----
-
-**Status**: Completed

@@ -48,13 +48,3 @@ Add security scanning to CI pipeline with failure on critical vulnerabilities.
 - v0.8.5 (Knowledge Graph Foundation)
 - pip-audit, bandit, safety installed
 
----
-
-## Related Documentation
-
-- [v0.8.6 Milestone](../../milestones/v0.8.6.md)
-- [pyproject.toml security extras](../../../pyproject.toml)
-
----
-
-**Status**: Completed

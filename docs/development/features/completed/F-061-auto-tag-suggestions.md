@@ -132,6 +132,3 @@ tagging:
 - [F-030: Metadata Extraction](../completed/F-030-metadata-extraction.md)
 - [F-062: Tag Library](./F-062-tag-library.md)
 
----
-
-**Status**: Completed

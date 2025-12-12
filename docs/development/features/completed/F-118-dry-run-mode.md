@@ -113,6 +113,3 @@ safety:
 - [F-114 CLI User Feedback](./F-114-cli-user-feedback.md)
 - [v0.9.6 Milestone](../../milestones/v0.9.6.md)
 
----
-
-**Status**: Completed

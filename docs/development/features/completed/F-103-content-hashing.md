@@ -93,6 +93,3 @@ class ContentHash:
 - [F-104: Duplicate Detection](./F-104-duplicate-detection.md)
 - [v0.9.0 Implementation](../../implementation/v0.9.0.md)
 
----
-
-**Status**: Completed

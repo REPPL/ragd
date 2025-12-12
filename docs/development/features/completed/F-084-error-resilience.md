@@ -59,13 +59,3 @@ When optional features fail, continue with reduced functionality rather than cra
 
 - v0.8.5 (Knowledge Graph Foundation)
 
----
-
-## Related Documentation
-
-- [v0.8.6 Milestone](../../milestones/v0.8.6.md)
-- [F-082 Security Hardening](./F-082-security-hardening.md)
-
----
-
-**Status**: Completed
