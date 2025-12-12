@@ -588,6 +588,7 @@ Storage (SQLite/PostgreSQL + ChromaDB)
 
 ## Related Documentation
 
+- [State-of-the-Art NER](./state-of-the-art-ner.md) - Named entity recognition for documents
 - [State-of-the-Art RAG](./state-of-the-art-rag.md) - Advanced retrieval techniques
 - [State-of-the-Art PDF Processing](./state-of-the-art-pdf-processing.md) - Document extraction
 - [Citation Systems Research](./citation-systems.md) - Citation formats and output
