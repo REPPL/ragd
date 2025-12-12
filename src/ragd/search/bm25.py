@@ -117,13 +117,15 @@ class BM25Index:
         query: str,
         limit: int = 10,
         document_filter: str | None = None,
+        document_ids: list[str] | None = None,
     ) -> list[BM25Result]:
         """Search using BM25 ranking.
 
         Args:
             query: Search query
             limit: Maximum results
-            document_filter: Optional document ID to filter by
+            document_filter: Optional single document ID to filter by (deprecated)
+            document_ids: Optional list of document IDs to filter by
 
         Returns:
             List of BM25Result ordered by relevance
@@ -136,7 +138,26 @@ class BM25Index:
         # Escape special FTS5 characters
         escaped_query = self._escape_query(query)
 
-        if document_filter:
+        # Handle document filtering (document_ids takes precedence)
+        if document_ids:
+            # Multiple document IDs - use IN clause
+            placeholders = ",".join("?" for _ in document_ids)
+            cursor.execute(
+                f"""
+                SELECT
+                    chunk_id,
+                    document_id,
+                    content,
+                    bm25({self.TABLE_NAME}) as score
+                FROM {self.TABLE_NAME}
+                WHERE {self.TABLE_NAME} MATCH ?
+                    AND document_id IN ({placeholders})
+                ORDER BY score
+                LIMIT ?
+                """,
+                (escaped_query, *document_ids, limit),
+            )
+        elif document_filter:
             cursor.execute(
                 f"""
                 SELECT

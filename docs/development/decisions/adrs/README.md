@@ -15,12 +15,13 @@ Lightweight documentation of significant technical decisions.
 | [0005](./0005-cli-design-principles.md) | CLI Design Principles | Accepted |
 | [0006](./0006-citation-system.md) | Citation System Architecture | Accepted |
 
-### Advanced Retrieval (v0.3)
+### Advanced Retrieval (v0.3+)
 
 | ADR | Title | Status |
 |-----|-------|--------|
 | [0007](./0007-advanced-retrieval-techniques.md) | Advanced Retrieval Techniques | Accepted |
 | [0008](./0008-evaluation-framework.md) | Evaluation Framework (RAGAS) | Accepted |
+| [0033](./0033-document-reference-resolution.md) | Document Reference Resolution Strategy | Accepted |
 
 ### Platform & Infrastructure (v0.2)
 

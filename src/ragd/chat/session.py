@@ -241,11 +241,18 @@ class ChatSession:
                 system_prompt, user_prompt, citations
             )
 
-    def _retrieve(self, query: str) -> list[HybridSearchResult]:
+    def _retrieve(
+        self,
+        query: str,
+        document_ids: list[str] | None = None,
+        document_boosts: dict[str, float] | None = None,
+    ) -> list[HybridSearchResult]:
         """Retrieve relevant context for a query.
 
         Args:
             query: Search query
+            document_ids: Optional list of document IDs to restrict search to
+            document_boosts: Optional dict mapping document_id to boost factor (0.0-1.0)
 
         Returns:
             List of search results
@@ -254,6 +261,8 @@ class ChatSession:
             query=query,
             limit=self.chat_config.search_limit * 2,  # Fetch extra for filtering
             mode=SearchMode.HYBRID,
+            document_ids=document_ids,
+            document_boosts=document_boosts,
         )
 
     def _retrieve_with_fallback(
@@ -264,6 +273,7 @@ class ChatSession:
         """Retrieve context with cascading fallback strategies.
 
         Tries multiple retrieval strategies in order:
+        0. Reference-based retrieval (filter for high confidence, boost for medium)
         1. Rewritten query with standard min_relevance
         2. Original query with standard min_relevance (if rewrite changed it)
         3. Original query with lowered min_relevance
@@ -280,38 +290,29 @@ class ChatSession:
         max_results = self.chat_config.search_limit
         min_relevance = self.chat_config.min_relevance
 
-        # Step 1: Try rewritten query with standard threshold
-        enhanced_query = self._rewrite_query_with_context(question)
-        results = self._retrieve(enhanced_query)
-        context, citations = build_context_from_results(
-            results,
-            max_tokens=max_tokens,
-            reserved_tokens=reserved_tokens,
-            max_results=max_results,
-            min_relevance=min_relevance,
-        )
+        # Step 0: Resolve document references for filtering/boosting
+        resolutions = self._resolve_references_for_retrieval(question)
 
-        if citations:
+        # Thresholds for reference-based retrieval
+        FAST_PATH_THRESHOLD = 0.9  # Direct filter for very high confidence
+        BOOST_THRESHOLD = 0.6      # Boost for medium confidence
+
+        # Separate high and medium confidence resolutions
+        high_confidence_refs = [r for r in resolutions if r.confidence >= FAST_PATH_THRESHOLD]
+        medium_confidence_refs = [r for r in resolutions if BOOST_THRESHOLD <= r.confidence < FAST_PATH_THRESHOLD]
+
+        # Step 0a: Fast-path direct filter for high-confidence references
+        if high_confidence_refs:
+            # Get unique document IDs from filename (document_id is typically the filename stem)
+            document_ids = list({r.matched_filename for r in high_confidence_refs})
             logger.debug(
-                "Retrieval succeeded with rewritten query: %d citations",
-                len(citations),
-            )
-            return RetrievalResult(
-                results=results,
-                citations=citations,
-                context=context,
-                strategy_used="rewritten",
-                original_query=question,
-                rewritten_query=enhanced_query if enhanced_query != question else None,
+                "Fast-path: filtering to %d documents with confidence >= %.2f: %s",
+                len(document_ids),
+                FAST_PATH_THRESHOLD,
+                document_ids,
             )
 
-        # Step 2: Try original query (if different from rewritten)
-        if (
-            enhanced_query != question
-            and self.chat_config.enable_fallback_retrieval
-        ):
-            logger.debug("Fallback: trying original query '%s'", question)
-            results = self._retrieve(question)
+            results = self._retrieve(question, document_ids=document_ids)
             context, citations = build_context_from_results(
                 results,
                 max_tokens=max_tokens,
@@ -322,14 +323,90 @@ class ChatSession:
 
             if citations:
                 logger.debug(
-                    "Retrieval succeeded with original query: %d citations",
+                    "Fast-path retrieval succeeded: %d citations",
                     len(citations),
                 )
                 return RetrievalResult(
                     results=results,
                     citations=citations,
                     context=context,
-                    strategy_used="original",
+                    strategy_used="reference_filter",
+                    original_query=question,
+                    rewritten_query=None,
+                )
+            else:
+                logger.debug("Fast-path filter returned no results, falling back")
+
+        # Step 0b: Boost path for medium-confidence references
+        document_boosts: dict[str, float] | None = None
+        if medium_confidence_refs or high_confidence_refs:
+            # Build boost dict from all resolutions with confidence >= BOOST_THRESHOLD
+            all_boost_refs = [r for r in resolutions if r.confidence >= BOOST_THRESHOLD]
+            if all_boost_refs:
+                document_boosts = {
+                    r.matched_filename: r.confidence
+                    for r in all_boost_refs
+                }
+                logger.debug(
+                    "Boost path: boosting %d documents: %s",
+                    len(document_boosts),
+                    list(document_boosts.keys()),
+                )
+
+        # Step 1: Try rewritten query with standard threshold (with optional boosting)
+        enhanced_query = self._rewrite_query_with_context(question)
+        results = self._retrieve(enhanced_query, document_boosts=document_boosts)
+        context, citations = build_context_from_results(
+            results,
+            max_tokens=max_tokens,
+            reserved_tokens=reserved_tokens,
+            max_results=max_results,
+            min_relevance=min_relevance,
+        )
+
+        if citations:
+            strategy = "rewritten_boosted" if document_boosts else "rewritten"
+            logger.debug(
+                "Retrieval succeeded with %s query: %d citations",
+                strategy,
+                len(citations),
+            )
+            return RetrievalResult(
+                results=results,
+                citations=citations,
+                context=context,
+                strategy_used=strategy,
+                original_query=question,
+                rewritten_query=enhanced_query if enhanced_query != question else None,
+            )
+
+        # Step 2: Try original query (if different from rewritten)
+        if (
+            enhanced_query != question
+            and self.chat_config.enable_fallback_retrieval
+        ):
+            logger.debug("Fallback: trying original query '%s'", question)
+            results = self._retrieve(question, document_boosts=document_boosts)
+            context, citations = build_context_from_results(
+                results,
+                max_tokens=max_tokens,
+                reserved_tokens=reserved_tokens,
+                max_results=max_results,
+                min_relevance=min_relevance,
+            )
+
+            if citations:
+                strategy = "original_boosted" if document_boosts else "original"
+                logger.debug(
+                    "Retrieval succeeded with %s query: %d citations",
+                    strategy,
+                    len(citations),
+                )
+                return RetrievalResult(
+                    results=results,
+                    citations=citations,
+                    context=context,
+                    strategy_used=strategy,
                     original_query=question,
                     rewritten_query=enhanced_query,
                 )
@@ -466,17 +543,7 @@ class ChatSession:
         Returns:
             Formatted string of resolved references, or "None"
         """
-        from ragd.chat.reference_resolver import resolve_document_references
-
-        # Get full Citation objects (not just filenames) for metadata
-        recent_citations = self._history.get_recent_citations(
-            n=self.chat_config.rewrite_history_turns
-        )
-
-        if not recent_citations:
-            return "None"
-
-        resolutions = resolve_document_references(question, recent_citations)
+        resolutions = self._resolve_references_for_retrieval(question)
 
         if not resolutions:
             return "None"
@@ -487,6 +554,35 @@ class ChatSession:
             for r in resolutions
             if r.original_text  # Skip token-match-only results
         ) or "None"
+
+    def _resolve_references_for_retrieval(
+        self, question: str
+    ) -> list["ResolvedReference"]:
+        """Resolve document references for retrieval filtering/boosting.
+
+        Returns raw ResolvedReference objects for use in retrieval,
+        unlike _resolve_document_references which returns formatted strings.
+
+        Args:
+            question: User's question
+
+        Returns:
+            List of ResolvedReference objects with confidence scores
+        """
+        from ragd.chat.reference_resolver import (
+            ResolvedReference,
+            resolve_document_references,
+        )
+
+        # Get full Citation objects (not just filenames) for metadata
+        recent_citations = self._history.get_recent_citations(
+            n=self.chat_config.rewrite_history_turns
+        )
+
+        if not recent_citations:
+            return []
+
+        return resolve_document_references(question, recent_citations)
 
     def _generate_response(
         self,

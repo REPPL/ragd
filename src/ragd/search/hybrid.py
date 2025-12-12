@@ -150,6 +150,8 @@ class HybridSearcher:
         semantic_weight: float | None = None,
         keyword_weight: float | None = None,
         rrf_k: int | None = None,
+        document_ids: list[str] | None = None,
+        document_boosts: dict[str, float] | None = None,
     ) -> list[HybridSearchResult]:
         """Perform search based on mode.
 
@@ -162,6 +164,9 @@ class HybridSearcher:
             semantic_weight: Override semantic weight (0-1)
             keyword_weight: Override keyword weight (0-1)
             rrf_k: Override RRF k constant
+            document_ids: Optional list of document IDs to restrict search to
+            document_boosts: Optional dict mapping document_id to boost factor (0.0-1.0).
+                Results from boosted documents get score multiplied by (1 + 0.5 * boost).
 
         Returns:
             List of HybridSearchResult sorted by relevance
@@ -175,12 +180,13 @@ class HybridSearcher:
         k = rrf_k if rrf_k is not None else 60
 
         if mode == SearchMode.SEMANTIC:
-            return self._semantic_search(query, limit, min_score, filters)
+            return self._semantic_search(query, limit, min_score, filters, document_ids)
         elif mode == SearchMode.KEYWORD:
-            return self._keyword_search(query, limit, min_score)
+            return self._keyword_search(query, limit, min_score, document_ids)
         else:
             return self._hybrid_search(
-                query, limit, min_score, filters, sem_weight, kw_weight, k
+                query, limit, min_score, filters, sem_weight, kw_weight, k,
+                document_ids, document_boosts
             )
 
     def _semantic_search(
@@ -189,6 +195,7 @@ class HybridSearcher:
         limit: int,
         min_score: float,
         filters: dict[str, Any] | None,
+        document_ids: list[str] | None = None,
     ) -> list[HybridSearchResult]:
         """Perform pure semantic search.
 
@@ -197,6 +204,7 @@ class HybridSearcher:
             limit: Maximum results
             min_score: Minimum score filter
             filters: Optional metadata filters
+            document_ids: Optional list of document IDs to restrict search to
 
         Returns:
             List of results from semantic search only
@@ -204,11 +212,16 @@ class HybridSearcher:
         # Generate query embedding
         query_embedding = self._embedder.embed_single(query)
 
+        # Merge document_ids filter with existing filters
+        effective_filters = filters.copy() if filters else {}
+        if document_ids:
+            effective_filters["document_id"] = {"$in": document_ids}
+
         # Search vector store (returns VectorSearchResult or dict depending on backend)
         raw_results = self._vector_store.search(
             query_embedding=query_embedding,
             limit=limit,
-            where=filters,
+            where=effective_filters if effective_filters else None,
         )
 
         results = []
@@ -261,6 +274,7 @@ class HybridSearcher:
         query: str,
         limit: int,
         min_score: float,
+        document_ids: list[str] | None = None,
     ) -> list[HybridSearchResult]:
         """Perform pure keyword (BM25) search.
 
@@ -268,11 +282,12 @@ class HybridSearcher:
             query: Search query
             limit: Maximum results
             min_score: Minimum score filter
+            document_ids: Optional list of document IDs to restrict search to
 
         Returns:
             List of results from keyword search only
         """
-        bm25_results = self._bm25.search(query, limit=limit)
+        bm25_results = self._bm25.search(query, limit=limit, document_ids=document_ids)
 
         results = []
         for bm25_res in bm25_results:
@@ -310,6 +325,8 @@ class HybridSearcher:
         semantic_weight: float,
         keyword_weight: float,
         rrf_k: int,
+        document_ids: list[str] | None = None,
+        document_boosts: dict[str, float] | None = None,
     ) -> list[HybridSearchResult]:
         """Perform hybrid search combining semantic and keyword.
 
@@ -321,6 +338,9 @@ class HybridSearcher:
             semantic_weight: Weight for semantic results
             keyword_weight: Weight for keyword results
             rrf_k: RRF k constant
+            document_ids: Optional list of document IDs to restrict search to
+            document_boosts: Optional dict mapping document_id to boost factor (0.0-1.0).
+                Results from boosted documents get score multiplied by (1 + 0.5 * boost).
 
         Returns:
             List of results combined using RRF
@@ -328,16 +348,21 @@ class HybridSearcher:
         # Fetch more results for fusion (we'll trim later)
         fetch_limit = limit * 3
 
+        # Merge document_ids filter with existing filters for semantic search
+        effective_filters = filters.copy() if filters else {}
+        if document_ids:
+            effective_filters["document_id"] = {"$in": document_ids}
+
         # Get semantic results
         query_embedding = self._embedder.embed_single(query)
         semantic_raw = self._vector_store.search(
             query_embedding=query_embedding,
             limit=fetch_limit,
-            where=filters,
+            where=effective_filters if effective_filters else None,
         )
 
-        # Get keyword results
-        keyword_raw = self._bm25.search(query, limit=fetch_limit)
+        # Get keyword results (with document filtering)
+        keyword_raw = self._bm25.search(query, limit=fetch_limit, document_ids=document_ids)
 
         # Build rankings for RRF
         semantic_ranking: list[tuple[str, float]] = []
@@ -435,6 +460,8 @@ class HybridSearcher:
                 char_end=metadata.get("end_char"),
             ) if metadata else None
 
+            doc_id = metadata.get("document_id", "") or (kw_data.document_id if kw_data else "")
+
             results.append(
                 HybridSearchResult(
                     content=content,
@@ -444,7 +471,7 @@ class HybridSearcher:
                     semantic_rank=sem_rank,
                     keyword_rank=kw_rank,
                     rrf_score=rrf_score,
-                    document_id=metadata.get("document_id", "") or (kw_data.document_id if kw_data else ""),
+                    document_id=doc_id,
                     document_name=metadata.get("filename", ""),
                     chunk_id=chunk_id,
                     chunk_index=metadata.get("chunk_index", 0),
@@ -452,6 +479,20 @@ class HybridSearcher:
                     location=location,
                 )
             )
+
+        # Apply document boosts if provided
+        if document_boosts:
+            for result in results:
+                boost_factor = document_boosts.get(result.document_id, 0.0)
+                if boost_factor > 0:
+                    # Apply boost: score * (1 + 0.5 * boost_factor)
+                    # boost_factor of 1.0 gives 50% increase
+                    multiplier = 1.0 + 0.5 * boost_factor
+                    result.combined_score *= multiplier
+                    result.rrf_score *= multiplier
+
+            # Re-sort by boosted combined_score
+            results.sort(key=lambda r: r.combined_score, reverse=True)
 
         return results
 

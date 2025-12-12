@@ -325,6 +325,42 @@ def test_bm25_document_filter(temp_db: Path) -> None:
         assert all(r.document_id == "doc1" for r in results)
 
 
+def test_bm25_document_ids_filter(temp_db: Path) -> None:
+    """Test BM25 search with multiple document IDs filter."""
+    with BM25Index(temp_db) as index:
+        index.add_chunks("doc1", [("doc1_chunk_0", "Python programming language.")])
+        index.add_chunks("doc2", [("doc2_chunk_0", "Python snake species.")])
+        index.add_chunks("doc3", [("doc3_chunk_0", "Python web framework.")])
+
+        # Search only in doc1 and doc3
+        results = index.search("Python", limit=10, document_ids=["doc1", "doc3"])
+        assert len(results) == 2
+        doc_ids = {r.document_id for r in results}
+        assert doc_ids == {"doc1", "doc3"}
+        assert "doc2" not in doc_ids
+
+
+def test_bm25_document_ids_empty_list(temp_db: Path) -> None:
+    """Test BM25 search with empty document IDs returns all."""
+    with BM25Index(temp_db) as index:
+        index.add_chunks("doc1", [("doc1_chunk_0", "Python programming.")])
+        index.add_chunks("doc2", [("doc2_chunk_0", "Python snakes.")])
+
+        # Empty list should not filter
+        results = index.search("Python", limit=10, document_ids=[])
+        # Empty list is falsy, so no filter applied
+        assert len(results) == 2
+
+
+def test_bm25_document_ids_no_match(temp_db: Path) -> None:
+    """Test BM25 search with non-matching document IDs."""
+    with BM25Index(temp_db) as index:
+        index.add_chunks("doc1", [("doc1_chunk_0", "Python programming.")])
+
+        results = index.search("Python", limit=10, document_ids=["nonexistent"])
+        assert len(results) == 0
+
+
 def test_bm25_ranking_order(temp_db: Path) -> None:
     """Test BM25 returns results in relevance order."""
     with BM25Index(temp_db) as index:
