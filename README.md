@@ -13,6 +13,8 @@
 
 `ragd` is a local RAG *(Retrieval-Augmented Generation)* system that lets you ask questions about your documents and get accurate answers with citations -- all while keeping your data completely private and local.
 
+![Getting Started with ragd](docs/assets/img/getting-started-comic1.png)
+
 ## Overview
 
 ragd is a reference implementation demonstrating best practices for:
@@ -34,15 +36,44 @@ ragd is a reference implementation demonstrating best practices for:
 python3.12 -m venv ~/.ragd-env
 source ~/.ragd-env/bin/activate  # On Windows: .ragd-env\Scripts\activate
 
-# Install ragd
+# Downgrade pip (required due to bug in pip 24.2+)
+pip install pip==24.1.2
+
+# Install ragd (includes all runtime features)
 pip install ragd
 ```
+
+> **Note:** The pip downgrade is required due to a [bug in pip 24.2+](https://github.com/pypa/pip/issues)
+> that causes `InvalidVersion` errors when evaluating optional dependency markers.
 
 Then run the guided setup:
 
 ```bash
 ragd init     # Detects hardware, recommends models
-ragd doctor   # Verify installation
+ragd doctor   # Verify installation and show feature status
+```
+
+#### Expert Installation (Minimal)
+
+For CI pipelines or resource-constrained environments:
+
+```bash
+# Install core features only (smaller footprint)
+RAGD_MINIMAL=1 pip install ragd
+```
+
+#### System-Dependent Extras
+
+Some features require system-level dependencies:
+
+```bash
+# Database encryption (requires SQLCipher)
+# macOS: brew install sqlcipher
+# Linux: apt install sqlcipher libsqlcipher-dev
+pip install 'ragd[encryption]'
+
+# FAISS vector store (alternative backend)
+pip install 'ragd[faiss]'
 ```
 
 ### Install from Source (for contributors)
@@ -52,7 +83,8 @@ git clone git@github.com:REPPL/ragd.git
 cd ragd
 python3.12 -m venv .venv
 source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-pip install -e ".[dev]"
+pip install pip==24.1.2    # Required: downgrade pip first (see note above)
+pip install -e ".[all]"    # Includes dev, test, and security tools
 ```
 
 ## Usage
