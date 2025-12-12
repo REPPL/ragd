@@ -3,7 +3,7 @@
 ## Overview
 
 **Research**: [State-of-the-Art NER Indexing](../../research/state-of-the-art-ner-indexing.md)
-**Milestone**: v0.4 or v0.5
+**Milestone**: [v1.1.0](../../milestones/v1.1.0.md)
 **Priority**: P1 (High)
 
 ## Problem Statement

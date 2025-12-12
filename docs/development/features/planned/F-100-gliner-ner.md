@@ -4,7 +4,7 @@
 
 **Research**: [State-of-the-Art NER](../../research/state-of-the-art-ner.md)
 **ADR**: [ADR-0034: GLiNER Zero-Shot NER](../../decisions/adrs/0034-gliner-zero-shot-ner.md)
-**Milestone**: TBD (v0.4 or v0.5)
+**Milestone**: [v1.1.0](../../milestones/v1.1.0.md)
 **Priority**: P2
 
 ## Problem Statement

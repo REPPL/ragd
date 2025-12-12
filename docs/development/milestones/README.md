@@ -37,11 +37,13 @@ Release planning and milestone tracking.
 
 | Version | Name | Focus | Features |
 |---------|------|-------|----------|
-| [v1.0.0](./v1.0.0.md) | Performance & Polish | Production ready | F-123 to F-127 |
-| [v1.1.0](./v1.1.0.md) | Graph & Automation | Knowledge graph CLI, scripting | F-128 to F-132 |
-| [v1.5.0](./v1.5.0.md) | API & Onboarding | REST API, guided setup | F-133 to F-137 |
-| [v1.6.0](./v1.6.0.md) | Automation & Fine-Tuning | Workflows, scripting, local training | F-058, F-201, F-206, F-207 |
-| [v1.8.0](./v1.8.0.md) | WebUI Foundation | Basic web interface | F-024, F-138 to F-141 |
+| [v1.0.0](./v1.0.0.md) | Performance & Polish | Production ready | F-119, F-057, F-075, F-123-127 |
+| [v1.1.0](./v1.1.0.md) | Knowledge Graph & NER | Entity extraction, graph CLI | F-100-102, F-128-132 |
+| [v1.2.0](./v1.2.0.md) | Onboarding | Guided first-run experience | F-134 |
+| [v1.3.0](./v1.3.0.md) | API | REST API, authentication, webhooks | F-133, F-135-137 |
+| [v1.4.0](./v1.4.0.md) | Automation | Workflow scripting | F-201, F-206, F-207 |
+| [v1.5.0](./v1.5.0.md) | WebUI Foundation | Basic web interface | F-024, F-138-141 |
+| [v1.6.0](./v1.6.0.md) | Fine-Tuning | Local model training | F-058 |
 
 ### Future Vision (v2.x+)
 

@@ -3,7 +3,7 @@
 ## Overview
 
 **Research**: [State-of-the-Art NER](../../research/state-of-the-art-ner.md)
-**Milestone**: TBD (v0.4 or v0.5)
+**Milestone**: [v1.1.0](../../milestones/v1.1.0.md)
 **Priority**: P2
 
 ## Problem Statement
