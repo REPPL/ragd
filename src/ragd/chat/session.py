@@ -10,24 +10,23 @@ import uuid
 
 logger = logging.getLogger(__name__)
 from collections.abc import Iterator
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from ragd.citation import ValidationReport
 
 from ragd.chat.context import (
-    ContextWindow,
     build_context_from_results,
     calculate_token_budget,
 )
 from ragd.chat.history import ChatHistory, get_history_path, save_history
-from ragd.chat.message import ChatMessage, ChatRole, CitedAnswer
+from ragd.chat.message import CitedAnswer
 from ragd.chat.prompts import PromptTemplate, get_prompt_template
 from ragd.citation import Citation
 from ragd.config import RagdConfig, load_config
-from ragd.llm import LLMResponse, OllamaClient, OllamaError, StreamChunk
+from ragd.llm import OllamaClient, OllamaError
 from ragd.search.hybrid import HybridSearcher, HybridSearchResult, SearchMode
 
 
@@ -96,7 +95,7 @@ class ChatConfig:
     max_tokens: int = 1024
     context_window: int | None = None  # None = auto-detect from model card
     history_turns: int = 5
-    search_limit: int = 5
+    search_limit: int = 15
     auto_save: bool = True
     min_relevance: float = 0.55  # Raised from 0.3 to reduce hallucination
     history_budget_ratio: float = 0.3
@@ -557,7 +556,7 @@ class ChatSession:
 
     def _resolve_references_for_retrieval(
         self, question: str
-    ) -> list["ResolvedReference"]:
+    ) -> list[ResolvedReference]:
         """Resolve document references for retrieval filtering/boosting.
 
         Returns raw ResolvedReference objects for use in retrieval,
@@ -570,7 +569,6 @@ class ChatSession:
             List of ResolvedReference objects with confidence scores
         """
         from ragd.chat.reference_resolver import (
-            ResolvedReference,
             resolve_document_references,
         )
 
@@ -742,7 +740,7 @@ class ChatSession:
         self,
         response_text: str,
         citations: list[Citation],
-    ) -> "ValidationReport":
+    ) -> ValidationReport:
         """Validate citations in a response.
 
         Uses keyword overlap to check if cited documents contain

@@ -257,7 +257,7 @@ class TestEvaluationConfig:
         assert MetricType.CONTEXT_PRECISION in config.metrics
         assert MetricType.RELEVANCE_SCORE in config.metrics
         assert config.relevance_threshold == 0.5
-        assert config.search_limit == 5
+        assert config.search_limit == 15
         assert config.include_llm_metrics is False
 
     def test_custom_config(self):

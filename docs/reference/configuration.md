@@ -136,7 +136,7 @@ Chat session configuration.
 | `max_tokens` | int | 1024 | Maximum tokens in response |
 | `context_window` | int | 4096 | Context window size |
 | `history_turns` | int | 5 | Conversation turns to keep |
-| `search_limit` | int | 5 | Documents to retrieve per query |
+| `search_limit` | int | 15 | Documents to retrieve per query |
 | `auto_save` | bool | true | Auto-save conversation |
 | `default_cite_mode` | string | `numbered` | Citation style: `numbered`, `none`, `inline` |
 

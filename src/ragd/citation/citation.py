@@ -56,6 +56,9 @@ class Citation:
     relevance_score: float | None = None
     content_preview: str | None = None
 
+    # Deduplication
+    content_hash: str | None = None  # For content-based deduplication
+
     # Additional metadata
     extra: dict[str, Any] = field(default_factory=dict)
 
@@ -64,7 +67,7 @@ class Citation:
         cls,
         result: Any,  # SearchResult or HybridSearchResult
         accessed_date: date | None = None,
-    ) -> "Citation":
+    ) -> Citation:
         """Create Citation from a search result.
 
         Args:
@@ -123,6 +126,7 @@ class Citation:
             accessed_date=accessed_date or date.today(),
             relevance_score=score,
             content_preview=_truncate(getattr(result, "content", ""), 200),
+            content_hash=metadata.get("content_hash"),
             extra=metadata,
         )
 

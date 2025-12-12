@@ -14,11 +14,11 @@ from ragd.config import RagdConfig, load_config
 from ragd.evaluation.metrics import (
     EvaluationMetrics,
     MetricType,
+    compute_answer_relevancy,
     compute_context_precision,
     compute_context_recall,
-    compute_relevance_score,
     compute_faithfulness,
-    compute_answer_relevancy,
+    compute_relevance_score,
 )
 from ragd.search.hybrid import HybridSearcher, SearchMode
 
@@ -41,7 +41,7 @@ class EvaluationConfig:
         ]
     )
     relevance_threshold: float = 0.5
-    search_limit: int = 5
+    search_limit: int = 15
     include_llm_metrics: bool = False
 
     def __post_init__(self) -> None:
@@ -92,7 +92,7 @@ class EvaluationResult:
         }
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> "EvaluationResult":
+    def from_dict(cls, data: dict[str, Any]) -> EvaluationResult:
         """Create from dictionary."""
         return cls(
             query=data["query"],

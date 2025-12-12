@@ -6,8 +6,6 @@ ASCII art banners and standardised formatting for a clean, professional CLI.
 from __future__ import annotations
 
 from rich.console import Console
-from rich.panel import Panel
-from rich.text import Text
 
 
 # Status indicators (ASCII-only)
@@ -83,27 +81,6 @@ def print_init_header(console: Console) -> None:
     console.print()
 
 
-def print_doctor_header(console: Console, status: str) -> None:
-    """Print the doctor command header.
-
-    Args:
-        console: Rich console instance
-        status: Overall health status (HEALTHY, DEGRADED, UNHEALTHY)
-    """
-    status_colour = {
-        "HEALTHY": "green",
-        "DEGRADED": "yellow",
-        "UNHEALTHY": "red",
-    }.get(status.upper(), "dim")
-
-    width = 60
-    border = "+" + "-" * (width - 2) + "+"
-
-    console.print(f"+-- System Health " + "-" * (width - 19) + "+")
-    console.print(f"|  Overall: [{status_colour}]{status.upper()}[/{status_colour}]" + " " * (width - 14 - len(status)) + "|")
-    console.print(border)
-
-
 def print_search_header(console: Console, query: str, result_count: int) -> None:
     """Print the search command header.
 
@@ -167,7 +144,7 @@ def print_dependency_error(
     empty = "|" + " " * (width - 2) + "|"
 
     console.print()
-    console.print(f"+-- [red]Missing Optional Dependency[/red] " + "-" * (width - 34) + "+")
+    console.print("+-- [red]Missing Optional Dependency[/red] " + "-" * (width - 34) + "+")
     console.print(empty)
     console.print(f"|  The '{feature}' feature is required for this operation." + " " * (width - 53 - len(feature)) + "|")
     console.print(empty)

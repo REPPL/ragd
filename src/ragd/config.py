@@ -160,6 +160,15 @@ class DeletionConfig(BaseModel):
     audit_log: bool = True
 
 
+class MemoryConfig(BaseModel):
+    """Memory optimisation configuration (F-124)."""
+
+    max_peak_mb: int = 2048  # Warn if exceeded
+    streaming_threshold_mb: int = 100  # Use streaming above this
+    embedding_batch_size: int = 32  # Batch size for embeddings
+    gc_frequency: str = "per_document"  # per_document | per_batch | manual
+
+
 class SecurityConfig(BaseModel):
     """Security configuration (v0.7)."""
 
@@ -240,7 +249,7 @@ class ChatConfig(BaseModel):
     max_tokens: int = 1024
     context_window: int | None = None  # None = auto-detect from model card
     history_turns: int = 5
-    search_limit: int = 5
+    search_limit: int = 15
     auto_save: bool = True
     default_cite_mode: str = "numbered"  # numbered, none, inline
     min_relevance: float = 0.55  # Minimum relevance score (raised to reduce hallucination)
@@ -278,6 +287,7 @@ class RagdConfig(BaseModel):
     metadata: MetadataConfig = Field(default_factory=MetadataConfig)
     multi_modal: MultiModalConfig = Field(default_factory=MultiModalConfig)
     security: SecurityConfig = Field(default_factory=SecurityConfig)
+    memory: MemoryConfig = Field(default_factory=MemoryConfig)
     chat: ChatConfig = Field(default_factory=ChatConfig)
     display: DisplayConfig = Field(default_factory=DisplayConfig)
     model_discovery: ModelDiscoveryConfig = Field(default_factory=ModelDiscoveryConfig)

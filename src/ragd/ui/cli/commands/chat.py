@@ -13,7 +13,11 @@ from rich.progress import (
 )
 
 from ragd.ui import OutputFormat
-from ragd.ui.cli.utils import get_console, format_citation_location, StreamingWordWrapper
+from ragd.ui.cli.utils import (
+    StreamingWordWrapper,
+    format_citation_location,
+    get_console,
+)
 
 
 def ask_command(
@@ -34,9 +38,14 @@ def ask_command(
 
     Retrieves relevant documents and generates an answer using Ollama.
     """
-    from ragd.chat import ChatSession, ChatConfig, check_chat_available
-    from ragd.chat import AgenticRAG, AgenticConfig
-    from ragd.config import load_config, config_exists
+    from ragd.chat import (
+        AgenticConfig,
+        AgenticRAG,
+        ChatConfig,
+        ChatSession,
+        check_chat_available,
+    )
+    from ragd.config import config_exists, load_config
     from ragd.ui.cli.commands.core import init_command
 
     # Auto-init if config doesn't exist
@@ -74,7 +83,7 @@ def ask_command(
         con.print(f"[dim]Model: {model_name}[/dim]")
         if use_agentic:
             con.print("[dim]Agentic mode: enabled (CRAG + Self-RAG)[/dim]")
-        con.print(f"[dim]Retrieving context...[/dim]\n")
+        con.print("[dim]Retrieving context...[/dim]\n")
 
     try:
         if use_agentic:
@@ -206,8 +215,8 @@ def chat_command(
 
     Multi-turn conversation with your knowledge base.
     """
-    from ragd.chat import ChatSession, ChatConfig, check_chat_available
-    from ragd.config import load_config, config_exists
+    from ragd.chat import ChatConfig, ChatSession, check_chat_available
+    from ragd.config import config_exists, load_config
     from ragd.ui.cli.commands.core import init_command
 
     # Auto-init if config doesn't exist
@@ -276,7 +285,7 @@ def chat_command(
                 break
             elif user_input.lower() == "/help":
                 con.print("\n[bold]Commands:[/bold]")
-                con.print("  /search <query> [-n N]  - Search documents (default 5 results)")
+                con.print("  /search <query> [-n N]  - Search documents (default 15 results)")
                 con.print("  /exit, /quit, /q        - Exit chat")
                 con.print("  /clear                  - Clear conversation history")
                 con.print("  /history                - Show conversation history")
@@ -308,7 +317,7 @@ def chat_command(
                     continue
 
                 # Parse optional limit argument
-                search_limit = 5  # Default
+                search_limit = 15  # Default
                 import re
                 limit_match = re.search(r'(?:-n|--limit)\s+(\d+)', search_text)
                 if limit_match:
@@ -328,7 +337,8 @@ def chat_command(
                 con.print(f"\n[dim]Searching for: {search_text} (limit: {search_limit})[/dim]\n")
 
                 try:
-                    from ragd.search import hybrid_search, SearchMode
+                    from collections import OrderedDict
+                    from ragd.search import SearchMode, hybrid_search
 
                     results = hybrid_search(
                         search_text,
@@ -340,14 +350,36 @@ def chat_command(
                     if not results:
                         con.print("[yellow]No results found.[/yellow]\n")
                     else:
+                        # Group results by document (using content_hash for dedup)
+                        doc_results: OrderedDict[str, list] = OrderedDict()
+                        for result in results:
+                            doc_key = (
+                                result.metadata.get("content_hash")
+                                or result.document_id
+                                or result.document_name
+                                or "Unknown"
+                            )
+                            if doc_key not in doc_results:
+                                doc_results[doc_key] = []
+                            doc_results[doc_key].append(result)
+
                         con.print("[bold]Results:[/bold]")
-                        for i, result in enumerate(results, 1):
-                            score = f"{result.combined_score:.2f}"
-                            doc = result.document_name or "Unknown"
-                            preview = result.content[:80].replace("\n", " ")
-                            if len(result.content) > 80:
+                        for i, (doc_key, chunks) in enumerate(doc_results.items(), 1):
+                            best_score = max(c.combined_score for c in chunks)
+                            chunk_count = len(chunks)
+                            display_name = chunks[0].document_name or doc_key
+
+                            # Show document with best score and chunk count
+                            if chunk_count > 1:
+                                con.print(f"  [{i}] {display_name} (score: {best_score:.2f}, {chunk_count} chunks)")
+                            else:
+                                con.print(f"  [{i}] {display_name} (score: {best_score:.2f})")
+
+                            # Show preview from highest-scoring chunk
+                            best_chunk = max(chunks, key=lambda c: c.combined_score)
+                            preview = best_chunk.content[:80].replace("\n", " ")
+                            if len(best_chunk.content) > 80:
                                 preview += "..."
-                            con.print(f"  [{i}] {doc} (score: {score})")
                             con.print(f"      [dim]{preview}[/dim]")
                         con.print()
                 except Exception as e:
@@ -412,7 +444,129 @@ def chat_command(
         con.print("[dim]Chat session saved.[/dim]")
 
 
+def compare_command(
+    question: str,
+    models: str | None = None,
+    judge: str | None = None,
+    ensemble: bool = False,
+    limit: int = 5,
+    temperature: float = 0.7,
+    verbose: bool = False,
+    no_color: bool = False,
+) -> None:
+    """Compare outputs from multiple LLM models.
+
+    Query multiple models with the same context and compare responses
+    side-by-side, with optional judge evaluation or ensemble voting.
+    """
+    from ragd.config import config_exists, load_config
+    from ragd.llm.comparator import ModelComparator, get_available_models
+    from ragd.search import SearchMode, hybrid_search
+    from ragd.ui.cli.commands.core import init_command
+    from ragd.ui.formatters.comparison import print_comparison
+
+    # Auto-init if config doesn't exist
+    if not config_exists():
+        con = get_console(no_color)
+        con.print("[yellow]ragd not initialised. Running first-time setup...[/yellow]\n")
+        init_command(no_color=no_color)
+        con.print()
+
+    config = load_config()
+    con = get_console(no_color, max_width=config.display.max_width)
+
+    # Get available models
+    available = get_available_models(config.llm.base_url)
+    if not available:
+        con.print("[red]No Ollama models available.[/red]")
+        con.print("\nTo use this feature:")
+        con.print("  1. Start Ollama: [cyan]ollama serve[/cyan]")
+        con.print("  2. Pull models: [cyan]ollama pull llama3.2:3b[/cyan]")
+        raise typer.Exit(1)
+
+    # Parse model list
+    if models == "all":
+        model_list = available[:3]  # Limit to 3 for performance
+    elif models:
+        model_list = [m.strip() for m in models.split(",")]
+    else:
+        # Default: compare configured model with next available
+        model_list = [config.llm.model]
+        for m in available:
+            if m != config.llm.model and len(model_list) < 2:
+                model_list.append(m)
+
+    if len(model_list) < 2:
+        con.print("[red]Need at least 2 models for comparison[/red]")
+        con.print(f"Available models: {', '.join(available)}")
+        raise typer.Exit(1)
+
+    # Validate models
+    for m in model_list:
+        if m not in available and not any(m.startswith(a.split(":")[0]) for a in available):
+            con.print(f"[yellow]Warning: Model '{m}' may not be available[/yellow]")
+
+    if verbose:
+        con.print(f"[dim]Models: {', '.join(model_list)}[/dim]")
+        if judge:
+            con.print(f"[dim]Judge: {judge}[/dim]")
+        if ensemble:
+            con.print("[dim]Mode: Ensemble voting[/dim]")
+        con.print("[dim]Retrieving context...[/dim]\n")
+
+    # Get context via search
+    try:
+        results = hybrid_search(
+            question,
+            limit=limit,
+            mode=SearchMode.HYBRID,
+            config=config,
+        )
+        context = "\n\n".join([r.content for r in results[:limit]])
+    except Exception as e:
+        con.print(f"[red]Search error: {e}[/red]")
+        context = ""
+
+    # Create comparator
+    comparator = ModelComparator(
+        base_url=config.llm.base_url,
+        timeout_seconds=config.retrieval.contextual.timeout_seconds,
+    )
+
+    # Run comparison
+    try:
+        if judge:
+            result = comparator.compare_with_judge(
+                query=question,
+                models=model_list,
+                judge_model=judge,
+                context=context,
+                temperature=temperature,
+            )
+        elif ensemble:
+            result = comparator.compare_ensemble(
+                query=question,
+                models=model_list,
+                context=context,
+                temperature=temperature,
+            )
+        else:
+            result = comparator.compare(
+                query=question,
+                models=model_list,
+                context=context,
+                temperature=temperature,
+            )
+
+        print_comparison(result, no_color=no_color)
+
+    except Exception as e:
+        con.print(f"[red]Comparison error: {e}[/red]")
+        raise typer.Exit(1)
+
+
 __all__ = [
     "ask_command",
     "chat_command",
+    "compare_command",
 ]

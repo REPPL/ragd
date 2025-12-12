@@ -11,7 +11,6 @@ from typing import TYPE_CHECKING, Any, Literal
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
-from rich.text import Text
 
 if TYPE_CHECKING:
     from ragd.health.checker import HealthResult
@@ -317,7 +316,7 @@ def format_health_results(
             lines.append(f"[{icon}] {r.name}: {r.message} ({r.duration_ms:.1f}ms)")
         return "\n".join(lines)
 
-    # Rich format with ASCII banner
+    # Rich format with Table
     if console is None:
         console = Console()
 
@@ -335,23 +334,28 @@ def format_health_results(
         overall = "HEALTHY"
         overall_colour = "green"
 
-    # Print ASCII banner header
-    width = 60
-    border = "+" + "-" * (width - 2) + "+"
-
-    console.print()
-    console.print(f"+-- System Health " + "-" * (width - 19) + "+")
-    status_line = f"|  Overall: [{overall_colour}]{overall}[/{overall_colour}]"
-    padding = width - 14 - len(overall)
-    console.print(status_line + " " * padding + "|")
-    console.print("|" + " " * (width - 2) + "|")
-
     # Categorise checks
     core_checks = ["Configuration", "Storage", "Embedding Model", "Dependencies"]
     optional_checks = ["Docling", "OCR", "Ollama", "NLTK Data"]
 
-    # Print core components
-    console.print("|  [bold]Core Components:[/bold]" + " " * (width - 21) + "|")
+    # Build table
+    table = Table(
+        title="System Health",
+        show_header=False,
+        padding=(0, 1),
+        expand=False,
+    )
+    table.add_column("Icon", width=4)
+    table.add_column("Component", width=20)
+    table.add_column("Message")
+
+    # Overall status row
+    table.add_row("", f"Overall: [{overall_colour}]{overall}[/{overall_colour}]", "")
+    table.add_section()
+
+    # Core components header
+    table.add_row("", "[bold]Core Components:[/bold]", "")
+
     for r in results:
         if r.name in core_checks or r.name not in optional_checks:
             if r.status == "healthy":
@@ -361,19 +365,15 @@ def format_health_results(
             else:
                 icon = "[red][XX][/red]"
 
-            # Truncate message if needed
-            msg = r.message[:30] + "..." if len(r.message) > 30 else r.message
-            line = f"|    {icon} {r.name:<18} {msg}"
-            padding = width - len(r.name) - len(r.message[:30]) - 14
-            if len(r.message) > 30:
-                padding -= 3
-            console.print(line + " " * max(0, padding) + "|")
+            msg = r.message[:40] + "..." if len(r.message) > 40 else r.message
+            table.add_row(icon, r.name, msg)
 
-    # Print optional features if any exist
+    # Optional features if any exist
     optional_results = [r for r in results if r.name in optional_checks]
     if optional_results:
-        console.print("|" + " " * (width - 2) + "|")
-        console.print("|  [bold]Optional Features:[/bold]" + " " * (width - 23) + "|")
+        table.add_section()
+        table.add_row("", "[bold]Optional Features:[/bold]", "")
+
         for r in optional_results:
             if r.status == "healthy":
                 icon = "[green][OK][/green]"
@@ -382,12 +382,9 @@ def format_health_results(
             else:
                 icon = "[red][XX][/red]"
 
-            msg = r.message[:30] + "..." if len(r.message) > 30 else r.message
-            line = f"|    {icon} {r.name:<18} {msg}"
-            padding = width - len(r.name) - len(r.message[:30]) - 14
-            if len(r.message) > 30:
-                padding -= 3
-            console.print(line + " " * max(0, padding) + "|")
+            msg = r.message[:40] + "..." if len(r.message) > 40 else r.message
+            table.add_row(icon, r.name, msg)
 
-    console.print(border)
+    console.print()
+    console.print(table)
     return None

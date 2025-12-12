@@ -267,10 +267,11 @@ class ContextWindow:
 
         return added
 
-    def _group_by_document(self) -> "OrderedDict[str, list[RetrievedContext]]":
+    def _group_by_document(self) -> OrderedDict[str, list[RetrievedContext]]:
         """Group contexts by document, preserving insertion order.
 
-        Documents are keyed by document_id, falling back to source name.
+        Documents are keyed by content_hash (for content-based dedup),
+        falling back to document_id, then source name.
         Order is determined by first occurrence of each document.
 
         Returns:
@@ -281,7 +282,8 @@ class ContextWindow:
         doc_chunks: OrderedDict[str, list[RetrievedContext]] = OrderedDict()
 
         for ctx in self._contexts:
-            doc_key = ctx.document_id or ctx.source
+            # Prefer content_hash for content-based grouping
+            doc_key = ctx.metadata.get("content_hash") or ctx.document_id or ctx.source
             if doc_key not in doc_chunks:
                 doc_chunks[doc_key] = []
             doc_chunks[doc_key].append(ctx)
@@ -415,9 +417,10 @@ class ContextWindow:
 
 
 def deduplicate_citations(citations: list[Citation]) -> list[Citation]:
-    """Deduplicate citations by document_id.
+    """Deduplicate citations by content_hash or document_id.
 
-    Keeps first occurrence of each document.
+    Prefers content_hash (content-based deduplication) to merge identical
+    content from different filenames. Falls back to document_id, then filename.
 
     Args:
         citations: List of citations (may contain duplicates)
@@ -425,13 +428,14 @@ def deduplicate_citations(citations: list[Citation]) -> list[Citation]:
     Returns:
         List of unique citations
     """
-    seen_docs: set[str] = set()
+    seen: set[str] = set()
     unique: list[Citation] = []
 
     for cit in citations:
-        key = cit.document_id or cit.filename
-        if key and key not in seen_docs:
-            seen_docs.add(key)
+        # Prefer content_hash for content-based dedup, fallback to document_id/filename
+        key = cit.content_hash or cit.document_id or cit.filename
+        if key and key not in seen:
+            seen.add(key)
             unique.append(cit)
         elif not key:
             # Fallback: include if no identifier

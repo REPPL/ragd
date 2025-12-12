@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ragd"
-version = "1.0.0a7"
+version = "1.0.0a8"
 description = "Local RAG for personal knowledge management"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -25,47 +25,52 @@ classifiers = [
     "Typing :: Typed",
 ]
 
+# All runtime dependencies included by default (F-119)
 dependencies = [
     # CLI Framework
     "typer>=0.9.0",
     "rich>=13.0.0",
-
     # Security: Fix known vulnerabilities
-    "urllib3>=2.5.0",  # CVE fixes
-
+    "urllib3>=2.5.0",
     # Vector Database
     "chromadb>=0.4.0",
-
     # Embeddings
     "sentence-transformers>=2.2.0",
-
     # PDF Processing
     "pymupdf>=1.23.0",
-
     # Configuration & Validation
     "pydantic>=2.0.0",
     "pydantic-settings>=2.0.0",
     "pyyaml>=6.0.0",
-
     # Text Processing
     "nltk>=3.8.0",
     "beautifulsoup4>=4.12.0",
     "tiktoken>=0.5.0",
-    "pyparsing>=3.0.0",  # Boolean query parsing
-
-    # HTML Rendering (F-098)
+    "pyparsing>=3.0.0",
+    # HTML Rendering
     "playwright>=1.40.0",
-
     # Interactive TUI
     "textual>=0.40.0",
-
     # System utilities
     "psutil>=5.9.0",
-
-    # OCR for scanned documents (required for v0.7.6+)
+    # OCR for scanned documents
     "paddleocr>=2.7.0",
     "paddlepaddle>=2.5.0",
     "opencv-python-headless>=4.8.0",
+    # Full feature dependencies (included by default)
+    "docling>=2.0.0",
+    "docling-core>=2.0.0",
+    "easyocr>=1.7.0",
+    "keybert>=0.8.0",
+    "spacy>=3.7.0",
+    "langdetect>=1.0.9",
+    "pyarrow>=14.0.0",
+    "watchdog>=3.0.0",
+    "trafilatura>=1.6.0",
+    "selectolax>=0.3.0",
+    "presidio-analyzer>=2.2.0",
+    # FAISS vector store (pre-built wheels available)
+    "faiss-cpu>=1.7.4",
 ]
 
 [project.optional-dependencies]
@@ -97,12 +102,6 @@ web = [
     # Web archive support (F-038)
     "trafilatura>=1.6.0",
     "selectolax>=0.3.0",
-]
-
-# v0.6 Feature Extras
-faiss = [
-    # FAISS vector store backend (F-021)
-    "faiss-cpu>=1.7.4",
 ]
 
 # v0.7 Feature Extras
@@ -153,6 +152,21 @@ test = [
     "pytest-asyncio>=0.21.0",
 ]
 security = [
+    "pip-audit>=2.6.0",
+    "bandit>=1.7.0",
+    "safety>=2.3.0",
+]
+# Contributor extra (no system dependencies required)
+contrib = [
+    # Dev tools
+    "ruff>=0.1.0",
+    "mypy>=1.0.0",
+    "pre-commit>=3.0.0",
+    # Testing
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "pytest-asyncio>=0.21.0",
+    # Security auditing
     "pip-audit>=2.6.0",
     "bandit>=1.7.0",
     "safety>=2.3.0",
