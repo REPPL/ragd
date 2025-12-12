@@ -1,0 +1,110 @@
+"""CLI commands package for ragd.
+
+This package contains command implementations organised by domain:
+- core: Fundamental commands (init, index, search, status, etc.)
+- chat: Ask and interactive chat commands
+- models: LLM model management commands
+- metadata: Document metadata and tag management
+- archive: Export and import commands
+- watch: Directory watch commands
+- quality: Evaluation and quality assessment
+"""
+
+from ragd.ui.cli.commands.core import (
+    init_command,
+    index_command,
+    search_command,
+    info_command,
+    status_command,
+    stats_command,
+    doctor_command,
+    config_command,
+    reindex_command,
+    list_documents_command,
+)
+
+from ragd.ui.cli.commands.chat import (
+    ask_command,
+    chat_command,
+)
+
+from ragd.ui.cli.commands.models import (
+    models_list_command,
+    models_set_command,
+    models_recommend_command,
+    models_show_command,
+    models_discover_command,
+    models_cards_command,
+    models_card_edit_command,
+)
+
+from ragd.ui.cli.commands.metadata import (
+    meta_show_command,
+    meta_edit_command,
+    tag_add_command,
+    tag_remove_command,
+    tag_list_command,
+)
+
+from ragd.ui.cli.commands.archive import (
+    export_command,
+    import_command,
+)
+
+from ragd.ui.cli.commands.watch import (
+    watch_start_command,
+    watch_stop_command,
+    watch_status_command,
+)
+
+from ragd.ui.cli.commands.quality import (
+    evaluate_command,
+    quality_command,
+)
+
+# Re-export utilities for backwards compatibility
+from ragd.ui.cli.utils import get_console, StreamingWordWrapper
+
+__all__ = [
+    # Utils
+    "get_console",
+    "StreamingWordWrapper",
+    # Core commands
+    "init_command",
+    "index_command",
+    "search_command",
+    "info_command",
+    "status_command",
+    "stats_command",
+    "doctor_command",
+    "config_command",
+    "reindex_command",
+    "list_documents_command",
+    # Chat commands
+    "ask_command",
+    "chat_command",
+    # Model commands
+    "models_list_command",
+    "models_set_command",
+    "models_recommend_command",
+    "models_show_command",
+    "models_discover_command",
+    "models_cards_command",
+    "models_card_edit_command",
+    # Metadata commands
+    "meta_show_command",
+    "meta_edit_command",
+    "tag_add_command",
+    "tag_remove_command",
+    "tag_list_command",
+    # Archive commands
+    "export_command",
+    "import_command",
+    # Watch commands
+    "watch_start_command",
+    "watch_stop_command",
+    "watch_status_command",
+    # Quality commands
+    "evaluate_command",
+    "quality_command",
+]

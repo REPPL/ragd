@@ -69,11 +69,6 @@ ragd search "decision about deployment schedule"
 ragd search "action items assigned to me"
 ```
 
-**Find by date:**
-```bash
-ragd search "discussed last week" --after 2024-01-08
-```
-
 ### Organising Meetings
 
 Create collections by type:

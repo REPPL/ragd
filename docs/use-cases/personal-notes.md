@@ -70,7 +70,7 @@ ragd tag add note-123 "status:actionable"
 
 Create collections:
 ```bash
-ragd collection create projects --tag "topic:project"
+ragd collection create projects --include-all "topic:project"
 ```
 
 ## Example Queries

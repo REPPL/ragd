@@ -39,7 +39,7 @@ retrieval:
 ragd index ~/Papers --recursive
 ```
 
-Index Zotero storage:
+Index Zotero's local storage folder (note: this indexes the PDF files, not Zotero's database):
 ```bash
 ragd index ~/Zotero/storage
 ```
