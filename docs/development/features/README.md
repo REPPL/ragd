@@ -277,12 +277,30 @@ Features are the primary unit of work. Each feature specification describes:
 | F-140 | WebUI Index | 📅 Planned | Upload and index documents |
 | F-141 | Mobile Responsive | 📅 Planned | Works on all devices |
 
-### v2.0 Features (Extensibility)
+### v1.6 Features (Automation & Fine-Tuning)
 
-| ID | Feature | Status | Description |
-|----|---------|--------|-------------|
+| ID | Feature | Status | Research |
+|----|---------|--------|----------|
+| [F-058](./planned/F-058-fine-tuning-pipeline.md) | Fine-Tuning Pipeline | 📅 Planned | [State-of-the-Art Fine-Tuning](../research/state-of-the-art-fine-tuning.md) |
+| [F-201](./planned/F-201-workflow-automation.md) | Workflow Automation | 📅 Planned | [State-of-the-Art Automation Scripts](../research/state-of-the-art-automation-scripts.md) |
+| [F-206](./planned/F-206-interactive-script-wizard.md) | Interactive Script Wizard | 📅 Planned | [State-of-the-Art Automation Scripts](../research/state-of-the-art-automation-scripts.md) |
+| [F-207](./planned/F-207-shell-script-export.md) | Shell Script Export | 📅 Planned | [State-of-the-Art Automation Scripts](../research/state-of-the-art-automation-scripts.md) |
+
+### v2.0 Features (Personal Knowledge Assistant)
+
+| ID | Feature | Status | Research |
+|----|---------|--------|----------|
+| [F-040](./planned/F-040-long-term-memory.md) | Long-Term Memory Store | 📅 Planned | [State-of-the-Art Personal RAG](../research/state-of-the-art-personal-rag.md) |
+| [F-041](./planned/F-041-user-profile-management.md) | User Profile Management | 📅 Planned | [State-of-the-Art Personal RAG](../research/state-of-the-art-personal-rag.md) |
+| F-042 | Persona Agent System | 📅 Planned | [State-of-the-Art Personal RAG](../research/state-of-the-art-personal-rag.md) |
+| F-043 | Memory Consolidation | 📅 Planned | [State-of-the-Art Personal RAG](../research/state-of-the-art-personal-rag.md) |
+| [F-044](./planned/F-044-personal-vault.md) | Personal Information Vault | 📅 Planned | [State-of-the-Art Personal RAG](../research/state-of-the-art-personal-rag.md) |
+
+### v2.5 Features (Extensibility)
+
+| ID | Feature | Status | Research |
+|----|---------|--------|----------|
 | F-200 | Plugin System | 📅 Planned | Extensibility framework |
-| F-201 | Workflow Automation | 📅 Planned | Scheduled indexing, triggers |
 | F-202 | Advanced Dashboard | 📅 Planned | Analytics, visualisations |
 | F-203 | Knowledge Graph Explorer | 📅 Planned | Visual graph navigation |
 | F-204 | Saved Searches | 📅 Planned | Bookmarks, history |
@@ -292,22 +310,11 @@ Features are the primary unit of work. Each feature specification describes:
 
 | ID | Feature | Status | Research |
 |----|---------|--------|----------|
-| [F-058](./planned/F-058-fine-tuning-pipeline.md) | Fine-Tuning Pipeline | 📅 Planned | Local model fine-tuning |
 | [F-059](./planned/F-059-embedding-privacy-protection.md) | Embedding Privacy Protection | 📅 Planned | Differential privacy |
 | [F-060](./planned/F-060-gdpr-compliant-deletion.md) | GDPR-Compliant Deletion | 📅 Planned | Right to be forgotten |
 | F-300 | Privacy Dashboard | 📅 Planned | Privacy settings UI |
 | F-301 | Data Lineage Tracking | 📅 Planned | Data origin tracking |
 | F-302 | Anonymisation Engine | 📅 Planned | Auto-redact PII |
-
-### v3.5 Features (Memory & Profiles)
-
-| ID | Feature | Status | Research |
-|----|---------|--------|----------|
-| [F-040](./planned/F-040-long-term-memory.md) | Long-Term Memory Store | 📅 Planned | [State-of-the-Art Personal RAG](../research/state-of-the-art-personal-rag.md) |
-| [F-041](./planned/F-041-user-profile-management.md) | User Profile Management | 📅 Planned | [State-of-the-Art Personal RAG](../research/state-of-the-art-personal-rag.md) |
-| F-042 | Persona Agent System | 📅 Planned | [State-of-the-Art Personal RAG](../research/state-of-the-art-personal-rag.md) |
-| F-043 | Memory Consolidation | 📅 Planned | [State-of-the-Art Personal RAG](../research/state-of-the-art-personal-rag.md) |
-| [F-044](./planned/F-044-personal-vault.md) | Personal Information Vault | 📅 Planned | [State-of-the-Art Personal RAG](../research/state-of-the-art-personal-rag.md) |
 
 ### v3.x Features (Personal Data Connectors)
 
@@ -377,10 +384,11 @@ Features are numbered sequentially with milestone-based ranges:
 | F-123 to F-127 | v1.0 | Performance & Polish |
 | F-128 to F-132 | v1.1 | Graph & Automation |
 | F-133 to F-137 | v1.5 | API & Onboarding |
-| F-138 to F-141 | v1.8 | WebUI Foundation |
-| F-200 to F-205 | v2.0 | Extensibility |
-| F-300 to F-302 | v3.0 | Privacy Foundation |
-| F-040 to F-044 | v3.5 | Memory & Profiles |
+| F-058, F-201, F-206, F-207 | v1.6 | Automation & Fine-Tuning |
+| F-024, F-138 to F-141 | v1.8 | WebUI Foundation |
+| F-040 to F-044 | v2.0 | Personal Knowledge Assistant |
+| F-200, F-202 to F-205 | v2.5 | Extensibility |
+| F-059, F-060, F-300 to F-302 | v3.0 | Privacy Foundation |
 | F-045 to F-048 | v3.x | Personal Data Connectors |
 | F-400 to F-407 | v4.0 | Autonomous Agents |
 | F-500 to F-506 | v5.0 | Multi-User |

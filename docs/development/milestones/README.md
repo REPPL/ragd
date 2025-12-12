@@ -40,15 +40,16 @@ Release planning and milestone tracking.
 | [v1.0.0](./v1.0.0.md) | Performance & Polish | Production ready | F-123 to F-127 |
 | [v1.1.0](./v1.1.0.md) | Graph & Automation | Knowledge graph CLI, scripting | F-128 to F-132 |
 | [v1.5.0](./v1.5.0.md) | API & Onboarding | REST API, guided setup | F-133 to F-137 |
-| [v1.8.0](./v1.8.0.md) | WebUI Foundation | Basic web interface | F-138 to F-141 |
+| [v1.6.0](./v1.6.0.md) | Automation & Fine-Tuning | Workflows, scripting, local training | F-058, F-201, F-206, F-207 |
+| [v1.8.0](./v1.8.0.md) | WebUI Foundation | Basic web interface | F-024, F-138 to F-141 |
 
 ### Future Vision (v2.x+)
 
 | Version | Name | Focus | Theme |
 |---------|------|-------|-------|
-| [v2.0.0](./v2.0.0.md) | Extensibility | Plugins, workflows, dashboard | "Extend & Automate" |
+| [v2.0.0](./v2.0.0.md) | Personal Knowledge Assistant | Memory, profiles, vault | "Remember Everything" |
+| [v2.5.0](./v2.5.0.md) | Extensibility | Plugins, dashboard, tools | "Extend & Automate" |
 | [v3.0.0](./v3.0.0.md) | Privacy Foundation | GDPR, embedding privacy | "Privacy by Design" |
-| [v3.5.0](./v3.5.0.md) | Memory & Profiles | Personal knowledge assistant | "Remember Everything" |
 | [v4.0.0](./v4.0.0.md) | Autonomous Agents | Tool use, MCP, reasoning | "AI That Acts" |
 | [v5.0.0](./v5.0.0.md) | Multi-User | Teams, RBAC, SSO | "Shared Intelligence" |
 
