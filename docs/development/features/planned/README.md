@@ -7,17 +7,22 @@ Features planned for future development. See [features/README.md](../README.md) 
 | ID | Feature | Version | Description |
 |----|---------|---------|-------------|
 | [F-119](./F-119-full-features-by-default.md) | Full Features by Default | v1.0 | All runtime deps in default install |
-| F-123 to F-127 | Performance & Polish | v1.0 | Profiling, memory, benchmarks |
+| [F-123](./F-123-performance-profiling.md) | Performance Profiling | v1.0 | Identify and fix bottlenecks |
+| [F-124](./F-124-memory-optimisation.md) | Memory Optimisation | v1.0 | Reduce RAM usage |
+| [F-125](./F-125-startup-time.md) | Startup Time | v1.0 | Faster CLI startup |
+| [F-126](./F-126-final-bug-fixes.md) | Final Bug Fixes | v1.0 | Last fixes and polish |
+| [F-127](./F-127-performance-benchmarks.md) | Performance Benchmarks | v1.0 | Published benchmarks |
 | [F-057](./F-057-model-comparison.md) | Model Comparison | v1.0 | Evaluate models side-by-side |
 | [F-075](./F-075-backend-migration-tool.md) | Backend Migration | v1.0 | Move between vector stores |
 | F-128 to F-132 | Graph & Automation | v1.1 | Knowledge graph CLI, batch ops |
-| F-133 to F-137 | API & Onboarding | v1.5 | REST API, guided setup |
+| F-134 | Onboarding Flow | v1.2 | Guided first-run experience |
+| F-133, F-135 to F-137 | API | v1.3 | REST API, auth, webhooks |
+| [F-201](./F-201-workflow-automation.md) | Workflow Automation | v1.4 | [State-of-the-Art Automation Scripts](../../research/state-of-the-art-automation-scripts.md) |
+| [F-206](./F-206-interactive-script-wizard.md) | Interactive Script Wizard | v1.4 | [State-of-the-Art Automation Scripts](../../research/state-of-the-art-automation-scripts.md) |
+| [F-207](./F-207-shell-script-export.md) | Shell Script Export | v1.4 | [State-of-the-Art Automation Scripts](../../research/state-of-the-art-automation-scripts.md) |
+| [F-024](./F-024-basic-webui.md) | Basic WebUI | v1.5 | FastAPI + HTMX + Tailwind |
+| F-138 to F-141 | WebUI Features | v1.5 | Search, chat, index in browser |
 | [F-058](./F-058-fine-tuning-pipeline.md) | Fine-Tuning Pipeline | v1.6 | [State-of-the-Art Fine-Tuning](../../research/state-of-the-art-fine-tuning.md) |
-| [F-201](./F-201-workflow-automation.md) | Workflow Automation | v1.6 | [State-of-the-Art Automation Scripts](../../research/state-of-the-art-automation-scripts.md) |
-| [F-206](./F-206-interactive-script-wizard.md) | Interactive Script Wizard | v1.6 | [State-of-the-Art Automation Scripts](../../research/state-of-the-art-automation-scripts.md) |
-| [F-207](./F-207-shell-script-export.md) | Shell Script Export | v1.6 | [State-of-the-Art Automation Scripts](../../research/state-of-the-art-automation-scripts.md) |
-| [F-024](./F-024-basic-webui.md) | Basic WebUI | v1.8 | FastAPI + HTMX + Tailwind |
-| F-138 to F-141 | WebUI Features | v1.8 | Search, chat, index in browser |
 
 ## v2.0 Features (Personal Knowledge Assistant)
 

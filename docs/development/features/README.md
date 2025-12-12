@@ -257,17 +257,30 @@ Features are the primary unit of work. Each feature specification describes:
 | F-131 | Results Export | 📅 Planned | Export to JSON/CSV |
 | F-132 | Timing & Metrics Output | 📅 Planned | `--timing` flag |
 
-### v1.5 Features (API & Onboarding)
+### v1.2 Features (Onboarding)
+
+| ID | Feature | Status | Description |
+|----|---------|--------|-------------|
+| F-134 | Onboarding Flow | 📅 Planned | Guided first-run experience |
+
+### v1.3 Features (API)
 
 | ID | Feature | Status | Description |
 |----|---------|--------|-------------|
 | F-133 | API Server | 📅 Planned | REST API with OpenAPI |
-| F-134 | Onboarding Flow | 📅 Planned | Guided first-run |
 | F-135 | API Authentication | 📅 Planned | API keys, rate limiting |
 | F-136 | Webhooks | 📅 Planned | Event notifications |
 | F-137 | Health Endpoints | 📅 Planned | `/health`, `/ready`, `/metrics` |
 
-### v1.8 Features (WebUI Foundation)
+### v1.4 Features (Automation)
+
+| ID | Feature | Status | Research |
+|----|---------|--------|----------|
+| [F-201](./planned/F-201-workflow-automation.md) | Workflow Automation | 📅 Planned | [State-of-the-Art Automation Scripts](../research/state-of-the-art-automation-scripts.md) |
+| [F-206](./planned/F-206-interactive-script-wizard.md) | Interactive Script Wizard | 📅 Planned | [State-of-the-Art Automation Scripts](../research/state-of-the-art-automation-scripts.md) |
+| [F-207](./planned/F-207-shell-script-export.md) | Shell Script Export | 📅 Planned | [State-of-the-Art Automation Scripts](../research/state-of-the-art-automation-scripts.md) |
+
+### v1.5 Features (WebUI Foundation)
 
 | ID | Feature | Status | Description |
 |----|---------|--------|-------------|
@@ -277,14 +290,11 @@ Features are the primary unit of work. Each feature specification describes:
 | F-140 | WebUI Index | 📅 Planned | Upload and index documents |
 | F-141 | Mobile Responsive | 📅 Planned | Works on all devices |
 
-### v1.6 Features (Automation & Fine-Tuning)
+### v1.6 Features (Fine-Tuning)
 
 | ID | Feature | Status | Research |
 |----|---------|--------|----------|
 | [F-058](./planned/F-058-fine-tuning-pipeline.md) | Fine-Tuning Pipeline | 📅 Planned | [State-of-the-Art Fine-Tuning](../research/state-of-the-art-fine-tuning.md) |
-| [F-201](./planned/F-201-workflow-automation.md) | Workflow Automation | 📅 Planned | [State-of-the-Art Automation Scripts](../research/state-of-the-art-automation-scripts.md) |
-| [F-206](./planned/F-206-interactive-script-wizard.md) | Interactive Script Wizard | 📅 Planned | [State-of-the-Art Automation Scripts](../research/state-of-the-art-automation-scripts.md) |
-| [F-207](./planned/F-207-shell-script-export.md) | Shell Script Export | 📅 Planned | [State-of-the-Art Automation Scripts](../research/state-of-the-art-automation-scripts.md) |
 
 ### v2.0 Features (Personal Knowledge Assistant)
 
@@ -383,9 +393,11 @@ Features are numbered sequentially with milestone-based ranges:
 | F-098, F-099, F-105, F-111, F-112, F-114, F-115, F-118 | v0.9.6 | Alpha Testing Release |
 | F-123 to F-127 | v1.0 | Performance & Polish |
 | F-128 to F-132 | v1.1 | Graph & Automation |
-| F-133 to F-137 | v1.5 | API & Onboarding |
-| F-058, F-201, F-206, F-207 | v1.6 | Automation & Fine-Tuning |
-| F-024, F-138 to F-141 | v1.8 | WebUI Foundation |
+| F-134 | v1.2 | Onboarding |
+| F-133, F-135 to F-137 | v1.3 | API |
+| F-201, F-206, F-207 | v1.4 | Automation |
+| F-024, F-138 to F-141 | v1.5 | WebUI Foundation |
+| F-058 | v1.6 | Fine-Tuning |
 | F-040 to F-044 | v2.0 | Personal Knowledge Assistant |
 | F-200, F-202 to F-205 | v2.5 | Extensibility |
 | F-059, F-060, F-300 to F-302 | v3.0 | Privacy Foundation |

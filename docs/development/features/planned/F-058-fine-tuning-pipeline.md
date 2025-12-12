@@ -3,7 +3,7 @@
 ## Overview
 
 **Research**: [State-of-the-Art Fine-Tuning](../../research/state-of-the-art-fine-tuning.md)
-**Milestone**: v0.9.0
+**Milestone**: v1.6
 **Priority**: P2
 
 ## Problem Statement

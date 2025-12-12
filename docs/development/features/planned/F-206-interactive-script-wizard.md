@@ -2,7 +2,7 @@
 
 ## Overview
 
-**Milestone**: v2.0
+**Milestone**: v1.4
 **Priority**: P2
 **Depends On**: [F-201](./F-201-workflow-automation.md) (Workflow Automation)
 **Research**: [State-of-the-Art Automation Scripts](../../research/state-of-the-art-automation-scripts.md)

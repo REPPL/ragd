@@ -2,7 +2,7 @@
 
 ## Overview
 
-**Milestone**: v2.0
+**Milestone**: v1.4
 **Priority**: P1
 **Research**: [State-of-the-Art Automation Scripts](../../research/state-of-the-art-automation-scripts.md)
 

@@ -3,7 +3,7 @@
 ## Overview
 
 **Research**: [State-of-the-Art User Interfaces](../../research/state-of-the-art-user-interfaces.md)
-**Milestone**: v1.0
+**Milestone**: v1.5
 **Priority**: P2
 
 ## Problem Statement
@@ -238,7 +238,7 @@ ragd serve --open
 ## Related Documentation
 
 - [State-of-the-Art User Interfaces](../../research/state-of-the-art-user-interfaces.md) - Research basis
-- [v1.0.0 Milestone](../../milestones/v1.0.0.md) - Release planning
+- [v1.5.0 Milestone](../../milestones/v1.5.0.md) - Release planning
 - [CLI Best Practices](../../research/cli-best-practices.md) - CLI/Web consistency
 
 ---
