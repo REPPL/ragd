@@ -52,6 +52,10 @@ Layer 3: TUTORIALS (How users experience it)
 | [Research Papers](research-papers.md) | Academic research and paper management |
 | [Code Documentation](code-documentation.md) | Technical documentation search |
 | [Meeting Notes](meeting-notes.md) | Work meeting notes management |
+| [E-book Library](ebook-library.md) | Managing personal book collections |
+| [Financial Records](financial-records.md) | Tax documents and financial compliance |
+| [Recipe Collection](recipe-collection.md) | Organising recipes from various sources |
+| [Technical Manuals](technical-manuals.md) | Equipment and product documentation |
 
 ## Directory Contents
 
