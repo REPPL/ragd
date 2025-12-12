@@ -409,6 +409,7 @@ Document Input
 
 ## Related Documentation
 
+- [State-of-the-Art NER Indexing](./state-of-the-art-ner-indexing.md) - NER integration with indexing pipelines
 - [NLP Library Integration Guide](./nlp-library-integration.md) - Implementation patterns for spaCy, KeyBERT, langdetect
 - [State-of-the-Art Metadata](./state-of-the-art-metadata.md) - Metadata extraction research
 - [State-of-the-Art Knowledge Graphs](./state-of-the-art-knowledge-graphs.md) - Entity extraction for graph construction

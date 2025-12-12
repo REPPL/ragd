@@ -736,9 +736,11 @@ Phase 3 (v1.0): Hybrid Retrieval
 
 ## Related Documentation
 
+- [State-of-the-Art NER Indexing](./state-of-the-art-ner-indexing.md) - NER integration with indexing pipelines
+- [State-of-the-Art NER](./state-of-the-art-ner.md) - Named entity recognition techniques
 - [State-of-the-Art Local RAG](./state-of-the-art-local-rag.md) - GraphRAG section
 - [State-of-the-Art Embeddings](./state-of-the-art-embeddings.md) - Entity embeddings
-- [ADRs](../decisions/adrs/README.md) - Architecture decisions (graph database pending)
+- [ADRs](../decisions/adrs/README.md) - Architecture decisions
 
 ---
 
