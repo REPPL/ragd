@@ -52,3 +52,8 @@ ragd search "query"  # Uses JSON
 
 - v0.8.6 (Security Focus)
 
+## Related Documentation
+
+- [F-006: Result Formatting](./F-006-result-formatting.md)
+- [v0.8.6 Milestone](../../milestones/v0.8.6.md)
+

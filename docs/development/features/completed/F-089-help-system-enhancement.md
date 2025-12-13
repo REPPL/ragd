@@ -60,3 +60,8 @@ $ ragd help search
 - Typer (existing)
 - v0.8.6 (Security Focus)
 
+## Related Documentation
+
+- [F-087: Shell Completion](./F-087-shell-completion.md)
+- [CLI Reference](../../../guides/cli/reference.md)
+- [v0.8.6 Milestone](../../milestones/v0.8.6.md)

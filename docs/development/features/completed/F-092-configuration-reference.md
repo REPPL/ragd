@@ -64,3 +64,8 @@ chunking:
 
 - v0.8.6 (Security Focus)
 
+## Related Documentation
+
+- [Configuration Reference](../../../reference/configuration.md)
+- [F-088: Interactive Config](./F-088-interactive-config.md)
+- [v0.8.6 Milestone](../../milestones/v0.8.6.md)

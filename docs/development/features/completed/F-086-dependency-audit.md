@@ -48,3 +48,8 @@ Add security scanning to CI pipeline with failure on critical vulnerabilities.
 - v0.8.5 (Knowledge Graph Foundation)
 - pip-audit, bandit, safety installed
 
+## Related Documentation
+
+- [F-085: Test Coverage Boost](./F-085-test-coverage-boost.md)
+- [v0.8.5 Milestone](../../milestones/v0.8.5.md)
+

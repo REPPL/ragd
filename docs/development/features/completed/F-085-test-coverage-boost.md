@@ -49,3 +49,8 @@ Focus on high-risk areas:
 - v0.8.5 (Knowledge Graph Foundation)
 - pytest-cov installed
 
+## Related Documentation
+
+- [F-086: Dependency Audit](./F-086-dependency-audit.md)
+- [v0.8.5 Milestone](../../milestones/v0.8.5.md)
+

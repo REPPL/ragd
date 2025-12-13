@@ -52,3 +52,8 @@ $ ragd config
 - questionary (new dependency)
 - v0.8.6 (Security Focus)
 
+## Related Documentation
+
+- [F-036: Guided Setup](./F-036-guided-setup.md)
+- [F-092: Configuration Reference](./F-092-configuration-reference.md)
+- [v0.8.6 Milestone](../../milestones/v0.8.6.md)

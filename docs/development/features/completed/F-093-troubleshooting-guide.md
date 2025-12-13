@@ -70,3 +70,7 @@ Each issue includes:
 
 - v0.8.6 (Security Focus)
 
+## Related Documentation
+
+- [F-035: Health Check](./F-035-health-check.md)
+- [v0.8.6 Milestone](../../milestones/v0.8.6.md)

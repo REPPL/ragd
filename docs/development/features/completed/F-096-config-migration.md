@@ -58,3 +58,8 @@ def migrate(config: dict) -> dict:
 
 - v0.8.6 (Security Focus)
 
+## Related Documentation
+
+- [F-097: Config Debugging](./F-097-config-debugging.md)
+- [F-092: Configuration Reference](./F-092-configuration-reference.md)
+- [v0.8.6 Milestone](../../milestones/v0.8.6.md)

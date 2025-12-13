@@ -63,3 +63,9 @@ llm:
 
 - v0.8.6 (Security Focus)
 
+## Related Documentation
+
+- [F-096: Config Migration](./F-096-config-migration.md)
+- [F-078: Configuration Validation](./F-078-configuration-validation.md)
+- [v0.8.6 Milestone](../../milestones/v0.8.6.md)
+

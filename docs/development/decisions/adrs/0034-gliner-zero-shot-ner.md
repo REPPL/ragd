@@ -133,7 +133,7 @@ class GlinerEntityExtractor:
 ## Related Documentation
 
 - [State-of-the-Art NER](../../research/state-of-the-art-ner.md) - Research context
-- [F-100: GLiNER NER Integration](../../features/planned/F-100-gliner-ner.md) - Feature specification
+- [F-128: GLiNER NER Integration](../../features/planned/F-128-gliner-ner.md) - Feature specification
 - [NLP Library Integration](../../research/nlp-library-integration.md) - Existing NER integration
 
 ---

@@ -1,4 +1,4 @@
-# F-102: NER Pipeline Integration
+# F-130: NER Pipeline Integration
 
 ## Overview
 
@@ -195,7 +195,7 @@ ragd status
 - Existing: `src/ragd/knowledge/entities.py`
 - Existing: `src/ragd/knowledge/graph.py`
 - Optional: spaCy (for Tier 2)
-- Optional: GLiNER (for Tier 3, F-100)
+- Optional: GLiNER (for Tier 3, F-128)
 
 ## Performance Budget
 
@@ -221,7 +221,7 @@ ragd status
 - [State-of-the-Art NER Indexing](../../research/state-of-the-art-ner-indexing.md) - Research context
 - [F-022: Knowledge Graph Integration](../completed/F-022-knowledge-graph.md) - Graph storage
 - [F-030: Metadata Extraction](../completed/F-030-metadata-extraction.md) - Metadata pipeline
-- [F-100: GLiNER NER](./F-100-gliner-ner.md) - Zero-shot extraction
+- [F-128: GLiNER NER](./F-128-gliner-ner.md) - Zero-shot extraction
 - [NLP Library Integration](../../research/nlp-library-integration.md) - spaCy patterns
 
 ---

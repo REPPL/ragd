@@ -50,3 +50,9 @@ Even in debug mode, secrets must not appear in logs.
 - v0.8.5 (Knowledge Graph Foundation)
 - ADR-0013: Configuration Schema
 
+## Related Documentation
+
+- [ADR-0009: Security Architecture](../../decisions/adrs/0009-security-architecture.md)
+- [F-082: Security Hardening](./F-082-security-hardening.md)
+- [v0.8.5 Milestone](../../milestones/v0.8.5.md)
+

@@ -54,3 +54,8 @@ Each tutorial includes:
 
 - v0.8.6 (Security Focus)
 
+## Related Documentation
+
+- [Tutorials](../../../tutorials/)
+- [Getting Started](../../../tutorials/01-getting-started.md)
+- [v0.8.6 Milestone](../../milestones/v0.8.6.md)

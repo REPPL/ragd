@@ -48,3 +48,8 @@ ragd completion bash > ~/.ragd/completions/ragd.bash
 - Typer (existing)
 - v0.8.6 (Security Focus)
 
+## Related Documentation
+
+- [F-089: Help System Enhancement](./F-089-help-system-enhancement.md)
+- [CLI Reference](../../../guides/cli/reference.md)
+- [v0.8.6 Milestone](../../milestones/v0.8.6.md)

@@ -463,7 +463,7 @@ knowledge_graph:
 - [State-of-the-Art Knowledge Graphs](./state-of-the-art-knowledge-graphs.md) - Graph construction
 - [F-022: Knowledge Graph Integration](../features/completed/F-022-knowledge-graph.md) - Feature spec
 - [F-030: Metadata Extraction](../features/completed/F-030-metadata-extraction.md) - Metadata pipeline
-- [F-100: GLiNER NER](../features/planned/F-100-gliner-ner.md) - Zero-shot extraction
+- [F-128: GLiNER NER](../features/planned/F-128-gliner-ner.md) - Zero-shot extraction
 - [ADR-0031: Knowledge Graph Storage](../decisions/adrs/0031-knowledge-graph-storage.md) - SQLite decision
 
 ---

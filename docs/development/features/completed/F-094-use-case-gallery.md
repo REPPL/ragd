@@ -52,3 +52,8 @@ docs/use-cases/
 
 - v0.8.6 (Security Focus)
 
+## Related Documentation
+
+- [Use Cases](../../../use-cases/)
+- [v0.8.6 Milestone](../../milestones/v0.8.6.md)
+
