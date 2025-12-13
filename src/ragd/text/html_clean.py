@@ -18,7 +18,6 @@ import re
 from dataclasses import dataclass, field
 from urllib.parse import urlparse
 
-
 # Site-specific boilerplate patterns
 SITE_PATTERNS: dict[str, list[str]] = {
     "medium.com": [

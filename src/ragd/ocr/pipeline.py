@@ -11,9 +11,9 @@ from __future__ import annotations
 
 import logging
 import time
+from collections.abc import Iterator
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Iterator
 
 import fitz
 
@@ -22,8 +22,8 @@ from ragd.ocr.engine import (
     EasyOCREngine,
     OCREngine,
     OCRResult,
-    PageOCRResult,
     PaddleOCREngine,
+    PageOCRResult,
 )
 
 logger = logging.getLogger(__name__)

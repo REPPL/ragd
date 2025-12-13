@@ -8,8 +8,8 @@ from __future__ import annotations
 import json
 import logging
 import sys
-from dataclasses import dataclass, field, asdict
-from datetime import datetime, UTC
+from dataclasses import asdict, dataclass, field
+from datetime import UTC, datetime
 from enum import Enum
 from pathlib import Path
 from typing import Any, TextIO
@@ -46,7 +46,7 @@ class LogEntry:
         file: str | None = None,
         duration_ms: float | None = None,
         **extra: Any,
-    ) -> "LogEntry":
+    ) -> LogEntry:
         """Create a log entry with current timestamp.
 
         Args:

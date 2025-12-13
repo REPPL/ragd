@@ -16,12 +16,13 @@ import json
 import logging
 import os
 import secrets
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import Enum
 from hashlib import sha256
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Callable, Protocol
+from typing import TYPE_CHECKING, Any, Protocol
 
 if TYPE_CHECKING:
     from ragd.security.session import SessionManager
@@ -68,7 +69,7 @@ class DeletionResult:
     chunks_deleted: int = 0
     vectors_deleted: int = 0
     key_rotated: bool = False
-    timestamp: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    timestamp: datetime = field(default_factory=lambda: datetime.now(UTC))
     audit_logged: bool = False
 
     def to_dict(self) -> dict[str, Any]:
@@ -116,7 +117,7 @@ class DeletionAuditEntry:
         chunks_removed: int,
         key_rotated: bool,
         user_confirmed: bool = True,
-    ) -> "DeletionAuditEntry":
+    ) -> DeletionAuditEntry:
         """Create a new audit entry.
 
         Args:
@@ -136,7 +137,7 @@ class DeletionAuditEntry:
         }
 
         return cls(
-            timestamp=datetime.now(timezone.utc),
+            timestamp=datetime.now(UTC),
             action=action_map.get(level, "delete"),
             document_id=document_id,
             document_hash=sha256(document_id.encode()).hexdigest()[:16],

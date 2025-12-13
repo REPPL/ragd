@@ -65,7 +65,7 @@ class PromptTemplate:
         )
         return self.system_prompt, user_message
 
-    def with_citation_instruction(self, instruction: str) -> "PromptTemplate":
+    def with_citation_instruction(self, instruction: str) -> PromptTemplate:
         """Create a copy with custom citation instruction in system prompt.
 
         Args:
@@ -267,7 +267,7 @@ _TEMPLATES: dict[str, PromptTemplate] = {
 def get_prompt_template(
     name: str,
     citation_instruction: str | None = None,
-    config: "ChatPromptsConfig | None" = None,
+    config: ChatPromptsConfig | None = None,
 ) -> PromptTemplate:
     """Get a prompt template by name.
 

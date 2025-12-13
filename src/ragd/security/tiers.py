@@ -100,7 +100,7 @@ class DataTier(Enum):
         return self.level >= other.level
 
     @classmethod
-    def from_string(cls, value: str) -> "DataTier":
+    def from_string(cls, value: str) -> DataTier:
         """Parse tier from string value.
 
         Args:
@@ -172,8 +172,8 @@ class TierManager:
 
     def __init__(
         self,
-        store: "MetadataStore",
-        session: "SessionManager | None" = None,
+        store: MetadataStore,
+        session: SessionManager | None = None,
         config: TierConfig | None = None,
     ) -> None:
         """Initialise the tier manager.
@@ -342,7 +342,7 @@ class TierManager:
         Returns:
             Dictionary mapping tiers to document counts.
         """
-        counts: dict[DataTier, int] = {tier: 0 for tier in DataTier}
+        counts: dict[DataTier, int] = dict.fromkeys(DataTier, 0)
 
         for doc_id in self._store.list_ids():
             tier = self.get_tier(doc_id)

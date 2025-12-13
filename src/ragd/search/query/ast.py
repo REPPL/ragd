@@ -47,9 +47,9 @@ class BinaryNode:
         right: Right operand
     """
 
-    left: "QueryNode"
+    left: QueryNode
     op: BooleanOp
-    right: "QueryNode"
+    right: QueryNode
 
 
 @dataclass
@@ -62,7 +62,7 @@ class UnaryNode:
     """
 
     op: BooleanOp
-    operand: "QueryNode"
+    operand: QueryNode
 
 
 @dataclass
@@ -73,7 +73,7 @@ class GroupNode:
         child: The grouped expression
     """
 
-    child: "QueryNode"
+    child: QueryNode
 
 
 # Type alias for any query node

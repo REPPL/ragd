@@ -11,11 +11,10 @@ import platform
 import subprocess
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any
 
 from ragd.models.cards import (
-    ModelCard,
     ModelCapability,
+    ModelCard,
     ModelType,
     get_installed_models,
     list_model_cards,

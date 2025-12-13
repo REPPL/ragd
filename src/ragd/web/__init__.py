@@ -9,6 +9,8 @@ This module provides:
 from __future__ import annotations
 
 from ragd.web.archive import (
+    SELECTOLAX_AVAILABLE,
+    TRAFILATURA_AVAILABLE,
     ExtractedWebContent,
     WebArchiveMetadata,
     WebArchiveProcessor,
@@ -16,22 +18,22 @@ from ragd.web.archive import (
     extract_web_content,
     generate_reader_view,
     is_singlefile_archive,
-    SELECTOLAX_AVAILABLE,
-    TRAFILATURA_AVAILABLE,
+)
+from ragd.web.metadata import (
+    HTMLMetadata,
+    extract_metadata,
 )
 from ragd.web.parser import (
+    BEAUTIFULSOUP_AVAILABLE,
     ComplexityTier,
     ParseResult,
     detect_complexity,
     get_attribute,
     get_element_by_selector,
     parse_html,
-    SELECTOLAX_AVAILABLE as PARSER_SELECTOLAX_AVAILABLE,
-    BEAUTIFULSOUP_AVAILABLE,
 )
-from ragd.web.metadata import (
-    HTMLMetadata,
-    extract_metadata,
+from ragd.web.parser import (
+    SELECTOLAX_AVAILABLE as PARSER_SELECTOLAX_AVAILABLE,
 )
 from ragd.web.structure import (
     CodeBlockInfo,
@@ -47,12 +49,12 @@ from ragd.web.watcher import (
     DEFAULT_EXCLUDES,
     DEFAULT_MAX_FILE_SIZE_MB,
     DEFAULT_PATTERNS,
+    WATCHDOG_AVAILABLE,
     FolderWatcher,
     IndexEventHandler,
     WatchConfig,
     WatchEvent,
     WatchStatus,
-    WATCHDOG_AVAILABLE,
     should_index,
 )
 

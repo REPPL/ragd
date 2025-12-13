@@ -9,14 +9,13 @@ from __future__ import annotations
 import hashlib
 import logging
 from dataclasses import dataclass, field
-from datetime import datetime
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 # Lazy import chromadb - it's heavy (~3-5 seconds)
 # Imported inside ChromaStore.__init__ when actually needed
 if TYPE_CHECKING:
-    import chromadb
+    pass
 
 logger = logging.getLogger(__name__)
 

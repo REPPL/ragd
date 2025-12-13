@@ -6,14 +6,14 @@ with support for graph-enhanced retrieval.
 
 from __future__ import annotations
 
-import json
 import logging
 import sqlite3
+from collections.abc import Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Sequence
+from typing import Any
 
-from ragd.knowledge.entities import Entity, EntityType, get_entity_extractor
+from ragd.knowledge.entities import Entity, EntityType
 
 logger = logging.getLogger(__name__)
 

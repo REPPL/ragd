@@ -37,8 +37,8 @@ from ragd.search.multimodal import (
 )
 from ragd.search.rerank import (
     CrossEncoderReranker,
-    RerankResult,
     RerankerConfig,
+    RerankResult,
     get_reranker,
     rerank,
 )

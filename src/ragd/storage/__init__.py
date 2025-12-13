@@ -13,11 +13,20 @@ For backwards compatibility, ChromaStore is still available:
 """
 
 # New v0.6 API
+# Legacy API (deprecated but maintained for compatibility)
+from ragd.storage.chromadb import ChromaStore, DocumentRecord
 from ragd.storage.factory import (
     BackendNotAvailableError,
     VectorStoreFactory,
     create_vector_store,
     get_factory,
+)
+from ragd.storage.images import ImageRecord, ImageStore
+from ragd.storage.profiler import (
+    BenchmarkResult,
+    OperationMetrics,
+    StorageProfiler,
+    compare_backends,
 )
 from ragd.storage.protocols import MetadataProxy, VectorStore
 from ragd.storage.types import (
@@ -28,16 +37,6 @@ from ragd.storage.types import (
     StorageStats,
     VectorSearchResult,
 )
-from ragd.storage.profiler import (
-    BenchmarkResult,
-    OperationMetrics,
-    StorageProfiler,
-    compare_backends,
-)
-
-# Legacy API (deprecated but maintained for compatibility)
-from ragd.storage.chromadb import ChromaStore, DocumentRecord
-from ragd.storage.images import ImageRecord, ImageStore
 
 __all__ = [
     # New v0.6 API

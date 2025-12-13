@@ -22,7 +22,7 @@ def models_list_command(
     """
     from ragd.config import load_config
     from ragd.llm import ModelRegistry, OllamaClient
-    from ragd.models.cards import infer_model_type, ModelType
+    from ragd.models.cards import ModelType, infer_model_type
 
     con = get_console(no_color)
     config = load_config()
@@ -374,7 +374,7 @@ def models_show_command(
     """
     from rich.panel import Panel
 
-    from ragd.models import load_model_card, get_installed_models
+    from ragd.models import get_installed_models, load_model_card
 
     con = get_console(no_color)
 
@@ -479,7 +479,10 @@ def models_discover_command(
     """
     from ragd.models import load_model_card
     from ragd.models.discovery import AutoDiscoveryService
-    from ragd.models.discovery.connectivity import is_internet_available, is_ollama_available
+    from ragd.models.discovery.connectivity import (
+        is_internet_available,
+        is_ollama_available,
+    )
 
     con = get_console(no_color)
 

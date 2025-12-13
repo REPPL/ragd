@@ -7,8 +7,8 @@ from __future__ import annotations
 
 import os
 import sys
+from collections.abc import Generator
 from contextlib import contextmanager
-from typing import Generator
 
 from rich.console import Console
 from rich.progress import (

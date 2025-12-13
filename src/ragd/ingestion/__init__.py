@@ -1,11 +1,11 @@
 """Document ingestion pipeline for ragd."""
 
+from ragd.ingestion.chunker import Chunk, chunk_text
 from ragd.ingestion.extractor import (
     ExtractionResult,
     TextExtractor,
     extract_text,
 )
-from ragd.ingestion.chunker import Chunk, chunk_text
 from ragd.ingestion.pipeline import IndexResult, index_document, index_path
 from ragd.utils.paths import discover_files
 

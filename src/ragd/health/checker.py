@@ -6,8 +6,9 @@ This module provides comprehensive health checks for all ragd components.
 from __future__ import annotations
 
 import time
-from dataclasses import dataclass, field
-from typing import Any, Callable, Literal
+from collections.abc import Callable
+from dataclasses import dataclass
+from typing import Any, Literal
 
 from ragd.config import RagdConfig, config_exists, load_config
 
@@ -254,6 +255,66 @@ def check_nltk_data(config: RagdConfig) -> HealthResult:
         )
 
 
+def check_installation_mode(config: RagdConfig) -> HealthResult:
+    """Check installation mode (F-119: Full Features by Default).
+
+    Args:
+        config: Configuration
+
+    Returns:
+        HealthResult
+    """
+    start = time.perf_counter()
+
+    try:
+        from ragd.features import get_installation_summary
+
+        summary = get_installation_summary()
+        mode = summary["mode"]
+        available = summary["available_count"]
+        total = summary["total_count"]
+
+        if mode == "full":
+            return HealthResult(
+                name="Installation Mode",
+                status="healthy",
+                message=f"Full installation ({available}/{total} optional features)",
+                duration_ms=(time.perf_counter() - start) * 1000,
+                details=summary,
+            )
+        elif mode == "minimal":
+            return HealthResult(
+                name="Installation Mode",
+                status="degraded",
+                message=(
+                    "Minimal installation (core features only). "
+                    "Run: pip install ragd (without RAGD_MINIMAL=1) for full features"
+                ),
+                duration_ms=(time.perf_counter() - start) * 1000,
+                details=summary,
+            )
+        else:  # custom
+            missing = summary["missing_features"][:3]
+            return HealthResult(
+                name="Installation Mode",
+                status="degraded",
+                message=(
+                    f"Custom installation ({available}/{total} optional features). "
+                    f"Missing: {', '.join(missing)}"
+                ),
+                duration_ms=(time.perf_counter() - start) * 1000,
+                details=summary,
+            )
+
+    except Exception as e:
+        return HealthResult(
+            name="Installation Mode",
+            status="unhealthy",
+            message=f"Installation mode check failed: {e}",
+            duration_ms=(time.perf_counter() - start) * 1000,
+        )
+
+
 # Registry of health checks
 HEALTH_CHECKS: list[HealthCheck] = [
     check_config,
@@ -261,6 +322,7 @@ HEALTH_CHECKS: list[HealthCheck] = [
     check_embedding_model,
     check_dependencies,
     check_nltk_data,
+    check_installation_mode,
 ]
 
 

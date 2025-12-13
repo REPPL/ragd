@@ -126,7 +126,7 @@ class CitedAnswer:
     model: str | None = None
     tokens_used: int | None = None
     confidence: float | None = None
-    validation_report: "ValidationReport | None" = None
+    validation_report: ValidationReport | None = None
 
     @property
     def has_citations(self) -> bool:

@@ -4,13 +4,13 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from textual.app import App, ComposeResult
-from textual.binding import Binding
-from textual.containers import Container, Vertical
-from textual.widgets import Footer, Header, Static
 from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
+from textual.app import App, ComposeResult
+from textual.binding import Binding
+from textual.containers import Vertical
+from textual.widgets import Footer, Header, Static
 
 if TYPE_CHECKING:
     from ragd.search.searcher import SearchResult

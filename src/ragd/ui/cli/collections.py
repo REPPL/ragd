@@ -7,7 +7,6 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Optional
 
 import typer
 from rich.console import Console
@@ -15,7 +14,7 @@ from rich.table import Table
 
 from ragd.config import load_config
 from ragd.metadata import MetadataStore, TagManager
-from ragd.metadata.collections import CollectionManager, TagQuery
+from ragd.metadata.collections import CollectionManager
 
 console = Console()
 
@@ -31,20 +30,20 @@ def _get_collection_manager() -> CollectionManager:
 
 def collection_create_command(
     name: str = typer.Argument(..., help="Collection name"),
-    include_all: Optional[list[str]] = typer.Option(
+    include_all: list[str] | None = typer.Option(
         None, "--include-all", "-a",
         help="Tags that must ALL be present (AND logic)",
     ),
-    include_any: Optional[list[str]] = typer.Option(
+    include_any: list[str] | None = typer.Option(
         None, "--include-any", "-o",
         help="Tags where at least ONE must be present (OR logic)",
     ),
-    exclude: Optional[list[str]] = typer.Option(
+    exclude: list[str] | None = typer.Option(
         None, "--exclude", "-x",
         help="Tags that must NOT be present",
     ),
     description: str = typer.Option("", "--description", "-d", help="Collection description"),
-    parent: Optional[str] = typer.Option(None, "--parent", "-p", help="Parent collection name"),
+    parent: str | None = typer.Option(None, "--parent", "-p", help="Parent collection name"),
 ) -> None:
     """Create a new smart collection."""
     try:
@@ -67,7 +66,7 @@ def collection_create_command(
 
 
 def collection_list_command(
-    parent: Optional[str] = typer.Option(None, "--parent", "-p", help="List children of this collection"),
+    parent: str | None = typer.Option(None, "--parent", "-p", help="List children of this collection"),
 ) -> None:
     """List all collections."""
     manager = _get_collection_manager()
@@ -165,19 +164,19 @@ def collection_show_command(
 
 def collection_update_command(
     name: str = typer.Argument(..., help="Collection name"),
-    include_all: Optional[list[str]] = typer.Option(
+    include_all: list[str] | None = typer.Option(
         None, "--include-all", "-a",
         help="New tags that must ALL be present",
     ),
-    include_any: Optional[list[str]] = typer.Option(
+    include_any: list[str] | None = typer.Option(
         None, "--include-any", "-o",
         help="New tags where at least ONE must be present",
     ),
-    exclude: Optional[list[str]] = typer.Option(
+    exclude: list[str] | None = typer.Option(
         None, "--exclude", "-x",
         help="New tags that must NOT be present",
     ),
-    description: Optional[str] = typer.Option(None, "--description", "-d", help="New description"),
+    description: str | None = typer.Option(None, "--description", "-d", help="New description"),
 ) -> None:
     """Update a collection's query or description."""
     manager = _get_collection_manager()
@@ -222,13 +221,13 @@ def collection_delete_command(
     if manager.delete(name):
         console.print(f"[green]Deleted collection '{name}'[/green]")
     else:
-        console.print(f"[red]Failed to delete collection[/red]")
+        console.print("[red]Failed to delete collection[/red]")
         raise typer.Exit(1)
 
 
 def collection_export_command(
     name: str = typer.Argument(..., help="Collection name"),
-    output: Optional[Path] = typer.Option(None, "--output", "-o", help="Output file (default: stdout)"),
+    output: Path | None = typer.Option(None, "--output", "-o", help="Output file (default: stdout)"),
     format: str = typer.Option("json", "--format", "-f", help="Output format (json, csv, ids)"),
 ) -> None:
     """Export collection members."""

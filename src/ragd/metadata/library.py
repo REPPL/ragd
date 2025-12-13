@@ -8,14 +8,14 @@ F-062: Tag Library Management
 
 from __future__ import annotations
 
-import json
 import logging
 import sqlite3
+from collections.abc import Iterator
 from contextlib import contextmanager
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Iterator
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from ragd.metadata.tags import TagManager
@@ -53,7 +53,7 @@ class TagNamespace:
         }
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> "TagNamespace":
+    def from_dict(cls, data: dict[str, Any]) -> TagNamespace:
         """Create TagNamespace from dictionary."""
         return cls(
             name=data["name"],
@@ -117,7 +117,7 @@ class TagLibrary:
     Provides namespace management and tag validation.
     """
 
-    def __init__(self, db_path: Path, tag_manager: "TagManager") -> None:
+    def __init__(self, db_path: Path, tag_manager: TagManager) -> None:
         """Initialise the tag library.
 
         Args:

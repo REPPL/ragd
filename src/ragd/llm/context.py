@@ -9,7 +9,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
-from ragd.llm.client import LLMClient, LLMResponse
+from ragd.llm.client import LLMClient
 
 
 @dataclass

@@ -5,10 +5,10 @@ Provides quality assessment metrics for document extraction.
 
 from ragd.quality.metrics import (
     QualityMetrics,
-    compute_completeness,
     compute_character_quality,
-    compute_structure_score,
+    compute_completeness,
     compute_image_handling,
+    compute_structure_score,
     compute_table_handling,
 )
 from ragd.quality.scorer import (

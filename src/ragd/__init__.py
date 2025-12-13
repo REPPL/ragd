@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import os
-from importlib.metadata import version, PackageNotFoundError
+from importlib.metadata import PackageNotFoundError, version
 
 # Suppress HuggingFace tokenizers parallelism warning
 # ragd uses single-threaded indexing; parallelism causes fork deadlocks with OCR

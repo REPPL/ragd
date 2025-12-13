@@ -22,7 +22,7 @@ def watch_start_command(
     """Start watching directories for changes."""
     from ragd.config import load_config
     from ragd.ingestion import index_path
-    from ragd.web.watcher import FolderWatcher, WatchConfig, WATCHDOG_AVAILABLE
+    from ragd.web.watcher import WATCHDOG_AVAILABLE, FolderWatcher, WatchConfig
 
     con = get_console(no_color)
 

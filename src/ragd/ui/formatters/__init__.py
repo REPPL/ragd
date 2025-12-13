@@ -8,19 +8,21 @@ Provides Rich-based formatters for:
 """
 
 # New F-114 formatters
-from ragd.ui.formatters.progress import IndexingProgress, create_progress
-from ragd.ui.formatters.errors import format_error, format_errors_summary
-from ragd.ui.formatters.summaries import format_summary, format_batch_summary
-
 # Legacy formatters (from original formatters.py, now in _legacy.py)
 from ragd.ui.formatters._legacy import (
-    OutputFormat,
     CitationStyleOption,
+    OutputFormat,
+    format_health_results,
+    format_index_results,
     format_search_results,
     format_status,
-    format_index_results,
-    format_health_results,
 )
+
+# F-057 Model Comparison
+from ragd.ui.formatters.comparison import format_comparison, print_comparison
+from ragd.ui.formatters.errors import format_error, format_errors_summary
+from ragd.ui.formatters.progress import IndexingProgress, create_progress
+from ragd.ui.formatters.summaries import format_batch_summary, format_summary
 
 __all__ = [
     # New F-114 formatters
@@ -30,6 +32,9 @@ __all__ = [
     "format_errors_summary",
     "format_summary",
     "format_batch_summary",
+    # F-057 Model Comparison
+    "format_comparison",
+    "print_comparison",
     # Legacy formatters
     "OutputFormat",
     "CitationStyleOption",

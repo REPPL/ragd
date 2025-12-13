@@ -306,7 +306,7 @@ def check_ocr_available() -> tuple[bool, str]:
         Tuple of (available: bool, message: str)
     """
     try:
-        from ragd.features import PADDLEOCR_AVAILABLE, EASYOCR_AVAILABLE
+        from ragd.features import EASYOCR_AVAILABLE, PADDLEOCR_AVAILABLE
 
         if PADDLEOCR_AVAILABLE:
             return True, "OCR is available (PaddleOCR)"

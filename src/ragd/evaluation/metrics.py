@@ -91,7 +91,7 @@ class EvaluationMetrics:
         }
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> "EvaluationMetrics":
+    def from_dict(cls, data: dict[str, Any]) -> EvaluationMetrics:
         """Create from dictionary."""
         return cls(
             context_precision=data.get("context_precision"),

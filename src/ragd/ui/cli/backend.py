@@ -17,13 +17,12 @@ from rich.text import Text
 from ragd.config import load_config
 from ragd.storage import (
     BackendType,
-    VectorStoreFactory,
     create_vector_store,
     get_factory,
 )
 
 if TYPE_CHECKING:
-    from ragd.storage.protocols import VectorStore
+    pass
 
 
 def get_console(no_color: bool = False) -> Console:

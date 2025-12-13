@@ -3,9 +3,9 @@
 from ragd.embedding.embedder import (
     Embedder,
     SentenceTransformerEmbedder,
+    download_model,
     get_embedder,
     is_model_cached,
-    download_model,
 )
 from ragd.embedding.late_chunking import (
     ChunkBoundary,

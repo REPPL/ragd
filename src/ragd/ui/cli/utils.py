@@ -30,7 +30,7 @@ def get_console(no_color: bool = False, max_width: int | None = None) -> Console
     return Console(no_color=no_color, width=max_width, soft_wrap=True)
 
 
-def format_citation_location(cit: "Citation") -> str:
+def format_citation_location(cit: Citation) -> str:
     """Format citation location with page range support.
 
     Handles both single page numbers and aggregated page ranges
@@ -90,10 +90,7 @@ class StreamingWordWrapper:
                 self._flush_word()
                 if char == "\n":
                     self._newline()
-                elif char == " ":
-                    self._write_space()
-                # Tabs treated as spaces
-                elif char == "\t":
+                elif char == " " or char == "\t":
                     self._write_space()
             else:
                 self.word_buffer += char

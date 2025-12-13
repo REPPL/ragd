@@ -5,8 +5,6 @@ F-062: Tag Library Management
 
 from __future__ import annotations
 
-from typing import Optional
-
 import typer
 from rich.console import Console
 from rich.table import Table
@@ -67,7 +65,7 @@ def library_create_command(
     open_: bool = typer.Option(False, "--open", "-o", help="Create as open namespace (any value allowed)"),
     closed: bool = typer.Option(False, "--closed", "-c", help="Create as closed namespace (predefined values only)"),
     description: str = typer.Option("", "--description", "-d", help="Namespace description"),
-    tags: Optional[list[str]] = typer.Option(None, "--tags", "-t", help="Initial tag values (for closed namespaces)"),
+    tags: list[str] | None = typer.Option(None, "--tags", "-t", help="Initial tag values (for closed namespaces)"),
 ) -> None:
     """Create a new namespace in the tag library."""
     library = _get_tag_library()
@@ -110,7 +108,7 @@ def library_add_command(
     if added:
         console.print(f"[green]Added {added} tag(s) to namespace '{namespace}'[/green]")
     else:
-        console.print(f"[yellow]No tags added (namespace not found or tags already exist)[/yellow]")
+        console.print("[yellow]No tags added (namespace not found or tags already exist)[/yellow]")
 
 
 def library_remove_command(
@@ -128,7 +126,7 @@ def library_remove_command(
     if removed:
         console.print(f"[green]Removed {removed} tag(s) from namespace '{namespace}'[/green]")
     else:
-        console.print(f"[yellow]No tags removed (not found)[/yellow]")
+        console.print("[yellow]No tags removed (not found)[/yellow]")
 
 
 def library_rename_command(
@@ -144,7 +142,7 @@ def library_rename_command(
     if updated:
         console.print(f"[green]Renamed '{old_value}' to '{new_value}' in {updated} documents[/green]")
     else:
-        console.print(f"[yellow]No documents updated[/yellow]")
+        console.print("[yellow]No documents updated[/yellow]")
 
 
 def library_delete_command(
@@ -229,7 +227,7 @@ def library_promote_command(
     if library.promote_pending_tag(tag_name, namespace):
         console.print(f"[green]Promoted '{tag_name}' to namespace '{namespace}'[/green]")
     else:
-        console.print(f"[red]Failed to promote tag (namespace not found or tag not in pending)[/red]")
+        console.print("[red]Failed to promote tag (namespace not found or tag not in pending)[/red]")
         raise typer.Exit(1)
 
 

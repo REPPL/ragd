@@ -9,16 +9,16 @@ Provides Rich-based error display with:
 
 from __future__ import annotations
 
-from rich.console import Console, Group
+from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
 
 from ragd.operations.errors import (
-    DocumentResult,
-    BatchResult,
-    IndexingErrorCategory,
     REMEDIATION_HINTS,
+    BatchResult,
+    DocumentResult,
+    IndexingErrorCategory,
 )
 
 

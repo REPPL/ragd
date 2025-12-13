@@ -9,13 +9,11 @@ from __future__ import annotations
 import html
 import logging
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime
 from html.parser import HTMLParser as StdHTMLParser
 from pathlib import Path
 from typing import Any
-
-from ragd.features import DependencyError
 
 logger = logging.getLogger(__name__)
 
@@ -496,7 +494,7 @@ class WebArchiveProcessor:
 
         try:
             # Read first 10KB to check
-            with open(path, "r", encoding="utf-8", errors="ignore") as f:
+            with open(path, encoding="utf-8", errors="ignore") as f:
                 content = f.read(10000)
             return is_singlefile_archive(content)
         except Exception:
@@ -519,7 +517,7 @@ class WebArchiveProcessor:
             )
 
         try:
-            with open(path, "r", encoding="utf-8", errors="ignore") as f:
+            with open(path, encoding="utf-8", errors="ignore") as f:
                 html_content = f.read()
 
             return extract_web_content(html_content, path)

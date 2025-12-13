@@ -6,15 +6,14 @@ Handles version-aware configuration migration with backup and rollback.
 from __future__ import annotations
 
 import shutil
+from collections.abc import Callable
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Callable
 
 import yaml
 from rich.console import Console
 
 from ragd.config import DEFAULT_CONFIG_PATH
-
 
 # Current config schema version
 CURRENT_VERSION = 2

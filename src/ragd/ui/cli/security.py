@@ -12,7 +12,6 @@ import getpass
 import sys
 from pathlib import Path
 
-from rich.console import Console
 from rich.panel import Panel
 from rich.progress import Progress, SpinnerColumn, TextColumn
 
@@ -32,8 +31,7 @@ def _get_session_manager(config_path: Path | None = None):
     Raises:
         ImportError: If encryption dependencies not available.
     """
-    from ragd.config import load_config
-    from ragd.security import SessionManager, SessionConfig
+    from ragd.security import SessionConfig, SessionManager
     from ragd.security.crypto import CryptoConfig
 
     config = load_config(config_path)
@@ -119,13 +117,12 @@ def unlock_command(
         no_color: Disable coloured output.
         extend: Extend existing session instead of new unlock.
     """
-    from ragd.ui.cli.commands import get_console
     from ragd.security import (
         AuthenticationError,
         LockoutError,
         SessionError,
-        SessionLockError,
     )
+    from ragd.ui.cli.commands import get_console
 
     con = get_console(no_color)
 
@@ -242,8 +239,8 @@ def password_change_command(
     Args:
         no_color: Disable coloured output.
     """
-    from ragd.ui.cli.commands import get_console
     from ragd.security import AuthenticationError, SessionError
+    from ragd.ui.cli.commands import get_console
 
     con = get_console(no_color)
 
@@ -299,8 +296,9 @@ def password_reset_command(
         no_color: Disable coloured output.
         confirm_data_loss: Must be True to proceed.
     """
-    from ragd.ui.cli.commands import get_console
     import typer
+
+    from ragd.ui.cli.commands import get_console
 
     con = get_console(no_color)
 
@@ -371,7 +369,7 @@ def session_status_command(
         remaining = _format_time_remaining(status["time_remaining_seconds"])
         state_text = f"Unlocked ({remaining} remaining)"
 
-    con.print(f"\n[bold]Session Status[/bold]")
+    con.print("\n[bold]Session Status[/bold]")
     con.print(f"  {state_icon} {state_text}")
 
     if status["is_initialised"]:

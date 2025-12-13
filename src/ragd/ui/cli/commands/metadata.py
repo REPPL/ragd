@@ -115,7 +115,7 @@ def meta_edit_command(
     if description is not None:
         old_val = metadata.dc_description[:50] + "..." if len(metadata.dc_description) > 50 else metadata.dc_description
         store.update(document_id, dc_description=description)
-        changes.append(f"Description: updated")
+        changes.append("Description: updated")
 
     if doc_type is not None:
         old_val = metadata.dc_type

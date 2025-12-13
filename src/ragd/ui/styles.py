@@ -52,19 +52,29 @@ def print_banner(
     console.print(border)
 
 
-def print_chat_header(console: Console, model: str) -> None:
+def print_chat_header(
+    console: Console,
+    model: str,
+    context_window: int | None = None,
+) -> None:
     """Print the chat command header.
 
     Args:
         console: Rich console instance
         model: Model name to display
+        context_window: Context window size in tokens (optional)
     """
     print_banner(
         console,
         "ragd Chat",
         "Your AI-powered knowledge assistant",
     )
-    console.print(f"[dim]Model: {model} | Type '/help' for commands[/dim]\n")
+    # Format context window with comma separators (e.g., 131,072)
+    if context_window:
+        ctx_display = f"{context_window:,}"
+        console.print(f"[dim]Model: {model} | Context: {ctx_display} tokens | Type '/help' for commands[/dim]\n")
+    else:
+        console.print(f"[dim]Model: {model} | Type '/help' for commands[/dim]\n")
 
 
 def print_init_header(console: Console) -> None:

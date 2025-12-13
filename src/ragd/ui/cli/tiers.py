@@ -12,7 +12,6 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Literal
 
-from rich.console import Console
 from rich.table import Table
 
 from ragd.config import load_config
@@ -28,9 +27,8 @@ def _get_tier_manager(config_path: Path | None = None):
     Returns:
         TierManager instance.
     """
-    from ragd.config import load_config
     from ragd.metadata.store import MetadataStore
-    from ragd.security.tiers import TierManager, TierConfig, DataTier
+    from ragd.security.tiers import DataTier, TierConfig, TierManager
 
     config = load_config(config_path)
 
@@ -40,7 +38,7 @@ def _get_tier_manager(config_path: Path | None = None):
     # Get session manager if available
     session = None
     try:
-        from ragd.security import SessionManager, SessionConfig
+        from ragd.security import SessionConfig, SessionManager
         from ragd.security.crypto import CryptoConfig
 
         session_config = SessionConfig(
@@ -84,8 +82,8 @@ def tier_set_command(
         tier: Tier name (public, personal, sensitive, critical).
         no_color: Disable coloured output.
     """
-    from ragd.ui.cli.commands import get_console
     from ragd.security.tiers import DataTier, get_tier_colour, get_tier_icon
+    from ragd.ui.cli.commands import get_console
 
     con = get_console(no_color)
 
@@ -120,8 +118,8 @@ def tier_show_command(
         document_id: Document ID to query.
         no_color: Disable coloured output.
     """
-    from ragd.ui.cli.commands import get_console
     from ragd.security.tiers import get_tier_colour, get_tier_icon
+    from ragd.ui.cli.commands import get_console
 
     con = get_console(no_color)
     manager = _get_tier_manager()
@@ -150,8 +148,8 @@ def tier_list_command(
     """
     import json as json_module
 
-    from ragd.ui.cli.commands import get_console
     from ragd.security.tiers import DataTier, get_tier_colour, get_tier_icon
+    from ragd.ui.cli.commands import get_console
 
     con = get_console(no_color)
     manager = _get_tier_manager()
@@ -231,8 +229,8 @@ def tier_summary_command(
     """
     import json as json_module
 
-    from ragd.ui.cli.commands import get_console
     from ragd.security.tiers import DataTier, get_tier_colour, get_tier_icon
+    from ragd.ui.cli.commands import get_console
 
     con = get_console(no_color)
     manager = _get_tier_manager()
@@ -277,8 +275,8 @@ def tier_promote_command(
         document_id: Document ID to promote.
         no_color: Disable coloured output.
     """
-    from ragd.ui.cli.commands import get_console
     from ragd.security.tiers import get_tier_colour, get_tier_icon
+    from ragd.ui.cli.commands import get_console
 
     con = get_console(no_color)
     manager = _get_tier_manager()
@@ -315,8 +313,8 @@ def tier_demote_command(
         document_id: Document ID to demote.
         no_color: Disable coloured output.
     """
-    from ragd.ui.cli.commands import get_console
     from ragd.security.tiers import get_tier_colour, get_tier_icon
+    from ragd.ui.cli.commands import get_console
 
     con = get_console(no_color)
     manager = _get_tier_manager()

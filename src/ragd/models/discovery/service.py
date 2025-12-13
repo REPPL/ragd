@@ -65,7 +65,7 @@ class AutoDiscoveryService:
         self,
         model_id: str,
         interactive: bool = False,
-        console: "Console | None" = None,
+        console: Console | None = None,
     ) -> ModelCard | None:
         """Discover and optionally create a model card.
 
@@ -186,7 +186,7 @@ class AutoDiscoveryService:
     def _prompt_confirmation(
         self,
         card: ModelCard,
-        console: "Console",
+        console: Console,
     ) -> ModelCard | None:
         """Interactive prompt for user to confirm/edit card.
 

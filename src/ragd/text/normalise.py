@@ -153,6 +153,7 @@ class TextNormaliser:
         Returns:
             Tuple of (normalised_text, list_of_changes)
         """
+        from ragd.text.captions import remove_captions
         from ragd.text.pdf_fixes import (
             fix_ligature_errors,
             fix_ocr_spelling,
@@ -161,7 +162,6 @@ class TextNormaliser:
             fix_title_ocr,
             fix_word_boundaries,
         )
-        from ragd.text.captions import remove_captions
 
         changes: list[str] = []
         normalised = text
@@ -222,8 +222,8 @@ class TextNormaliser:
         Returns:
             Tuple of (normalised_text, list_of_changes)
         """
-        from ragd.text.html_clean import fix_html_line_breaks, remove_boilerplate
         from ragd.text.captions import remove_captions
+        from ragd.text.html_clean import fix_html_line_breaks, remove_boilerplate
 
         changes: list[str] = []
         normalised = text

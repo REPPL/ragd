@@ -20,12 +20,13 @@ from __future__ import annotations
 
 import json
 import logging
+from collections.abc import Iterator
 from contextlib import contextmanager
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Iterator
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
-    import sqlite3
+    pass
 
 logger = logging.getLogger(__name__)
 
@@ -148,7 +149,7 @@ class EncryptedConnection:
             self._conn.execute(f"PRAGMA key = \"x'{key_hex}'\"")
 
             # Configure SQLCipher settings
-            self._conn.execute(f"PRAGMA cipher_page_size = 4096")
+            self._conn.execute("PRAGMA cipher_page_size = 4096")
             self._conn.execute(f"PRAGMA kdf_iter = {self._kdf_iter}")
             self._conn.execute(f"PRAGMA cipher = '{self._cipher}'")
 

@@ -319,7 +319,7 @@ def run_auto_fix(data_dir: Path | None = None, console: Console | None = None) -
     chroma_path = data_dir / "chroma"
     if not chroma_path.exists():
         chroma_path.mkdir(parents=True, exist_ok=True)
-        console.print(f"[green]✓[/green] Created vector store directory")
+        console.print("[green]✓[/green] Created vector store directory")
         fixed += 1
 
     if fixed == 0:

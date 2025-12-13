@@ -16,7 +16,6 @@ from bs4 import BeautifulSoup
 
 from ragd.ingestion.extractor import ExtractionResult
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -213,7 +212,7 @@ class JSHTMLExtractor:
         """
         # Read HTML content
         try:
-            with open(path, "r", encoding="utf-8", errors="ignore") as f:
+            with open(path, encoding="utf-8", errors="ignore") as f:
                 html_content = f.read()
         except Exception as e:
             return ExtractionResult(

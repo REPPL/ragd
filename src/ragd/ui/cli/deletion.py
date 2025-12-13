@@ -31,7 +31,6 @@ def _get_secure_deleter(config_path: Path | None = None) -> SecureDeleter:
     Returns:
         SecureDeleter instance.
     """
-    from ragd.config import load_config
 
     config = load_config(config_path)
 
@@ -81,7 +80,7 @@ def _confirm_deletion(
         ))
         prompt = f"PURGE {count} document(s)?"
     elif level == DeletionLevel.SECURE:
-        con.print(f"\n[yellow]Secure deletion[/yellow] will overwrite storage locations.")
+        con.print("\n[yellow]Secure deletion[/yellow] will overwrite storage locations.")
         prompt = f"Securely delete {count} document(s)?"
     else:
         if source:
@@ -270,9 +269,9 @@ def _print_result(con: Console, result: DeletionResult) -> None:
     if result.vectors_deleted > 0:
         con.print(f"[dim]  Vectors removed: {result.vectors_deleted}[/dim]")
     if result.key_rotated:
-        con.print(f"[dim]  Encryption key rotated[/dim]")
+        con.print("[dim]  Encryption key rotated[/dim]")
     if result.audit_logged:
-        con.print(f"[dim]  Audit entry created[/dim]")
+        con.print("[dim]  Audit entry created[/dim]")
 
 
 def delete_audit_command(

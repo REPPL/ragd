@@ -5,7 +5,6 @@ Provides a guided interface for configuring ragd without manual YAML editing.
 
 from __future__ import annotations
 
-import os
 from pathlib import Path
 from typing import Any
 
@@ -14,7 +13,6 @@ from rich.panel import Panel
 from rich.prompt import Confirm, IntPrompt, Prompt
 
 from ragd.config import (
-    DEFAULT_CONFIG_PATH,
     RagdConfig,
     load_config,
     save_config,

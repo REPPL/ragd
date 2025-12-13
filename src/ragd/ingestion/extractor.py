@@ -5,7 +5,6 @@ This module provides extractors for PDF, TXT, Markdown, and HTML files.
 
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Protocol
@@ -99,7 +98,6 @@ class PDFExtractor:
         Returns:
             Dictionary with author, publication_year, and other metadata
         """
-        import re
 
         metadata: dict[str, Any] = {}
 
@@ -327,7 +325,7 @@ class HTMLExtractor:
         except ImportError:
             return False
 
-    def _extract_from_script_tags(self, soup: "BeautifulSoup") -> str:
+    def _extract_from_script_tags(self, soup: BeautifulSoup) -> str:
         """Extract text content from script tags containing JSON data.
 
         Many modern web apps (React, Next.js, Vue) embed article content
@@ -587,7 +585,7 @@ class AdvancedHTMLExtractor:
                 encoding = "latin-1"
 
             # Check if this is a SingleFile archive
-            from ragd.web.archive import is_singlefile_archive, WebArchiveProcessor
+            from ragd.web.archive import WebArchiveProcessor, is_singlefile_archive
 
             if is_singlefile_archive(html_content):
                 # Route to WebArchiveProcessor (F-038)
@@ -637,8 +635,8 @@ class AdvancedHTMLExtractor:
         Returns:
             ExtractionResult with enhanced extraction
         """
-        from ragd.web.parser import parse_html, ComplexityTier
         from ragd.web.metadata import extract_metadata as extract_html_metadata
+        from ragd.web.parser import ComplexityTier, parse_html
         from ragd.web.structure import extract_structure, get_text_with_structure
 
         # Parse HTML

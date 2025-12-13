@@ -8,14 +8,13 @@ scores are always in the 0-1 range.
 from __future__ import annotations
 
 import logging
-from datetime import datetime
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 # Lazy import chromadb - it's heavy (~3-5 seconds)
 # Imported inside ChromaDBAdapter.__init__ when actually needed
 if TYPE_CHECKING:
-    import chromadb
+    pass
 
 from ragd.storage.types import (
     BackendHealth,

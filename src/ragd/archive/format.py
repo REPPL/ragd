@@ -6,10 +6,7 @@ The format is self-describing and versioned for forward compatibility.
 
 from __future__ import annotations
 
-import json
 from dataclasses import dataclass, field
-from datetime import datetime
-from pathlib import Path
 from typing import Any
 
 # Archive format version

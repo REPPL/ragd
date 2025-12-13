@@ -7,7 +7,6 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from datetime import date
-from typing import Any
 
 from ragd.citation.citation import Citation, CitationStyle
 

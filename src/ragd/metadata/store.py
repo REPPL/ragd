@@ -9,10 +9,11 @@ from __future__ import annotations
 import json
 import logging
 import sqlite3
+from collections.abc import Iterator
 from contextlib import contextmanager
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Iterator
+from typing import Any
 
 from ragd.metadata.migration import migrate_to_current, needs_migration
 from ragd.metadata.schema import DocumentMetadata

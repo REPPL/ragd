@@ -6,26 +6,25 @@ of ragd knowledge bases.
 
 from __future__ import annotations
 
-import gzip
 import hashlib
 import json
 import logging
 import os
 import tarfile
 import tempfile
-from collections.abc import Callable, Iterator
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 from ragd.archive.format import (
     ARCHIVE_VERSION,
+    ArchivedChunk,
+    ArchivedDocument,
     ArchiveFilters,
     ArchiveManifest,
     ArchiveStatistics,
-    ArchivedChunk,
-    ArchivedDocument,
     EmbeddingInfo,
 )
 
@@ -490,7 +489,7 @@ class ExportEngine:
         """Create archive manifest."""
         return ArchiveManifest(
             version=ARCHIVE_VERSION,
-            created_at=datetime.utcnow().isoformat() + "Z",
+            created_at=datetime.now(UTC).isoformat().replace("+00:00", "Z"),
             ragd_version=self._ragd_version,
             statistics=ArchiveStatistics(
                 document_count=doc_count,

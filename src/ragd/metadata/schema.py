@@ -13,7 +13,7 @@ from datetime import datetime
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
-    from ragd.metadata.provenance import TagEntry
+    pass
 
 
 @dataclass

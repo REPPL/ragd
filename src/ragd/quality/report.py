@@ -5,9 +5,10 @@ Provides functions to generate quality reports for indexed documents.
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any
 
 from ragd.config import RagdConfig, load_config
 from ragd.quality.scorer import DocumentQuality, QualityScorer
@@ -253,8 +254,8 @@ def get_quality_summary(report: QualityReport) -> str:
         Human-readable summary
     """
     lines = [
-        f"Quality Report",
-        f"=" * 50,
+        "Quality Report",
+        "=" * 50,
         f"Total documents: {report.total_documents}",
         f"Average score: {report.average_score:.2%}",
         f"Low quality (< 70%): {report.low_quality_count}",

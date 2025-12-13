@@ -6,7 +6,6 @@ Provides extraction for DOCX, XLSX, and EPUB formats.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING
 
 from ragd.ingestion.extractor import ExtractionResult
 
@@ -153,8 +152,8 @@ class EPUBExtractor:
         """
         try:
             import ebooklib
-            from ebooklib import epub
             from bs4 import BeautifulSoup
+            from ebooklib import epub
         except ImportError:
             return ExtractionResult(
                 text="",

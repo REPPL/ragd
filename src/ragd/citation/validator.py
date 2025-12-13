@@ -206,8 +206,8 @@ class CitationValidator:
     def validate(
         self,
         response_text: str,
-        citations: list["Citation"],
-        extracted: list["ExtractedCitation"],
+        citations: list[Citation],
+        extracted: list[ExtractedCitation],
     ) -> ValidationReport:
         """Validate all citations in a response.
 
@@ -252,7 +252,7 @@ class CitationValidator:
         self,
         index: int,
         claim: str,
-        citations: list["Citation"],
+        citations: list[Citation],
     ) -> CitationValidation:
         """Validate a single citation usage.
 
@@ -422,7 +422,7 @@ class CitationValidator:
 
 def validate_citations(
     response_text: str,
-    citations: list["Citation"],
+    citations: list[Citation],
     mode: ValidationMode = ValidationMode.WARN,
     use_semantic: bool = False,
 ) -> ValidationReport:

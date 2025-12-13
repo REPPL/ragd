@@ -10,11 +10,11 @@ from pathlib import Path
 import typer
 from rich.console import Console
 from rich.progress import (
+    BarColumn,
+    MofNCompleteColumn,
     Progress,
     SpinnerColumn,
     TextColumn,
-    BarColumn,
-    MofNCompleteColumn,
 )
 
 from ragd.ui import OutputFormat
@@ -38,14 +38,15 @@ def evaluate_command(
     When --include-llm is set, also computes faithfulness and answer_relevancy.
     """
     import json
+
     import yaml
     from rich.table import Table
 
     from ragd.config import load_config
     from ragd.evaluation import (
-        Evaluator,
         EvaluationConfig,
         EvaluationStorage,
+        Evaluator,
         MetricType,
     )
 
@@ -197,8 +198,8 @@ def quality_command(
     from ragd.config import load_config
     from ragd.quality import QualityScorer
     from ragd.quality.report import (
-        generate_quality_report,
         generate_corpus_report,
+        generate_quality_report,
         get_quality_summary,
     )
     from ragd.storage import ChromaStore
@@ -341,7 +342,6 @@ def _display_document_quality(
 ) -> None:
     """Display quality metrics for a single document."""
     from rich.table import Table
-    from rich.panel import Panel
 
     m = result.metrics
 

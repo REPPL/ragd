@@ -12,8 +12,8 @@ from typing import Any
 import yaml
 from rich.console import Console
 from rich.panel import Panel
-from rich.table import Table
 from rich.syntax import Syntax
+from rich.table import Table
 
 from ragd.config import (
     DEFAULT_CONFIG_PATH,

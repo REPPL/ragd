@@ -16,7 +16,7 @@ import re
 from collections import Counter
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import TYPE_CHECKING, Any, Callable
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -209,7 +209,7 @@ class PIIReport:
         document_path: str,
         results: list[PIIResult],
         confidence_threshold: float = 0.85,
-    ) -> "PIIReport":
+    ) -> PIIReport:
         """Create report from detection results.
 
         Args:

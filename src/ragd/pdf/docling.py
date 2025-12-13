@@ -96,7 +96,7 @@ class DoclingProcessor:
         """Docling handles complex layouts."""
         return True
 
-    def _ensure_converter(self) -> "DocumentConverter":
+    def _ensure_converter(self) -> DocumentConverter:
         """Lazy load the converter on first use.
 
         Returns:

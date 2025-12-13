@@ -12,12 +12,13 @@ import hashlib
 import json
 import logging
 import sqlite3
+from collections.abc import Iterator
 from contextlib import contextmanager
 from dataclasses import dataclass, field
 from datetime import datetime
 from fnmatch import fnmatch
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Iterator
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from ragd.metadata.tags import TagManager
@@ -109,7 +110,7 @@ class TagQuery:
         }
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> "TagQuery":
+    def from_dict(cls, data: dict[str, Any]) -> TagQuery:
         """Create TagQuery from dictionary."""
         return cls(
             include_all=data.get("include_all", []),
@@ -149,7 +150,7 @@ class Collection:
         }
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> "Collection":
+    def from_dict(cls, data: dict[str, Any]) -> Collection:
         """Create Collection from dictionary."""
         return cls(
             id=data["id"],
@@ -178,7 +179,7 @@ class CollectionManager:
     Provides CRUD operations for collections and membership queries.
     """
 
-    def __init__(self, db_path: Path, tag_manager: "TagManager") -> None:
+    def __init__(self, db_path: Path, tag_manager: TagManager) -> None:
         """Initialise the collection manager.
 
         Args:

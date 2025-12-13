@@ -13,8 +13,8 @@ from ragd.knowledge.entities import (
     PatternEntityExtractor,
 )
 from ragd.knowledge.graph import (
-    KnowledgeGraph,
     GraphConfig,
+    KnowledgeGraph,
     Relationship,
 )
 

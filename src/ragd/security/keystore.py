@@ -19,7 +19,7 @@ import gc
 import platform
 import secrets
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -49,8 +49,8 @@ class KeyMetadata:
         is_protected: Whether memory protection (mlock) succeeded.
     """
 
-    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
-    last_accessed: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
+    last_accessed: datetime = field(default_factory=lambda: datetime.now(UTC))
     access_count: int = 0
     is_protected: bool = False
 
@@ -202,7 +202,7 @@ class KeyStore:
             raise KeyStoreError("No key stored")
 
         if self._metadata:
-            self._metadata.last_accessed = datetime.now(timezone.utc)
+            self._metadata.last_accessed = datetime.now(UTC)
             self._metadata.access_count += 1
 
         # Return a copy to prevent external modification
@@ -271,7 +271,7 @@ class KeyStore:
         """Clean up on garbage collection."""
         self.clear()
 
-    def __enter__(self) -> "KeyStore":
+    def __enter__(self) -> KeyStore:
         """Context manager entry."""
         return self
 
@@ -336,7 +336,7 @@ class VerificationStore:
         }
 
     @classmethod
-    def from_dict(cls, data: dict[str, str]) -> "VerificationStore":
+    def from_dict(cls, data: dict[str, str]) -> VerificationStore:
         """Create from dictionary.
 
         Args:

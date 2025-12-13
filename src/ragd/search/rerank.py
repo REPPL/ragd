@@ -9,11 +9,12 @@ understanding. This improves precision at the cost of speed (O(n) inference).
 from __future__ import annotations
 
 import logging
-from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Any, Protocol, Sequence
+from collections.abc import Sequence
+from dataclasses import dataclass
+from typing import TYPE_CHECKING, Any, Protocol
 
 if TYPE_CHECKING:
-    from ragd.search.hybrid import HybridSearchResult
+    pass
 
 logger = logging.getLogger(__name__)
 

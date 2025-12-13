@@ -9,12 +9,11 @@ from __future__ import annotations
 import hashlib
 import json
 import logging
-import os
 import tarfile
 import tempfile
 from collections.abc import Callable
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import UTC, datetime
 from enum import Enum
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
@@ -70,21 +69,15 @@ def _safe_extract(tar: tarfile.TarFile, path: Path) -> None:
                     f"Archive contains symlink escaping target: {member.name}"
                 ) from None
 
-        tar.extract(member, path)
+        tar.extract(member, path, filter="data")
 
 from ragd.archive.format import (
     COMPATIBLE_VERSIONS,
     ArchiveManifest,
-    ArchiveValidationError,
-    ArchivedChunk,
-    ArchivedDocument,
-    ChecksumMismatchError,
-    IncompatibleVersionError,
     is_version_compatible,
 )
 
 if TYPE_CHECKING:
-    from ragd.metadata.schema import DocumentMetadata
     from ragd.metadata.store import MetadataStore
     from ragd.storage.chromadb import ChromaStore
 
@@ -502,7 +495,7 @@ class ImportEngine:
                     replaced += 1
                 elif options.conflict_resolution == ConflictResolution.RENAME:
                     # Generate new ID
-                    doc_id = f"{doc_id}_imported_{datetime.utcnow().strftime('%Y%m%d%H%M%S')}"
+                    doc_id = f"{doc_id}_imported_{datetime.now(UTC).strftime('%Y%m%d%H%M%S')}"
                     doc_data["id"] = doc_id
 
             # Store document record info for later when we import chunks

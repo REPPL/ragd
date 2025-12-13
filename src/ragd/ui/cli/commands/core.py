@@ -11,11 +11,11 @@ from pathlib import Path
 
 import typer
 from rich.progress import (
+    BarColumn,
+    MofNCompleteColumn,
     Progress,
     SpinnerColumn,
     TextColumn,
-    BarColumn,
-    MofNCompleteColumn,
 )
 
 from ragd.ui import OutputFormat
@@ -30,16 +30,16 @@ def init_command(
     Detects hardware capabilities and creates optimal configuration.
     """
     from ragd.config import (
+        config_exists,
         create_default_config,
         ensure_data_dir,
         save_config,
-        config_exists,
     )
     from ragd.hardware import (
-        detect_hardware,
-        get_recommendations,
-        get_extreme_tier_model,
         HardwareTier,
+        detect_hardware,
+        get_extreme_tier_model,
+        get_recommendations,
     )
 
     con = get_console(no_color)
@@ -75,7 +75,7 @@ def init_command(
     llm_model = recommendations["llm_model"]
     if hw_info.tier == HardwareTier.EXTREME:
         try:
-            from ragd.llm import OllamaClient, ModelRegistry
+            from ragd.llm import ModelRegistry, OllamaClient
 
             client = OllamaClient()
             registry = ModelRegistry(client)
@@ -88,7 +88,7 @@ def init_command(
             # Ollama not running or error - use default
             pass
 
-    con.print(f"\n[bold]Recommended settings:[/bold]")
+    con.print("\n[bold]Recommended settings:[/bold]")
     con.print(f"  • Embedding model: {recommendations['embedding_model']}")
     con.print(f"  • LLM model: {llm_model}")
     con.print(f"  • Chunk size: {recommendations['chunk_size']} tokens")
@@ -120,14 +120,14 @@ def init_command(
     ensure_data_dir(config)
     save_config(config)
 
-    con.print(f"\n[green]✓[/green] Configuration saved to ~/.ragd/config.yaml")
-    con.print(f"[green]✓[/green] Data directory created at ~/.ragd/")
+    con.print("\n[green]✓[/green] Configuration saved to ~/.ragd/config.yaml")
+    con.print("[green]✓[/green] Data directory created at ~/.ragd/")
 
     # Download required models and data
     con.print("\n[bold]Downloading required models...[/bold]")
 
     # Download embedding model
-    from ragd.embedding import is_model_cached, download_model
+    from ragd.embedding import download_model, is_model_cached
 
     embedding_model = recommendations["embedding_model"]
     if is_model_cached(embedding_model):
@@ -184,8 +184,8 @@ def index_command(
 
     Supported formats: PDF, TXT, MD, HTML
     """
-    from ragd.config import load_config, ensure_data_dir
-    from ragd.ingestion import index_path, discover_files
+    from ragd.config import ensure_data_dir, load_config
+    from ragd.ingestion import discover_files, index_path
     from ragd.ui import format_index_results
 
     con = get_console(no_color)
@@ -317,7 +317,7 @@ def search_command(
         ragd search "(Python OR Java) AND web" --mode keyword
     """
     from ragd.config import load_config
-    from ragd.search import hybrid_search, SearchMode
+    from ragd.search import SearchMode, hybrid_search
     from ragd.search.query import QueryParseError
     from ragd.ui import format_search_results
     from ragd.ui.tui import run_search_navigator
@@ -450,7 +450,7 @@ def status_command(
     no_color: bool = False,
 ) -> None:
     """Show ragd status and statistics (brief mode)."""
-    from ragd.config import load_config, config_exists
+    from ragd.config import config_exists, load_config
     from ragd.storage import ChromaStore
     from ragd.ui import format_status
 
@@ -496,9 +496,9 @@ def stats_command(
 
     from rich.panel import Panel
 
-    from ragd.config import load_config, config_exists
-    from ragd.storage import ChromaStore
+    from ragd.config import config_exists, load_config
     from ragd.metadata import MetadataStore
+    from ragd.storage import ChromaStore
 
     con = get_console(no_color)
 
@@ -660,7 +660,8 @@ def config_command(
 ) -> None:
     """Manage ragd configuration."""
     import yaml
-    from ragd.config import DEFAULT_CONFIG_PATH, load_config, config_exists
+
+    from ragd.config import DEFAULT_CONFIG_PATH, config_exists, load_config
 
     con = get_console(no_color)
 
@@ -695,11 +696,10 @@ def config_command(
 
 def _config_validate(con) -> None:
     """Run configuration validation checks."""
-    from rich.console import Console
-    from ragd.config import DEFAULT_CONFIG_PATH, load_config, config_exists
+    from ragd.config import DEFAULT_CONFIG_PATH, config_exists, load_config
     from ragd.config_validator import (
-        validate_config,
         ValidationSeverity,
+        validate_config,
     )
 
     if not config_exists():
@@ -769,8 +769,8 @@ def reindex_command(
     and normalisation pipeline (F-051 text quality improvements).
     """
     from ragd.config import load_config
-    from ragd.storage import ChromaStore
     from ragd.ingestion import index_document
+    from ragd.storage import ChromaStore
 
     con = get_console(no_color)
 

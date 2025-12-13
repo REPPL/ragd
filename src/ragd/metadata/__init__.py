@@ -12,11 +12,24 @@ This module provides:
 
 from __future__ import annotations
 
+# F-063: Smart Collections
+from ragd.metadata.collections import (
+    Collection,
+    CollectionManager,
+    TagQuery,
+)
 from ragd.metadata.extractor import (
     ExtractedEntity,
     ExtractedKeyword,
     ExtractedMetadata,
     MetadataExtractor,
+)
+
+# F-062: Tag Library Management
+from ragd.metadata.library import (
+    LibraryConfig,
+    TagLibrary,
+    TagNamespace,
 )
 from ragd.metadata.migration import (
     CURRENT_SCHEMA,
@@ -27,20 +40,12 @@ from ragd.metadata.migration import (
     get_schema_version,
     migrate_to_current,
     migrate_v1_to_v2,
-    migrate_v2_to_v2_1,
     migrate_v2_1_to_v2_2,
+    migrate_v2_to_v2_1,
     needs_migration,
 )
 from ragd.metadata.schema import DocumentMetadata
 from ragd.metadata.store import MetadataStore
-from ragd.metadata.tags import TagManager
-
-# F-063: Smart Collections
-from ragd.metadata.collections import (
-    Collection,
-    CollectionManager,
-    TagQuery,
-)
 
 # F-061: Auto-Tag Suggestions
 from ragd.metadata.suggestions import (
@@ -48,13 +53,7 @@ from ragd.metadata.suggestions import (
     SuggestionEngine,
     TagSuggestion,
 )
-
-# F-062: Tag Library Management
-from ragd.metadata.library import (
-    LibraryConfig,
-    TagLibrary,
-    TagNamespace,
-)
+from ragd.metadata.tags import TagManager
 
 __all__ = [
     # Schema

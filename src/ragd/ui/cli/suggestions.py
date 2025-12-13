@@ -5,8 +5,6 @@ F-061: Auto-Tag Suggestions
 
 from __future__ import annotations
 
-from typing import Optional
-
 import typer
 from rich.console import Console
 from rich.table import Table
@@ -124,8 +122,8 @@ def suggestions_pending_command(
 
 def suggestions_confirm_command(
     doc_id: str = typer.Argument(..., help="Document ID"),
-    tags: Optional[list[str]] = typer.Argument(None, help="Specific tags to confirm (default: all)"),
-    min_confidence: Optional[float] = typer.Option(
+    tags: list[str] | None = typer.Argument(None, help="Specific tags to confirm (default: all)"),
+    min_confidence: float | None = typer.Option(
         None, "--min-confidence", "-c",
         help="Only confirm tags above this confidence",
     ),
@@ -154,7 +152,7 @@ def suggestions_confirm_command(
 
 def suggestions_reject_command(
     doc_id: str = typer.Argument(..., help="Document ID"),
-    tags: Optional[list[str]] = typer.Argument(None, help="Specific tags to reject (default: all pending)"),
+    tags: list[str] | None = typer.Argument(None, help="Specific tags to reject (default: all pending)"),
 ) -> None:
     """Reject tag suggestions."""
     engine = _get_suggestion_engine()

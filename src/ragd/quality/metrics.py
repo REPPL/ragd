@@ -52,7 +52,7 @@ class QualityMetrics:
         }
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> "QualityMetrics":
+    def from_dict(cls, data: dict[str, Any]) -> QualityMetrics:
         """Create metrics from dictionary."""
         return cls(
             completeness=data.get("completeness", 0.0),

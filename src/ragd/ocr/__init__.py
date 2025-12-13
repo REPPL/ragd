@@ -13,8 +13,8 @@ from ragd.ocr.engine import (
     EasyOCREngine,
     OCREngine,
     OCRResult,
-    PageOCRResult,
     PaddleOCREngine,
+    PageOCRResult,
     create_ocr_engine,
     get_available_engine,
 )

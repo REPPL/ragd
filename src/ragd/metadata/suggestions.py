@@ -8,14 +8,14 @@ F-061: Auto-Tag Suggestions
 
 from __future__ import annotations
 
-import json
 import logging
 import sqlite3
+from collections.abc import Iterator
 from contextlib import contextmanager
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Iterator, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 if TYPE_CHECKING:
     from ragd.metadata.tags import TagManager
@@ -60,7 +60,7 @@ class TagSuggestion:
         }
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> "TagSuggestion":
+    def from_dict(cls, data: dict[str, Any]) -> TagSuggestion:
         """Create TagSuggestion from dictionary."""
         return cls(
             tag_name=data["tag_name"],
@@ -84,7 +84,7 @@ class TagSuggestion:
         *,
         source_text: str = "",
         model: str = "all-MiniLM-L6-v2",
-    ) -> "TagSuggestion":
+    ) -> TagSuggestion:
         """Create suggestion from KeyBERT extraction."""
         return cls(
             tag_name=keyword.lower().replace(" ", "-"),
@@ -104,7 +104,7 @@ class TagSuggestion:
         *,
         source_text: str = "",
         model: str = "",
-    ) -> "TagSuggestion":
+    ) -> TagSuggestion:
         """Create suggestion from LLM classification."""
         return cls(
             tag_name=category.lower().replace(" ", "-"),
@@ -125,7 +125,7 @@ class TagSuggestion:
         *,
         source_text: str = "",
         model: str = "en_core_web_sm",
-    ) -> "TagSuggestion":
+    ) -> TagSuggestion:
         """Create suggestion from Named Entity Recognition."""
         # Prefix with entity type for namespace
         tag_name = f"{entity_type.lower()}/{entity.lower().replace(' ', '-')}"
@@ -157,7 +157,7 @@ class SuggestionEngine:
     Provides operations for creating, reviewing, and confirming suggestions.
     """
 
-    def __init__(self, db_path: Path, tag_manager: "TagManager") -> None:
+    def __init__(self, db_path: Path, tag_manager: TagManager) -> None:
         """Initialise the suggestion engine.
 
         Args:

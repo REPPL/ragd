@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 
 def prompt_card_confirmation(
     card: ModelCard,
-    console: "Console",
+    console: Console,
 ) -> ModelCard | None:
     """Prompt user to confirm or edit a discovered model card.
 
@@ -109,7 +109,7 @@ def prompt_card_confirmation(
         return None
 
 
-def _edit_card(card: ModelCard, console: "Console") -> ModelCard | None:
+def _edit_card(card: ModelCard, console: Console) -> ModelCard | None:
     """Edit card fields interactively.
 
     Args:
@@ -119,7 +119,7 @@ def _edit_card(card: ModelCard, console: "Console") -> ModelCard | None:
     Returns:
         Edited card or None if cancelled
     """
-    from rich.prompt import IntPrompt, Prompt
+    from rich.prompt import Prompt
 
     console.print()
     console.print("[bold]Edit Model Card[/bold]")
@@ -198,7 +198,7 @@ def _edit_card(card: ModelCard, console: "Console") -> ModelCard | None:
 
 def display_card_summary(
     card: ModelCard,
-    console: "Console",
+    console: Console,
     is_cached: bool = False,
 ) -> None:
     """Display a brief card summary.

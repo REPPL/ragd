@@ -16,7 +16,6 @@ from typing import Any
 
 import fitz  # PyMuPDF
 
-
 logger = logging.getLogger(__name__)
 
 

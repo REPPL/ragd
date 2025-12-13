@@ -12,7 +12,7 @@ import os
 from dataclasses import asdict, is_dataclass
 from enum import Enum
 from pathlib import Path
-from typing import Any, Protocol, TypeVar
+from typing import Any
 
 from rich.console import Console
 from rich.table import Table

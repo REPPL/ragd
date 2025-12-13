@@ -9,7 +9,6 @@ from __future__ import annotations
 import warnings
 from dataclasses import dataclass, field
 from enum import Enum
-from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 from ragd.config import RagdConfig, load_config
@@ -18,7 +17,7 @@ from ragd.search.bm25 import BM25Index, BM25Result
 from ragd.storage import BackendType, ChromaStore, VectorStore, create_vector_store
 
 if TYPE_CHECKING:
-    from ragd.storage.types import VectorSearchResult
+    pass
 
 
 class SearchMode(Enum):

@@ -5,10 +5,10 @@ Identifies and handles duplicate content during indexing.
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import Callable
 
-from ragd.ingestion.hashing import ContentHash, is_duplicate
+from ragd.ingestion.hashing import ContentHash
 
 
 @dataclass

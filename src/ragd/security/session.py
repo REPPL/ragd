@@ -15,9 +15,8 @@ from __future__ import annotations
 import json
 import logging
 import threading
-import time
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from enum import Enum
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
@@ -105,7 +104,7 @@ class SessionMetadata:
     verification_hash: bytes
     failed_attempts: int = 0
     lockout_until: datetime | None = None
-    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
 
     def to_dict(self) -> dict[str, Any]:
         """Serialise to dictionary."""
@@ -120,7 +119,7 @@ class SessionMetadata:
         }
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> "SessionMetadata":
+    def from_dict(cls, data: dict[str, Any]) -> SessionMetadata:
         """Create from dictionary."""
         return cls(
             salt=bytes.fromhex(data["salt"]),
@@ -252,7 +251,7 @@ class SessionManager:
                 return None
 
             timeout = timedelta(minutes=self._config.auto_lock_minutes)
-            elapsed = datetime.now(timezone.utc) - self._last_activity
+            elapsed = datetime.now(UTC) - self._last_activity
             remaining = timeout - elapsed
 
             return max(remaining, timedelta(0))
@@ -349,7 +348,7 @@ class SessionManager:
             return
 
         if self._metadata.lockout_until is not None:
-            now = datetime.now(timezone.utc)
+            now = datetime.now(UTC)
             if now < self._metadata.lockout_until:
                 remaining = self._metadata.lockout_until - now
                 raise LockoutError(
@@ -370,7 +369,7 @@ class SessionManager:
         self._metadata.failed_attempts += 1
 
         if self._metadata.failed_attempts >= self._config.failed_attempts_lockout:
-            self._metadata.lockout_until = datetime.now(timezone.utc) + timedelta(
+            self._metadata.lockout_until = datetime.now(UTC) + timedelta(
                 minutes=self._config.lockout_minutes
             )
             logger.warning(
@@ -384,8 +383,8 @@ class SessionManager:
     def _activate_session(self) -> None:
         """Activate the session and start timeout timer."""
         self._state = SessionState.ACTIVE
-        self._last_activity = datetime.now(timezone.utc)
-        self._unlock_time = datetime.now(timezone.utc)
+        self._last_activity = datetime.now(UTC)
+        self._unlock_time = datetime.now(UTC)
         self._start_timer()
 
     def _start_timer(self) -> None:
@@ -448,7 +447,7 @@ class SessionManager:
 
             # Reset timer on activity
             if self._config.activity_resets_timer:
-                self._last_activity = datetime.now(timezone.utc)
+                self._last_activity = datetime.now(UTC)
                 self._start_timer()
 
             return self._keystore.get_key()
@@ -460,7 +459,7 @@ class SessionManager:
         """
         with self._lock:
             if self._state != SessionState.LOCKED:
-                self._last_activity = datetime.now(timezone.utc)
+                self._last_activity = datetime.now(UTC)
                 if self._config.activity_resets_timer:
                     self._start_timer()
 
@@ -474,7 +473,7 @@ class SessionManager:
             if self._state == SessionState.LOCKED:
                 raise SessionLockError("Cannot extend locked session")
 
-            self._last_activity = datetime.now(timezone.utc)
+            self._last_activity = datetime.now(UTC)
             self._start_timer()
             logger.info("Session extended")
 
@@ -548,7 +547,7 @@ class SessionManager:
                 ),
                 "is_locked_out": (
                     self._metadata.lockout_until is not None
-                    and datetime.now(timezone.utc) < self._metadata.lockout_until
+                    and datetime.now(UTC) < self._metadata.lockout_until
                     if self._metadata
                     else False
                 ),

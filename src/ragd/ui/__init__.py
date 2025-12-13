@@ -9,10 +9,10 @@ This module provides UI implementations for different interfaces:
 from ragd.ui.formatters import (
     CitationStyleOption,
     OutputFormat,
+    format_health_results,
+    format_index_results,
     format_search_results,
     format_status,
-    format_index_results,
-    format_health_results,
 )
 
 __all__ = [

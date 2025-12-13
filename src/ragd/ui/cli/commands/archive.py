@@ -9,11 +9,11 @@ from pathlib import Path
 
 import typer
 from rich.progress import (
+    BarColumn,
+    MofNCompleteColumn,
     Progress,
     SpinnerColumn,
     TextColumn,
-    BarColumn,
-    MofNCompleteColumn,
 )
 
 from ragd.ui import OutputFormat
@@ -34,10 +34,10 @@ def export_command(
     Creates a portable tar.gz archive containing documents, chunks,
     embeddings, and metadata.
     """
+    from ragd.archive import ArchiveFilters, ExportEngine, ExportOptions
     from ragd.config import load_config
-    from ragd.storage import ChromaStore
     from ragd.metadata import MetadataStore
-    from ragd.archive import ExportEngine, ExportOptions, ArchiveFilters
+    from ragd.storage import ChromaStore
 
     con = get_console(no_color)
     config = load_config()
@@ -103,10 +103,10 @@ def import_command(
     Restores documents, chunks, embeddings, and metadata from
     a portable tar.gz archive.
     """
+    from ragd.archive import ConflictResolution, ImportEngine, ImportOptions
     from ragd.config import load_config
-    from ragd.storage import ChromaStore
     from ragd.metadata import MetadataStore
-    from ragd.archive import ImportEngine, ImportOptions, ConflictResolution
+    from ragd.storage import ChromaStore
 
     con = get_console(no_color)
     config = load_config()
@@ -177,7 +177,7 @@ def import_command(
 
     # Summary
     con.print()
-    con.print(f"[green]✓[/green] Import complete")
+    con.print("[green]✓[/green] Import complete")
     con.print(f"  Documents imported: {result.documents_imported}")
     con.print(f"  Chunks imported: {result.chunks_imported}")
     if result.documents_skipped > 0:

@@ -19,7 +19,7 @@ class FileHash:
     mtime: float
 
     @classmethod
-    def from_path(cls, path: Path) -> "FileHash":
+    def from_path(cls, path: Path) -> FileHash:
         """Create hash from file path.
 
         Args:
@@ -48,7 +48,7 @@ class ContentHash:
     digest: str
 
     @classmethod
-    def from_content(cls, content: str | bytes, algorithm: str = "sha256") -> "ContentHash":
+    def from_content(cls, content: str | bytes, algorithm: str = "sha256") -> ContentHash:
         """Create hash from content.
 
         Args:
@@ -67,7 +67,7 @@ class ContentHash:
         return cls(algorithm=algorithm, digest=hasher.hexdigest())
 
     @classmethod
-    def from_file(cls, path: Path, algorithm: str = "sha256") -> "ContentHash":
+    def from_file(cls, path: Path, algorithm: str = "sha256") -> ContentHash:
         """Create hash from file.
 
         Args:

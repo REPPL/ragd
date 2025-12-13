@@ -6,11 +6,10 @@ Saves progress during large indexing operations for recovery.
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass, field, asdict
-from datetime import datetime, UTC
+from dataclasses import asdict, dataclass, field
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
-
 
 DEFAULT_CHECKPOINT_FILE = Path.home() / ".ragd" / ".indexing_checkpoint.json"
 
@@ -28,7 +27,7 @@ class IndexingCheckpoint:
     errors: list[dict[str, str]] = field(default_factory=list)
 
     @classmethod
-    def create(cls, source_path: Path, total_files: int) -> "IndexingCheckpoint":
+    def create(cls, source_path: Path, total_files: int) -> IndexingCheckpoint:
         """Create new checkpoint.
 
         Args:
@@ -80,7 +79,7 @@ class IndexingCheckpoint:
         return asdict(self)
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> "IndexingCheckpoint":
+    def from_dict(cls, data: dict[str, Any]) -> IndexingCheckpoint:
         """Create from dictionary.
 
         Args:

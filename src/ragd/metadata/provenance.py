@@ -12,7 +12,6 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any, Literal
 
-
 # Valid tag source types
 TagSource = Literal[
     "manual",      # User explicitly added
@@ -232,9 +231,7 @@ def normalise_tags(tags: list[str | TagEntry | dict[str, Any]]) -> list[TagEntry
     for tag in tags:
         if isinstance(tag, TagEntry):
             result.append(tag)
-        elif isinstance(tag, dict):
-            result.append(TagEntry.from_dict(tag))
-        elif isinstance(tag, str):
+        elif isinstance(tag, dict) or isinstance(tag, str):
             result.append(TagEntry.from_dict(tag))
         else:
             raise TypeError(f"Unexpected tag type: {type(tag)}")

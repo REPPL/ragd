@@ -182,8 +182,8 @@ def is_model_cached(model_name: str = "all-MiniLM-L6-v2") -> bool:
     Returns:
         True if model is available locally (no download needed)
     """
-    from pathlib import Path
     import os
+    from pathlib import Path
 
     # sentence-transformers uses huggingface_hub caching
     # Check both the cache directory and the model-specific path

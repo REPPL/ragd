@@ -7,20 +7,19 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
 
 from ragd.config import RagdConfig, load_config
-from ragd.ingestion.extractor import extract_text, ExtractionResult
+from ragd.ingestion.extractor import ExtractionResult, extract_text
 from ragd.quality.metrics import (
     QualityMetrics,
-    compute_completeness,
     compute_character_quality,
-    compute_structure_score,
+    compute_completeness,
     compute_image_handling,
-    compute_table_handling,
     compute_overall_score,
+    compute_structure_score,
+    compute_table_handling,
 )
-from ragd.storage import ChromaStore, DocumentRecord
+from ragd.storage import ChromaStore
 from ragd.utils.paths import get_file_type
 
 

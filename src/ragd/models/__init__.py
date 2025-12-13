@@ -7,17 +7,17 @@ for LLM and embedding models used by ragd.
 from __future__ import annotations
 
 from ragd.models.cards import (
-    ModelCard,
-    ModelCapability,
-    ModelType,
     HardwareRequirements,
-    load_model_card,
-    list_model_cards,
+    ModelCapability,
+    ModelCard,
+    ModelType,
     get_installed_models,
+    list_model_cards,
+    load_model_card,
 )
 from ragd.models.recommender import (
-    ModelRecommender,
     ModelRecommendation,
+    ModelRecommender,
     UseCase,
     recommend_model,
 )

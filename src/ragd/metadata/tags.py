@@ -41,7 +41,7 @@ class TagManager:
         >>> tags.remove("doc-123", "reviewed")
     """
 
-    def __init__(self, store: "MetadataStore") -> None:
+    def __init__(self, store: MetadataStore) -> None:
         """Initialise the tag manager.
 
         Args:

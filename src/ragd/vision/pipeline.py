@@ -7,10 +7,10 @@ enabling text-to-image and image-to-image search capabilities.
 from __future__ import annotations
 
 import logging
+from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Callable
 
 from ragd.config import RagdConfig
 from ragd.storage.images import (
@@ -21,7 +21,6 @@ from ragd.storage.images import (
 )
 from ragd.vision.embedder import VisionEmbedder, create_vision_embedder
 from ragd.vision.image import (
-    ExtractedImage,
     check_image_extraction_available,
     extract_images_from_pdf,
     load_image_file,

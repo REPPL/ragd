@@ -332,7 +332,7 @@ class BM25Index:
         """Close database connection."""
         self._conn.close()
 
-    def __enter__(self) -> "BM25Index":
+    def __enter__(self) -> BM25Index:
         """Context manager entry."""
         return self
 

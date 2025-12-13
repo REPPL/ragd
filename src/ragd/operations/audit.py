@@ -12,13 +12,14 @@ import json
 import sqlite3
 import time
 import uuid
+from collections.abc import Generator
 from contextlib import contextmanager
 from dataclasses import asdict, dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Generator, Iterator
+from typing import Any
 
-from ragd.config import load_config, DEFAULT_DATA_DIR
+from ragd.config import DEFAULT_DATA_DIR, load_config
 
 
 @dataclass

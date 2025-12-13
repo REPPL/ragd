@@ -9,7 +9,6 @@ from rich.console import Console
 from rich.markdown import Markdown
 from rich.panel import Panel
 
-
 # Extended help content for commands
 EXTENDED_HELP: dict[str, str] = {
     "search": """

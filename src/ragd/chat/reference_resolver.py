@@ -68,7 +68,7 @@ class DocumentReferenceResolver:
     # Minimum confidence to report a match
     MIN_CONFIDENCE = 0.6
 
-    def __init__(self, citations: list["Citation"]) -> None:
+    def __init__(self, citations: list[Citation]) -> None:
         """Initialise with recently cited documents.
 
         Args:
@@ -76,8 +76,8 @@ class DocumentReferenceResolver:
         """
         self.citations = citations
         # Build lookup indices for fast matching
-        self._author_index: dict[str, list["Citation"]] = {}
-        self._year_index: dict[str, list["Citation"]] = {}
+        self._author_index: dict[str, list[Citation]] = {}
+        self._year_index: dict[str, list[Citation]] = {}
         self._build_indices()
 
     def _build_indices(self) -> None:
@@ -161,7 +161,7 @@ class DocumentReferenceResolver:
                     author_name = group.lower()
 
         # Try to match
-        candidates: list[tuple["Citation", float, str]] = []
+        candidates: list[tuple[Citation, float, str]] = []
 
         # Match by author
         if author_name and author_name in self._author_index:
@@ -210,7 +210,7 @@ class DocumentReferenceResolver:
         stopwords = {"the", "a", "an", "this", "that", "paper", "document", "article"}
         query_words -= stopwords
 
-        best_match: tuple["Citation", float] | None = None
+        best_match: tuple[Citation, float] | None = None
 
         for citation in self.citations:
             # Tokenise filename (lowercase, remove extension, split on separators)
@@ -239,7 +239,7 @@ class DocumentReferenceResolver:
 
 def resolve_document_references(
     query: str,
-    citations: list["Citation"],
+    citations: list[Citation],
 ) -> list[ResolvedReference]:
     """Convenience function to resolve document references.
 

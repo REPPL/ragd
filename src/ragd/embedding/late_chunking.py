@@ -12,8 +12,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
-import numpy as np
-
 
 @dataclass
 class ChunkBoundary:
@@ -80,8 +78,8 @@ class LateChunkingEmbedder:
             return
 
         try:
-            from transformers import AutoModel, AutoTokenizer
             import torch
+            from transformers import AutoModel, AutoTokenizer
 
             self._tokenizer = AutoTokenizer.from_pretrained(
                 self._model_name,
@@ -289,8 +287,8 @@ class LateChunkingEmbedder:
             True if transformers and torch are available
         """
         try:
-            import transformers
             import torch
+            import transformers
 
             return True
         except ImportError:
@@ -304,8 +302,8 @@ def check_late_chunking_available() -> tuple[bool, str]:
         Tuple of (available: bool, message: str)
     """
     try:
-        import transformers
         import torch
+        import transformers
 
         return True, "Late chunking is available"
     except ImportError as e:

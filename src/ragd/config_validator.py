@@ -317,7 +317,7 @@ class ConfigValidator:
         return ValidationResult(
             name="contextual",
             passed=True,
-            message=f"Contextual retrieval configured correctly",
+            message="Contextual retrieval configured correctly",
             severity=ValidationSeverity.WARNING,
         )
 
@@ -391,8 +391,8 @@ class ConfigValidator:
         Returns:
             List of model names, or None if Ollama not reachable
         """
-        import urllib.request
         import json
+        import urllib.request
 
         try:
             url = f"{base_url}/api/tags"

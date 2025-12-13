@@ -9,7 +9,6 @@ from __future__ import annotations
 import logging
 from datetime import datetime
 from pathlib import Path
-from typing import Any
 
 import yaml
 
