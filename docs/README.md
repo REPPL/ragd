@@ -28,8 +28,8 @@ This documentation follows the [Diátaxis](https://diataxis.fr/) framework:
 ## Quick Start
 
 ```bash
-# Install ragd
-pip install ragd
+# Install ragd from GitHub
+pip install git+https://github.com/REPPL/ragd.git
 
 # Index your documents
 ragd index ~/Documents/notes/

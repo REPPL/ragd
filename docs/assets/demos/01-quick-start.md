@@ -14,7 +14,7 @@
 
 ### Scene 1: Installation (5s)
 ```
-pip install ragd
+pip install git+https://github.com/REPPL/ragd.git
 ```
 - Show progress bar
 - Annotation: "Install with pip"
@@ -51,7 +51,7 @@ ragd search "key findings"
 clear
 echo "# Install ragd"
 sleep 1
-pip install ragd
+pip install git+https://github.com/REPPL/ragd.git
 
 echo ""
 echo "# Initialise"

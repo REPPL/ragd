@@ -16,7 +16,11 @@ Learn to install ragd and index your first documents.
 ## Step 1: Install ragd
 
 ```bash
-pip install ragd
+# Downgrade pip (required due to pip 24.1+ bug)
+pip install pip==24.0
+
+# Install ragd from GitHub
+pip install git+https://github.com/REPPL/ragd.git
 ```
 
 This installs ragd with all runtime features. Verify installation:
@@ -27,7 +31,7 @@ ragd doctor     # Shows installation status and feature availability
 ```
 
 > **Expert users:** For minimal installations (CI, resource-constrained environments):
-> `RAGD_MINIMAL=1 pip install ragd`
+> `RAGD_MINIMAL=1 pip install git+https://github.com/REPPL/ragd.git`
 
 ## Step 2: Initialise ragd
 
@@ -94,7 +98,7 @@ You've succeeded if:
 
 **"No module named ragd"**
 - Ensure Python 3.12+ is installed
-- Try `pip install --upgrade ragd`
+- Try `pip install --upgrade git+https://github.com/REPPL/ragd.git`
 
 **"Embedding model not found"**
 - Run `ragd init` again to download models

@@ -15,6 +15,8 @@
 
 ![Getting Started with ragd](docs/assets/img/getting-started-comic1.png)
 
+*[Generated](docs/assets/prompts/getting-started-comic.md) by Gemini 3, cropped. Inspiration: [here](https://youtu.be/rX4PzvWgu6c).*
+
 ## Overview
 
 ragd is a reference implementation demonstrating best practices for:
@@ -39,8 +41,8 @@ source ~/.ragd-env/bin/activate  # On Windows: .ragd-env\Scripts\activate
 # Downgrade pip (required due to bug in pip 24.1+)
 pip install pip==24.0
 
-# Install ragd (includes all runtime features)
-pip install ragd
+# Install ragd from GitHub
+pip install git+https://github.com/REPPL/ragd.git
 ```
 
 > **Note:** The pip downgrade is required due to a [breaking change in packaging 24.0](https://packaging.pypa.io/en/stable/changelog.html)
@@ -59,7 +61,7 @@ For CI pipelines or resource-constrained environments:
 
 ```bash
 # Install core features only (smaller footprint)
-RAGD_MINIMAL=1 pip install ragd
+RAGD_MINIMAL=1 pip install git+https://github.com/REPPL/ragd.git
 ```
 
 ### Contributing
