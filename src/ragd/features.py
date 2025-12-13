@@ -2,15 +2,21 @@
 
 This module provides detection of optional features that may or may not be
 installed, enabling graceful degradation and helpful error messages.
+
+Also provides installation mode detection for F-119: Full Features by Default.
 """
 
 from __future__ import annotations
 
 import logging
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Callable
+from typing import Literal
 
 logger = logging.getLogger(__name__)
+
+# Installation mode type
+InstallationMode = Literal["full", "minimal", "custom"]
 
 
 @dataclass(frozen=True)
@@ -488,3 +494,114 @@ class _LazyAndCheck:
 
 OCR_AVAILABLE = _LazyOrCheck(PADDLEOCR_AVAILABLE, EASYOCR_AVAILABLE)
 WEB_AVAILABLE = _LazyAndCheck(SELECTOLAX_AVAILABLE, TRAFILATURA_AVAILABLE)
+
+
+# =============================================================================
+# Installation Mode Detection (F-119)
+# =============================================================================
+
+# Features included in full install (from setup.py FULL_FEATURE_DEPS)
+FULL_INSTALL_FEATURES = [
+    "docling",
+    "easyocr",
+    "keybert",
+    "spacy",
+    "langdetect",
+    "pyarrow",
+    "watchdog",
+    "trafilatura",
+    "selectolax",
+    "presidio_analyzer",
+]
+
+# Core features (always installed)
+CORE_FEATURES = [
+    "chromadb",
+    "sentence_transformers",
+    "fitz",  # pymupdf
+    "paddleocr",
+    "typer",
+    "rich",
+]
+
+
+def get_installation_mode() -> InstallationMode:
+    """Determine the installation mode based on available features.
+
+    Returns:
+        'full' if all full-install features are available
+        'minimal' if only core features are available
+        'custom' if some but not all full features are available
+    """
+    full_features_available = sum(
+        1 for module in FULL_INSTALL_FEATURES if _check_import(module)
+    )
+    total_full_features = len(FULL_INSTALL_FEATURES)
+
+    if full_features_available == total_full_features:
+        return "full"
+    elif full_features_available == 0:
+        return "minimal"
+    else:
+        return "custom"
+
+
+def get_installation_summary() -> dict:
+    """Get detailed installation summary.
+
+    Returns:
+        Dictionary with:
+        - mode: 'full', 'minimal', or 'custom'
+        - available_features: List of available optional features
+        - missing_features: List of missing optional features
+        - core_features: Dict of core feature availability
+        - full_features: Dict of full-install feature availability
+    """
+    mode = get_installation_mode()
+
+    # Check core features
+    core_status = {module: _check_import(module) for module in CORE_FEATURES}
+
+    # Check full-install features
+    full_status = {module: _check_import(module) for module in FULL_INSTALL_FEATURES}
+
+    available = [name for name, avail in full_status.items() if avail]
+    missing = [name for name, avail in full_status.items() if not avail]
+
+    return {
+        "mode": mode,
+        "available_features": available,
+        "missing_features": missing,
+        "available_count": len(available),
+        "total_count": len(FULL_INSTALL_FEATURES),
+        "core_features": core_status,
+        "full_features": full_status,
+    }
+
+
+def get_installation_mode_message() -> str:
+    """Get human-readable installation mode message.
+
+    Returns:
+        Descriptive string about current installation
+    """
+    summary = get_installation_summary()
+    mode = summary["mode"]
+
+    if mode == "full":
+        return "Full installation (all runtime features available)"
+    elif mode == "minimal":
+        return (
+            "Minimal installation (core features only)\n"
+            "To get all features: pip install ragd (without RAGD_MINIMAL=1)"
+        )
+    else:
+        available = summary["available_count"]
+        total = summary["total_count"]
+        missing = ", ".join(summary["missing_features"][:3])
+        more = len(summary["missing_features"]) - 3
+        more_text = f" (+{more} more)" if more > 0 else ""
+        return (
+            f"Custom installation ({available}/{total} optional features)\n"
+            f"Missing: {missing}{more_text}"
+        )
