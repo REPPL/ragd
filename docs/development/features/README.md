@@ -247,30 +247,33 @@ Features are the primary unit of work. Each feature specification describes:
 | [F-057](./planned/F-057-model-comparison.md) | Model Comparison Mode | 📅 Planned | Evaluate models side-by-side |
 | [F-075](./planned/F-075-backend-migration-tool.md) | Backend Migration Tool | 📅 Planned | Move between vector stores |
 
-### v1.1 Features (Graph & Automation)
+### v1.1 Features (NER & Graph)
 
 | ID | Feature | Status | Description |
 |----|---------|--------|-------------|
-| F-128 | Knowledge Graph CLI | 📅 Planned | `ragd graph query/explore/visualise` |
-| F-129 | Comparison Framework | 📅 Planned | A/B testing models/configs |
-| F-130 | Batch Operations | 📅 Planned | Process multiple queries |
-| F-131 | Results Export | 📅 Planned | Export to JSON/CSV |
-| F-132 | Timing & Metrics Output | 📅 Planned | `--timing` flag |
+| [F-128](./planned/F-128-gliner-ner.md) | GLiNER NER | 📅 Planned | Zero-shot custom entity types |
+| [F-129](./planned/F-129-epub-extraction.md) | EPUB Extraction | 📅 Planned | Ebook text extraction |
+| [F-130](./planned/F-130-ner-pipeline-integration.md) | NER Pipeline Integration | 📅 Planned | Extract entities during indexing |
+| F-131 | Knowledge Graph CLI | 📅 Planned | `ragd graph query/explore/visualise` |
+| F-132 | Comparison Framework | 📅 Planned | A/B testing models/configs |
+| F-133 | Batch Operations | 📅 Planned | Process multiple queries |
+| F-134 | Results Export | 📅 Planned | Export to JSON/CSV |
+| F-135 | Timing & Metrics Output | 📅 Planned | `--timing` flag |
 
 ### v1.2 Features (Onboarding)
 
 | ID | Feature | Status | Description |
 |----|---------|--------|-------------|
-| F-134 | Onboarding Flow | 📅 Planned | Guided first-run experience |
+| F-136 | Onboarding Flow | 📅 Planned | Guided first-run experience |
 
 ### v1.3 Features (API)
 
 | ID | Feature | Status | Description |
 |----|---------|--------|-------------|
-| F-133 | API Server | 📅 Planned | REST API with OpenAPI |
-| F-135 | API Authentication | 📅 Planned | API keys, rate limiting |
-| F-136 | Webhooks | 📅 Planned | Event notifications |
-| F-137 | Health Endpoints | 📅 Planned | `/health`, `/ready`, `/metrics` |
+| F-137 | API Server | 📅 Planned | REST API with OpenAPI |
+| F-138 | API Authentication | 📅 Planned | API keys, rate limiting |
+| F-139 | Webhooks | 📅 Planned | Event notifications |
+| F-140 | Health Endpoints | 📅 Planned | `/health`, `/ready`, `/metrics` |
 
 ### v1.4 Features (Automation)
 
@@ -285,10 +288,10 @@ Features are the primary unit of work. Each feature specification describes:
 | ID | Feature | Status | Description |
 |----|---------|--------|-------------|
 | [F-024](./planned/F-024-basic-webui.md) | Basic WebUI | 📅 Planned | FastAPI + HTMX + Tailwind |
-| F-138 | WebUI Search | 📅 Planned | Search interface with filters |
-| F-139 | WebUI Chat | 📅 Planned | Chat in browser |
-| F-140 | WebUI Index | 📅 Planned | Upload and index documents |
-| F-141 | Mobile Responsive | 📅 Planned | Works on all devices |
+| F-141 | WebUI Search | 📅 Planned | Search interface with filters |
+| F-142 | WebUI Chat | 📅 Planned | Chat in browser |
+| F-143 | WebUI Index | 📅 Planned | Upload and index documents |
+| F-144 | Mobile Responsive | 📅 Planned | Works on all devices |
 
 ### v1.6 Features (Fine-Tuning)
 

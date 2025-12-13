@@ -183,6 +183,3 @@ entity_extraction:
 - [NLP Library Integration](../../research/nlp-library-integration.md) - Existing NER patterns
 - [F-022: Knowledge Graph Integration](../completed/F-022-knowledge-graph.md) - Entity storage
 
----
-
-**Status**: Planned

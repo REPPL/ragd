@@ -224,6 +224,3 @@ ragd status
 - [F-128: GLiNER NER](./F-128-gliner-ner.md) - Zero-shot extraction
 - [NLP Library Integration](../../research/nlp-library-integration.md) - spaCy patterns
 
----
-
-**Status**: Planned

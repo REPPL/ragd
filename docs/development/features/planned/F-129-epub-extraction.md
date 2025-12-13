@@ -215,6 +215,3 @@ SUPPORTED_FORMATS = {
 - [F-002: Text Extraction](../completed/F-002-text-extraction.md) - Existing extraction pipeline
 - [EbookLib GitHub](https://github.com/aerkalov/ebooklib) - Library documentation
 
----
-
-**Status**: Planned
