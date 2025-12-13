@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "ragd"
 version = "1.0.0"
-description = "Local RAG for personal knowledge management"
+description = "Your Private Intelligent Document Assistant"
 readme = "README.md"
 requires-python = ">=3.12"
 license = {text = "GPL-3.0-or-later"}
@@ -30,6 +30,7 @@ dependencies = [
     # CLI Framework
     "typer>=0.9.0",
     "rich>=13.0.0",
+    "questionary>=2.0.0",
     # Security: Fix known vulnerabilities
     "urllib3>=2.5.0",
     # Vector Database

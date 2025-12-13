@@ -217,12 +217,61 @@ def models_set_command(
             changes.append(f"Contextual: {contextual}")
 
     if not changes:
-        con.print("[yellow]No model changes specified.[/yellow]")
-        con.print("\nUsage:")
-        con.print("  ragd models set --chat llama3.1:8b")
-        con.print("  ragd models set --summary llama3.2:3b")
-        con.print("  ragd models set --embedding nomic-embed-text")
-        return
+        # No arguments - enter interactive mode
+        import questionary
+
+        # Step 1: Ask for purpose
+        purposes = [
+            questionary.Choice("Chat (main generation model)", value="chat"),
+            questionary.Choice("Summary (document summarisation)", value="summary"),
+            questionary.Choice("Classification (document type)", value="classification"),
+            questionary.Choice("Embedding (vector embeddings)", value="embedding"),
+            questionary.Choice("Contextual (retrieval augmentation)", value="contextual"),
+        ]
+
+        purpose = questionary.select(
+            "Which model purpose?",
+            choices=purposes,
+        ).ask()
+
+        if not purpose:
+            return  # User cancelled
+
+        # Step 2: Select model
+        if purpose == "embedding":
+            con.print("[dim]Embedding models are local (sentence-transformers), not Ollama.[/dim]")
+            con.print("[dim]Examples: all-mpnet-base-v2, all-MiniLM-L6-v2[/dim]")
+            model = questionary.text("Enter embedding model name:").ask()
+            if model:
+                config.embedding.model = model
+                changes.append(f"Embedding: {model}")
+        else:
+            if not installed_models:
+                con.print("[red]No Ollama models found.[/red]")
+                con.print("Install models first: [cyan]ollama pull llama3.2:3b[/cyan]")
+                return
+
+            model = questionary.select(
+                f"Select {purpose} model:",
+                choices=sorted(installed_models),
+            ).ask()
+
+            if model:
+                if purpose == "chat":
+                    config.llm.model = model
+                    changes.append(f"Chat: {model}")
+                elif purpose == "summary":
+                    config.metadata.summary_model = model
+                    changes.append(f"Summary: {model}")
+                elif purpose == "classification":
+                    config.metadata.classification_model = model
+                    changes.append(f"Classification: {model}")
+                elif purpose == "contextual":
+                    config.retrieval.contextual.model = model
+                    changes.append(f"Contextual: {model}")
+
+        if not changes:
+            return  # User cancelled model selection
 
     # Save configuration
     save_config(config)

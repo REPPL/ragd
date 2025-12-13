@@ -22,6 +22,55 @@ from ragd.ui import OutputFormat
 from ragd.ui.cli.utils import get_console
 
 
+def _show_config_diff(
+    con: "Console",
+    existing: "RagdConfig",
+    recommendations: dict,
+    llm_model: str,
+) -> bool:
+    """Display config differences in a table.
+
+    Args:
+        con: Rich console instance
+        existing: Existing configuration
+        recommendations: Recommended settings dict
+        llm_model: Recommended LLM model
+
+    Returns:
+        True if there are differences, False otherwise
+    """
+    from rich.table import Table
+
+    table = Table(show_header=True, header_style="bold")
+    table.add_column("Setting")
+    table.add_column("Current")
+    table.add_column("Recommended")
+
+    # Compare key settings
+    if existing.embedding.model != recommendations["embedding_model"]:
+        table.add_row(
+            "Embedding model",
+            existing.embedding.model,
+            recommendations["embedding_model"],
+        )
+    if existing.llm.model != llm_model:
+        table.add_row("LLM model", existing.llm.model, llm_model)
+    if existing.ingestion.chunk_size != recommendations["chunk_size"]:
+        table.add_row(
+            "Chunk size",
+            str(existing.ingestion.chunk_size),
+            str(recommendations["chunk_size"]),
+        )
+
+    if table.row_count > 0:
+        con.print("\n[bold]Current vs Recommended:[/bold]")
+        con.print(table)
+        return True
+    else:
+        con.print("\n[dim]Configuration matches recommended settings.[/dim]")
+        return False
+
+
 def init_command(
     no_color: bool = False,
 ) -> None:
@@ -73,6 +122,7 @@ def init_command(
 
     # For EXTREME tier, check installed models for dynamic selection
     llm_model = recommendations["llm_model"]
+    installed_names: list[str] = []
     if hw_info.tier == HardwareTier.EXTREME:
         try:
             from ragd.llm import ModelRegistry, OllamaClient
@@ -88,6 +138,27 @@ def init_command(
             # Ollama not running or error - use default
             pass
 
+    # Offer interactive model selection if multiple models available
+    if len(installed_names) > 1:
+        con.print(f"\n[dim]Found {len(installed_names)} installed models[/dim]")
+        if typer.confirm("Would you like to select a different LLM model?", default=False):
+            import questionary
+
+            # Mark recommended model
+            choices = []
+            for name in sorted(installed_names):
+                label = f"{name} (recommended)" if name == llm_model else name
+                choices.append(questionary.Choice(label, value=name))
+
+            selected = questionary.select(
+                "Select LLM model:",
+                choices=choices,
+                default=llm_model,
+            ).ask()
+
+            if selected:
+                llm_model = selected
+
     con.print("\n[bold]Recommended settings:[/bold]")
     con.print(f"  • Embedding model: {recommendations['embedding_model']}")
     con.print(f"  • LLM model: {llm_model}")
@@ -95,7 +166,12 @@ def init_command(
 
     # Check if config exists
     if config_exists():
-        if not typer.confirm("\nConfiguration already exists. Overwrite?"):
+        from ragd.config import load_config
+
+        existing = load_config()
+        _show_config_diff(con, existing, recommendations, llm_model)
+
+        if not typer.confirm("\nOverwrite with recommended settings?"):
             con.print("[yellow]Keeping existing configuration.[/yellow]")
             raise typer.Exit()
 

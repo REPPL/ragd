@@ -1,11 +1,14 @@
 """Visual styles and helpers for ragd CLI.
 
-ASCII art banners and standardised formatting for a clean, professional CLI.
+Rich Panel banners and standardised formatting for a clean, professional CLI.
 """
 
 from __future__ import annotations
 
 from rich.console import Console
+from rich.panel import Panel
+
+from ragd import __description__
 
 
 # Status indicators (ASCII-only)
@@ -24,32 +27,18 @@ def print_banner(
     console: Console,
     title: str,
     subtitle: str | None = None,
-    width: int = 60,
 ) -> None:
-    """Print an ASCII art banner.
+    """Print a Rich Panel banner.
 
     Args:
         console: Rich console instance
         title: Main title text
         subtitle: Optional subtitle text
-        width: Banner width in characters
     """
-    # Build banner lines
-    border = "+" + "-" * (width - 2) + "+"
-    empty = "|" + " " * (width - 2) + "|"
-
-    # Centre title and subtitle
-    # Padding = width - 4 (for "|  " at start and "|" at end) - text length
-    title_padding = width - 4 - len(title)
-    title_padded = f"|  {title}" + " " * title_padding + "|"
-
-    console.print(border)
-    console.print(title_padded)
+    content = f"[bold]{title}[/bold]"
     if subtitle:
-        subtitle_padding = width - 4 - len(subtitle)
-        subtitle_padded = f"|  [dim]{subtitle}[/dim]" + " " * subtitle_padding + "|"
-        console.print(subtitle_padded)
-    console.print(border)
+        content += f"\n[dim]{subtitle}[/dim]"
+    console.print(Panel(content, expand=False))
 
 
 def print_chat_header(
@@ -67,7 +56,7 @@ def print_chat_header(
     print_banner(
         console,
         "ragd Chat",
-        "Your AI-powered knowledge assistant",
+        __description__,
     )
     # Format context window with comma separators (e.g., 131,072)
     if context_window:
@@ -86,7 +75,7 @@ def print_init_header(console: Console) -> None:
     print_banner(
         console,
         "ragd Setup",
-        "Local RAG for personal knowledge management",
+        __description__,
     )
     console.print()
 
