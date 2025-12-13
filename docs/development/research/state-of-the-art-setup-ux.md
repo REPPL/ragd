@@ -688,7 +688,7 @@ ragd doctor
 
 **What to improve:**
 - Model search UX is not immediately obvious
-- Closed-source license concerns
+- Closed-source licence concerns
 
 ### Jan.ai
 
