@@ -362,19 +362,26 @@ def _configure_advanced(config: RagdConfig, console: Console) -> RagdConfig:
     """Configure advanced tuning parameters (v1.0.5)."""
     console.print("\n[bold]Advanced Tuning[/bold]\n")
 
-    # Search tuning submenu
-    console.print("  [1] Search tuning (BM25, RRF)")
-    console.print("  [2] Processing parameters")
-    console.print("  [3] Hardware thresholds")
-    console.print("  [4] Back to main menu")
+    # Sub-menu with arrow key navigation
+    choices = [
+        questionary.Choice("Search tuning (BM25, RRF)", value="search"),
+        questionary.Choice("Processing parameters", value="processing"),
+        questionary.Choice("Hardware thresholds", value="hardware"),
+        questionary.Separator(),
+        questionary.Choice("Back to main menu", value="back"),
+    ]
 
-    choice = Prompt.ask("\nEnter choice", choices=["1", "2", "3", "4"])
+    choice = questionary.select(
+        "Select category:",
+        choices=choices,
+        style=get_prompt_style(),
+    ).ask()
 
-    if choice == "1":
+    if choice == "search":
         config = _configure_search_tuning(config, console)
-    elif choice == "2":
+    elif choice == "processing":
         config = _configure_processing(config, console)
-    elif choice == "3":
+    elif choice == "hardware":
         config = _configure_hardware_thresholds(config, console)
 
     return config
@@ -507,15 +514,24 @@ def _configure_prompts(config: RagdConfig, console: Console) -> None:
     from ragd.prompts.loader import DEFAULT_PROMPTS_DIR, get_custom_prompt_status
 
     console.print("\n[bold]Prompt Template Management[/bold]\n")
-    console.print("  [1] List all prompts")
-    console.print("  [2] Export prompts for customisation")
-    console.print("  [3] Show customisation status")
-    console.print("  [4] View prompt content")
-    console.print("  [5] Back to main menu")
 
-    choice = Prompt.ask("\nEnter choice", choices=["1", "2", "3", "4", "5"])
+    # Sub-menu with arrow key navigation
+    choices = [
+        questionary.Choice("List all prompts", value="list"),
+        questionary.Choice("Export prompts for customisation", value="export"),
+        questionary.Choice("Show customisation status", value="status"),
+        questionary.Choice("View prompt content", value="view"),
+        questionary.Separator(),
+        questionary.Choice("Back to main menu", value="back"),
+    ]
 
-    if choice == "1":
+    choice = questionary.select(
+        "Select action:",
+        choices=choices,
+        style=get_prompt_style(),
+    ).ask()
+
+    if choice == "list":
         prompts = list_prompts()
         console.print("\n[bold]Available Prompts:[/bold]\n")
         for category, names in prompts.items():
@@ -523,7 +539,7 @@ def _configure_prompts(config: RagdConfig, console: Console) -> None:
             for name in names:
                 console.print(f"    - {name}")
 
-    elif choice == "2":
+    elif choice == "export":
         console.print(f"\n[dim]Prompts will be exported to: {DEFAULT_PROMPTS_DIR}[/dim]")
         if Confirm.ask("Export all default prompts?", default=True):
             exported = export_default_prompts(overwrite=False)
@@ -536,7 +552,7 @@ def _configure_prompts(config: RagdConfig, console: Console) -> None:
                     exported = export_default_prompts(overwrite=True)
                     console.print(f"[green]✓[/green] Exported {len(exported)} prompt files")
 
-    elif choice == "3":
+    elif choice == "status":
         status = get_custom_prompt_status(config)
         console.print("\n[bold]Customisation Status:[/bold]\n")
         for category, prompts_status in status.items():
@@ -545,7 +561,7 @@ def _configure_prompts(config: RagdConfig, console: Console) -> None:
                 style = "green" if stat == "default" else "yellow"
                 console.print(f"    - {name}: [{style}]{stat}[/{style}]")
 
-    elif choice == "4":
+    elif choice == "view":
         from ragd.prompts.defaults import DEFAULT_PROMPTS
 
         prompts = list_prompts()
@@ -554,15 +570,19 @@ def _configure_prompts(config: RagdConfig, console: Console) -> None:
             for name in names:
                 console.print(f"  {category}/{name}")
 
-        prompt_name = Prompt.ask("\nEnter prompt name (category/name)")
-        parts = prompt_name.split("/")
-        if len(parts) == 2 and parts[0] in DEFAULT_PROMPTS:
-            category, name = parts
-            if name in DEFAULT_PROMPTS[category]:
-                content = DEFAULT_PROMPTS[category][name]
-                console.print(f"\n[bold]{category}/{name}:[/bold]\n")
-                console.print(content)
+        prompt_name = questionary.text(
+            "Enter prompt name (category/name):",
+            style=get_prompt_style(),
+        ).ask()
+        if prompt_name:
+            parts = prompt_name.split("/")
+            if len(parts) == 2 and parts[0] in DEFAULT_PROMPTS:
+                category, name = parts
+                if name in DEFAULT_PROMPTS[category]:
+                    content = DEFAULT_PROMPTS[category][name]
+                    console.print(f"\n[bold]{category}/{name}:[/bold]\n")
+                    console.print(content)
+                else:
+                    console.print(f"[red]Unknown prompt: {name}[/red]")
             else:
-                console.print(f"[red]Unknown prompt: {name}[/red]")
-        else:
-            console.print("[red]Invalid format. Use category/name (e.g., rag/answer)[/red]")
+                console.print("[red]Invalid format. Use category/name (e.g., rag/answer)[/red]")

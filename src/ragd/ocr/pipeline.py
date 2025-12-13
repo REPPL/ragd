@@ -224,12 +224,20 @@ class OCRPipeline:
                 fallback_used = True
                 fallback_pages.append(page_num)
 
-            # Track consecutive complete failures (no text from either engine)
-            if not page_result.results:
+            # Track consecutive failures (no text OR very low confidence)
+            # A page is considered a failure if:
+            # 1. No OCR results at all, OR
+            # 2. Confidence is below the minimum threshold (essentially unusable)
+            is_failure = (
+                not page_result.results
+                or page_result.average_confidence < self._config.min_confidence
+            )
+
+            if is_failure:
                 consecutive_failures += 1
                 if consecutive_failures >= self._config.max_consecutive_failures:
                     skip_reason = (
-                        f"{consecutive_failures} consecutive OCR failures "
+                        f"{consecutive_failures} consecutive low-quality pages "
                         f"(processed {page_num + 1}/{page_count} pages)"
                     )
                     self._logger.warning(
