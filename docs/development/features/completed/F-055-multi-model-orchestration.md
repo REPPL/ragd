@@ -237,6 +237,6 @@ RAG (Retrieval-Augmented Generation) is a technique that...
 - [ADR-0026: Multi-Model Architecture](../../decisions/adrs/0026-multi-model-architecture.md) - Decision
 - [F-020: Ollama LLM Integration](./F-020-ollama-llm-integration.md) - Foundation feature
 - [F-056: Specialised Task Models](../planned/F-056-specialised-task-models.md) - SLIM models
-- [F-057: Model Comparison](../planned/F-057-model-comparison.md) - Comparison mode
+- [F-057: Model Comparison](./F-057-model-comparison.md) - Comparison mode
 
 ---

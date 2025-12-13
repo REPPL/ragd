@@ -239,13 +239,14 @@ Features are the primary unit of work. Each feature specification describes:
 
 | ID | Feature | Status | Description |
 |----|---------|--------|-------------|
-| F-123 | Performance Profiling | 📅 Planned | Identify bottlenecks |
-| F-124 | Memory Optimisation | 📅 Planned | Reduce RAM usage |
-| F-125 | Startup Time | 📅 Planned | Faster CLI startup |
-| F-126 | Final Bug Fixes | 📅 Planned | Last fixes and polish |
-| F-127 | Performance Benchmarks | 📅 Planned | Published benchmarks |
-| [F-057](./planned/F-057-model-comparison.md) | Model Comparison Mode | 📅 Planned | Evaluate models side-by-side |
-| [F-075](./planned/F-075-backend-migration-tool.md) | Backend Migration Tool | 📅 Planned | Move between vector stores |
+| [F-119](./completed/F-119-full-features-by-default.md) | Full Features by Default | ✅ Complete | All runtime deps in default install |
+| [F-123](./completed/F-123-performance-profiling.md) | Performance Profiling | ✅ Complete | Identify bottlenecks |
+| [F-127](./completed/F-127-performance-benchmarks.md) | Performance Benchmarks | ✅ Complete | Published benchmarks |
+| [F-057](./completed/F-057-model-comparison.md) | Model Comparison Mode | ✅ Complete | Evaluate models side-by-side |
+| [F-075](./completed/F-075-backend-migration-tool.md) | Backend Migration Tool | ✅ Complete | Move between vector stores |
+| [F-124](./planned/F-124-memory-optimisation.md) | Memory Optimisation | 📅 Planned | Reduce RAM usage |
+| [F-125](./planned/F-125-startup-time.md) | Startup Time | 📅 Planned | Faster CLI startup |
+| [F-126](./planned/F-126-final-bug-fixes.md) | Final Bug Fixes | 📅 Planned | Last fixes and polish |
 
 ### v1.1 Features (NER & Graph)
 

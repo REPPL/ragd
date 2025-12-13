@@ -2,14 +2,21 @@
 
 Implements the contextual retrieval technique from Anthropic research:
 https://www.anthropic.com/news/contextual-retrieval
+
+v1.0.5: Configuration exposure - prompts and parameters now configurable.
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from ragd.llm.client import LLMClient
+from ragd.prompts import get_prompt
+from ragd.prompts.defaults import CONTEXT_GENERATION_PROMPT as DEFAULT_CONTEXT
+
+if TYPE_CHECKING:
+    from ragd.config import RagdConfig
 
 
 @dataclass
@@ -21,18 +28,6 @@ class ContextualChunk:
     combined: str  # Context + Content (for embedding)
     index: int
     metadata: dict[str, Any] = field(default_factory=dict)
-
-
-# Default prompt template for context generation
-DEFAULT_CONTEXT_PROMPT = """Given this document excerpt, write a brief context statement (1-2 sentences) that explains what this text is about and where it comes from. Be specific and factual.
-
-Document: {title}
-Type: {file_type}
-
-Text:
-{chunk_content}
-
-Context:"""
 
 
 class ContextGenerator:
@@ -47,6 +42,7 @@ class ContextGenerator:
         llm_client: LLMClient,
         prompt_template: str | None = None,
         max_context_length: int = 200,
+        config: RagdConfig | None = None,
     ) -> None:
         """Initialise context generator.
 
@@ -54,10 +50,32 @@ class ContextGenerator:
             llm_client: LLM client for generation
             prompt_template: Custom prompt template (uses default if None)
             max_context_length: Maximum characters for context
+            config: Optional ragd config for parameters and prompts
         """
         self.llm = llm_client
-        self.prompt_template = prompt_template or DEFAULT_CONTEXT_PROMPT
-        self.max_context_length = max_context_length
+        self._config = config
+
+        # Use config values if available
+        if config:
+            params = config.metadata_params
+            self.max_context_length = params.max_context_length
+            ctx_params = params.context_generation
+            self._context_temperature = ctx_params.temperature or 0.0
+            self._context_max_tokens = ctx_params.max_tokens or 100
+
+            # Load prompt from config
+            self.prompt_template = get_prompt(
+                config.metadata_prompts.context_generation,
+                DEFAULT_CONTEXT,
+                category="metadata",
+                name="context_generation",
+            )
+        else:
+            # Legacy defaults
+            self.prompt_template = prompt_template or DEFAULT_CONTEXT
+            self.max_context_length = max_context_length
+            self._context_temperature = 0.0
+            self._context_max_tokens = 100
 
     def generate_context(
         self,
@@ -86,8 +104,8 @@ class ContextGenerator:
         try:
             response = self.llm.generate(
                 prompt=prompt,
-                temperature=0.0,  # Deterministic for consistency
-                max_tokens=100,  # Context should be brief
+                temperature=self._context_temperature,
+                max_tokens=self._context_max_tokens,
             )
 
             if response.success:
@@ -181,8 +199,8 @@ class ContextGenerator:
         try:
             responses = self.llm.generate_batch(
                 prompts=prompts,
-                temperature=0.0,
-                max_tokens=100,
+                temperature=self._context_temperature,
+                max_tokens=self._context_max_tokens,
             )
         except Exception:
             # Fall back to sequential
@@ -216,6 +234,7 @@ def create_context_generator(
     base_url: str = "http://localhost:11434",
     model: str = "llama3.2:3b",
     prompt_template: str | None = None,
+    config: RagdConfig | None = None,
 ) -> ContextGenerator | None:
     """Create a context generator with Ollama.
 
@@ -225,6 +244,7 @@ def create_context_generator(
         base_url: Ollama API URL
         model: Model to use
         prompt_template: Custom prompt template
+        config: Optional ragd config for parameters and prompts
 
     Returns:
         ContextGenerator or None if unavailable
@@ -236,4 +256,8 @@ def create_context_generator(
         return None
 
     client = OllamaClient(base_url=base_url, model=model)
-    return ContextGenerator(llm_client=client, prompt_template=prompt_template)
+    return ContextGenerator(
+        llm_client=client,
+        prompt_template=prompt_template,
+        config=config,
+    )

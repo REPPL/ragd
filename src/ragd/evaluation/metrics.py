@@ -1,13 +1,24 @@
 """Evaluation metrics for ragd.
 
 Implements retrieval and generation quality metrics inspired by RAGAS.
+
+v1.0.5: Configuration exposure - prompts and parameters now configurable.
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+from ragd.prompts import get_prompt
+from ragd.prompts.defaults import (
+    EVALUATION_FAITHFULNESS_PROMPT as DEFAULT_FAITHFULNESS,
+    EVALUATION_RELEVANCY_PROMPT as DEFAULT_RELEVANCY,
+)
+
+if TYPE_CHECKING:
+    from ragd.config import RagdConfig
 
 
 class MetricType(str, Enum):
@@ -155,7 +166,8 @@ def compute_context_recall(
 
 def compute_relevance_score(
     retrieved_scores: list[float],
-    decay_factor: float = 0.9,
+    decay_factor: float | None = None,
+    config: RagdConfig | None = None,
 ) -> float:
     """Compute weighted relevance score with position decay.
 
@@ -163,11 +175,18 @@ def compute_relevance_score(
 
     Args:
         retrieved_scores: List of relevance scores (in rank order)
-        decay_factor: Decay multiplier for each position (0-1)
+        decay_factor: Decay multiplier for each position (0-1). If None, uses config.
+        config: Optional ragd config for parameters
 
     Returns:
         Weighted relevance score (0-1)
     """
+    # Resolve decay factor from config or default
+    if decay_factor is None:
+        if config is not None:
+            decay_factor = config.search_tuning.position_decay_factor
+        else:
+            decay_factor = 0.9  # Default
     if not retrieved_scores:
         return 0.0
 
@@ -251,35 +270,8 @@ def compute_ndcg(
     return actual_dcg / ideal_dcg
 
 
-# LLM-based metric prompts
-FAITHFULNESS_PROMPT = """You are evaluating whether an answer is grounded in the provided context.
-
-Context:
-{context}
-
-Question: {question}
-
-Answer: {answer}
-
-Rate how faithfully the answer is grounded in the context on a scale from 0 to 1:
-- 1.0: Every claim in the answer is directly supported by the context
-- 0.5: Some claims are supported, but others are not found in context
-- 0.0: The answer contains claims that contradict or are not in context
-
-Respond with ONLY a single number between 0 and 1, nothing else."""
-
-ANSWER_RELEVANCY_PROMPT = """You are evaluating whether an answer addresses the question.
-
-Question: {question}
-
-Answer: {answer}
-
-Rate how well the answer addresses the question on a scale from 0 to 1:
-- 1.0: The answer directly and completely addresses the question
-- 0.5: The answer partially addresses the question
-- 0.0: The answer does not address the question at all
-
-Respond with ONLY a single number between 0 and 1, nothing else."""
+# Note: Default prompts are now in ragd.prompts.defaults
+# Custom prompts can be configured via config.yaml or prompt files
 
 
 def compute_faithfulness(
@@ -288,6 +280,7 @@ def compute_faithfulness(
     context: str,
     base_url: str = "http://localhost:11434",
     model: str = "llama3.2:3b",
+    config: RagdConfig | None = None,
 ) -> float | None:
     """Compute faithfulness score using LLM.
 
@@ -300,13 +293,27 @@ def compute_faithfulness(
         context: The retrieved context
         base_url: Ollama API base URL
         model: Model to use for evaluation
+        config: Optional ragd config for prompts and parameters
 
     Returns:
         Faithfulness score (0-1), or None if LLM unavailable
     """
+    # Load prompt from config or defaults
+    if config is not None:
+        prompt_template = get_prompt(
+            config.evaluation_prompts.faithfulness,
+            DEFAULT_FAITHFULNESS,
+            category="evaluation",
+            name="faithfulness",
+        )
+        truncation = config.processing.context_truncation_chars
+    else:
+        prompt_template = DEFAULT_FAITHFULNESS
+        truncation = 2000
+
     return _call_llm_for_score(
-        prompt=FAITHFULNESS_PROMPT.format(
-            context=context[:2000],  # Limit context length
+        prompt=prompt_template.format(
+            context=context[:truncation],
             question=question,
             answer=answer,
         ),
@@ -320,6 +327,7 @@ def compute_answer_relevancy(
     answer: str,
     base_url: str = "http://localhost:11434",
     model: str = "llama3.2:3b",
+    config: RagdConfig | None = None,
 ) -> float | None:
     """Compute answer relevancy score using LLM.
 
@@ -330,12 +338,24 @@ def compute_answer_relevancy(
         answer: The generated answer
         base_url: Ollama API base URL
         model: Model to use for evaluation
+        config: Optional ragd config for prompts
 
     Returns:
         Relevancy score (0-1), or None if LLM unavailable
     """
+    # Load prompt from config or defaults
+    if config is not None:
+        prompt_template = get_prompt(
+            config.evaluation_prompts.answer_relevancy,
+            DEFAULT_RELEVANCY,
+            category="evaluation",
+            name="answer_relevancy",
+        )
+    else:
+        prompt_template = DEFAULT_RELEVANCY
+
     return _call_llm_for_score(
-        prompt=ANSWER_RELEVANCY_PROMPT.format(
+        prompt=prompt_template.format(
             question=question,
             answer=answer,
         ),

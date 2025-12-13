@@ -131,7 +131,7 @@ Use pip's `--config-settings` for customisation. Rejected because it's less intu
 ## Related Documentation
 
 - [ADR-0024](./0024-optional-dependencies.md) - Original strategy (superseded)
-- [F-119](../../features/planned/F-119-full-features-by-default.md) - Feature spec
+- [F-119](../../features/completed/F-119-full-features-by-default.md) - Feature spec
 - [v1.0.0 Milestone](../../milestones/v1.0.0.md)
 
 ---

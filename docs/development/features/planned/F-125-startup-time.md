@@ -148,9 +148,9 @@ python -X importtime -c "import ragd" 2>&1 | head -50
 
 ## Related Documentation
 
-- [F-123: Performance Profiling](./F-123-performance-profiling.md) - Measurement framework
+- [F-123: Performance Profiling](../completed/F-123-performance-profiling.md) - Measurement framework
 - [F-124: Memory Optimisation](./F-124-memory-optimisation.md) - Related optimisation
-- [v1.0.0 Milestone](../../milestones/v1.0.0.md)
+- [v1.1.0 Milestone](../../milestones/v1.1.0.md)
 - [CLI Reference](../../../reference/cli-reference.md)
 
 ---

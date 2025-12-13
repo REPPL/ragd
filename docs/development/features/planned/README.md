@@ -6,14 +6,9 @@ Features planned for future development. See [features/README.md](../README.md) 
 
 | ID | Feature | Version | Description |
 |----|---------|---------|-------------|
-| [F-119](./F-119-full-features-by-default.md) | Full Features by Default | v1.0 | All runtime deps in default install |
-| [F-123](./F-123-performance-profiling.md) | Performance Profiling | v1.0 | Identify and fix bottlenecks |
-| [F-124](./F-124-memory-optimisation.md) | Memory Optimisation | v1.0 | Reduce RAM usage |
-| [F-125](./F-125-startup-time.md) | Startup Time | v1.0 | Faster CLI startup |
-| [F-126](./F-126-final-bug-fixes.md) | Final Bug Fixes | v1.0 | Last fixes and polish |
-| [F-127](./F-127-performance-benchmarks.md) | Performance Benchmarks | v1.0 | Published benchmarks |
-| [F-057](./F-057-model-comparison.md) | Model Comparison | v1.0 | Evaluate models side-by-side |
-| [F-075](./F-075-backend-migration-tool.md) | Backend Migration | v1.0 | Move between vector stores |
+| [F-124](./F-124-memory-optimisation.md) | Memory Optimisation | v1.1 | Reduce RAM usage |
+| [F-125](./F-125-startup-time.md) | Startup Time | v1.1 | Faster CLI startup |
+| [F-126](./F-126-final-bug-fixes.md) | Final Bug Fixes | v1.1 | Last fixes and polish |
 | F-128 to F-132 | Graph & Automation | v1.1 | Knowledge graph CLI, batch ops |
 | F-134 | Onboarding Flow | v1.2 | Guided first-run experience |
 | F-133, F-135 to F-137 | API | v1.3 | REST API, auth, webhooks |
@@ -72,6 +67,7 @@ The following features were previously planned and have been implemented:
 | F-106 to F-109 | CLI Polish II | v0.9.1 |
 | F-110, F-113, F-116, F-117 | Stability & Logging | v0.9.5 |
 | F-098, F-099, F-105, F-111, F-112, F-114, F-115, F-118 | Alpha Testing | v0.9.6 |
+| F-119, F-057, F-075, F-123, F-127 | Performance & Polish | v1.0.0 |
 
 ## Workflow
 

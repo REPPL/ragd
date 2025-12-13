@@ -1,13 +1,18 @@
 """RAG prompt templates for ragd.
 
 Provides prompt templates for different RAG tasks.
+
+v1.0.5: Added support for file-based prompt overrides.
 """
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 from enum import Enum
 from typing import TYPE_CHECKING, Any
+
+from ragd.prompts import DEFAULT_PROMPTS_DIR
 
 if TYPE_CHECKING:
     from ragd.config import ChatPromptsConfig
@@ -264,6 +269,40 @@ _TEMPLATES: dict[str, PromptTemplate] = {
 }
 
 
+def _parse_prompt_file(content: str) -> tuple[str, str]:
+    """Parse a prompt file into system and user parts.
+
+    Files use format:
+        # System Prompt
+        <system prompt content>
+
+        # User Prompt
+        <user prompt content>
+
+    Args:
+        content: File content
+
+    Returns:
+        Tuple of (system_prompt, user_template)
+    """
+    # Try to split on markers
+    system_match = re.search(
+        r"#\s*System\s*Prompt\s*\n(.*?)(?=#\s*User\s*Prompt|$)",
+        content,
+        re.IGNORECASE | re.DOTALL,
+    )
+    user_match = re.search(
+        r"#\s*User\s*Prompt\s*\n(.*?)$",
+        content,
+        re.IGNORECASE | re.DOTALL,
+    )
+
+    system_prompt = system_match.group(1).strip() if system_match else ""
+    user_template = user_match.group(1).strip() if user_match else content.strip()
+
+    return system_prompt, user_template
+
+
 def get_prompt_template(
     name: str,
     citation_instruction: str | None = None,
@@ -271,9 +310,11 @@ def get_prompt_template(
 ) -> PromptTemplate:
     """Get a prompt template by name.
 
-    Templates can be customised via:
+    Templates can be customised via (in priority order):
     1. Config overrides (config.overrides[name].system/user)
-    2. Citation instruction (config.citation_instruction or parameter)
+    2. File-based overrides (~/.ragd/prompts/rag/{name}.txt)
+    3. Citation instruction (config.citation_instruction or parameter)
+    4. Default built-in template
 
     Args:
         name: Template name (e.g., 'answer', 'summarise', 'chat')
@@ -286,17 +327,36 @@ def get_prompt_template(
     Raises:
         KeyError: If template not found
     """
-    if name not in _TEMPLATES:
+    # Normalise name (strip rag_ prefix if present)
+    base_name = name.replace("rag_", "") if name.startswith("rag_") else name
+
+    if name not in _TEMPLATES and f"rag_{name}" not in _TEMPLATES:
         available = ", ".join(sorted(set(_TEMPLATES.keys())))
         raise KeyError(f"Unknown template '{name}'. Available: {available}")
 
-    template = _TEMPLATES[name]
+    template = _TEMPLATES.get(name) or _TEMPLATES.get(f"rag_{name}")
 
-    # Apply config overrides if provided
+    # Check for file-based override first
+    prompt_file = DEFAULT_PROMPTS_DIR / "rag" / f"{base_name}.txt"
+    if prompt_file.exists():
+        try:
+            content = prompt_file.read_text(encoding="utf-8")
+            system_prompt, user_template = _parse_prompt_file(content)
+            if system_prompt or user_template:
+                template = PromptTemplate(
+                    name=template.name,
+                    system_prompt=system_prompt or template.system_prompt,
+                    user_template=user_template or template.user_template,
+                    description=template.description,
+                )
+        except OSError:
+            pass  # Fall back to default
+
+    # Apply config overrides if provided (takes precedence over file)
     if config:
         # Check for template-specific overrides
-        if name in config.overrides:
-            override = config.overrides[name]
+        if base_name in config.overrides:
+            override = config.overrides[base_name]
             if override.system or override.user:
                 template = PromptTemplate(
                     name=template.name,

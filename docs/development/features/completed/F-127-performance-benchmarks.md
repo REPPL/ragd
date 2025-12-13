@@ -190,8 +190,8 @@ ragd benchmark report --input benchmarks.json --output benchmarks.md
 ## Related Documentation
 
 - [F-123: Performance Profiling](./F-123-performance-profiling.md) - Foundation
-- [F-124: Memory Optimisation](./F-124-memory-optimisation.md) - Memory tracking
-- [F-125: Startup Time](./F-125-startup-time.md) - Startup benchmarks
+- [F-124: Memory Optimisation](../planned/F-124-memory-optimisation.md) - Memory tracking
+- [F-125: Startup Time](../planned/F-125-startup-time.md) - Startup benchmarks
 - [v1.0.0 Milestone](../../milestones/v1.0.0.md)
 
 ---

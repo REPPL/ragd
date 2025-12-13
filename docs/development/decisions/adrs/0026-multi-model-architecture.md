@@ -139,6 +139,6 @@ No migration required. Existing single-model configurations continue to work. Mu
 - [F-020: Ollama LLM Integration](../../features/completed/F-020-ollama-llm-integration.md)
 - [F-055: Multi-Model Orchestration](../../features/completed/F-055-multi-model-orchestration.md)
 - [F-056: Specialised Task Models](../../features/planned/F-056-specialised-task-models.md)
-- [F-057: Model Comparison](../../features/planned/F-057-model-comparison.md)
+- [F-057: Model Comparison](../../features/completed/F-057-model-comparison.md)
 
 ---

@@ -271,10 +271,276 @@ class ModelDiscoveryConfig(BaseModel):
     cache_ttl_days: int = 30  # Days before cached cards are refreshed
 
 
+# =============================================================================
+# v1.0.5: Configuration Exposure Models
+# =============================================================================
+
+
+class PromptFileReference(BaseModel):
+    """Reference to an external prompt file OR inline string.
+
+    Supports hybrid approach: users can either reference an external file
+    or provide the prompt inline in config.yaml.
+
+    Example config.yaml usage:
+        # File reference
+        agentic_prompts:
+          relevance_eval:
+            file: ~/.ragd/prompts/agentic/relevance_eval.txt
+
+        # Inline string
+        agentic_prompts:
+          query_rewrite:
+            inline: |
+              Rewrite this query to be more specific.
+              Original: {query}
+              Rewritten:
+    """
+
+    file: Path | None = None  # Path to external prompt file
+    inline: str | None = None  # Inline prompt string
+
+    def resolve(self, default: str) -> str:
+        """Resolve to actual prompt string.
+
+        Priority: file > inline > default
+
+        Args:
+            default: Default prompt to use if neither file nor inline specified
+
+        Returns:
+            Resolved prompt string
+        """
+        if self.file is not None:
+            expanded = Path(str(self.file).replace("~", str(Path.home())))
+            if expanded.exists():
+                return expanded.read_text(encoding="utf-8")
+            logger.warning("Prompt file not found: %s, using default", self.file)
+        if self.inline is not None:
+            return self.inline
+        return default
+
+
+class OperationParams(BaseModel):
+    """LLM parameters for a specific operation.
+
+    Allows fine-grained control over temperature and token limits
+    for different operations (evaluation, generation, etc.).
+    """
+
+    temperature: float | None = None  # None = use operation default
+    max_tokens: int | None = None  # None = use operation default
+
+
+class AgenticParamsConfig(BaseModel):
+    """Parameters for agentic RAG operations (CRAG/Self-RAG).
+
+    Controls the behaviour of query rewriting, relevance evaluation,
+    faithfulness checking, and response refinement.
+    """
+
+    # LLM parameters per operation
+    relevance_eval: OperationParams = Field(
+        default_factory=lambda: OperationParams(temperature=0.0, max_tokens=10),
+        description="Parameters for relevance evaluation (deterministic)",
+    )
+    query_rewrite: OperationParams = Field(
+        default_factory=lambda: OperationParams(temperature=0.3, max_tokens=100),
+        description="Parameters for query rewriting",
+    )
+    answer_generation: OperationParams = Field(
+        default_factory=lambda: OperationParams(temperature=0.7, max_tokens=1024),
+        description="Parameters for answer generation",
+    )
+    faithfulness_eval: OperationParams = Field(
+        default_factory=lambda: OperationParams(temperature=0.0, max_tokens=10),
+        description="Parameters for faithfulness evaluation (deterministic)",
+    )
+    refine_response: OperationParams = Field(
+        default_factory=lambda: OperationParams(temperature=0.3, max_tokens=1024),
+        description="Parameters for response refinement",
+    )
+
+    # CRAG thresholds
+    relevance_threshold: float = 0.6  # Minimum relevance for acceptable retrieval
+    max_rewrites: int = 2  # Maximum query rewrite attempts
+
+    # Self-RAG thresholds
+    faithfulness_threshold: float = 0.7  # Minimum faithfulness score
+    max_refinements: int = 1  # Maximum response refinement attempts
+
+    # RetrievalQuality thresholds (for categorising retrieval quality)
+    excellent_threshold: float = 0.8  # Score >= this = EXCELLENT
+    good_threshold: float = 0.6  # Score >= this = GOOD
+    poor_threshold: float = 0.4  # Score >= this = POOR, below = IRRELEVANT
+
+    # Confidence calculation weights
+    confidence_relevance_weight: float = 0.4  # Weight for relevance in confidence
+    confidence_faithfulness_weight: float = 0.6  # Weight for faithfulness
+
+
+class AgenticPromptsConfig(BaseModel):
+    """Prompt references for agentic RAG operations.
+
+    Each prompt can be customised via file reference or inline string.
+    """
+
+    relevance_eval: PromptFileReference | None = None
+    query_rewrite: PromptFileReference | None = None
+    faithfulness_eval: PromptFileReference | None = None
+    refine_response: PromptFileReference | None = None
+
+
+class MetadataParamsConfig(BaseModel):
+    """Parameters for metadata extraction operations.
+
+    Controls document summarisation, classification, and context generation.
+    """
+
+    # LLM parameters per operation
+    summary: OperationParams = Field(
+        default_factory=lambda: OperationParams(temperature=0.3, max_tokens=150),
+        description="Parameters for document summary generation",
+    )
+    classification: OperationParams = Field(
+        default_factory=lambda: OperationParams(temperature=0.0, max_tokens=20),
+        description="Parameters for document classification (deterministic)",
+    )
+    context_generation: OperationParams = Field(
+        default_factory=lambda: OperationParams(temperature=0.0, max_tokens=100),
+        description="Parameters for contextual retrieval context generation",
+    )
+
+    # Text limits
+    max_text_length: int = 8000  # Maximum chars to send to LLM for metadata
+    max_context_length: int = 200  # Maximum chars for generated context
+
+    # Classification categories (customisable)
+    classification_categories: list[str] = Field(
+        default_factory=lambda: [
+            "report",
+            "article",
+            "documentation",
+            "correspondence",
+            "legal",
+            "financial",
+            "academic",
+            "other",
+        ],
+        description="Valid document classification categories",
+    )
+
+
+class MetadataPromptsConfig(BaseModel):
+    """Prompt references for metadata extraction operations."""
+
+    summary: PromptFileReference | None = None
+    classification: PromptFileReference | None = None
+    context_generation: PromptFileReference | None = None
+
+
+class EvaluationPromptsConfig(BaseModel):
+    """Prompt references for RAG evaluation metrics."""
+
+    faithfulness: PromptFileReference | None = None
+    answer_relevancy: PromptFileReference | None = None
+
+
+class SearchTuningConfig(BaseModel):
+    """Fine-tuning parameters for search and retrieval.
+
+    These parameters affect how search results are scored, combined,
+    and ranked. Advanced users can tune these for their specific use case.
+    """
+
+    # BM25 normalisation
+    bm25_normalisation_divisor: float = Field(
+        default=10.0,
+        description="Divisor for normalising BM25 scores to 0-1 range",
+    )
+
+    # Reciprocal Rank Fusion
+    rrf_fetch_multiplier: int = Field(
+        default=3,
+        description="Multiplier for fetch limit before RRF (fetches limit * this)",
+    )
+
+    # Relevance scoring
+    position_decay_factor: float = Field(
+        default=0.9,
+        ge=0.0,
+        le=1.0,
+        description="Decay factor for position-weighted relevance (0-1)",
+    )
+    relevance_precision_threshold: float = Field(
+        default=0.5,
+        ge=0.0,
+        le=1.0,
+        description="Minimum score to consider a chunk relevant for precision",
+    )
+
+
+class ProcessingConfig(BaseModel):
+    """Processing parameters for text handling.
+
+    Controls tokenisation, truncation, and other text processing behaviours.
+    """
+
+    context_truncation_chars: int = Field(
+        default=2000,
+        description="Maximum characters for context in LLM prompts",
+    )
+    chars_per_token_estimate: int = Field(
+        default=4,
+        description="Estimated characters per token for fallback counting",
+    )
+    token_encoding: str = Field(
+        default="cl100k_base",
+        description="Tiktoken encoding name for token counting",
+    )
+
+
+class HardwareThresholdsConfig(BaseModel):
+    """Thresholds for hardware tier classification.
+
+    Defines memory boundaries for MINIMAL, STANDARD, HIGH, and EXTREME tiers.
+    """
+
+    minimal_max_gb: float = Field(
+        default=8.0,
+        description="Maximum RAM (GB) for MINIMAL tier (below this = MINIMAL)",
+    )
+    standard_max_gb: float = Field(
+        default=16.0,
+        description="Maximum RAM (GB) for STANDARD tier",
+    )
+    high_max_gb: float = Field(
+        default=32.0,
+        description="Maximum RAM (GB) for HIGH tier (above this = EXTREME)",
+    )
+
+
+class BoilerplateConfig(BaseModel):
+    """Custom boilerplate removal configuration.
+
+    Allows users to add custom patterns for boilerplate removal
+    and site-specific patterns for web content.
+    """
+
+    custom_patterns: list[str] = Field(
+        default_factory=list,
+        description="Additional regex patterns to match boilerplate content",
+    )
+    site_patterns: dict[str, list[str]] = Field(
+        default_factory=dict,
+        description="Site-specific boilerplate patterns (domain -> patterns)",
+    )
+
+
 class RagdConfig(BaseModel):
     """Main ragd configuration."""
 
-    version: int = 1
+    version: int = 2  # Bumped for v1.0.5 configuration exposure
     hardware: HardwareConfig = Field(default_factory=HardwareConfig)
     storage: StorageConfig = Field(default_factory=StorageConfig)
     embedding: EmbeddingConfig = Field(default_factory=EmbeddingConfig)
@@ -291,6 +557,21 @@ class RagdConfig(BaseModel):
     chat: ChatConfig = Field(default_factory=ChatConfig)
     display: DisplayConfig = Field(default_factory=DisplayConfig)
     model_discovery: ModelDiscoveryConfig = Field(default_factory=ModelDiscoveryConfig)
+
+    # v1.0.5: Configuration exposure - advanced tuning options
+    agentic_params: AgenticParamsConfig = Field(default_factory=AgenticParamsConfig)
+    agentic_prompts: AgenticPromptsConfig = Field(default_factory=AgenticPromptsConfig)
+    metadata_params: MetadataParamsConfig = Field(default_factory=MetadataParamsConfig)
+    metadata_prompts: MetadataPromptsConfig = Field(default_factory=MetadataPromptsConfig)
+    evaluation_prompts: EvaluationPromptsConfig = Field(
+        default_factory=EvaluationPromptsConfig
+    )
+    search_tuning: SearchTuningConfig = Field(default_factory=SearchTuningConfig)
+    processing: ProcessingConfig = Field(default_factory=ProcessingConfig)
+    hardware_thresholds: HardwareThresholdsConfig = Field(
+        default_factory=HardwareThresholdsConfig
+    )
+    boilerplate: BoilerplateConfig = Field(default_factory=BoilerplateConfig)
 
     @property
     def chroma_path(self) -> Path:

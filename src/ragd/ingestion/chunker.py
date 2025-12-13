@@ -2,15 +2,20 @@
 
 This module provides various strategies for splitting text into chunks
 suitable for embedding and retrieval.
+
+v1.0.5: Configuration exposure - token encoding now configurable.
 """
 
 from __future__ import annotations
 
 import re
 from dataclasses import dataclass, field
-from typing import Any, Literal, Protocol
+from typing import TYPE_CHECKING, Any, Literal, Protocol
 
 import tiktoken
+
+if TYPE_CHECKING:
+    from ragd.config import RagdConfig
 
 ChunkStrategy = Literal["sentence", "fixed", "recursive", "structure"]
 
@@ -43,22 +48,40 @@ class Chunker(Protocol):
         ...
 
 
-def count_tokens(text: str, encoding_name: str = "cl100k_base") -> int:
+def count_tokens(
+    text: str,
+    encoding_name: str | None = None,
+    config: RagdConfig | None = None,
+) -> int:
     """Count tokens in text using tiktoken.
 
     Args:
         text: Text to count tokens for
-        encoding_name: Tiktoken encoding name
+        encoding_name: Tiktoken encoding name. If None, uses config or default.
+        config: Optional ragd config for token encoding
 
     Returns:
         Number of tokens
     """
+    # Resolve encoding from config or defaults
+    if encoding_name is None:
+        if config is not None:
+            encoding_name = config.processing.token_encoding
+        else:
+            encoding_name = "cl100k_base"
+
+    # Get chars_per_token for fallback
+    if config is not None:
+        chars_per_token = config.processing.chars_per_token_estimate
+    else:
+        chars_per_token = 4
+
     try:
         encoding = tiktoken.get_encoding(encoding_name)
         return len(encoding.encode(text))
     except Exception:
-        # Fallback: rough estimate of 4 chars per token
-        return len(text) // 4
+        # Fallback: rough estimate based on config or default
+        return len(text) // chars_per_token
 
 
 class SentenceChunker:
@@ -210,15 +233,24 @@ class FixedChunker:
         self,
         chunk_size: int = 512,
         overlap: int = 50,
+        config: RagdConfig | None = None,
     ) -> None:
         """Initialise fixed chunker.
 
         Args:
             chunk_size: Chunk size in tokens
             overlap: Overlap between chunks in tokens
+            config: Optional ragd config for processing parameters
         """
         self.chunk_size = chunk_size
         self.overlap = overlap
+        self._config = config
+
+        # Get chars_per_token from config or default
+        if config is not None:
+            self._chars_per_token = config.processing.chars_per_token_estimate
+        else:
+            self._chars_per_token = 4
 
     def chunk(self, text: str, metadata: dict[str, Any] | None = None) -> list[Chunk]:
         """Split text into fixed-size chunks.
@@ -233,10 +265,9 @@ class FixedChunker:
         if not text.strip():
             return []
 
-        # Approximate chars per token
-        chars_per_token = 4
-        chunk_chars = self.chunk_size * chars_per_token
-        overlap_chars = self.overlap * chars_per_token
+        # Use configured chars per token estimate
+        chunk_chars = self.chunk_size * self._chars_per_token
+        overlap_chars = self.overlap * self._chars_per_token
 
         chunks: list[Chunk] = []
         start = 0

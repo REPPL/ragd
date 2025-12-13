@@ -112,7 +112,7 @@ ragd profile --compare baseline.json
 ## Related Documentation
 
 - [F-127: Performance Benchmarks](./F-127-performance-benchmarks.md) - Uses profiling framework
-- [F-124: Memory Optimisation](./F-124-memory-optimisation.md) - Uses memory tracking
+- [F-124: Memory Optimisation](../planned/F-124-memory-optimisation.md) - Uses memory tracking
 - [v1.0.0 Milestone](../../milestones/v1.0.0.md)
 - [Storage Profiler](../../../../src/ragd/storage/profiler.py) - Existing foundation
 

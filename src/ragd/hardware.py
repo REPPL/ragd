@@ -2,6 +2,8 @@
 
 This module detects system hardware capabilities and classifies them into
 performance tiers for optimal configuration.
+
+v1.0.5: Configuration exposure - thresholds now configurable.
 """
 
 from __future__ import annotations
@@ -11,9 +13,12 @@ import subprocess
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
-from typing import Literal
+from typing import TYPE_CHECKING, Literal
 
 import psutil
+
+if TYPE_CHECKING:
+    from ragd.config import RagdConfig
 
 
 class HardwareTier(str, Enum):
@@ -97,28 +102,48 @@ def get_cpu_cores() -> int:
     return psutil.cpu_count(logical=False) or psutil.cpu_count() or 1
 
 
-def classify_tier(memory_gb: float, backend: BackendType) -> HardwareTier:
+def classify_tier(
+    memory_gb: float,
+    backend: BackendType,
+    config: RagdConfig | None = None,
+) -> HardwareTier:
     """Classify hardware into a performance tier.
 
     Args:
         memory_gb: Total system memory in GB
         backend: Detected compute backend
+        config: Optional ragd config for tier thresholds
 
     Returns:
         Appropriate hardware tier
     """
-    if memory_gb < 8:
+    # Get thresholds from config or use defaults
+    if config is not None:
+        thresholds = config.hardware_thresholds
+        minimal_max = thresholds.minimal_max_memory_gb
+        standard_max = thresholds.standard_max_memory_gb
+        high_max = thresholds.high_max_memory_gb
+    else:
+        # Default thresholds
+        minimal_max = 8
+        standard_max = 16
+        high_max = 32
+
+    if memory_gb < minimal_max:
         return HardwareTier.MINIMAL
-    elif memory_gb < 16:
+    elif memory_gb < standard_max:
         return HardwareTier.STANDARD
-    elif memory_gb < 32:
+    elif memory_gb < high_max:
         return HardwareTier.HIGH
     else:
         return HardwareTier.EXTREME
 
 
-def detect_hardware() -> HardwareInfo:
+def detect_hardware(config: RagdConfig | None = None) -> HardwareInfo:
     """Detect system hardware and classify performance tier.
+
+    Args:
+        config: Optional ragd config for tier thresholds
 
     Returns:
         HardwareInfo with detected capabilities
@@ -126,7 +151,7 @@ def detect_hardware() -> HardwareInfo:
     backend, gpu_name = detect_backend()
     memory_gb = get_memory_gb()
     cpu_cores = get_cpu_cores()
-    tier = classify_tier(memory_gb, backend)
+    tier = classify_tier(memory_gb, backend, config)
 
     return HardwareInfo(
         backend=backend,

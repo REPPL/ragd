@@ -182,6 +182,132 @@ logging:
 #   detected_at: 2025-01-26T10:30:00Z
 
 # ============================================================================
+# Agentic RAG Parameters (v1.0.5)
+# ============================================================================
+# Controls CRAG (Corrective RAG) and Self-RAG behaviour
+agentic_params:
+  # Thresholds for quality evaluation
+  relevance_threshold: 0.6      # Minimum score for relevant context
+  faithfulness_threshold: 0.7   # Minimum score for faithful answer
+  excellent_threshold: 0.8      # Score for "excellent" quality
+  good_threshold: 0.6           # Score for "good" quality
+  poor_threshold: 0.4           # Score for "poor" quality
+
+  # LLM parameters per operation
+  relevance_eval:
+    temperature: 0.0            # Deterministic evaluation
+    max_tokens: 10              # Short score response
+  query_rewrite:
+    temperature: 0.3            # Some creativity for rewrites
+    max_tokens: 100             # Query length limit
+  answer_generation:
+    temperature: 0.7            # Default creativity
+    max_tokens: 1024            # Response length limit
+  faithfulness_eval:
+    temperature: 0.0            # Deterministic evaluation
+    max_tokens: 10              # Short score response
+  response_refine:
+    temperature: 0.5            # Balanced refinement
+    max_tokens: 1024            # Response length limit
+
+  # Confidence calculation weights
+  confidence_relevance_weight: 0.4   # Weight for relevance in confidence
+  confidence_faithfulness_weight: 0.6 # Weight for faithfulness in confidence
+
+# ============================================================================
+# Search Tuning Parameters (v1.0.5)
+# ============================================================================
+# Fine-tune hybrid search behaviour
+search_tuning:
+  # BM25 normalisation divisor (higher = reduced score range)
+  bm25_normalisation_divisor: 10.0
+
+  # Reciprocal Rank Fusion fetch multiplier
+  rrf_fetch_multiplier: 3
+
+  # Position decay factor for relevance scoring (0.0-1.0)
+  position_decay_factor: 0.9
+
+# ============================================================================
+# Processing Parameters (v1.0.5)
+# ============================================================================
+# Text processing and tokenisation settings
+processing:
+  # Maximum characters for context truncation in evaluation
+  context_truncation_chars: 2000
+
+  # Approximate characters per token for estimation
+  chars_per_token_estimate: 4
+
+  # tiktoken encoding for token counting
+  token_encoding: cl100k_base
+
+# ============================================================================
+# Hardware Tier Thresholds (v1.0.5)
+# ============================================================================
+# Memory thresholds for tier classification (GB)
+hardware_thresholds:
+  minimal_max_memory_gb: 8    # Systems < 8GB are MINIMAL tier
+  standard_max_memory_gb: 16  # Systems < 16GB are STANDARD tier
+  high_max_memory_gb: 32      # Systems < 32GB are HIGH tier, >= 32GB are EXTREME
+
+# ============================================================================
+# Prompt Templates (v1.0.5)
+# ============================================================================
+# Prompts can be customised via file reference or inline content.
+# Use "ragd prompts export" to create editable prompt files.
+#
+# File reference format:
+#   prompt_name:
+#     file: ~/.ragd/prompts/category/name.txt
+#
+# Inline format:
+#   prompt_name:
+#     inline: "Your custom prompt text here..."
+#
+# RAG prompts (answer generation)
+# rag_prompts:
+#   answer:
+#     file: ~/.ragd/prompts/rag/answer.txt
+#   summarise:
+#     file: ~/.ragd/prompts/rag/summarise.txt
+#   compare:
+#     file: ~/.ragd/prompts/rag/compare.txt
+#
+# Agentic prompts (CRAG/Self-RAG)
+# agentic_prompts:
+#   relevance_eval:
+#     file: ~/.ragd/prompts/agentic/relevance_eval.txt
+#   query_rewrite:
+#     file: ~/.ragd/prompts/agentic/query_rewrite.txt
+#   faithfulness_eval:
+#     file: ~/.ragd/prompts/agentic/faithfulness_eval.txt
+#
+# Metadata prompts (LLM metadata extraction)
+# metadata_prompts:
+#   summary:
+#     file: ~/.ragd/prompts/metadata/summary.txt
+#   classification:
+#     file: ~/.ragd/prompts/metadata/classification.txt
+#
+# Evaluation prompts (quality metrics)
+# evaluation_prompts:
+#   faithfulness:
+#     file: ~/.ragd/prompts/evaluation/faithfulness.txt
+#   answer_relevancy:
+#     file: ~/.ragd/prompts/evaluation/answer_relevancy.txt
+
+# ============================================================================
+# Boilerplate Patterns (v1.0.5)
+# ============================================================================
+# Custom patterns for boilerplate removal during HTML processing
+# boilerplate:
+#   custom_patterns:
+#     - "^Subscribe to our newsletter$"
+#     - "^Cookie preferences$"
+#     - "^Copyright \\d{4}"
+
+# ============================================================================
 # Hardware Tier Profiles
 # ============================================================================
 # These presets are applied based on detected hardware tier.

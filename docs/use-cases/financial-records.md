@@ -166,7 +166,7 @@ ragd tier summary
 
 - [F-015: Database Encryption](../development/features/completed/F-015-database-encryption.md)
 - [F-017: Secure Deletion](../development/features/completed/F-017-secure-deletion.md)
-- [F-018: Data Sensitivity Tiers](../development/features/completed/F-018-data-sensitivity-tiers.md)
+- [F-018: Data Sensitivity Tiers](../development/features/completed/F-018-data-tiers.md)
 
 ## Related Use Cases
 

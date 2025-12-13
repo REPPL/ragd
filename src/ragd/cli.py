@@ -164,11 +164,13 @@ session_app = typer.Typer(help="Manage encryption session.")
 audit_app = typer.Typer(help="View operation audit log.")
 profile_app = typer.Typer(help="Profile performance.")
 migrate_app = typer.Typer(help="Migrate between backends.")
+prompts_app = typer.Typer(help="Manage prompt templates.")
 
 # Register user subcommand groups (always visible)
 app.add_typer(collection_app, name="collection", rich_help_panel="Organisation")
 app.add_typer(meta_app, name="meta", rich_help_panel="Organisation")
 app.add_typer(tag_app, name="tag", rich_help_panel="Organisation")
+app.add_typer(prompts_app, name="prompts", rich_help_panel="Configuration")
 
 # Register admin subcommand groups (hidden unless ADMIN_MODE)
 app.add_typer(
@@ -1154,6 +1156,7 @@ def ask(
     question: Annotated[str, typer.Argument(help="Question to ask.")],
     model: str = typer.Option(None, "--model", "-m", help="LLM model to use (default: from config)."),
     temperature: float = typer.Option(0.7, "--temperature", "-t", help="Sampling temperature (0.0-1.0)."),
+    max_tokens: int = typer.Option(None, "--max-tokens", help="Maximum tokens for response (default: from config)."),
     limit: int = typer.Option(5, "--limit", "-n", help="Maximum search results for context."),
     min_relevance: float = typer.Option(None, "--min-relevance", "-r", help="Minimum relevance score (0.0-1.0, default: from config)."),
     no_stream: bool = typer.Option(False, "--no-stream", help="Disable streaming output."),
@@ -1182,6 +1185,7 @@ def ask(
         question=question,
         model=model,
         temperature=temperature,
+        max_tokens=max_tokens,
         limit=limit,
         min_relevance=min_relevance,
         stream=not no_stream,
@@ -1198,6 +1202,7 @@ def ask(
 def chat(
     model: str = typer.Option(None, "--model", "-m", help="LLM model to use (default: from config)."),
     temperature: float = typer.Option(0.7, "--temperature", "-t", help="Sampling temperature (0.0-1.0)."),
+    max_tokens: int = typer.Option(None, "--max-tokens", help="Maximum tokens for response (default: from config)."),
     limit: int = typer.Option(5, "--limit", "-n", help="Maximum search results per query."),
     min_relevance: float = typer.Option(None, "--min-relevance", "-r", help="Minimum relevance score (0.0-1.0, default: from config)."),
     session_id: str = typer.Option(None, "--session", "-s", help="Resume a previous chat session."),
@@ -1227,6 +1232,7 @@ def chat(
     chat_command(
         model=model,
         temperature=temperature,
+        max_tokens=max_tokens,
         limit=limit,
         min_relevance=min_relevance,
         session_id=session_id,
@@ -2379,6 +2385,139 @@ def migrate_status(
         ragd migrate status
     """
     migrate_status_command(no_color=no_color)
+
+
+# =============================================================================
+# Prompts subcommands (v1.0.5)
+# =============================================================================
+
+
+@prompts_app.command("list")
+def prompts_list(
+    category: str = typer.Option(None, "--category", "-c", help="Filter by category (rag, agentic, metadata, evaluation)."),
+    status: bool = typer.Option(False, "--status", "-s", help="Show customisation status."),
+    no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
+) -> None:
+    """List available prompt templates.
+
+    Shows all prompt templates organised by category.
+    Use --status to see which prompts have custom overrides.
+
+    Examples:
+        ragd prompts list
+        ragd prompts list --category rag
+        ragd prompts list --status
+    """
+    from ragd.config import load_config
+    from ragd.prompts import list_prompts
+    from ragd.prompts.loader import get_custom_prompt_status
+    from rich.console import Console
+    from rich.table import Table
+
+    con = Console(no_color=no_color)
+    prompts = list_prompts(category)
+
+    if status:
+        config = load_config()
+        prompt_status = get_custom_prompt_status(config)
+    else:
+        prompt_status = {}
+
+    table = Table(title="Prompt Templates")
+    table.add_column("Category", style="cyan")
+    table.add_column("Name", style="green")
+    if status:
+        table.add_column("Status", style="yellow")
+
+    for cat, names in prompts.items():
+        for name in names:
+            if status:
+                stat = prompt_status.get(cat, {}).get(name, "default")
+                style = "green" if stat == "default" else "yellow"
+                table.add_row(cat, name, f"[{style}]{stat}[/{style}]")
+            else:
+                table.add_row(cat, name)
+
+    con.print(table)
+
+
+@prompts_app.command("export")
+def prompts_export(
+    category: str = typer.Option(None, "--category", "-c", help="Export only this category."),
+    output_dir: Path = typer.Option(None, "--output", "-o", help="Output directory (default: ~/.ragd/prompts)."),
+    overwrite: bool = typer.Option(False, "--overwrite", "-f", help="Overwrite existing files."),
+    no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
+) -> None:
+    """Export default prompts to files for customisation.
+
+    Creates prompt template files that can be edited to customise ragd's behaviour.
+    Files are created in ~/.ragd/prompts/ by default.
+
+    Examples:
+        ragd prompts export                   # Export all prompts
+        ragd prompts export --category rag    # Export only RAG prompts
+        ragd prompts export --overwrite       # Replace existing files
+    """
+    from ragd.prompts import export_default_prompts
+    from rich.console import Console
+
+    con = Console(no_color=no_color)
+
+    exported = export_default_prompts(
+        output_dir=output_dir,
+        category=category,
+        overwrite=overwrite,
+    )
+
+    if exported:
+        con.print(f"\n[green]Exported {len(exported)} prompt files:[/green]")
+        for path in exported:
+            con.print(f"  - {path}")
+        con.print("\n[dim]Edit these files to customise prompt behaviour.[/dim]")
+    else:
+        con.print("[yellow]No files exported (all already exist, use --overwrite to replace).[/yellow]")
+
+
+@prompts_app.command("show")
+def prompts_show(
+    name: Annotated[str, typer.Argument(help="Prompt name (e.g., 'rag/answer', 'agentic/relevance_eval').")],
+    no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
+) -> None:
+    """Show the content of a specific prompt template.
+
+    Use category/name format to specify the prompt.
+
+    Examples:
+        ragd prompts show rag/answer
+        ragd prompts show agentic/relevance_eval
+    """
+    from ragd.prompts.defaults import DEFAULT_PROMPTS
+    from rich.console import Console
+    from rich.markdown import Markdown
+
+    con = Console(no_color=no_color)
+
+    # Parse category/name
+    parts = name.split("/")
+    if len(parts) != 2:
+        con.print("[red]Error: Use category/name format (e.g., 'rag/answer')[/red]")
+        raise typer.Exit(1)
+
+    category, prompt_name = parts
+
+    if category not in DEFAULT_PROMPTS:
+        con.print(f"[red]Error: Unknown category '{category}'[/red]")
+        con.print(f"[dim]Available: {', '.join(DEFAULT_PROMPTS.keys())}[/dim]")
+        raise typer.Exit(1)
+
+    if prompt_name not in DEFAULT_PROMPTS[category]:
+        con.print(f"[red]Error: Unknown prompt '{prompt_name}' in {category}[/red]")
+        con.print(f"[dim]Available: {', '.join(DEFAULT_PROMPTS[category].keys())}[/dim]")
+        raise typer.Exit(1)
+
+    content = DEFAULT_PROMPTS[category][prompt_name]
+    con.print(f"\n[bold cyan]{category}/{prompt_name}[/bold cyan]\n")
+    con.print(Markdown(f"```\n{content}\n```"))
 
 
 if __name__ == "__main__":

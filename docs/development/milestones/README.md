@@ -38,6 +38,7 @@ Release planning and milestone tracking.
 | Version | Name | Focus | Features |
 |---------|------|-------|----------|
 | [v1.0.0](./v1.0.0.md) | Performance & Polish | Production ready | F-119, F-057, F-075, F-123-127 |
+| [v1.0.5](./v1.0.5.md) | Configuration Exposure | Full customisation | Prompts, thresholds, tuning |
 | [v1.1.0](./v1.1.0.md) | Knowledge Graph & NER | Entity extraction, graph CLI | F-128-135 |
 | [v1.2.0](./v1.2.0.md) | Onboarding | Guided first-run experience | F-134 |
 | [v1.3.0](./v1.3.0.md) | API | REST API, authentication, webhooks | F-133, F-135-137 |

@@ -24,6 +24,7 @@ def ask_command(
     question: str,
     model: str | None = None,
     temperature: float = 0.7,
+    max_tokens: int | None = None,
     limit: int = 5,
     min_relevance: float | None = None,
     stream: bool = True,
@@ -134,9 +135,17 @@ def ask_command(
 
         else:
             # Standard chat mode
+            # Resolve max_tokens: CLI flag > config > default
+            effective_max_tokens = (
+                max_tokens
+                if max_tokens is not None
+                else config.agentic_params.answer_generation.max_tokens
+                or 1024
+            )
             chat_config = ChatConfig(
                 model=model or config.llm.model,
                 temperature=temperature,
+                max_tokens=effective_max_tokens,
                 search_limit=limit,
                 min_relevance=effective_min_relevance,
                 auto_save=False,
@@ -204,6 +213,7 @@ def ask_command(
 def chat_command(
     model: str | None = None,
     temperature: float = 0.7,
+    max_tokens: int | None = None,
     limit: int = 5,
     min_relevance: float | None = None,
     session_id: str | None = None,
@@ -250,9 +260,17 @@ def chat_command(
         raise typer.Exit(1)
 
     # Build chat config
+    # Resolve max_tokens: CLI flag > config > default
+    effective_max_tokens = (
+        max_tokens
+        if max_tokens is not None
+        else config.agentic_params.answer_generation.max_tokens
+        or 1024
+    )
     chat_config = ChatConfig(
         model=model or config.llm.model,
         temperature=temperature,
+        max_tokens=effective_max_tokens,
         search_limit=limit,
         min_relevance=effective_min_relevance,
         auto_save=True,

@@ -45,11 +45,14 @@ def run_config_wizard(console: Console | None = None) -> None:
         con.print("  [2] Search behaviour")
         con.print("  [3] Storage settings")
         con.print("  [4] Security options")
-        con.print("  [5] Show current config")
-        con.print("  [6] Save and exit")
-        con.print("  [7] Exit without saving")
+        con.print("  [5] Agentic RAG settings")
+        con.print("  [6] Advanced tuning")
+        con.print("  [7] Prompt templates")
+        con.print("  [8] Show current config")
+        con.print("  [9] Save and exit")
+        con.print("  [0] Exit without saving")
 
-        choice = Prompt.ask("\nEnter choice", choices=["1", "2", "3", "4", "5", "6", "7"])
+        choice = Prompt.ask("\nEnter choice", choices=["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"])
 
         if choice == "1":
             config = _configure_models(config, con)
@@ -60,12 +63,18 @@ def run_config_wizard(console: Console | None = None) -> None:
         elif choice == "4":
             config = _configure_security(config, con)
         elif choice == "5":
-            _show_config(config, con)
+            config = _configure_agentic(config, con)
         elif choice == "6":
+            config = _configure_advanced(config, con)
+        elif choice == "7":
+            _configure_prompts(config, con)
+        elif choice == "8":
+            _show_config(config, con)
+        elif choice == "9":
             save_config(config)
             con.print("\n[green]✓[/green] Configuration saved!")
             break
-        elif choice == "7":
+        elif choice == "0":
             if Confirm.ask("Discard changes?", default=False):
                 con.print("[yellow]Changes discarded.[/yellow]")
                 break
@@ -253,3 +262,275 @@ def _show_config(config: RagdConfig, console: Console) -> None:
     data = path_to_str(data)
 
     console.print(yaml.safe_dump(data, default_flow_style=False, sort_keys=False))
+
+
+def _configure_agentic(config: RagdConfig, console: Console) -> RagdConfig:
+    """Configure agentic RAG settings (v1.0.5)."""
+    console.print("\n[bold]Agentic RAG Settings[/bold]\n")
+    console.print("[dim]These control CRAG and Self-RAG quality thresholds.[/dim]\n")
+
+    params = config.agentic_params
+
+    # Relevance threshold
+    console.print(f"Relevance threshold: [cyan]{params.relevance_threshold}[/cyan]")
+    console.print("[dim]Minimum score for context to be considered relevant (0.0-1.0)[/dim]")
+    threshold_str = Prompt.ask(
+        "Relevance threshold",
+        default=str(params.relevance_threshold),
+    )
+    try:
+        threshold = float(threshold_str)
+        if 0.0 <= threshold <= 1.0:
+            params.relevance_threshold = threshold
+    except ValueError:
+        console.print("[red]Invalid value, keeping current[/red]")
+
+    # Faithfulness threshold
+    console.print(f"\nFaithfulness threshold: [cyan]{params.faithfulness_threshold}[/cyan]")
+    console.print("[dim]Minimum score for answer to be considered faithful (0.0-1.0)[/dim]")
+    faith_str = Prompt.ask(
+        "Faithfulness threshold",
+        default=str(params.faithfulness_threshold),
+    )
+    try:
+        faith = float(faith_str)
+        if 0.0 <= faith <= 1.0:
+            params.faithfulness_threshold = faith
+    except ValueError:
+        console.print("[red]Invalid value, keeping current[/red]")
+
+    # Answer generation temperature
+    answer_params = params.answer_generation
+    console.print(f"\nAnswer generation temperature: [cyan]{answer_params.temperature}[/cyan]")
+    console.print("[dim]Higher = more creative, lower = more focused (0.0-1.0)[/dim]")
+    temp_str = Prompt.ask(
+        "Answer temperature",
+        default=str(answer_params.temperature or 0.7),
+    )
+    try:
+        temp = float(temp_str)
+        if 0.0 <= temp <= 1.0:
+            answer_params.temperature = temp
+    except ValueError:
+        console.print("[red]Invalid value, keeping current[/red]")
+
+    # Answer generation max tokens
+    console.print(f"\nMax tokens for answer: [cyan]{answer_params.max_tokens}[/cyan]")
+    new_tokens = IntPrompt.ask(
+        "Max tokens",
+        default=answer_params.max_tokens or 1024,
+    )
+    answer_params.max_tokens = max(100, min(4096, new_tokens))
+
+    console.print("\n[green]✓[/green] Agentic RAG settings updated")
+    return config
+
+
+def _configure_advanced(config: RagdConfig, console: Console) -> RagdConfig:
+    """Configure advanced tuning parameters (v1.0.5)."""
+    console.print("\n[bold]Advanced Tuning[/bold]\n")
+
+    # Search tuning submenu
+    console.print("  [1] Search tuning (BM25, RRF)")
+    console.print("  [2] Processing parameters")
+    console.print("  [3] Hardware thresholds")
+    console.print("  [4] Back to main menu")
+
+    choice = Prompt.ask("\nEnter choice", choices=["1", "2", "3", "4"])
+
+    if choice == "1":
+        config = _configure_search_tuning(config, console)
+    elif choice == "2":
+        config = _configure_processing(config, console)
+    elif choice == "3":
+        config = _configure_hardware_thresholds(config, console)
+
+    return config
+
+
+def _configure_search_tuning(config: RagdConfig, console: Console) -> RagdConfig:
+    """Configure search tuning parameters."""
+    console.print("\n[bold]Search Tuning[/bold]\n")
+
+    tuning = config.search_tuning
+
+    # BM25 normalisation divisor
+    console.print(f"BM25 normalisation divisor: [cyan]{tuning.bm25_normalisation_divisor}[/cyan]")
+    console.print("[dim]Higher values reduce BM25 score range (default: 10.0)[/dim]")
+    bm25_str = Prompt.ask(
+        "BM25 divisor",
+        default=str(tuning.bm25_normalisation_divisor),
+    )
+    try:
+        bm25 = float(bm25_str)
+        if bm25 > 0:
+            tuning.bm25_normalisation_divisor = bm25
+    except ValueError:
+        console.print("[red]Invalid value, keeping current[/red]")
+
+    # RRF fetch multiplier
+    console.print(f"\nRRF fetch multiplier: [cyan]{tuning.rrf_fetch_multiplier}[/cyan]")
+    console.print("[dim]How many more results to fetch for rank fusion (default: 3)[/dim]")
+    rrf = IntPrompt.ask(
+        "RRF multiplier",
+        default=tuning.rrf_fetch_multiplier,
+    )
+    tuning.rrf_fetch_multiplier = max(1, min(10, rrf))
+
+    # Position decay factor
+    console.print(f"\nPosition decay factor: [cyan]{tuning.position_decay_factor}[/cyan]")
+    console.print("[dim]Decay rate for relevance scores by position (0.0-1.0)[/dim]")
+    decay_str = Prompt.ask(
+        "Decay factor",
+        default=str(tuning.position_decay_factor),
+    )
+    try:
+        decay = float(decay_str)
+        if 0.0 <= decay <= 1.0:
+            tuning.position_decay_factor = decay
+    except ValueError:
+        console.print("[red]Invalid value, keeping current[/red]")
+
+    console.print("\n[green]✓[/green] Search tuning updated")
+    return config
+
+
+def _configure_processing(config: RagdConfig, console: Console) -> RagdConfig:
+    """Configure processing parameters."""
+    console.print("\n[bold]Processing Parameters[/bold]\n")
+
+    processing = config.processing
+
+    # Context truncation
+    console.print(f"Context truncation (chars): [cyan]{processing.context_truncation_chars}[/cyan]")
+    console.print("[dim]Maximum characters for context in evaluation (default: 2000)[/dim]")
+    trunc = IntPrompt.ask(
+        "Context truncation",
+        default=processing.context_truncation_chars,
+    )
+    processing.context_truncation_chars = max(500, min(10000, trunc))
+
+    # Chars per token estimate
+    console.print(f"\nChars per token estimate: [cyan]{processing.chars_per_token_estimate}[/cyan]")
+    console.print("[dim]Approximate characters per token for estimation (default: 4)[/dim]")
+    cpt = IntPrompt.ask(
+        "Chars per token",
+        default=processing.chars_per_token_estimate,
+    )
+    processing.chars_per_token_estimate = max(1, min(10, cpt))
+
+    # Token encoding
+    console.print(f"\nToken encoding: [cyan]{processing.token_encoding}[/cyan]")
+    new_encoding = Prompt.ask(
+        "Token encoding",
+        default=processing.token_encoding,
+    )
+    processing.token_encoding = new_encoding
+
+    console.print("\n[green]✓[/green] Processing parameters updated")
+    return config
+
+
+def _configure_hardware_thresholds(config: RagdConfig, console: Console) -> RagdConfig:
+    """Configure hardware tier thresholds."""
+    console.print("\n[bold]Hardware Tier Thresholds[/bold]\n")
+    console.print("[dim]Memory thresholds for tier classification (GB).[/dim]\n")
+
+    thresholds = config.hardware_thresholds
+
+    # Minimal max
+    console.print(f"Minimal tier max memory: [cyan]{thresholds.minimal_max_memory_gb}[/cyan] GB")
+    console.print("[dim]Systems below this are MINIMAL tier (default: 8)[/dim]")
+    minimal = IntPrompt.ask(
+        "Minimal max GB",
+        default=int(thresholds.minimal_max_memory_gb),
+    )
+    thresholds.minimal_max_memory_gb = max(4, minimal)
+
+    # Standard max
+    console.print(f"\nStandard tier max memory: [cyan]{thresholds.standard_max_memory_gb}[/cyan] GB")
+    console.print("[dim]Systems below this are STANDARD tier (default: 16)[/dim]")
+    standard = IntPrompt.ask(
+        "Standard max GB",
+        default=int(thresholds.standard_max_memory_gb),
+    )
+    thresholds.standard_max_memory_gb = max(thresholds.minimal_max_memory_gb + 1, standard)
+
+    # High max
+    console.print(f"\nHigh tier max memory: [cyan]{thresholds.high_max_memory_gb}[/cyan] GB")
+    console.print("[dim]Systems below this are HIGH tier, above are EXTREME (default: 32)[/dim]")
+    high = IntPrompt.ask(
+        "High max GB",
+        default=int(thresholds.high_max_memory_gb),
+    )
+    thresholds.high_max_memory_gb = max(thresholds.standard_max_memory_gb + 1, high)
+
+    console.print("\n[green]✓[/green] Hardware thresholds updated")
+    return config
+
+
+def _configure_prompts(config: RagdConfig, console: Console) -> None:
+    """Configure prompt templates (v1.0.5)."""
+    from ragd.prompts import export_default_prompts, list_prompts
+    from ragd.prompts.loader import DEFAULT_PROMPTS_DIR, get_custom_prompt_status
+
+    console.print("\n[bold]Prompt Template Management[/bold]\n")
+    console.print("  [1] List all prompts")
+    console.print("  [2] Export prompts for customisation")
+    console.print("  [3] Show customisation status")
+    console.print("  [4] View prompt content")
+    console.print("  [5] Back to main menu")
+
+    choice = Prompt.ask("\nEnter choice", choices=["1", "2", "3", "4", "5"])
+
+    if choice == "1":
+        prompts = list_prompts()
+        console.print("\n[bold]Available Prompts:[/bold]\n")
+        for category, names in prompts.items():
+            console.print(f"  [cyan]{category}[/cyan]:")
+            for name in names:
+                console.print(f"    - {name}")
+
+    elif choice == "2":
+        console.print(f"\n[dim]Prompts will be exported to: {DEFAULT_PROMPTS_DIR}[/dim]")
+        if Confirm.ask("Export all default prompts?", default=True):
+            exported = export_default_prompts(overwrite=False)
+            if exported:
+                console.print(f"\n[green]✓[/green] Exported {len(exported)} prompt files")
+                console.print("[dim]Edit these files to customise prompt behaviour.[/dim]")
+            else:
+                console.print("[yellow]No files exported (all already exist).[/yellow]")
+                if Confirm.ask("Overwrite existing files?", default=False):
+                    exported = export_default_prompts(overwrite=True)
+                    console.print(f"[green]✓[/green] Exported {len(exported)} prompt files")
+
+    elif choice == "3":
+        status = get_custom_prompt_status(config)
+        console.print("\n[bold]Customisation Status:[/bold]\n")
+        for category, prompts_status in status.items():
+            console.print(f"  [cyan]{category}[/cyan]:")
+            for name, stat in prompts_status.items():
+                style = "green" if stat == "default" else "yellow"
+                console.print(f"    - {name}: [{style}]{stat}[/{style}]")
+
+    elif choice == "4":
+        from ragd.prompts.defaults import DEFAULT_PROMPTS
+
+        prompts = list_prompts()
+        console.print("\nAvailable prompts:")
+        for category, names in prompts.items():
+            for name in names:
+                console.print(f"  {category}/{name}")
+
+        prompt_name = Prompt.ask("\nEnter prompt name (category/name)")
+        parts = prompt_name.split("/")
+        if len(parts) == 2 and parts[0] in DEFAULT_PROMPTS:
+            category, name = parts
+            if name in DEFAULT_PROMPTS[category]:
+                content = DEFAULT_PROMPTS[category][name]
+                console.print(f"\n[bold]{category}/{name}:[/bold]\n")
+                console.print(content)
+            else:
+                console.print(f"[red]Unknown prompt: {name}[/red]")
+        else:
+            console.print("[red]Invalid format. Use category/name (e.g., rag/answer)[/red]")

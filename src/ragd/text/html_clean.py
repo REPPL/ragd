@@ -10,13 +10,19 @@ Removes common non-content elements from HTML-extracted text:
 
 Also fixes:
 - Spurious line breaks from HTML element boundaries
+
+v1.0.5: Configuration exposure - custom patterns now configurable.
 """
 
 from __future__ import annotations
 
 import re
 from dataclasses import dataclass, field
+from typing import TYPE_CHECKING
 from urllib.parse import urlparse
+
+if TYPE_CHECKING:
+    from ragd.config import RagdConfig
 
 # Site-specific boilerplate patterns
 SITE_PATTERNS: dict[str, list[str]] = {
@@ -213,6 +219,7 @@ def remove_boilerplate(
     mode: str = "moderate",
     custom_patterns: list[str] | None = None,
     source_url: str | None = None,
+    config: RagdConfig | None = None,
 ) -> str:
     """Remove boilerplate content from HTML-extracted text.
 
@@ -221,6 +228,7 @@ def remove_boilerplate(
         mode: Removal mode - conservative, moderate, or aggressive
         custom_patterns: Additional regex patterns to match boilerplate
         source_url: Source URL for site-specific pattern matching
+        config: Optional ragd config for custom patterns
 
     Returns:
         Text with boilerplate removed
@@ -254,7 +262,11 @@ def remove_boilerplate(
                 all_patterns.extend(site_patterns)
                 break
 
-    # Add custom patterns
+    # Add custom patterns from config
+    if config is not None:
+        all_patterns.extend(config.boilerplate.custom_patterns)
+
+    # Add custom patterns from parameter (for backwards compatibility)
     if custom_patterns:
         all_patterns.extend(custom_patterns)
 

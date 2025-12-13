@@ -131,8 +131,8 @@ def test_bug_XXX_does_not_regress():
 
 ## Related Documentation
 
-- [v1.0.0 Milestone](../../milestones/v1.0.0.md)
-- [F-127: Performance Benchmarks](./F-127-performance-benchmarks.md) - Run after bugs fixed
+- [v1.1.0 Milestone](../../milestones/v1.1.0.md)
+- [F-127: Performance Benchmarks](../completed/F-127-performance-benchmarks.md) - Run after bugs fixed
 
 ---
 

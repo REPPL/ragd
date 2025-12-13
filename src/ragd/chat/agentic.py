@@ -2,6 +2,8 @@
 
 Implements CRAG (Corrective RAG) and Self-RAG patterns for improved
 retrieval and generation quality.
+
+v1.0.5: Configuration exposure - prompts and parameters now configurable.
 """
 
 from __future__ import annotations
@@ -17,6 +19,13 @@ from ragd.chat.prompts import get_prompt_template
 from ragd.citation import Citation
 from ragd.config import RagdConfig, load_config
 from ragd.llm import OllamaClient, OllamaError
+from ragd.prompts import get_prompt
+from ragd.prompts.defaults import (
+    FAITHFULNESS_EVAL_PROMPT as DEFAULT_FAITHFULNESS_EVAL,
+    QUERY_REWRITE_PROMPT as DEFAULT_QUERY_REWRITE,
+    REFINE_RESPONSE_PROMPT as DEFAULT_REFINE_RESPONSE,
+    RELEVANCE_EVAL_PROMPT as DEFAULT_RELEVANCE_EVAL,
+)
 from ragd.search.hybrid import HybridSearcher, HybridSearchResult, SearchMode
 
 
@@ -85,50 +94,8 @@ class AgenticResponse:
         )
 
 
-# Prompts for agentic RAG
-
-RELEVANCE_EVAL_PROMPT = """Rate the relevance of the retrieved context to the query on a scale of 0 to 1.
-
-Query: {query}
-
-Retrieved Context:
-{context}
-
-Consider:
-- Does the context contain information relevant to answering the query?
-- Is the context topically related?
-- Would this context help generate a useful response?
-
-Respond with ONLY a number between 0 and 1, like: 0.75"""
-
-
-QUERY_REWRITE_PROMPT = """The search query returned poor results. Rewrite it to be more specific and targeted.
-
-Original Query: {query}
-
-The retrieval returned content about: {summary}
-
-This doesn't seem relevant. Generate a better search query that:
-- Is more specific
-- Uses different keywords
-- Targets the user's actual information need
-
-Respond with ONLY the rewritten query, nothing else."""
-
-
-FAITHFULNESS_EVAL_PROMPT = """Evaluate if this response is faithful to the source context.
-
-Response: {response}
-
-Source Context:
-{context}
-
-Consider:
-- Does the response only contain information from the context?
-- Are there any hallucinated or made-up facts?
-- Is the response accurate to what the sources say?
-
-Respond with ONLY a number between 0 and 1, like: 0.85"""
+# Note: Default prompts are now in ragd.prompts.defaults
+# Custom prompts can be configured via config.yaml or prompt files
 
 
 class AgenticRAG:
@@ -227,12 +194,16 @@ class AgenticRAG:
         rewrites = 0
         relevance_score = 1.0  # Default if not using CRAG
 
+        # Use config thresholds (from config.yaml) or AgenticConfig defaults
+        relevance_threshold = self.config.agentic_params.relevance_threshold
+        faithfulness_threshold = self.config.agentic_params.faithfulness_threshold
+
         if use_agentic and self.agentic.crag_enabled:
             relevance_score = self._evaluate_relevance(question, context)
 
             # Rewrite if relevance is poor
             while (
-                relevance_score < self.agentic.relevance_threshold
+                relevance_score < relevance_threshold
                 and rewrites < self.agentic.max_rewrites
             ):
                 rewrites += 1
@@ -263,7 +234,7 @@ class AgenticRAG:
 
             # Refine if faithfulness is poor
             if (
-                faithfulness_score < self.agentic.faithfulness_threshold
+                faithfulness_score < faithfulness_threshold
                 and refinements < self.agentic.max_refinements
             ):
                 refinements += 1
@@ -321,14 +292,23 @@ class AgenticRAG:
             Relevance score (0-1)
         """
         try:
-            prompt = RELEVANCE_EVAL_PROMPT.format(
-                query=query,
-                context=context[:2000],  # Truncate for efficiency
+            # Load prompt from config or defaults
+            prompt_template = get_prompt(
+                self.config.agentic_prompts.relevance_eval,
+                DEFAULT_RELEVANCE_EVAL,
+                category="agentic",
+                name="relevance_eval",
             )
+            truncation = self.config.processing.context_truncation_chars
+            prompt = prompt_template.format(
+                query=query,
+                context=context[:truncation],
+            )
+            params = self.config.agentic_params.relevance_eval
             response = self._llm.generate(
                 prompt=prompt,
-                temperature=0.0,
-                max_tokens=10,
+                temperature=params.temperature or 0.0,
+                max_tokens=params.max_tokens or 10,
             )
             return self._extract_score(response.content)
         except OllamaError:
@@ -345,17 +325,25 @@ class AgenticRAG:
             Rewritten query or None
         """
         try:
+            # Load prompt from config or defaults
+            prompt_template = get_prompt(
+                self.config.agentic_prompts.query_rewrite,
+                DEFAULT_QUERY_REWRITE,
+                category="agentic",
+                name="query_rewrite",
+            )
             # Summarise context for rewrite prompt
             summary = context[:500] + "..." if len(context) > 500 else context
 
-            prompt = QUERY_REWRITE_PROMPT.format(
+            prompt = prompt_template.format(
                 query=query,
                 summary=summary,
             )
+            params = self.config.agentic_params.query_rewrite
             response = self._llm.generate(
                 prompt=prompt,
-                temperature=0.3,
-                max_tokens=100,
+                temperature=params.temperature or 0.3,
+                max_tokens=params.max_tokens or 100,
             )
             rewritten = response.content.strip()
             return rewritten if rewritten else None
@@ -379,11 +367,12 @@ class AgenticRAG:
         )
 
         try:
+            params = self.config.agentic_params.answer_generation
             response = self._llm.generate(
                 prompt=user_prompt,
                 system_prompt=system_prompt,
-                temperature=0.7,
-                max_tokens=1024,
+                temperature=params.temperature or 0.7,
+                max_tokens=params.max_tokens or 1024,
             )
             return response.content
         except OllamaError as e:
@@ -400,14 +389,23 @@ class AgenticRAG:
             Faithfulness score (0-1)
         """
         try:
-            prompt = FAITHFULNESS_EVAL_PROMPT.format(
-                response=answer,
-                context=context[:2000],
+            # Load prompt from config or defaults
+            prompt_template = get_prompt(
+                self.config.agentic_prompts.faithfulness_eval,
+                DEFAULT_FAITHFULNESS_EVAL,
+                category="agentic",
+                name="faithfulness_eval",
             )
+            truncation = self.config.processing.context_truncation_chars
+            prompt = prompt_template.format(
+                response=answer,
+                context=context[:truncation],
+            )
+            params = self.config.agentic_params.faithfulness_eval
             response = self._llm.generate(
                 prompt=prompt,
-                temperature=0.0,
-                max_tokens=10,
+                temperature=params.temperature or 0.0,
+                max_tokens=params.max_tokens or 10,
             )
             return self._extract_score(response.content)
         except OllamaError:
@@ -429,23 +427,26 @@ class AgenticRAG:
         Returns:
             Refined answer
         """
-        refine_prompt = f"""The previous answer may contain information not in the sources.
-Please rewrite it to ONLY include information from the provided context.
-
-Previous Answer: {answer}
-
-Source Context:
-{context[:2000]}
-
-Question: {question}
-
-Provide a revised answer that strictly uses only information from the sources:"""
+        # Load prompt from config or defaults
+        prompt_template = get_prompt(
+            self.config.agentic_prompts.refine_response,
+            DEFAULT_REFINE_RESPONSE,
+            category="agentic",
+            name="refine_response",
+        )
+        truncation = self.config.processing.context_truncation_chars
+        refine_prompt = prompt_template.format(
+            answer=answer,
+            context=context[:truncation],
+            question=question,
+        )
 
         try:
+            params = self.config.agentic_params.refine_response
             response = self._llm.generate(
                 prompt=refine_prompt,
-                temperature=0.3,
-                max_tokens=1024,
+                temperature=params.temperature or 0.3,
+                max_tokens=params.max_tokens or 1024,
             )
             return response.content
         except OllamaError:
@@ -486,7 +487,9 @@ Provide a revised answer that strictly uses only information from the sources:""
             Combined confidence (0-1)
         """
         # Weighted average favouring faithfulness
-        return 0.4 * relevance + 0.6 * faithfulness
+        rel_weight = self.config.agentic_params.confidence_relevance_weight
+        faith_weight = self.config.agentic_params.confidence_faithfulness_weight
+        return rel_weight * relevance + faith_weight * faithfulness
 
     def _quality_from_score(self, score: float) -> RetrievalQuality:
         """Convert numeric score to quality enum.
@@ -497,11 +500,12 @@ Provide a revised answer that strictly uses only information from the sources:""
         Returns:
             RetrievalQuality enum value
         """
-        if score >= 0.8:
+        thresholds = self.config.agentic_params
+        if score >= thresholds.excellent_threshold:
             return RetrievalQuality.EXCELLENT
-        elif score >= 0.6:
+        elif score >= thresholds.good_threshold:
             return RetrievalQuality.GOOD
-        elif score >= 0.4:
+        elif score >= thresholds.poor_threshold:
             return RetrievalQuality.POOR
         else:
             return RetrievalQuality.IRRELEVANT

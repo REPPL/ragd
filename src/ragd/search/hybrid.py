@@ -139,6 +139,11 @@ class HybridSearcher:
             batch_size=self.config.embedding.batch_size,
         )
 
+        # Load search tuning parameters from config (v1.0.5)
+        search_tuning = self.config.search_tuning
+        self._bm25_normalisation_divisor = search_tuning.bm25_normalisation_divisor
+        self._rrf_fetch_multiplier = search_tuning.rrf_fetch_multiplier
+
     def search(
         self,
         query: str,
@@ -291,7 +296,7 @@ class HybridSearcher:
         results = []
         for bm25_res in bm25_results:
             # Normalise BM25 score to 0-1 range (approximate)
-            normalised_score = min(1.0, bm25_res.bm25_score / 10.0)
+            normalised_score = min(1.0, bm25_res.bm25_score / self._bm25_normalisation_divisor)
             if normalised_score < min_score:
                 continue
 
@@ -345,7 +350,7 @@ class HybridSearcher:
             List of results combined using RRF
         """
         # Fetch more results for fusion (we'll trim later)
-        fetch_limit = limit * 3
+        fetch_limit = limit * self._rrf_fetch_multiplier
 
         # Merge document_ids filter with existing filters for semantic search
         effective_filters = filters.copy() if filters else {}
@@ -427,7 +432,7 @@ class HybridSearcher:
                 combined += semantic_weight * sem_score
             if kw_score is not None:
                 # Normalise BM25 score
-                norm_kw = min(1.0, kw_score / 10.0)
+                norm_kw = min(1.0, kw_score / self._bm25_normalisation_divisor)
                 combined += keyword_weight * norm_kw
 
             if combined < min_score and rrf_score < min_score:
