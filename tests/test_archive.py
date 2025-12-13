@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 import tarfile
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
@@ -348,7 +348,7 @@ class TestExportEngine:
             file_type="pdf",
             file_size=1024,
             chunk_count=1,
-            indexed_at=datetime.utcnow().isoformat(),
+            indexed_at=datetime.now(UTC).isoformat(),
             content_hash="hash123",
         )
         chroma_store.add_document(
@@ -583,7 +583,7 @@ class TestImportEngine:
             file_type="pdf",
             file_size=1024,
             chunk_count=1,
-            indexed_at=datetime.utcnow().isoformat(),
+            indexed_at=datetime.now(UTC).isoformat(),
             content_hash="existing_hash",
         )
         chroma_store.add_document(
@@ -633,7 +633,7 @@ class TestExportImportRoundtrip:
                 file_type="pdf",
                 file_size=1024 * (i + 1),
                 chunk_count=2,
-                indexed_at=datetime.utcnow().isoformat(),
+                indexed_at=datetime.now(UTC).isoformat(),
                 content_hash=f"hash{i}",
             )
             store.add_document(

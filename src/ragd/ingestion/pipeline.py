@@ -349,9 +349,9 @@ def index_document(
                 embedding_texts = [cc.combined for cc in contextual_chunks]
                 context_texts = [cc.context for cc in contextual_chunks]
 
-        except Exception:
+        except (ImportError, ConnectionError, RuntimeError) as e:
             # Graceful fallback - continue without context
-            pass
+            logger.debug("Contextual retrieval unavailable: %s", e)
 
     # Generate embeddings (using context-enhanced text if available)
     # Check if late chunking is enabled and available
@@ -487,10 +487,10 @@ def index_document(
                 image_count = image_result.image_count
         except ImportError:
             # Vision dependencies not installed - continue without images
-            pass
-        except Exception:
+            logger.debug("Vision dependencies not installed for %s", path.name)
+        except (OSError, ValueError, RuntimeError) as e:
             # Log but don't fail document indexing due to image extraction
-            pass
+            logger.debug("Image extraction failed for %s: %s", path.name, e)
 
     return IndexResult(
         document_id=document_id,

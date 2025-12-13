@@ -43,7 +43,7 @@ Common issues and solutions for ragd.
 
 **Cause:** ragd doesn't support this file format in the current version.
 
-**Supported formats (v0.1):**
+**Supported formats (v1.0.0):**
 - PDF (`.pdf`)
 - Plain text (`.txt`)
 - Markdown (`.md`)

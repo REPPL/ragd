@@ -2,8 +2,9 @@
 
 ## Overview
 
-**Milestone**: v1.0
+**Milestone**: v1.1.0
 **Priority**: P0
+**Deferred From**: v1.0.0
 **Approach**: Audit first, then fix
 
 ## Problem Statement

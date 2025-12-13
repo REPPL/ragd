@@ -2,8 +2,9 @@
 
 ## Overview
 
-**Milestone**: v1.0
+**Milestone**: v1.1.0
 **Priority**: P1
+**Deferred From**: v1.0.0
 **Target**: CLI startup < 500ms
 
 ## Problem Statement
