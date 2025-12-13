@@ -26,7 +26,7 @@ ragd is a reference implementation demonstrating best practices for:
 ## Quick Start
 
 ### Prerequisites
-- Python 3.12
+- [Python 3.12](https://www.python.org/downloads/release/python-3120/)
 - [Ollama](https://ollama.ai/) (for LLM inference)
 
 ### Installation
