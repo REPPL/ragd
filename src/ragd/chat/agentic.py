@@ -160,11 +160,17 @@ class AgenticRAG:
         self._searcher = HybridSearcher(config=self.config)
 
     def _resolve_context_window(self) -> int:
-        """Resolve context window size from model card or fallback.
+        """Resolve context window size from model card, Ollama, or fallback.
+
+        Priority:
+        1. Model card context_length
+        2. Ollama API (/api/show)
+        3. Default fallback (4096)
 
         Returns:
             Context window size in tokens
         """
+        # Try model card first
         try:
             from ragd.models.cards import load_model_card
 
@@ -172,7 +178,15 @@ class AgenticRAG:
             if card and card.context_length:
                 return card.context_length
         except Exception:
-            pass  # Fall back to default
+            pass
+
+        # Fallback: query Ollama directly
+        try:
+            ctx_length = self._llm.get_context_length()
+            if ctx_length:
+                return ctx_length
+        except Exception:
+            pass
 
         return 4096  # Default fallback
 

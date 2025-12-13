@@ -259,6 +259,38 @@ class OllamaClient(LLMClient):
         models = response.get("models", [])
         return [m.get("name", "") for m in models]
 
+    def get_context_length(self, model: str | None = None) -> int | None:
+        """Get context length for a model from Ollama.
+
+        Queries the /api/show endpoint to get the model's context window size.
+        The context length is stored under {architecture}.context_length in model_info.
+
+        Args:
+            model: Model name (uses default if not specified)
+
+        Returns:
+            Context length in tokens, or None if not available
+        """
+        url = f"{self.base_url}/api/show"
+        model_name = model or self.model
+
+        try:
+            response = self._request("POST", url, {"name": model_name})
+        except OllamaError:
+            return None
+        except Exception:
+            return None
+
+        model_info = response.get("model_info", {})
+
+        # Context length is stored under {architecture}.context_length
+        # e.g., "llama.context_length", "glm4moe.context_length"
+        for key, value in model_info.items():
+            if key.endswith(".context_length") and isinstance(value, int):
+                return value
+
+        return None
+
     def pull_model(self, model: str | None = None) -> bool:
         """Pull a model from Ollama registry.
 

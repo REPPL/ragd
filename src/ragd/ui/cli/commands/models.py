@@ -229,9 +229,12 @@ def models_set_command(
             questionary.Choice("Contextual (retrieval augmentation)", value="contextual"),
         ]
 
+        from ragd.ui.styles import get_prompt_style
+
         purpose = questionary.select(
             "Which model purpose?",
             choices=purposes,
+            style=get_prompt_style(),
         ).ask()
 
         if not purpose:
@@ -241,7 +244,10 @@ def models_set_command(
         if purpose == "embedding":
             con.print("[dim]Embedding models are local (sentence-transformers), not Ollama.[/dim]")
             con.print("[dim]Examples: all-mpnet-base-v2, all-MiniLM-L6-v2[/dim]")
-            model = questionary.text("Enter embedding model name:").ask()
+            model = questionary.text(
+                "Enter embedding model name:",
+                style=get_prompt_style(),
+            ).ask()
             if model:
                 config.embedding.model = model
                 changes.append(f"Embedding: {model}")
@@ -254,6 +260,7 @@ def models_set_command(
             model = questionary.select(
                 f"Select {purpose} model:",
                 choices=sorted(installed_models),
+                style=get_prompt_style(),
             ).ask()
 
             if model:

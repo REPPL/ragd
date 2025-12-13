@@ -150,10 +150,13 @@ def init_command(
                 label = f"{name} (recommended)" if name == llm_model else name
                 choices.append(questionary.Choice(label, value=name))
 
+            from ragd.ui.styles import get_prompt_style
+
             selected = questionary.select(
                 "Select LLM model:",
                 choices=choices,
                 default=llm_model,
+                style=get_prompt_style(),
             ).ask()
 
             if selected:
@@ -182,7 +185,8 @@ def init_command(
     if config.llm.model != llm_model:
         config.llm.model = llm_model
 
-    # Detect and store context window from model card
+    # Detect and store context window from model card or Ollama
+    context_detected = False
     try:
         from ragd.models import load_model_card
 
@@ -190,8 +194,22 @@ def init_command(
         if card and card.context_length:
             config.chat.context_window = card.context_length
             con.print(f"[dim]Detected context window: {card.context_length:,} tokens[/dim]")
+            context_detected = True
     except Exception:
-        pass  # Model card not available, use default
+        pass  # Model card not available
+
+    # Fallback: query Ollama directly for context length
+    if not context_detected:
+        try:
+            from ragd.llm import OllamaClient
+
+            client = OllamaClient()
+            ctx_length = client.get_context_length(llm_model)
+            if ctx_length:
+                config.chat.context_window = ctx_length
+                con.print(f"[dim]Detected context window: {ctx_length:,} tokens (from Ollama)[/dim]")
+        except Exception:
+            pass  # Ollama not available, use default
 
     ensure_data_dir(config)
     save_config(config)

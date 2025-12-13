@@ -11,6 +11,24 @@ from rich.panel import Panel
 from ragd import __description__
 
 
+# Questionary prompt style (cyan for interactive prompts)
+def get_prompt_style():
+    """Get the questionary style for interactive prompts.
+
+    Returns:
+        prompt_toolkit Style with cyan highlights.
+    """
+    from prompt_toolkit.styles import Style
+
+    return Style.from_dict({
+        "question": "cyan bold",        # The "?" prefix
+        "questionmark": "cyan bold",    # Question mark
+        "pointer": "cyan bold",         # Selection pointer
+        "highlighted": "cyan bold",     # Highlighted option
+        "selected": "cyan",             # Selected option
+    })
+
+
 # Status indicators (ASCII-only)
 class Icons:
     """Standardised ASCII status indicators."""
@@ -27,7 +45,7 @@ def print_banner(
     console: Console,
     title: str,
     subtitle: str | None = None,
-    border_style: str = "cyan",
+    border_style: str = "dark_orange",
 ) -> None:
     """Print a Rich Panel banner.
 
@@ -35,9 +53,9 @@ def print_banner(
         console: Rich console instance
         title: Main title text
         subtitle: Optional subtitle text
-        border_style: Panel border colour (default: cyan)
+        border_style: Panel border colour (default: dark_orange)
     """
-    content = f"[bold cyan]{title}[/bold cyan]"
+    content = f"[bold dark_orange]{title}[/bold dark_orange]"
     if subtitle:
         content += f"\n[dim]{subtitle}[/dim]"
     console.print(Panel(content, expand=False, border_style=border_style))
