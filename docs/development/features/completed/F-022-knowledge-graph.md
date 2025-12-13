@@ -5,7 +5,6 @@
 **Research**: [State-of-the-Art Knowledge Graphs](../../research/state-of-the-art-knowledge-graphs.md)
 **Milestone**: v0.8.5
 **Priority**: P2
-**Status**: ✅ Complete
 
 ## Problem Statement
 
@@ -278,7 +277,3 @@ ragd graph export --format graphml graph.graphml
 - [v0.8.5 Milestone](../../milestones/v0.8.5.md) - Release planning
 - [v1.1.0 Milestone](../../milestones/v1.1.0.md) - Graph CLI commands
 - [F-005: Semantic Search](./F-005-semantic-search.md) - Enhanced by graph
-
----
-
-**Status**: Complete (Foundation) - CLI commands planned for v1.1

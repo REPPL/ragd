@@ -140,7 +140,3 @@ def multi_modal_search(query: str, k: int = 10) -> list[Result]:
 - [State-of-the-Art Multi-Modal](../../research/state-of-the-art-multi-modal.md) - Research basis
 - [v0.4.0 Milestone](../../milestones/v0.4.0.md) - Release planning
 - [F-002: Text Extraction](../completed/F-002-text-extraction.md) - Extended for images
-
----
-
-**Status**: Complete

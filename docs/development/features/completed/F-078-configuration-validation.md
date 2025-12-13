@@ -84,7 +84,3 @@ ragd config --validate
 
 - [F-036: Guided Setup](../completed/F-036-guided-setup.md)
 - [Configuration Reference](../../../reference/configuration.md)
-
----
-
-**Status**: Complete

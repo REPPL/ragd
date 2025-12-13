@@ -88,7 +88,3 @@ Categorised health checks with clear status indicators:
 ## Related Documentation
 
 - [CLI Reference](../../../guides/cli/reference.md)
-
----
-
-**Status**: Complete

@@ -65,7 +65,3 @@ When Ollama unavailable:
 
 - [F-013: RAGAS Evaluation](../completed/F-013-ragas-evaluation.md)
 - [F-020: Ollama LLM Integration](../completed/F-020-ollama-llm-integration.md)
-
----
-
-**Status**: Complete
