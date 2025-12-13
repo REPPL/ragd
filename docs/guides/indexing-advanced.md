@@ -138,10 +138,10 @@ Checkpoints are stored at `~/.ragd/.indexing_checkpoint.json`:
 ```json
 {
   "started_at": "2024-12-04T10:00:00+00:00",
-  "source_path": "/home/user/Documents",
+  "source_path": "/path/to/Documents",
   "total_files": 1000,
   "completed": 450,
-  "last_file": "/home/user/Documents/report450.pdf",
+  "last_file": "/path/to/Documents/report450.pdf",
   "files_completed": ["..."],
   "errors": []
 }

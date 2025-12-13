@@ -13,7 +13,7 @@ Replace stack traces with actionable messages:
 ```
 # Bad
 Traceback (most recent call last):
-  File "/Users/username/.../ragd/storage/chromadb.py", line 42
+  File "/path/to/ragd/storage/chromadb.py", line 42
     ...
 ConnectionError: [Errno 61] Connection refused
 

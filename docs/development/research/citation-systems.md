@@ -185,9 +185,9 @@ Link to specific sections when anchors are available.
 
 | Platform | Format |
 |----------|--------|
-| macOS | `file:///Users/name/Documents/paper.pdf` |
-| Linux | `file:///home/name/Documents/paper.pdf` |
-| Windows | `file:///C:/Users/name/Documents/paper.pdf` |
+| macOS | `file:///path/to/Documents/paper.pdf` |
+| Linux | `file:///path/to/Documents/paper.pdf` |
+| Windows | `file:///path/to/Documents/paper.pdf` |
 
 ---
 
