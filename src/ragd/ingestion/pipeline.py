@@ -7,20 +7,20 @@ extraction -> chunking -> embedding -> storage.
 from __future__ import annotations
 
 import logging
+from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import Callable
 
 from ragd.config import RagdConfig, load_config
-from ragd.embedding import get_embedder, ChunkBoundary, create_late_chunking_embedder
-from ragd.ingestion.chunker import Chunk, chunk_text
-from ragd.ingestion.extractor import extract_text, ExtractionResult
+from ragd.embedding import ChunkBoundary, create_late_chunking_embedder, get_embedder
+from ragd.ingestion.chunker import chunk_text
+from ragd.ingestion.extractor import ExtractionResult, extract_text
 from ragd.search.bm25 import BM25Index
 from ragd.storage import ChromaStore, DocumentRecord
 from ragd.storage.chromadb import generate_content_hash, generate_document_id
-from ragd.text import TextNormaliser, normalise_text
+from ragd.text import normalise_text
 from ragd.text.normalise import NormalisationSettings, source_type_from_file_type
 from ragd.utils.paths import discover_files, get_file_type
 
@@ -143,7 +143,7 @@ def _try_ocr_fallback(path: Path, original_result: ExtractionResult) -> Extracti
             )
             return ExtractionResult(
                 text=ocr_result.full_text,
-                extraction_method=f"ocr_{ocr_result.engine_used}",
+                extraction_method=f"ocr_{ocr_result.primary_engine}",
                 success=True,
                 pages=ocr_result.page_count,
                 metadata={

@@ -259,9 +259,19 @@ class PaddleOCREngine:
             if page_result is None:
                 continue
             for line in page_result:
+                # Defensive checks for malformed PaddleOCR results
+                if not line or len(line) < 2:
+                    continue
                 bbox_coords = line[0]
-                text = line[1][0]
-                confidence = float(line[1][1])
+                text_conf = line[1]
+                # PaddleOCR returns [text, confidence] - validate structure
+                if not isinstance(text_conf, (list, tuple)) or len(text_conf) < 2:
+                    continue
+                text = text_conf[0]
+                try:
+                    confidence = float(text_conf[1])
+                except (TypeError, ValueError):
+                    confidence = 0.0
 
                 ocr_results.append(
                     OCRResult(
