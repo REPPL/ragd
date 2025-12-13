@@ -1,1 +1,1 @@
-"""Benchmark infrastructure for ragd retrieval quality testing."""
+"""Performance benchmark tests for ragd (F-127)."""
