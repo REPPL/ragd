@@ -8,8 +8,8 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
+import questionary
 from rich.console import Console
-from rich.panel import Panel
 from rich.prompt import Confirm, IntPrompt, Prompt
 
 from ragd.config import (
@@ -17,6 +17,7 @@ from ragd.config import (
     load_config,
     save_config,
 )
+from ragd.ui.styles import get_prompt_style, print_banner
 
 
 def run_config_wizard(console: Console | None = None) -> None:
@@ -27,57 +28,64 @@ def run_config_wizard(console: Console | None = None) -> None:
     """
     con = console or Console()
 
-    con.print(Panel(
-        "[bold]ragd Configuration Wizard[/bold]\n\n"
-        "This wizard will help you configure ragd.\n"
-        "Press Enter to keep current values.",
-        title="Configuration",
-        border_style="blue",
-    ))
+    con.print()
+    print_banner(
+        con,
+        "ragd Configuration",
+        "Use arrow keys to navigate, Enter to select.",
+    )
 
     # Load existing config
     config = load_config()
 
+    # Menu choices
+    menu_choices = [
+        questionary.Choice("Model settings", value="models"),
+        questionary.Choice("Search behaviour", value="search"),
+        questionary.Choice("Storage settings", value="storage"),
+        questionary.Choice("Security options", value="security"),
+        questionary.Choice("Agentic RAG settings", value="agentic"),
+        questionary.Choice("Advanced tuning", value="advanced"),
+        questionary.Choice("Prompt templates", value="prompts"),
+        questionary.Separator(),
+        questionary.Choice("Show current config", value="show"),
+        questionary.Choice("Save and exit", value="save"),
+        questionary.Choice("Exit without saving", value="exit"),
+    ]
+
     # Main menu
     while True:
-        con.print("\n[bold]What would you like to configure?[/bold]\n")
-        con.print("  [1] Model settings")
-        con.print("  [2] Search behaviour")
-        con.print("  [3] Storage settings")
-        con.print("  [4] Security options")
-        con.print("  [5] Agentic RAG settings")
-        con.print("  [6] Advanced tuning")
-        con.print("  [7] Prompt templates")
-        con.print("  [8] Show current config")
-        con.print("  [9] Save and exit")
-        con.print("  [0] Exit without saving")
+        con.print()
+        choice = questionary.select(
+            "What would you like to configure?",
+            choices=menu_choices,
+            style=get_prompt_style(),
+        ).ask()
 
-        choice = Prompt.ask("\nEnter choice", choices=["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"])
-
-        if choice == "1":
+        if choice is None or choice == "exit":
+            if questionary.confirm("Discard changes?", default=False, style=get_prompt_style()).ask():
+                con.print("[yellow]Changes discarded.[/yellow]")
+                break
+        elif choice == "models":
             config = _configure_models(config, con)
-        elif choice == "2":
+        elif choice == "search":
             config = _configure_search(config, con)
-        elif choice == "3":
+        elif choice == "storage":
             config = _configure_storage(config, con)
-        elif choice == "4":
+        elif choice == "security":
             config = _configure_security(config, con)
-        elif choice == "5":
+        elif choice == "agentic":
             config = _configure_agentic(config, con)
-        elif choice == "6":
+        elif choice == "advanced":
             config = _configure_advanced(config, con)
-        elif choice == "7":
+        elif choice == "prompts":
             _configure_prompts(config, con)
-        elif choice == "8":
+        elif choice == "show":
             _show_config(config, con)
-        elif choice == "9":
+        elif choice == "save":
             save_config(config)
             con.print("\n[green]✓[/green] Configuration saved!")
             break
-        elif choice == "0":
-            if Confirm.ask("Discard changes?", default=False):
-                con.print("[yellow]Changes discarded.[/yellow]")
-                break
 
 
 def _configure_models(config: RagdConfig, console: Console) -> RagdConfig:
@@ -86,30 +94,38 @@ def _configure_models(config: RagdConfig, console: Console) -> RagdConfig:
 
     # Embedding model
     console.print(f"Current embedding model: [cyan]{config.embedding.model}[/cyan]")
-    new_model = Prompt.ask(
-        "Embedding model",
+    new_model = questionary.text(
+        "Embedding model:",
         default=config.embedding.model,
-    )
-    if new_model != config.embedding.model:
+        style=get_prompt_style(),
+    ).ask()
+    if new_model and new_model != config.embedding.model:
         config.embedding.model = new_model
 
     # LLM provider
     console.print(f"\nCurrent LLM provider: [cyan]{config.llm.provider}[/cyan]")
-    new_provider = Prompt.ask(
-        "LLM provider",
-        choices=["ollama", "openai", "anthropic"],
+    providers = [
+        questionary.Choice("ollama", value="ollama"),
+        questionary.Choice("openai", value="openai"),
+        questionary.Choice("anthropic", value="anthropic"),
+    ]
+    new_provider = questionary.select(
+        "LLM provider:",
+        choices=providers,
         default=config.llm.provider,
-    )
-    if new_provider != config.llm.provider:
+        style=get_prompt_style(),
+    ).ask()
+    if new_provider and new_provider != config.llm.provider:
         config.llm.provider = new_provider
 
     # LLM model
     console.print(f"\nCurrent LLM model: [cyan]{config.llm.model}[/cyan]")
-    new_llm = Prompt.ask(
-        "LLM model",
+    new_llm = questionary.text(
+        "LLM model:",
         default=config.llm.model,
-    )
-    if new_llm != config.llm.model:
+        style=get_prompt_style(),
+    ).ask()
+    if new_llm and new_llm != config.llm.model:
         config.llm.model = new_llm
 
     console.print("\n[green]✓[/green] Model settings updated")
@@ -122,51 +138,67 @@ def _configure_search(config: RagdConfig, console: Console) -> RagdConfig:
 
     # Search mode
     console.print(f"Current search mode: [cyan]{config.search.mode}[/cyan]")
-    new_mode = Prompt.ask(
-        "Search mode",
-        choices=["hybrid", "semantic", "keyword"],
+    modes = [
+        questionary.Choice("hybrid (semantic + keyword)", value="hybrid"),
+        questionary.Choice("semantic (embeddings only)", value="semantic"),
+        questionary.Choice("keyword (BM25 only)", value="keyword"),
+    ]
+    new_mode = questionary.select(
+        "Search mode:",
+        choices=modes,
         default=config.search.mode,
-    )
-    if new_mode != config.search.mode:
+        style=get_prompt_style(),
+    ).ask()
+    if new_mode and new_mode != config.search.mode:
         config.search.mode = new_mode
 
     # Semantic weight (only for hybrid)
     if config.search.mode == "hybrid":
         console.print(f"\nCurrent semantic weight: [cyan]{config.search.semantic_weight}[/cyan]")
         console.print("[dim]Higher = more semantic, lower = more keyword[/dim]")
-        weight_str = Prompt.ask(
-            "Semantic weight (0.0-1.0)",
+        weight_str = questionary.text(
+            "Semantic weight (0.0-1.0):",
             default=str(config.search.semantic_weight),
-        )
-        try:
-            weight = float(weight_str)
-            if 0.0 <= weight <= 1.0:
-                config.search.semantic_weight = weight
-                config.search.keyword_weight = 1.0 - weight
-        except ValueError:
-            console.print("[red]Invalid weight, keeping current value[/red]")
+            style=get_prompt_style(),
+        ).ask()
+        if weight_str:
+            try:
+                weight = float(weight_str)
+                if 0.0 <= weight <= 1.0:
+                    config.search.semantic_weight = weight
+                    config.search.keyword_weight = 1.0 - weight
+            except ValueError:
+                console.print("[red]Invalid weight, keeping current value[/red]")
 
     # Default limit
     console.print(f"\nCurrent default result limit: [cyan]{config.retrieval.default_limit}[/cyan]")
-    new_limit = IntPrompt.ask(
-        "Default result limit",
-        default=config.retrieval.default_limit,
-    )
-    if new_limit != config.retrieval.default_limit:
-        config.retrieval.default_limit = new_limit
+    new_limit = questionary.text(
+        "Default result limit:",
+        default=str(config.retrieval.default_limit),
+        style=get_prompt_style(),
+    ).ask()
+    if new_limit:
+        try:
+            limit_int = int(new_limit)
+            if limit_int != config.retrieval.default_limit:
+                config.retrieval.default_limit = limit_int
+        except ValueError:
+            console.print("[red]Invalid limit, keeping current value[/red]")
 
     # Min score
     console.print(f"\nCurrent minimum score threshold: [cyan]{config.retrieval.min_score}[/cyan]")
-    score_str = Prompt.ask(
-        "Minimum score (0.0-1.0)",
+    score_str = questionary.text(
+        "Minimum score (0.0-1.0):",
         default=str(config.retrieval.min_score),
-    )
-    try:
-        score = float(score_str)
-        if 0.0 <= score <= 1.0:
-            config.retrieval.min_score = score
-    except ValueError:
-        console.print("[red]Invalid score, keeping current value[/red]")
+        style=get_prompt_style(),
+    ).ask()
+    if score_str:
+        try:
+            score = float(score_str)
+            if 0.0 <= score <= 1.0:
+                config.retrieval.min_score = score
+        except ValueError:
+            console.print("[red]Invalid score, keeping current value[/red]")
 
     console.print("\n[green]✓[/green] Search settings updated")
     return config
