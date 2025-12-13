@@ -264,7 +264,7 @@ def chat_command(
     from ragd.ui.styles import print_chat_header
 
     con.print()
-    print_chat_header(con, chat_config.model)
+    print_chat_header(con, chat_config.model, session.chat_config.context_window)
 
     try:
         while True:

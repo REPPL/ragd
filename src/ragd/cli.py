@@ -35,100 +35,109 @@ def is_admin_mode() -> bool:
 
 ADMIN_MODE = is_admin_mode()
 from ragd.ui.cli import (
-    get_console,
-    init_command,
-    index_command,
-    search_command,
-    info_command,
-    doctor_command,
-    config_command,
-    reindex_command,
-    meta_show_command,
-    meta_edit_command,
-    tag_add_command,
-    tag_remove_command,
-    tag_list_command,
-    list_documents_command,
-    export_command,
-    import_command,
-    watch_start_command,
-    watch_stop_command,
-    watch_status_command,
     ask_command,
-    chat_command,
-    models_list_command,
-    models_recommend_command,
-    models_show_command,
-    models_set_command,
-    evaluate_command,
-    quality_command,
-    # Backend commands
-    backend_show_command,
-    backend_list_command,
-    backend_health_command,
-    backend_set_command,
-    backend_benchmark_command,
-    # Security commands
-    unlock_command,
-    lock_command,
-    password_change_command,
-    password_reset_command,
-    session_status_command,
-    # Deletion commands
-    delete_command,
-    delete_audit_command,
-    # Tier commands
-    tier_set_command,
-    tier_show_command,
-    tier_list_command,
-    tier_summary_command,
-    tier_promote_command,
-    tier_demote_command,
-    # Collection commands
-    collection_create_command,
-    collection_list_command,
-    collection_show_command,
-    collection_update_command,
-    collection_delete_command,
-    collection_export_command,
-    # Suggestion commands
-    suggestions_show_command,
-    suggestions_pending_command,
-    suggestions_confirm_command,
-    suggestions_reject_command,
-    suggestions_stats_command,
-    # Library commands
-    library_show_command,
-    library_create_command,
-    library_add_command,
-    library_remove_command,
-    library_rename_command,
-    library_delete_command,
-    library_hide_command,
-    library_validate_command,
-    library_promote_command,
-    library_pending_command,
-    library_stats_command,
-    # Config wizard
-    run_config_wizard,
-    # Config debugging
-    show_effective_config,
-    show_config_diff,
-    show_config_source,
-    validate_config,
-    # Config migration
-    migrate_config,
-    rollback_config,
-    needs_migration,
-    # Help system
-    show_extended_help,
-    show_examples,
-    list_help_topics,
+    audit_clear_command,
     # Audit commands
     audit_list_command,
     audit_show_command,
-    audit_clear_command,
     audit_stats_command,
+    backend_benchmark_command,
+    backend_health_command,
+    backend_list_command,
+    backend_set_command,
+    # Backend commands
+    backend_show_command,
+    chat_command,
+    # Collection commands
+    collection_create_command,
+    collection_delete_command,
+    collection_export_command,
+    collection_list_command,
+    collection_show_command,
+    collection_update_command,
+    compare_command,
+    config_command,
+    delete_audit_command,
+    # Deletion commands
+    delete_command,
+    doctor_command,
+    evaluate_command,
+    export_command,
+    get_console,
+    import_command,
+    index_command,
+    info_command,
+    init_command,
+    library_add_command,
+    library_create_command,
+    library_delete_command,
+    library_hide_command,
+    library_pending_command,
+    library_promote_command,
+    library_remove_command,
+    library_rename_command,
+    # Library commands
+    library_show_command,
+    library_stats_command,
+    library_validate_command,
+    list_documents_command,
+    list_help_topics,
+    lock_command,
+    meta_edit_command,
+    meta_show_command,
+    # Migration commands
+    migrate_command,
+    # Config migration
+    migrate_config,
+    migrate_status_command,
+    models_list_command,
+    models_recommend_command,
+    models_set_command,
+    models_show_command,
+    password_change_command,
+    password_reset_command,
+    profile_all_command,
+    profile_chat_command,
+    profile_compare_command,
+    # Profile commands
+    profile_index_command,
+    profile_search_command,
+    profile_startup_command,
+    quality_command,
+    reindex_command,
+    rollback_config,
+    # Config wizard
+    run_config_wizard,
+    search_command,
+    session_status_command,
+    show_config_diff,
+    show_config_source,
+    # Config debugging
+    show_effective_config,
+    show_examples,
+    show_extended_help,
+    suggestions_confirm_command,
+    suggestions_pending_command,
+    suggestions_reject_command,
+    # Suggestion commands
+    suggestions_show_command,
+    suggestions_stats_command,
+    tag_add_command,
+    tag_list_command,
+    tag_remove_command,
+    tier_demote_command,
+    tier_list_command,
+    tier_promote_command,
+    # Tier commands
+    tier_set_command,
+    tier_show_command,
+    tier_summary_command,
+    # Security commands
+    unlock_command,
+    validate_config,
+    watch_start_command,
+    watch_status_command,
+    watch_stop_command,
 )
 
 app = typer.Typer(
@@ -153,6 +162,8 @@ backend_app = typer.Typer(help="Manage vector store backends.")
 password_app = typer.Typer(help="Manage encryption password.")
 session_app = typer.Typer(help="Manage encryption session.")
 audit_app = typer.Typer(help="View operation audit log.")
+profile_app = typer.Typer(help="Profile performance.")
+migrate_app = typer.Typer(help="Migrate between backends.")
 
 # Register user subcommand groups (always visible)
 app.add_typer(collection_app, name="collection", rich_help_panel="Organisation")
@@ -200,6 +211,16 @@ app.add_typer(
     hidden=not ADMIN_MODE,
     rich_help_panel="Maintenance" if ADMIN_MODE else None,
 )
+app.add_typer(
+    profile_app, name="profile",
+    hidden=not ADMIN_MODE,
+    rich_help_panel="Performance" if ADMIN_MODE else None,
+)
+app.add_typer(
+    migrate_app, name="migrate",
+    hidden=not ADMIN_MODE,
+    rich_help_panel="Infrastructure" if ADMIN_MODE else None,
+)
 
 
 # Output format option
@@ -224,11 +245,11 @@ def version_callback(value: bool) -> None:
 ALL_COMMANDS = [
     # Top-level commands
     "init", "index", "search", "info", "doctor", "config", "reindex",
-    "list", "export", "import", "ask", "chat", "evaluate", "quality",
+    "list", "export", "import", "ask", "chat", "compare", "evaluate", "quality",
     "unlock", "lock", "help", "delete",
     # Subcommand groups
     "meta", "tag", "tier", "collection", "library", "watch", "models",
-    "backend", "password", "session", "audit",
+    "backend", "password", "session", "audit", "profile", "migrate",
 ]
 
 
@@ -1217,6 +1238,42 @@ def chat(
 
 @app.command(
     hidden=not ADMIN_MODE,
+    rich_help_panel="Infrastructure" if ADMIN_MODE else None,
+)
+def compare(
+    question: Annotated[str, typer.Argument(help="Question to compare across models.")],
+    models: str = typer.Option(None, "--models", "-m", help="Models to compare (comma-separated)."),
+    judge: str = typer.Option(None, "--judge", "-j", help="Judge model for evaluation."),
+    ensemble: bool = typer.Option(False, "--ensemble", "-e", help="Use ensemble voting."),
+    limit: int = typer.Option(5, "--limit", "-n", help="Maximum search results for context."),
+    temperature: float = typer.Option(0.7, "--temperature", "-t", help="Sampling temperature."),
+    verbose: bool = typer.Option(False, "--verbose", "-V", help="Show detailed progress."),
+    no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
+) -> None:
+    """Compare LLM outputs side-by-side.
+
+    Runs the same query through multiple models and shows responses together.
+    Optionally uses a judge model to evaluate which response is better.
+
+    Examples:
+        ragd compare "What is RAG?" --models llama3.2:3b,qwen2.5:3b
+        ragd compare "Explain AI" --models model1,model2 --judge llama3.1:8b
+        ragd compare "Question" --models m1,m2,m3 --ensemble
+    """
+    compare_command(
+        question=question,
+        models=models,
+        judge=judge,
+        ensemble=ensemble,
+        limit=limit,
+        temperature=temperature,
+        verbose=verbose,
+        no_color=no_color,
+    )
+
+
+@app.command(
+    hidden=not ADMIN_MODE,
     rich_help_panel="Maintenance" if ADMIN_MODE else None,
 )
 def evaluate(
@@ -2088,6 +2145,240 @@ def audit_stats(
         console=Console(),
         output_json=output_json,
     )
+
+
+# =============================================================================
+# Profile commands (F-123)
+# =============================================================================
+
+
+@profile_app.command("index")
+def profile_index(
+    path: Annotated[Path, typer.Argument(help="File or directory to profile indexing.")],
+    iterations: int = typer.Option(3, "--iterations", "-n", help="Number of iterations."),
+    output: Path = typer.Option(None, "--output", "-o", help="Output JSON file."),
+    no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
+) -> None:
+    """Profile document indexing performance.
+
+    Measures timing and memory usage for parsing, chunking,
+    embedding, and storage operations.
+
+    Examples:
+        ragd profile index document.pdf
+        ragd profile index ~/Documents/ --iterations 5
+        ragd profile index file.pdf --output profile.json
+    """
+    profile_index_command(
+        path=path,
+        iterations=iterations,
+        output=output,
+        no_color=no_color,
+    )
+
+
+@profile_app.command("search")
+def profile_search(
+    query: Annotated[str, typer.Argument(help="Search query to profile.")],
+    iterations: int = typer.Option(10, "--iterations", "-n", help="Number of iterations."),
+    output: Path = typer.Option(None, "--output", "-o", help="Output JSON file."),
+    no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
+) -> None:
+    """Profile search performance.
+
+    Measures search latency across multiple iterations and
+    calculates percentiles (p50, p95, p99).
+
+    Examples:
+        ragd profile search "machine learning"
+        ragd profile search "query" --iterations 100
+        ragd profile search "query" --output search_profile.json
+    """
+    profile_search_command(
+        query=query,
+        iterations=iterations,
+        output=output,
+        no_color=no_color,
+    )
+
+
+@profile_app.command("chat")
+def profile_chat(
+    question: Annotated[str, typer.Argument(help="Question to profile.")],
+    iterations: int = typer.Option(3, "--iterations", "-n", help="Number of iterations."),
+    output: Path = typer.Option(None, "--output", "-o", help="Output JSON file."),
+    no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
+) -> None:
+    """Profile chat response time.
+
+    Measures timing for context retrieval and LLM response.
+    Requires Ollama to be running.
+
+    Examples:
+        ragd profile chat "What is RAG?"
+        ragd profile chat "question" --iterations 5
+    """
+    profile_chat_command(
+        question=question,
+        iterations=iterations,
+        output=output,
+        no_color=no_color,
+    )
+
+
+@profile_app.command("all")
+def profile_all(
+    output: Path = typer.Option(Path("profile.json"), "--output", "-o", help="Output JSON file."),
+    no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
+) -> None:
+    """Run full profile suite.
+
+    Profiles model loading, storage, embedding, and search operations.
+    Results are saved to JSON for comparison.
+
+    Examples:
+        ragd profile all
+        ragd profile all --output full_profile.json
+    """
+    profile_all_command(
+        output=output,
+        no_color=no_color,
+    )
+
+
+@profile_app.command("compare")
+def profile_compare(
+    baseline: Annotated[Path, typer.Argument(help="Baseline profile JSON.")],
+    current: Path = typer.Argument(None, help="Current profile JSON (runs new profile if omitted)."),
+    no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
+) -> None:
+    """Compare profile against baseline.
+
+    Shows regression/improvement analysis for each operation.
+    Exits with error code 1 if regressions are detected.
+
+    Examples:
+        ragd profile compare baseline.json current.json
+        ragd profile compare baseline.json  # Runs new profile
+    """
+    profile_compare_command(
+        baseline=baseline,
+        current=current,
+        no_color=no_color,
+    )
+
+
+@profile_app.command("startup")
+def profile_startup(
+    iterations: int = typer.Option(10, "--iterations", "-n", help="Number of iterations."),
+    output: Path = typer.Option(None, "--output", "-o", help="Output JSON file."),
+    no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
+) -> None:
+    """Profile CLI startup time.
+
+    Measures cold startup performance for --version and --help.
+    Target: < 500ms for production release.
+
+    Examples:
+        ragd profile startup
+        ragd profile startup --iterations 20
+        ragd profile startup --output startup.json
+    """
+    profile_startup_command(
+        iterations=iterations,
+        output=output,
+        no_color=no_color,
+    )
+
+
+@profile_app.command("benchmark")
+def profile_benchmark(
+    iterations: int = typer.Option(3, "--iterations", "-n", help="Number of iterations."),
+    output: Path = typer.Option(None, "--output", "-o", help="Output JSON file."),
+    verbose: bool = typer.Option(False, "--verbose", "-V", help="Show detailed progress."),
+    no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
+) -> None:
+    """Run performance benchmarks.
+
+    Runs a comprehensive benchmark suite measuring:
+    - CLI startup time
+    - Indexing throughput (docs/sec)
+    - Search latency (p50, p95, p99)
+
+    Examples:
+        ragd profile benchmark
+        ragd profile benchmark --iterations 5 --verbose
+        ragd profile benchmark --output benchmarks.json
+    """
+    from ragd.benchmark import BenchmarkRunner
+    from rich.console import Console
+
+    con = Console(no_color=no_color)
+
+    runner = BenchmarkRunner(verbose=verbose)
+
+    with con.status("[bold blue]Running benchmarks...[/bold blue]"):
+        suite = runner.run_all()
+
+    # Print report
+    report = runner.generate_report()
+    con.print(report)
+
+    if output:
+        suite.save(output)
+        con.print(f"\n[green]Results saved to {output}[/green]")
+
+
+# =============================================================================
+# Migrate subcommands (F-075)
+# =============================================================================
+
+
+@migrate_app.command("run")
+def migrate_run(
+    source: str = typer.Option(..., "--from", help="Source backend (chromadb, faiss)."),
+    target: str = typer.Option(..., "--to", help="Target backend (chromadb, faiss)."),
+    batch_size: int = typer.Option(500, "--batch-size", "-b", help="Chunks per batch."),
+    validate: bool = typer.Option(True, "--validate/--no-validate", help="Run validation."),
+    keep_source: bool = typer.Option(True, "--keep-source/--delete-source", help="Keep source data."),
+    dry_run: bool = typer.Option(False, "--dry-run", help="Only show what would be migrated."),
+    resume: bool = typer.Option(False, "--resume", help="Resume interrupted migration."),
+    no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
+) -> None:
+    """Migrate data between vector store backends.
+
+    Migrate your indexed documents from one backend to another without
+    re-indexing. Supports ChromaDB and FAISS backends.
+
+    Examples:
+        ragd migrate run --from chromadb --to faiss
+        ragd migrate run --from chromadb --to faiss --dry-run
+        ragd migrate run --resume
+    """
+    migrate_command(
+        source=source,
+        target=target,
+        batch_size=batch_size,
+        validate=validate,
+        keep_source=keep_source,
+        dry_run=dry_run,
+        resume=resume,
+        no_color=no_color,
+    )
+
+
+@migrate_app.command("status")
+def migrate_status(
+    no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
+) -> None:
+    """Show migration checkpoint status if one exists.
+
+    Use this to check if there's an interrupted migration that can be resumed.
+
+    Examples:
+        ragd migrate status
+    """
+    migrate_status_command(no_color=no_color)
 
 
 if __name__ == "__main__":
