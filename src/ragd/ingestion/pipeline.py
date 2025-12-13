@@ -540,9 +540,9 @@ def index_path(
 
     try:
         for i, file_path in enumerate(files):
-            # Show current file being processed (completed count is i, not i+1)
+            # Show current file being processed (1-based for display)
             if progress_callback:
-                progress_callback(i, total, file_path.name)
+                progress_callback(i + 1, total, file_path.name)
 
             result = index_document(
                 file_path,

@@ -27,6 +27,7 @@ def print_banner(
     console: Console,
     title: str,
     subtitle: str | None = None,
+    border_style: str = "cyan",
 ) -> None:
     """Print a Rich Panel banner.
 
@@ -34,11 +35,12 @@ def print_banner(
         console: Rich console instance
         title: Main title text
         subtitle: Optional subtitle text
+        border_style: Panel border colour (default: cyan)
     """
-    content = f"[bold]{title}[/bold]"
+    content = f"[bold cyan]{title}[/bold cyan]"
     if subtitle:
         content += f"\n[dim]{subtitle}[/dim]"
-    console.print(Panel(content, expand=False))
+    console.print(Panel(content, expand=False, border_style=border_style))
 
 
 def print_chat_header(

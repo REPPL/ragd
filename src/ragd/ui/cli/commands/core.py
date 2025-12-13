@@ -55,10 +55,10 @@ def _show_config_diff(
         )
     if existing.llm.model != llm_model:
         table.add_row("LLM model", existing.llm.model, llm_model)
-    if existing.ingestion.chunk_size != recommendations["chunk_size"]:
+    if existing.chunking.chunk_size != recommendations["chunk_size"]:
         table.add_row(
             "Chunk size",
-            str(existing.ingestion.chunk_size),
+            str(existing.chunking.chunk_size),
             str(recommendations["chunk_size"]),
         )
 
