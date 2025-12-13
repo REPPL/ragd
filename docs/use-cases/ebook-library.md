@@ -124,7 +124,7 @@ ragd tag add book-789 "status:completed" "rating:5"
 
 - [Tutorial: Getting Started](../tutorials/01-getting-started.md)
 - [Tutorial: Organising Your Knowledge Base](../tutorials/04-organisation.md)
-- [F-100: Office Document Support](../development/features/completed/F-100-office-document-support.md)
+- [F-100: New File Types](../development/features/completed/F-100-new-file-types.md)
 
 ## Related Use Cases
 

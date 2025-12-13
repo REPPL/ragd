@@ -19,11 +19,15 @@ Learn to install ragd and index your first documents.
 pip install ragd
 ```
 
-Verify installation:
+This installs ragd with all runtime features. Verify installation:
 
 ```bash
 ragd --version
+ragd doctor     # Shows installation status and feature availability
 ```
+
+> **Expert users:** For minimal installations (CI, resource-constrained environments):
+> `RAGD_MINIMAL=1 pip install ragd`
 
 ## Step 2: Initialise ragd
 
