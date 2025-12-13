@@ -144,6 +144,7 @@ app = typer.Typer(
     name="ragd",
     help="Your Private Intelligent Document Assistant.",
     no_args_is_help=True,
+    add_completion=False,  # Hide --install-completion/--show-completion (American English)
 )
 console = Console()
 
