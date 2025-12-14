@@ -196,4 +196,4 @@ ragd benchmark report --input benchmarks.json --output benchmarks.md
 
 ---
 
-**Status**: Planned
+**Status**: Completed

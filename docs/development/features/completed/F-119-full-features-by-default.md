@@ -100,4 +100,4 @@ These remain as optional extras users must explicitly install.
 
 ---
 
-**Status**: Planned
+**Status**: Completed

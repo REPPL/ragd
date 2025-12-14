@@ -27,3 +27,11 @@ When adding new prompts:
 - Use descriptive filenames
 - Include context about the target audience and style
 - Note which AI tool the prompt was designed for
+
+---
+
+## Related Documentation
+
+- [Assets Hub](../README.md) - Parent directory for all assets
+- [Images Directory](../img/README.md) - Generated images storage
+- [Documentation Hub](../../README.md) - Main documentation index
