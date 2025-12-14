@@ -10,7 +10,7 @@
 > [!NOTE]
 > **ragd is under active development.** If you need a working RAG solution today, consider these alternatives:
 >
-> **On GitHub:** [PrivateGPT](https://github.com/zylon-ai/private-gpt), [AnythingLLM]([https://anythingllm.com/](https://github.com/Mintplex-Labs/anything-llm)), [GPT4All]([https://gpt4all.io/](https://github.com/nomic-ai/gpt4all)), and Khoj]([https://khoj.dev/](https://github.com/khoj-ai/khoj)).
+> **On GitHub:** [PrivateGPT](https://github.com/zylon-ai/private-gpt), [AnythingLLM](https://github.com/Mintplex-Labs/anything-llm), [GPT4All](https://github.com/nomic-ai/gpt4all), and [Khoj](https://github.com/khoj-ai/khoj).
 > 
 > **Managed:** [Needle](https://needle.app/)
 >
