@@ -5,21 +5,19 @@
 [![Linux](https://img.shields.io/badge/Linux-supported-brightgreen.svg)]()
 [![Built with Claude Code](https://img.shields.io/badge/built%20with-Claude%20Code-orange.svg)](https://claude.ai/code)
 
-> **Note:** ragd is currently under active development. If you need a working RAG solution today, consider these excellent alternatives:
->
-> **Local-First (Privacy-Focused):**
-> - [PrivateGPT](https://github.com/zylon-ai/private-gpt) - Local document Q&A, OpenAI-compatible API
-> - [AnythingLLM](https://anythingllm.com/) - Desktop app with built-in RAG and agents
-> - [GPT4All](https://gpt4all.io/) - One-click install, no GPU required
-> - [Khoj](https://khoj.dev/) - Personal AI "second brain" with Obsidian integration
->
-> **Managed Service:**
-> - [Needle](https://needle.app/) - Enterprise RAG-as-a-Service with 25+ app connectors
->
-> See [Alternative Projects](docs/explanation/alternatives.md) for a detailed comparison.
-
 ![ragged logo](docs/assets/img/ragd-logo.png)
 
+> [!NOTE]
+> **ragd is under active development.** If you need a working RAG solution today, consider these alternatives:
+>
+> **Local-First:** [PrivateGPT](https://github.com/zylon-ai/private-gpt) ·
+> [AnythingLLM](https://anythingllm.com/) ·
+> [GPT4All](https://gpt4all.io/) ·
+> [Khoj](https://khoj.dev/)
+>
+> **Managed:** [Needle](https://needle.app/)
+>
+> See [Alternative Projects](docs/explanation/alternatives.md) for a detailed comparison.
 
 ## Your Private Intelligent Document Assistant
 
