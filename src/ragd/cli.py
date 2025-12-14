@@ -11,11 +11,14 @@ from __future__ import annotations
 # Suppress third-party library warnings before any imports
 # These must be set before docling/paddlex libraries are loaded
 import os
+import sys
 
-os.environ.setdefault("PADDLE_PDX_DISABLE_MODEL_SOURCE_CHECK", "True")  # PaddleOCR/PaddleX
+# Skip connectivity check except during init (init needs to download models anyway)
+# This prevents the "Checking connectivity to model hosters" warning during normal use
+if "init" not in sys.argv:
+    os.environ.setdefault("PADDLE_PDX_DISABLE_MODEL_SOURCE_CHECK", "True")
 
 import difflib
-import sys
 from pathlib import Path
 from typing import Annotated
 

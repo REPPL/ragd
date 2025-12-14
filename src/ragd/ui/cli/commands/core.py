@@ -277,13 +277,14 @@ def init_command(
                 from ragd.ocr.engine import PaddleOCREngine
 
                 engine = PaddleOCREngine(lang="en", use_gpu=False)
-                # Force model download by accessing the engine
-                _ = engine._engine
+                # Force model download by calling lazy loader
+                engine._ensure_ocr()
                 progress.update(task, completed=True)
-                con.print("[green]✓[/green] OCR models ready (PaddleOCR)")
             except Exception as e:
                 progress.update(task, completed=True)
                 con.print(f"[yellow]![/yellow] OCR models will download on first use: {e}")
+            else:
+                con.print("[green]✓[/green] OCR models ready (PaddleOCR)")
 
     # Pre-warm Docling models
     if DOCLING_AVAILABLE:
@@ -300,10 +301,11 @@ def init_command(
                 # Force model download by accessing the converter
                 processor._ensure_converter()
                 progress.update(task, completed=True)
-                con.print("[green]✓[/green] Document layout models ready (Docling)")
             except Exception as e:
                 progress.update(task, completed=True)
                 con.print(f"[yellow]![/yellow] Document models will download on first use: {e}")
+            else:
+                con.print("[green]✓[/green] Document layout models ready (Docling)")
 
     con.print("\n[bold green]ragd is ready![/bold green]")
     con.print("\nNext steps:")
