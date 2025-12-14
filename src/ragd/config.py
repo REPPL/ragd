@@ -128,7 +128,11 @@ class NormalisationConfig(BaseModel):
     fix_word_boundaries: bool = True
     fix_line_breaks: bool = True
     fix_ocr_spelling: bool = True
+    fix_ligature_errors: bool = True
+    fix_title_ocr: bool = True
+    remove_captions: bool = True
     remove_boilerplate: bool = True
+    remove_zero_width_chars: bool = True
     boilerplate_mode: str = "aggressive"  # conservative | moderate | aggressive
 
 

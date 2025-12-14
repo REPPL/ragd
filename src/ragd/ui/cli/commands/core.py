@@ -368,6 +368,10 @@ def index_command(
             f"\n[bold]Indexing {total_files} document{'s' if total_files != 1 else ''}...[/bold]\n"
         )
 
+        # Suppress stdout/stderr from third-party libraries (PaddleOCR, Docling, etc.)
+        # This prevents library output from disrupting Rich's progress bar rendering
+        from ragd.logging.structured import SuppressStdout
+
         with Progress(
             SpinnerColumn(),
             TextColumn("[progress.description]{task.description}"),
@@ -388,14 +392,16 @@ def index_command(
                     file_display = "[green](done)[/green]"
                 progress.update(task, completed=completed, current_file=file_display)
 
-            results = index_path(
-                path,
-                config=config,
-                recursive=recursive,
-                skip_duplicates=skip_duplicates,
-                progress_callback=progress_callback,
-                contextual=use_contextual,
-            )
+            # Suppress library output during indexing to keep progress bar clean
+            with SuppressStdout():
+                results = index_path(
+                    path,
+                    config=config,
+                    recursive=recursive,
+                    skip_duplicates=skip_duplicates,
+                    progress_callback=progress_callback,
+                    contextual=use_contextual,
+                )
     else:
         # Verbose mode (old behaviour) or non-rich output
         con.print(f"\n[bold]Indexing:[/bold] {path}\n")

@@ -27,6 +27,7 @@ class ContentAuditResult:
     source_size: int | None
     indexed_chunks: int
     extraction_method: str | None
+    quality_warning: str | None
     issues: list[str]
 
 
@@ -76,10 +77,15 @@ def audit_content_command(
         source_exists = source_path.exists()
         source_size = source_path.stat().st_size if source_exists else None
 
-        # Get extraction method from metadata
+        # Get extraction method and quality warning from metadata
         extraction_method = None
+        quality_warning = None
         if doc.metadata:
             extraction_method = doc.metadata.get("extraction_method")
+            quality_warning = doc.metadata.get("quality_warning")
+            # Also check for OCR quality in nested metadata
+            if not quality_warning and doc.metadata.get("ocr_quality") == "poor":
+                quality_warning = "OCR quality poor - text may be unreliable"
 
         # Identify issues
         issues: list[str] = []
@@ -87,6 +93,8 @@ def audit_content_command(
             issues.append("Source file missing")
         if doc.chunk_count == 0:
             issues.append("No chunks extracted")
+        if quality_warning:
+            issues.append(quality_warning)
 
         results.append(
             ContentAuditResult(
@@ -97,6 +105,7 @@ def audit_content_command(
                 source_size=source_size,
                 indexed_chunks=doc.chunk_count,
                 extraction_method=extraction_method,
+                quality_warning=quality_warning,
                 issues=issues,
             )
         )

@@ -334,3 +334,61 @@ def suppress_third_party_logs(
 
     # Also suppress root logger's propagation of warnings
     logging.getLogger().setLevel(level)
+
+
+class SuppressStdout:
+    """Context manager to suppress stdout/stderr from third-party libraries.
+
+    Useful during progress bar displays where library output would disrupt
+    the terminal rendering.
+
+    Usage:
+        with SuppressStdout():
+            # Code that might print to stdout/stderr
+            pass
+
+        # Or capture to a file:
+        with SuppressStdout(capture_file=Path("~/.ragd/logs/output.log")):
+            pass
+    """
+
+    def __init__(self, capture_file: Path | None = None) -> None:
+        """Initialise suppressor.
+
+        Args:
+            capture_file: Optional file to capture suppressed output
+        """
+        self.capture_file = capture_file
+        self._original_stdout: TextIO | None = None
+        self._original_stderr: TextIO | None = None
+        self._devnull: TextIO | None = None
+        self._capture_handle: TextIO | None = None
+
+    def __enter__(self) -> "SuppressStdout":
+        """Start suppressing output."""
+        import os
+
+        self._original_stdout = sys.stdout
+        self._original_stderr = sys.stderr
+
+        if self.capture_file:
+            self.capture_file.parent.mkdir(parents=True, exist_ok=True)
+            self._capture_handle = open(self.capture_file, "a")
+            sys.stdout = self._capture_handle
+            sys.stderr = self._capture_handle
+        else:
+            self._devnull = open(os.devnull, "w")
+            sys.stdout = self._devnull
+            sys.stderr = self._devnull
+
+        return self
+
+    def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
+        """Restore output."""
+        sys.stdout = self._original_stdout  # type: ignore
+        sys.stderr = self._original_stderr  # type: ignore
+
+        if self._devnull:
+            self._devnull.close()
+        if self._capture_handle:
+            self._capture_handle.close()

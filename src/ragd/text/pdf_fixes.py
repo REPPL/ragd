@@ -126,12 +126,17 @@ def fix_word_boundaries(text: str) -> str:
         pattern = rf"\b({prefix})([a-z]{{3,}})\b"
 
         def split_prefix(match: re.Match[str]) -> str:
+            full_word = match.group(0)
+            # Don't split if the original word is already valid
+            if is_valid_word(full_word.lower()):
+                return full_word
+
             prefix_word = match.group(1)
             rest = match.group(2)
-            # Check if the rest is a valid word
+            # Only split if the rest forms a valid word
             if is_valid_word(rest.lower()):
                 return f"{prefix_word} {rest}"
-            return match.group(0)
+            return full_word
 
         result = re.sub(pattern, split_prefix, result, flags=re.IGNORECASE)
 
@@ -141,12 +146,17 @@ def fix_word_boundaries(text: str) -> str:
         pattern = rf"\b([a-z]{{2,}})({suffix})\b"
 
         def split_suffix(match: re.Match[str]) -> str:
+            full_word = match.group(0)
+            # Don't split if the original word is already valid
+            if is_valid_word(full_word.lower()):
+                return full_word
+
             first = match.group(1)
             suffix_word = match.group(2)
-            # Check if the first part is a valid word
+            # Only split if the first part forms a valid word
             if is_valid_word(first.lower()):
                 return f"{first} {suffix_word}"
-            return match.group(0)
+            return full_word
 
         result = re.sub(pattern, split_suffix, result, flags=re.IGNORECASE)
 

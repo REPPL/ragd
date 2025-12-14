@@ -133,6 +133,35 @@ def test_fix_word_boundaries_the() -> None:
     assert result == "the computer is working"
 
 
+def test_fix_word_boundaries_preserves_incomplete() -> None:
+    """Test that valid words starting with prefixes are preserved.
+
+    Regression test for bug where 'Incomplete' was split to 'In complete'.
+    """
+    text = "The Incomplete Common Market"
+    result = fix_word_boundaries(text)
+    assert "Incomplete" in result
+    assert "In complete" not in result
+
+
+def test_fix_word_boundaries_preserves_prefix_words() -> None:
+    """Test that words starting with common prefixes are preserved."""
+    # Words that legitimately start with prefixes
+    test_cases = [
+        ("incomplete", "incomplete"),
+        ("inaccurate", "in accurate"),  # Not in wordlist, so gets split
+        ("information", "information"),
+        ("inevitable", "in evitable"),  # Not in wordlist
+        ("anarchy", "an archy"),  # Not in wordlist
+        ("theorem", "theorem"),
+    ]
+    for input_text, expected in test_cases:
+        result = fix_word_boundaries(input_text)
+        # Words in wordlist should be preserved, others may be split
+        if is_valid_word(input_text.lower()):
+            assert input_text in result, f"'{input_text}' should be preserved"
+
+
 def test_fix_spurious_newlines_basic() -> None:
     """Test fixing spurious newlines."""
     text = "This is a sentence that continues\non the next line."
@@ -387,6 +416,34 @@ def test_universal_fixes_blank_lines() -> None:
 
     # Should collapse to at most 2 newlines
     assert "\n\n\n" not in result.text
+
+
+def test_universal_fixes_zero_width_chars() -> None:
+    """Test removal of zero-width Unicode characters.
+
+    Regression test for bug where zero-width spaces appeared in extracted text.
+    """
+    normaliser = TextNormaliser()
+    # Text with zero-width space (U+200B) after hyphen
+    text = "Re-\u200bthinking the approach"
+
+    result = normaliser.normalise(text, SourceType.PDF)
+
+    assert "\u200b" not in result.text
+    assert "Re-thinking" in result.text
+    assert "removed_zero_width_chars" in result.changes_made
+
+
+def test_universal_fixes_zero_width_disabled() -> None:
+    """Test that zero-width removal can be disabled."""
+    settings = NormalisationSettings(remove_zero_width_chars=False)
+    normaliser = TextNormaliser(settings)
+    text = "Re-\u200bthinking"
+
+    result = normaliser.normalise(text, SourceType.PDF)
+
+    # Should preserve zero-width char when disabled
+    assert "\u200b" in result.text
 
 
 def test_normaliser_tracks_changes() -> None:

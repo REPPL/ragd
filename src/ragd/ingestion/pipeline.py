@@ -123,6 +123,7 @@ def _try_ocr_fallback(path: Path, original_result: ExtractionResult) -> Extracti
         return original_result
 
     try:
+        from ragd.logging.structured import SuppressStdout
         from ragd.ocr.pipeline import OCRPipeline
 
         logger.info(
@@ -131,8 +132,10 @@ def _try_ocr_fallback(path: Path, original_result: ExtractionResult) -> Extracti
             path.name,
         )
 
-        ocr_pipeline = OCRPipeline()
-        ocr_result = ocr_pipeline.process_pdf(path)
+        # Suppress stdout/stderr from OCR libraries (PaddleOCR prints directly)
+        with SuppressStdout():
+            ocr_pipeline = OCRPipeline()
+            ocr_result = ocr_pipeline.process_pdf(path)
 
         if ocr_result.full_text and len(ocr_result.full_text.strip()) > len(
             original_result.text.strip()
@@ -150,6 +153,7 @@ def _try_ocr_fallback(path: Path, original_result: ExtractionResult) -> Extracti
                 metadata={
                     "ocr_confidence": ocr_result.average_confidence,
                     "ocr_quality": ocr_result.get_quality_assessment(),
+                    "ocr_quality_warning": ocr_result.get_quality_warning(),
                     "fallback_from": original_result.extraction_method,
                 },
             )
@@ -502,6 +506,7 @@ def index_document(
     if result.extraction_method and result.extraction_method.startswith("ocr_"):
         ocr_confidence = result.metadata.get("ocr_confidence", 0) if result.metadata else 0
         ocr_quality = result.metadata.get("ocr_quality", "") if result.metadata else ""
+        ocr_warning = result.metadata.get("ocr_quality_warning") if result.metadata else None
 
         quality_details = {
             "extraction_method": result.extraction_method,
@@ -509,7 +514,10 @@ def index_document(
             "ocr_quality": ocr_quality,
         }
 
-        if ocr_quality == "poor" or ocr_confidence < 0.3:
+        # Use warning from OCR pipeline if available, otherwise generate one
+        if ocr_warning:
+            quality_warning = ocr_warning
+        elif ocr_quality == "poor" or ocr_confidence < 0.3:
             quality_warning = f"Scanned document - OCR quality {ocr_quality or 'poor'}"
         elif ocr_quality == "fair" or ocr_confidence < 0.5:
             quality_warning = "OCR quality fair - some text may be inaccurate"

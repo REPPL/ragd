@@ -42,6 +42,16 @@ class OCRConfig:
 
 
 @dataclass
+class OCRIssue:
+    """An issue detected during OCR processing."""
+
+    page: int
+    issue_type: str  # "low_confidence", "fallback_used", "extraction_failed"
+    message: str
+    confidence: float = 0.0
+
+
+@dataclass
 class DocumentOCRResult:
     """OCR results for an entire document."""
 
@@ -52,6 +62,7 @@ class DocumentOCRResult:
     fallback_pages: list[int] = field(default_factory=list)
     skipped: bool = False  # True if document was skipped due to failures
     skip_reason: str = ""  # Reason for skipping
+    issues: list[OCRIssue] = field(default_factory=list)  # Quality issues detected
 
     @property
     def full_text(self) -> str:
@@ -82,6 +93,21 @@ class DocumentOCRResult:
             return "fair - some text may be incorrect"
         else:
             return "poor - results may be unreliable"
+
+    def get_quality_warning(self) -> str | None:
+        """Get a user-friendly warning if quality is poor.
+
+        Returns:
+            Warning message if quality is concerning, None otherwise
+        """
+        conf = self.average_confidence
+        if conf < 0.5:
+            return f"OCR quality poor ({conf:.0%} confidence) - text may be unreliable"
+        elif self.fallback_used and conf < 0.7:
+            return f"Scanned document - OCR quality fair ({conf:.0%})"
+        elif self.skipped:
+            return f"OCR skipped: {self.skip_reason}"
+        return None
 
     def __str__(self) -> str:
         """Human-readable summary."""

@@ -53,7 +53,11 @@ class NormalisationSettings:
     fix_word_boundaries: bool = True
     fix_line_breaks: bool = True
     fix_ocr_spelling: bool = True
+    fix_ligature_errors: bool = True
+    fix_title_ocr: bool = True
+    remove_captions: bool = True
     remove_boilerplate: bool = True
+    remove_zero_width_chars: bool = True
     boilerplate_mode: str = "aggressive"  # conservative | moderate | aggressive
 
     @classmethod
@@ -78,7 +82,13 @@ class NormalisationSettings:
                 fix_word_boundaries=getattr(norm_config, "fix_word_boundaries", True),
                 fix_line_breaks=getattr(norm_config, "fix_line_breaks", True),
                 fix_ocr_spelling=getattr(norm_config, "fix_ocr_spelling", True),
+                fix_ligature_errors=getattr(norm_config, "fix_ligature_errors", True),
+                fix_title_ocr=getattr(norm_config, "fix_title_ocr", True),
+                remove_captions=getattr(norm_config, "remove_captions", True),
                 remove_boilerplate=getattr(norm_config, "remove_boilerplate", True),
+                remove_zero_width_chars=getattr(
+                    norm_config, "remove_zero_width_chars", True
+                ),
                 boilerplate_mode=getattr(norm_config, "boilerplate_mode", "aggressive"),
             )
 
@@ -185,16 +195,18 @@ class TextNormaliser:
                 normalised = new_text
 
         # Apply ligature fixes (F-051)
-        new_text = fix_ligature_errors(normalised)
-        if new_text != normalised:
-            changes.append("fixed_ligature_errors")
-            normalised = new_text
+        if self.settings.fix_ligature_errors:
+            new_text = fix_ligature_errors(normalised)
+            if new_text != normalised:
+                changes.append("fixed_ligature_errors")
+                normalised = new_text
 
         # Apply title OCR fixes (F-051)
-        new_text = fix_title_ocr(normalised)
-        if new_text != normalised:
-            changes.append("fixed_title_ocr")
-            normalised = new_text
+        if self.settings.fix_title_ocr:
+            new_text = fix_title_ocr(normalised)
+            if new_text != normalised:
+                changes.append("fixed_title_ocr")
+                normalised = new_text
 
         if self.settings.fix_ocr_spelling:
             new_text = fix_ocr_spelling(normalised)
@@ -203,10 +215,11 @@ class TextNormaliser:
                 normalised = new_text
 
         # Remove captions (F-051)
-        new_text = remove_captions(normalised)
-        if new_text != normalised:
-            changes.append("removed_captions")
-            normalised = new_text
+        if self.settings.remove_captions:
+            new_text = remove_captions(normalised)
+            if new_text != normalised:
+                changes.append("removed_captions")
+                normalised = new_text
 
         return normalised, changes
 
@@ -264,6 +277,15 @@ class TextNormaliser:
         """
         changes: list[str] = []
         normalised = text
+
+        # Remove zero-width characters that corrupt text
+        if self.settings.remove_zero_width_chars:
+            # Zero-width space, non-joiner, joiner, word joiner, BOM
+            zero_width = "\u200b\u200c\u200d\u2060\ufeff"
+            new_text = normalised.translate(str.maketrans("", "", zero_width))
+            if new_text != normalised:
+                changes.append("removed_zero_width_chars")
+                normalised = new_text
 
         # Normalise multiple spaces to single space (but preserve newlines)
         import re
