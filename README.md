@@ -2,7 +2,7 @@
 [![Requires Ollama](https://img.shields.io/badge/requires-Ollama-purple.svg)](https://ollama.ai/)
 [![macOS](https://img.shields.io/badge/macOS-supported-brightgreen.svg)]()
 [![Linux](https://img.shields.io/badge/Linux-supported-brightgreen.svg)]()
-[![Built with Claude Code](https://img.shields.io/badge/built%20with-Claude%20Code-orange.svg)](https://claude.ai/code)
+[![Built with Claude Code](https://img.shields.io/badge/Built%20with-Claude%20Code-blueviolet?logo=anthropic)](https://claude.ai/code)
 
 ![ragged logo](docs/assets/img/ragd-logo.png)
 
@@ -27,7 +27,7 @@
 
 ragd is a reference implementation demonstrating best practices for:
 - **Local-first, privacy-preserving AI** - All processing happens on your machine
-- **Hardware-aware optimisation** - Automatic tuning for Apple Silicon, CUDA, or CPU
+- **Hardware-aware optimisation** - Automatic tuning for Apple Silicon, CPU, etc.
 - **CLI-first applications** with Typer + Rich
 - **Feature-centric documentation**
 
