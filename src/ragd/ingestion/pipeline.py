@@ -55,6 +55,26 @@ FAILURE_REMEDIATION = {
 }
 
 
+class SkipReason(Enum):
+    """Reasons for skipping a document during indexing."""
+
+    DUPLICATE_CONTENT = "duplicate_content"  # Exact content hash match
+    ALREADY_INDEXED = "already_indexed"  # Same document_id exists (path-based)
+    UNSUPPORTED_FORMAT = "unsupported_format"  # File extension not supported
+    SYMLINK = "symlink"  # Security: symlinks are skipped
+    EXCLUDED_BY_PATTERN = "excluded_by_pattern"  # Matches exclusion glob
+
+
+# Human-readable descriptions for skip reasons
+SKIP_REASON_DESCRIPTIONS = {
+    SkipReason.DUPLICATE_CONTENT: "Duplicate content (same hash as existing document)",
+    SkipReason.ALREADY_INDEXED: "Already indexed (same document ID)",
+    SkipReason.UNSUPPORTED_FORMAT: "Unsupported file format",
+    SkipReason.SYMLINK: "Symbolic link (skipped for security)",
+    SkipReason.EXCLUDED_BY_PATTERN: "Excluded by pattern",
+}
+
+
 def classify_failure(
     path: Path,
     result: ExtractionResult,
@@ -182,6 +202,10 @@ class IndexResult:
     remediation: str | None = None  # Suggested fix for the failure (v0.7.6)
     quality_warning: str | None = None  # User-friendly quality note (v0.8.0)
     quality_details: dict[str, Any] | None = None  # Technical quality details (v0.8.0)
+    # Skip transparency fields (v1.0.8)
+    skip_reason: SkipReason | None = None  # Why the document was skipped
+    duplicate_of: str | None = None  # Path of original if duplicate
+    duplicate_hash: str | None = None  # Content hash if duplicate
 
 
 def index_document(
@@ -271,15 +295,31 @@ def index_document(
 
     # Check for duplicates (use normalised text for hash)
     content_hash = generate_content_hash(text)
-    if skip_duplicates and store.document_exists(content_hash):
-        return IndexResult(
-            document_id=document_id,
-            path=str(path),
-            filename=path.name,
-            chunk_count=0,
-            success=True,
-            skipped=True,
-        )
+
+    # Determine duplicate handling based on config
+    duplicate_policy = config.indexing.duplicate_policy if hasattr(config, "indexing") else "skip"
+
+    if skip_duplicates and duplicate_policy != "overwrite":
+        # Check for content hash duplicate
+        existing_doc = store.find_by_content_hash(content_hash)
+        if existing_doc:
+            return IndexResult(
+                document_id=document_id,
+                path=str(path),
+                filename=path.name,
+                chunk_count=0,
+                success=True,
+                skipped=True,
+                skip_reason=SkipReason.DUPLICATE_CONTENT,
+                duplicate_of=existing_doc.path,
+                duplicate_hash=content_hash,
+            )
+
+    # Handle overwrite policy: delete existing document first
+    if duplicate_policy == "overwrite":
+        existing_doc = store.find_by_content_hash(content_hash)
+        if existing_doc:
+            store.delete_document(existing_doc.document_id)
 
     # Chunk normalised text
     chunks = chunk_text(

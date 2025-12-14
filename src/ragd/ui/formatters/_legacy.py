@@ -214,11 +214,22 @@ def format_index_results(
 
     total_chunks = sum(r.chunk_count for r in successful)
 
+    # Categorise skipped documents by reason
+    skipped_by_reason: dict[str, list[IndexResult]] = {}
+    for r in skipped:
+        reason_key = r.skip_reason.value if r.skip_reason else "unknown"
+        if reason_key not in skipped_by_reason:
+            skipped_by_reason[reason_key] = []
+        skipped_by_reason[reason_key].append(r)
+
     if output_format == "json":
         return json.dumps(
             {
                 "indexed": len(successful),
                 "skipped": len(skipped),
+                "skipped_breakdown": {
+                    reason: len(docs) for reason, docs in skipped_by_reason.items()
+                },
                 "failed": len(failed),
                 "with_issues": len(with_issues),
                 "total_chunks": total_chunks,
@@ -228,6 +239,8 @@ def format_index_results(
                         "filename": r.filename,
                         "success": r.success,
                         "skipped": r.skipped,
+                        "skip_reason": r.skip_reason.value if r.skip_reason else None,
+                        "duplicate_of": r.duplicate_of,
                         "chunks": r.chunk_count,
                         "error": r.error,
                         "quality_warning": r.quality_warning,
@@ -244,9 +257,16 @@ def format_index_results(
             "Indexing Complete",
             "=" * 40,
             f"Indexed: {len(successful)} documents ({total_chunks} chunks)",
-            f"Skipped: {len(skipped)} (already indexed)",
-            f"Failed: {len(failed)}",
         ]
+        # Show skipped breakdown
+        if skipped:
+            lines.append(f"Skipped: {len(skipped)} total")
+            for reason, docs in skipped_by_reason.items():
+                reason_display = reason.replace("_", " ").title()
+                lines.append(f"  - {reason_display}: {len(docs)}")
+        else:
+            lines.append("Skipped: 0")
+        lines.append(f"Failed: {len(failed)}")
         if with_issues:
             lines.append(f"With issues: {len(with_issues)}")
             lines.append("\nQuality issues:")
@@ -271,7 +291,16 @@ def format_index_results(
     summary.add_column("Count")
 
     summary.add_row("[green]Indexed[/green]", f"{len(successful)} ({total_chunks} chunks)")
-    summary.add_row("[yellow]Skipped[/yellow]", str(len(skipped)))
+
+    # Show skipped with breakdown
+    if skipped:
+        summary.add_row("[yellow]Skipped[/yellow]", f"{len(skipped)} total")
+        for reason, docs in skipped_by_reason.items():
+            reason_display = reason.replace("_", " ").title()
+            summary.add_row(f"  [dim]{reason_display}[/dim]", str(len(docs)))
+    else:
+        summary.add_row("[yellow]Skipped[/yellow]", "0")
+
     summary.add_row("[red]Failed[/red]", str(len(failed)))
 
     console.print(summary)

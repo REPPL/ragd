@@ -213,6 +213,50 @@ class ChromaStore:
         )
         return bool(result["ids"])
 
+    def find_by_content_hash(self, content_hash: str) -> DocumentRecord | None:
+        """Find document by content hash for duplicate detection.
+
+        Args:
+            content_hash: Content hash to search for
+
+        Returns:
+            DocumentRecord if found, None otherwise
+        """
+        result = self._metadata.get(
+            where={"content_hash": content_hash},
+            include=["metadatas", "documents"],
+        )
+
+        if not result["ids"]:
+            return None
+
+        doc_id = result["ids"][0]
+        metadata = result["metadatas"][0] if result["metadatas"] else {}
+        doc_text = result["documents"][0] if result["documents"] else None
+
+        return DocumentRecord(
+            document_id=doc_id,
+            path=metadata.get("path", doc_text or ""),
+            filename=metadata.get("filename", ""),
+            file_type=metadata.get("file_type", ""),
+            file_size=metadata.get("file_size", 0),
+            chunk_count=metadata.get("chunk_count", 0),
+            indexed_at=metadata.get("indexed_at", ""),
+            content_hash=metadata.get("content_hash", content_hash),
+        )
+
+    def document_exists_by_id(self, document_id: str) -> bool:
+        """Check if a document with given ID already exists.
+
+        Args:
+            document_id: Document ID to check
+
+        Returns:
+            True if document exists
+        """
+        result = self._metadata.get(ids=[document_id])
+        return bool(result["ids"])
+
     def delete_document(self, document_id: str) -> bool:
         """Delete a document and its chunks.
 

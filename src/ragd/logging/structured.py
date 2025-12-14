@@ -273,6 +273,12 @@ SUPPRESSED_LOGGERS = [
     "onnxruntime",
     "torch",
     "easyocr",
+    # Docling document processing library (v1.0.8)
+    "docling",
+    "docling_core",
+    "docling.datamodel",
+    "docling.document_converter",
+    "docling_parse",
 ]
 
 

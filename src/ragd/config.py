@@ -10,7 +10,7 @@ import logging
 import os
 import stat
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 import yaml
 from pydantic import BaseModel, Field
@@ -162,6 +162,34 @@ class DeletionConfig(BaseModel):
     default_level: str = "standard"  # standard | secure | purge
     require_confirmation: bool = True
     audit_log: bool = True
+
+
+class IndexingConfig(BaseModel):
+    """Indexing behaviour configuration (v1.0.8).
+
+    Controls how documents are handled during indexing, including
+    duplicate detection and handling policies.
+    """
+
+    # Duplicate handling policy
+    duplicate_policy: Literal["skip", "overwrite", "error"] = "skip"
+
+    # What constitutes a "duplicate"
+    check_content_hash: bool = True  # Check by content hash (recommended)
+    check_document_id: bool = False  # Check by document_id (path-based)
+
+    # Exclusion patterns (glob-style)
+    exclude_patterns: list[str] = Field(
+        default_factory=lambda: [
+            ".*",  # Hidden files
+            "*~",  # Backup files
+            "*.tmp",  # Temp files
+        ],
+        description="Glob patterns for files to exclude from indexing",
+    )
+
+    # Verbose skip reporting
+    report_all_skips: bool = True  # Include all skip reasons in results
 
 
 class MemoryConfig(BaseModel):
@@ -558,6 +586,7 @@ class RagdConfig(BaseModel):
     multi_modal: MultiModalConfig = Field(default_factory=MultiModalConfig)
     security: SecurityConfig = Field(default_factory=SecurityConfig)
     memory: MemoryConfig = Field(default_factory=MemoryConfig)
+    indexing: IndexingConfig = Field(default_factory=IndexingConfig)  # v1.0.8
     chat: ChatConfig = Field(default_factory=ChatConfig)
     display: DisplayConfig = Field(default_factory=DisplayConfig)
     model_discovery: ModelDiscoveryConfig = Field(default_factory=ModelDiscoveryConfig)

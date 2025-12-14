@@ -341,6 +341,10 @@ def index(
     skip_duplicates: bool = typer.Option(
         True, "--skip-duplicates/--no-skip-duplicates", help="Skip already-indexed documents."
     ),
+    overwrite: bool = typer.Option(
+        False, "--overwrite", "-f", "--force",
+        help="Re-index documents even if they already exist. Useful after changing config."
+    ),
     contextual: bool = typer.Option(
         None, "--contextual/--no-contextual", "-c",
         help="Enable contextual retrieval (requires Ollama). Uses config if not specified."
@@ -364,11 +368,14 @@ def index(
 
     Late chunking embeds chunks with full document context, improving
     embedding quality for retrieval.
+
+    Use --overwrite to re-index documents even if they already exist.
     """
     index_command(
         path=path,
         recursive=recursive,
         skip_duplicates=skip_duplicates,
+        overwrite=overwrite,
         contextual=contextual,
         late_chunking=late_chunking,
         verbose=verbose,
@@ -585,6 +592,124 @@ def reindex(
         output_format=output_format,  # type: ignore
         no_color=no_color,
     )
+
+
+@app.command(rich_help_panel="Document Management")
+def inspect(
+    show_hashes: bool = typer.Option(False, "--hashes", "-H", help="Show content hashes."),
+    duplicates: bool = typer.Option(False, "--duplicates", "-d", help="Find duplicate content."),
+    explain: Annotated[
+        Path | None, typer.Option("--explain", "-e", help="Explain why a file would be skipped.")
+    ] = None,
+    limit: int = typer.Option(100, "--limit", "-n", help="Maximum documents to show."),
+    output_format: FormatOption = "rich",
+    no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
+) -> None:
+    """Inspect the index for troubleshooting.
+
+    Use this command to understand what's in your index, find duplicates,
+    or investigate why files are being skipped during indexing.
+
+    Examples:
+        ragd inspect                     # Show index overview
+        ragd inspect --hashes            # Include content hashes
+        ragd inspect --duplicates        # Find duplicate content
+        ragd inspect --explain file.pdf  # Why would this be skipped?
+    """
+    import json
+
+    from ragd.operations.inspect import (
+        explain_skipped,
+        find_duplicates_in_index,
+        inspect_index,
+    )
+
+    con = get_console(no_color)
+
+    if explain:
+        # Explain why a specific file would be skipped
+        result = explain_skipped(explain)
+
+        if output_format == "json":
+            con.print(json.dumps({
+                "path": result.path,
+                "would_skip": result.would_skip,
+                "reasons": result.reasons,
+                "duplicate_of": result.duplicate_of,
+                "content_hash": result.content_hash,
+                "supported_formats": result.supported_formats,
+                "extraction_error": result.extraction_error,
+            }, indent=2))
+        else:
+            con.print(f"\n[bold]Skip Analysis: {explain.name}[/bold]\n")
+            if result.would_skip:
+                con.print(f"[yellow]Would be skipped[/yellow]: Yes")
+                con.print("\n[bold]Reasons:[/bold]")
+                for reason in result.reasons:
+                    con.print(f"  • {reason}")
+                if result.duplicate_of:
+                    con.print(f"\n[dim]Duplicate of: {result.duplicate_of}[/dim]")
+                if result.supported_formats:
+                    con.print(f"\n[dim]Supported formats: {', '.join(result.supported_formats)}[/dim]")
+            else:
+                con.print("[green]Would be indexed[/green]: Yes")
+            if result.extraction_error:
+                con.print(f"\n[red]Extraction error: {result.extraction_error}[/red]")
+        return
+
+    if duplicates:
+        # Find duplicate content in the index
+        dups = find_duplicates_in_index()
+
+        if output_format == "json":
+            con.print(json.dumps([
+                {"hash": d.content_hash, "count": d.count, "documents": d.documents}
+                for d in dups
+            ], indent=2))
+        else:
+            if not dups:
+                con.print("[green]No duplicate content found in the index.[/green]")
+            else:
+                con.print(f"\n[bold]Found {len(dups)} duplicate groups[/bold]\n")
+                for i, group in enumerate(dups[:20], 1):
+                    con.print(f"[yellow]Group {i}[/yellow] ({group.count} documents):")
+                    for doc in group.documents:
+                        con.print(f"  • {doc['filename']} ({doc['path']})")
+                    con.print()
+                if len(dups) > 20:
+                    con.print(f"[dim]... and {len(dups) - 20} more groups[/dim]")
+        return
+
+    # Default: show index overview
+    result = inspect_index(limit=limit, show_hashes=show_hashes)
+
+    if output_format == "json":
+        con.print(json.dumps({
+            "document_count": result.document_count,
+            "chunk_count": result.chunk_count,
+            "file_types": result.file_types,
+            "storage_size_mb": result.storage_size_mb,
+            "documents": result.documents,
+        }, indent=2))
+    else:
+        con.print("\n[bold]Index Overview[/bold]\n")
+        con.print(f"Documents: {result.document_count:,}")
+        con.print(f"Chunks: {result.chunk_count:,}")
+        if result.storage_size_mb:
+            con.print(f"Storage: {result.storage_size_mb:.1f} MB")
+
+        if result.file_types:
+            con.print("\n[bold]File Types:[/bold]")
+            for ft, count in sorted(result.file_types.items(), key=lambda x: -x[1]):
+                con.print(f"  {ft}: {count}")
+
+        if result.documents:
+            con.print(f"\n[bold]Documents (showing {len(result.documents)} of {result.document_count}):[/bold]")
+            for doc in result.documents[:20]:
+                hash_suffix = f" [{doc['content_hash'][:8]}...]" if show_hashes and 'content_hash' in doc else ""
+                con.print(f"  • {doc['filename']} ({doc['chunks']} chunks){hash_suffix}")
+            if len(result.documents) > 20:
+                con.print(f"  [dim]... and {len(result.documents) - 20} more[/dim]")
 
 
 # --- Metadata subcommands ---

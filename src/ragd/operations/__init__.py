@@ -37,6 +37,14 @@ from ragd.operations.quality import (
     format_quality_badge,
     format_quality_summary,
 )
+from ragd.operations.inspect import (
+    DuplicateGroup,
+    InspectResult,
+    SkipExplanation,
+    explain_skipped,
+    find_duplicates_in_index,
+    inspect_index,
+)
 
 __all__ = [
     # Error logging (F-111)
@@ -66,4 +74,11 @@ __all__ = [
     "calculate_quality_score",
     "format_quality_badge",
     "format_quality_summary",
+    # Index inspection (v1.0.8)
+    "InspectResult",
+    "DuplicateGroup",
+    "SkipExplanation",
+    "inspect_index",
+    "find_duplicates_in_index",
+    "explain_skipped",
 ]

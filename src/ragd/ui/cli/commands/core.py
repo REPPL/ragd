@@ -318,6 +318,7 @@ def index_command(
     path: Path,
     recursive: bool = True,
     skip_duplicates: bool = True,
+    overwrite: bool = False,
     contextual: bool | None = None,
     late_chunking: bool | None = None,
     verbose: bool = False,
@@ -327,6 +328,9 @@ def index_command(
     """Index documents from a file or directory.
 
     Supported formats: PDF, TXT, MD, HTML
+
+    Use --overwrite to re-index documents even if they already exist.
+    This is useful after changing embedding models or configuration.
     """
     from ragd.config import ensure_data_dir, load_config
     from ragd.ingestion import discover_files, index_path
@@ -353,6 +357,12 @@ def index_command(
         con.print("[dim]Late chunking enabled for context-aware embeddings[/dim]")
         # Temporarily override config for this indexing session
         config.embedding.late_chunking = True
+
+    # Handle overwrite mode
+    if overwrite:
+        skip_duplicates = False
+        config.indexing.duplicate_policy = "overwrite"
+        con.print("[dim]Overwrite mode: existing documents will be re-indexed[/dim]")
 
     # Discover files first to get total count
     files = discover_files(path, recursive=recursive)
