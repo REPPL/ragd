@@ -140,6 +140,17 @@ from ragd.ui.cli import (
     watch_stop_command,
 )
 
+# Suppress noisy third-party library logs from console, route to file
+import logging
+
+from ragd.config import DEFAULT_DATA_DIR
+from ragd.logging.structured import suppress_third_party_logs
+
+suppress_third_party_logs(
+    level=logging.ERROR,  # Only show errors on console
+    log_file=DEFAULT_DATA_DIR / "logs" / "third_party.log",
+)
+
 app = typer.Typer(
     name="ragd",
     help="Your Private Intelligent Document Assistant.",
@@ -2151,6 +2162,38 @@ def audit_stats(
     audit_stats_command(
         console=Console(),
         output_json=output_json,
+    )
+
+
+@audit_app.command("content")
+def audit_content(
+    path: Annotated[Path | None, typer.Option("--path", "-p", help="Filter by source path.")] = None,
+    document_id: Annotated[str | None, typer.Option("--document", "-d", help="Filter by document ID.")] = None,
+    show_missing: bool = typer.Option(False, "--missing", "-m", help="Show only documents with missing sources."),
+    show_quality: bool = typer.Option(False, "--quality", "-q", help="Include quality scores."),
+    output_json: bool = typer.Option(False, "--json", help="Output as JSON."),
+    no_color: bool = typer.Option(False, "--no-color", help="Disable colour output."),
+) -> None:
+    """Audit indexed content against source files.
+
+    Compares what's in the database with source files on disk.
+    Helps identify missing files, extraction issues, and data quality problems.
+
+    Examples:
+        ragd audit content                    # Full audit
+        ragd audit content --missing          # Show missing sources only
+        ragd audit content --quality          # Include quality scores
+        ragd audit content --path ~/Documents # Filter by path
+    """
+    from ragd.ui.cli.commands.audit import audit_content_command
+
+    audit_content_command(
+        path=path,
+        document_id=document_id,
+        show_missing=show_missing,
+        show_quality=show_quality,
+        output_json=output_json,
+        no_color=no_color,
     )
 
 

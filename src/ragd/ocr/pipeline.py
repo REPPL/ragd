@@ -332,7 +332,8 @@ class OCRPipeline:
             if result.average_confidence >= self._config.min_confidence:
                 return result, False
 
-            self._logger.warning(
+            # Log at debug level - quality info is captured in result metadata
+            self._logger.debug(
                 "%s page %d: low confidence (%.2f), trying fallback",
                 pdf_path.name,
                 page_number,
@@ -340,7 +341,8 @@ class OCRPipeline:
             )
 
         except Exception as e:
-            self._logger.warning(
+            # Log at debug level - avoid console spam during indexing
+            self._logger.debug(
                 "%s page %d: primary OCR failed (%s), trying fallback",
                 pdf_path.name,
                 page_number,
@@ -366,7 +368,8 @@ class OCRPipeline:
                     return fallback_result, True
 
             except Exception as e:
-                self._logger.warning(
+                # Log at debug level - quality info is captured in result
+                self._logger.debug(
                     "Page %d: fallback OCR also failed: %s",
                     page_number,
                     e,

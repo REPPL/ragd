@@ -12,6 +12,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
+from typing import Any
 
 from ragd.config import RagdConfig, load_config
 from ragd.embedding import ChunkBoundary, create_late_chunking_embedder, get_embedder
@@ -175,6 +176,8 @@ class IndexResult:
     image_count: int = 0  # Number of images extracted (v0.4.0)
     failure_category: FailureCategory | None = None  # Categorised failure type (v0.7.6)
     remediation: str | None = None  # Suggested fix for the failure (v0.7.6)
+    quality_warning: str | None = None  # User-friendly quality note (v0.8.0)
+    quality_details: dict[str, Any] | None = None  # Technical quality details (v0.8.0)
 
 
 def index_document(
@@ -492,6 +495,25 @@ def index_document(
             # Log but don't fail document indexing due to image extraction
             logger.debug("Image extraction failed for %s: %s", path.name, e)
 
+    # Determine quality warnings based on extraction method and metadata
+    quality_warning: str | None = None
+    quality_details: dict[str, Any] | None = None
+
+    if result.extraction_method and result.extraction_method.startswith("ocr_"):
+        ocr_confidence = result.metadata.get("ocr_confidence", 0) if result.metadata else 0
+        ocr_quality = result.metadata.get("ocr_quality", "") if result.metadata else ""
+
+        quality_details = {
+            "extraction_method": result.extraction_method,
+            "ocr_confidence": ocr_confidence,
+            "ocr_quality": ocr_quality,
+        }
+
+        if ocr_quality == "poor" or ocr_confidence < 0.3:
+            quality_warning = f"Scanned document - OCR quality {ocr_quality or 'poor'}"
+        elif ocr_quality == "fair" or ocr_confidence < 0.5:
+            quality_warning = "OCR quality fair - some text may be inaccurate"
+
     return IndexResult(
         document_id=document_id,
         path=str(path),
@@ -499,6 +521,8 @@ def index_document(
         chunk_count=len(chunks),
         success=True,
         image_count=image_count,
+        quality_warning=quality_warning,
+        quality_details=quality_details,
     )
 
 

@@ -210,6 +210,7 @@ def format_index_results(
     successful = [r for r in results if r.success and not r.skipped]
     skipped = [r for r in results if r.skipped]
     failed = [r for r in results if not r.success]
+    with_issues = [r for r in successful if r.quality_warning]
 
     total_chunks = sum(r.chunk_count for r in successful)
 
@@ -219,6 +220,7 @@ def format_index_results(
                 "indexed": len(successful),
                 "skipped": len(skipped),
                 "failed": len(failed),
+                "with_issues": len(with_issues),
                 "total_chunks": total_chunks,
                 "results": [
                     {
@@ -228,6 +230,8 @@ def format_index_results(
                         "skipped": r.skipped,
                         "chunks": r.chunk_count,
                         "error": r.error,
+                        "quality_warning": r.quality_warning,
+                        "quality_details": r.quality_details,
                     }
                     for r in results
                 ],
@@ -243,6 +247,13 @@ def format_index_results(
             f"Skipped: {len(skipped)} (already indexed)",
             f"Failed: {len(failed)}",
         ]
+        if with_issues:
+            lines.append(f"With issues: {len(with_issues)}")
+            lines.append("\nQuality issues:")
+            for r in with_issues[:10]:
+                lines.append(f"  - {r.filename}: {r.quality_warning}")
+            if len(with_issues) > 10:
+                lines.append(f"  ... and {len(with_issues) - 10} more")
         if failed:
             lines.append("\nFailures:")
             for r in failed:
@@ -264,6 +275,14 @@ def format_index_results(
     summary.add_row("[red]Failed[/red]", str(len(failed)))
 
     console.print(summary)
+
+    # Show quality issues summary
+    if with_issues:
+        console.print(f"\n[yellow]⚠[/yellow] {len(with_issues)} documents had quality issues:")
+        for r in with_issues[:10]:
+            console.print(f"  • {r.filename}: {r.quality_warning}")
+        if len(with_issues) > 10:
+            console.print(f"  [dim]... and {len(with_issues) - 10} more[/dim]")
 
     if failed:
         console.print("\n[red]Failures:[/red]")

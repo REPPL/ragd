@@ -7,7 +7,9 @@ from __future__ import annotations
 
 import json
 import logging
+import logging.handlers
 import sys
+import warnings
 from dataclasses import asdict, dataclass, field
 from datetime import UTC, datetime
 from enum import Enum
@@ -269,24 +271,66 @@ SUPPRESSED_LOGGERS = [
     "urllib3",
     "chromadb",
     "onnxruntime",
+    "torch",
+    "easyocr",
 ]
 
 
 def suppress_third_party_logs(
     level: int = logging.WARNING,
     loggers: list[str] | None = None,
+    log_file: Path | None = None,
 ) -> None:
-    """Suppress noisy third-party loggers.
+    """Suppress noisy third-party loggers from console, optionally routing to file.
+
+    Also suppresses common UserWarnings from PyTorch/EasyOCR that use the
+    warnings module rather than logging.
 
     Args:
-        level: Minimum level for third-party logs
+        level: Minimum level for third-party logs on console
         loggers: List of logger names to suppress (defaults to common ones)
+        log_file: Optional file path to route suppressed logs to
     """
     target_loggers = loggers or SUPPRESSED_LOGGERS
+
+    # Suppress common UserWarnings from third-party libraries
+    # These use Python's warnings module, not logging
+    warnings.filterwarnings(
+        "ignore",
+        message=".*pin_memory.*",
+        category=UserWarning,
+    )
+    warnings.filterwarnings(
+        "ignore",
+        message=".*Using CPU.*",
+        category=UserWarning,
+    )
+    warnings.filterwarnings(
+        "ignore",
+        message=".*ccache.*",
+        category=UserWarning,
+    )
+
+    # Create file handler if log_file specified
+    file_handler: logging.Handler | None = None
+    if log_file:
+        log_file.parent.mkdir(parents=True, exist_ok=True)
+        file_handler = logging.handlers.RotatingFileHandler(
+            log_file,
+            maxBytes=10_000_000,  # 10MB
+            backupCount=3,
+        )
+        file_handler.setLevel(logging.DEBUG)
+        file_handler.setFormatter(
+            logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+        )
 
     for logger_name in target_loggers:
         logger = logging.getLogger(logger_name)
         logger.setLevel(level)
+        # Route to file if configured
+        if file_handler:
+            logger.addHandler(file_handler)
 
     # Also suppress root logger's propagation of warnings
     logging.getLogger().setLevel(level)
