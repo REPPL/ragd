@@ -8,8 +8,13 @@ Command implementations are in ragd.ui.cli.commands.
 
 from __future__ import annotations
 
-import difflib
+# Suppress third-party library warnings before any imports
+# These must be set before docling/paddlex libraries are loaded
 import os
+
+os.environ.setdefault("PADDLE_PDX_DISABLE_MODEL_SOURCE_CHECK", "True")  # PaddleOCR/PaddleX
+
+import difflib
 import sys
 from pathlib import Path
 from typing import Annotated

@@ -24,7 +24,7 @@ Most commands support these common options:
 | Option | Short | Description | Default |
 |--------|-------|-------------|---------|
 | `--format` | `-f` | Output format: `rich`, `plain`, `json` | `rich` |
-| `--no-color` | | Disable coloured output | `false` |
+| `--no-color` | | Disable colour output | `false` |
 
 ### Output Formats
 

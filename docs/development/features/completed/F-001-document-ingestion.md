@@ -47,24 +47,24 @@ ragd index ./documents/ --recursive --format pdf,txt,md
 
 ## Implementation Tasks
 
-- [ ] Create `FileDiscovery` class for path resolution and globbing
-- [ ] Implement format detection with extension and magic byte support
-- [ ] Build `IngestionPipeline` orchestrator class
-- [ ] Add progress tracking with Rich progress bars
-- [ ] Implement duplicate detection (hash-based)
-- [ ] Create `ragd index` CLI command
-- [ ] Add batch processing with configurable concurrency
-- [ ] Write unit tests for file discovery and format detection
-- [ ] Write integration tests for full pipeline
+- [x] Create `FileDiscovery` class for path resolution and globbing
+- [x] Implement format detection with extension and magic byte support
+- [x] Build `IngestionPipeline` orchestrator class
+- [x] Add progress tracking with Rich progress bars
+- [x] Implement duplicate detection (hash-based)
+- [x] Create `ragd index` CLI command
+- [x] Add batch processing with configurable concurrency
+- [x] Write unit tests for file discovery and format detection
+- [x] Write integration tests for full pipeline
 
 ## Success Criteria
 
-- [ ] Single file indexing works for PDF, TXT, MD formats
-- [ ] Directory indexing with recursive option works
-- [ ] Progress feedback shown during processing
-- [ ] Duplicate files detected and skipped with message
-- [ ] Errors handled gracefully with clear messages
-- [ ] Processing completes within reasonable time (< 1s per simple document)
+- [x] Single file indexing works for PDF, TXT, MD formats
+- [x] Directory indexing with recursive option works
+- [x] Progress feedback shown during processing
+- [x] Duplicate files detected and skipped with message
+- [x] Errors handled gracefully with clear messages
+- [x] Processing completes within reasonable time (< 1s per simple document)
 
 ## Dependencies
 

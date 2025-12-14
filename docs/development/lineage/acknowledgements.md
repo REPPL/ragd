@@ -25,7 +25,7 @@ This document acknowledges the research papers, projects, and sources that infor
 ### EasyOCR
 
 **Source**: EasyOCR
-**Author**: JaidedAI
+**Creator**: JaidedAI
 **Link**: https://github.com/JaidedAI/EasyOCR
 **Licence**: Apache 2.0
 **How Used**: Fallback OCR engine for cross-platform compatibility
@@ -96,7 +96,7 @@ This document acknowledges the research papers, projects, and sources that infor
 ### Typer
 
 **Source**: Typer - Build great CLIs with Python
-**Author**: Sebastián Ramírez
+**Creator**: Sebastián Ramírez
 **Link**: https://github.com/tiangolo/typer
 **Licence**: MIT
 **How Used**: CLI framework for ragd commands
@@ -105,7 +105,7 @@ This document acknowledges the research papers, projects, and sources that infor
 ### Rich
 
 **Source**: Rich - Python library for rich text and beautiful formatting
-**Author**: Will McGugan
+**Creator**: Will McGugan
 **Link**: https://github.com/Textualize/rich
 **Licence**: MIT
 **How Used**: Terminal output formatting, progress bars, tables
@@ -151,7 +151,7 @@ When integrating new research or projects, add an entry following this template:
 ### [Feature/Technology Name]
 
 **Source**: [Paper/Project Name]
-**Authors/Organisation**: [Authors or Organisation]
+**Creator/Organisation**: [Creator or Organisation]
 **Link**: [URL to paper or repository]
 **Licence**: [Licence type]
 **How Used**: [Brief description of how ragd uses this]

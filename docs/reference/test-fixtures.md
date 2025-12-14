@@ -558,4 +558,4 @@ generated/
 
 ---
 
-**Status**: Reference specification for v0.1.0
+**Status**: Reference specification for v1.0

@@ -257,6 +257,54 @@ def init_command(
             progress.update(task, completed=True)
         con.print("[green]✓[/green] Downloaded NLTK tokeniser data")
 
+    # Pre-warm document processing models
+    from ragd.features import DOCLING_AVAILABLE, PADDLEOCR_AVAILABLE
+
+    if PADDLEOCR_AVAILABLE or DOCLING_AVAILABLE:
+        con.print("\n[bold]Preparing document processing models...[/bold]")
+        con.print("[dim]This downloads AI models for OCR and layout analysis[/dim]")
+        con.print("[dim]First-time setup may take a few minutes[/dim]")
+
+    # Pre-warm PaddleOCR models
+    if PADDLEOCR_AVAILABLE:
+        with Progress(
+            SpinnerColumn(),
+            TextColumn("[progress.description]{task.description}"),
+            console=con,
+        ) as progress:
+            task = progress.add_task("Initialising OCR engine...", total=None)
+            try:
+                from ragd.ocr.engine import PaddleOCREngine
+
+                engine = PaddleOCREngine(lang="en", use_gpu=False)
+                # Force model download by accessing the engine
+                _ = engine._engine
+                progress.update(task, completed=True)
+                con.print("[green]✓[/green] OCR models ready (PaddleOCR)")
+            except Exception as e:
+                progress.update(task, completed=True)
+                con.print(f"[yellow]![/yellow] OCR models will download on first use: {e}")
+
+    # Pre-warm Docling models
+    if DOCLING_AVAILABLE:
+        with Progress(
+            SpinnerColumn(),
+            TextColumn("[progress.description]{task.description}"),
+            console=con,
+        ) as progress:
+            task = progress.add_task("Initialising document processor...", total=None)
+            try:
+                from ragd.pdf.docling import DoclingProcessor
+
+                processor = DoclingProcessor()
+                # Force model download by accessing the converter
+                processor._ensure_converter()
+                progress.update(task, completed=True)
+                con.print("[green]✓[/green] Document layout models ready (Docling)")
+            except Exception as e:
+                progress.update(task, completed=True)
+                con.print(f"[yellow]![/yellow] Document models will download on first use: {e}")
+
     con.print("\n[bold green]ragd is ready![/bold green]")
     con.print("\nNext steps:")
     con.print("  • Index documents: [cyan]ragd index <path>[/cyan]")
