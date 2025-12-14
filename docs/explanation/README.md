@@ -23,6 +23,10 @@ Explanation documentation helps users understand concepts, architecture, and des
 
 - [Model Purposes](./model-purposes.md) — Understanding the five model types (chat, summary, classification, embedding, contextual)
 
+### Alternatives
+
+- [RAG Alternatives](./alternatives.md) — Comprehensive guide to alternative RAG projects
+
 ## Explanation Guidelines
 
 When writing explanations:

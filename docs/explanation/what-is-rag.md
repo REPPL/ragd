@@ -73,3 +73,4 @@ See [Hybrid Search](./hybrid-search.md) and [Chunking Strategies](./chunking-str
 - [Hybrid Search](./hybrid-search.md) - How retrieval works
 - [Model Purposes](./model-purposes.md) - Understanding the different AI models
 - [Getting Started Tutorial](../tutorials/01-getting-started.md) - Hands-on introduction
+- [RAG Alternatives](./alternatives.md) - Other tools if ragd doesn't fit your needs
