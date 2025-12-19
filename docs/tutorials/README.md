@@ -27,6 +27,8 @@ Progressive learning guides for ragd, from installation to advanced usage.
 | [Powerful Searching](powerful-searching.md) | 25 min | Search modes, filters, and syntax |
 | [Processing Difficult PDFs](processing-difficult-pdfs.md) | 20 min | OCR, scans, complex layouts |
 | [Automation](06-automation.md) | 20 min | Scripts, JSON output, integrations |
+| [Troubleshooting Indexing](07-troubleshooting-index.md) | 15 min | Using inspect to diagnose issues |
+| [Customising Prompts](08-customising-prompts.md) | 20 min | Modify AI behaviour with prompt templates |
 
 ## Prerequisites
 

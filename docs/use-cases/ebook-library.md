@@ -39,7 +39,7 @@ ragd index ~/Calibre\ Library --recursive
 ragd index ~/Books --recursive
 ```
 
-**Supported formats:** PDF, EPUB, TXT
+**Supported formats:** PDF, TXT, MD, HTML
 
 ## Workflow
 

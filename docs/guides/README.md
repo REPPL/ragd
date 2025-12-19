@@ -8,20 +8,33 @@ Guides help users accomplish specific tasks. Each guide focuses on a practical g
 
 ## Available Guides
 
+### Quick Start
+
+| Guide | Description |
+|-------|-------------|
+| [Quick Start Card](./quick-start.md) | The 4 commands you need to know |
+
 ### CLI Guides
 
 | Guide | Description | Time |
 |-------|-------------|------|
 | [CLI Documentation Hub](./cli/README.md) | Overview of CLI documentation |  |
-| [CLI Essentials](./cli/essentials.md) | 4 core commands to get started | 15 min |
+| [CLI Essentials](./cli/essentials.md) | 6 core commands explained | 20 min |
 | [CLI Intermediate](./cli/intermediate.md) | Task-specific workflows | 20 min |
 | [CLI Advanced](./cli/advanced.md) | Configuration, debugging, themes | 15 min |
 | [CLI Reference](./cli/reference.md) | Complete command specifications |  |
+
+### Automation
+
+| Guide | Description |
+|-------|-------------|
+| [Recipes](./recipes.md) | Copy-paste scripts for common workflows |
 
 ### Other Guides
 
 | Guide | Description |
 |-------|-------------|
+| [Customising Prompts](./customising-prompts.md) | Modify ragd's AI behaviour |
 | [Troubleshooting](./troubleshooting.md) | Common issues and solutions |
 
 ## Guide Guidelines

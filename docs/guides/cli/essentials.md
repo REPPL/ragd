@@ -98,7 +98,7 @@ Indexing: document.pdf
 ✅ Indexed 1 document (47 chunks)
 ```
 
-**Supported formats:** PDF, Markdown, Plain text, HTML
+**Supported formats:** PDF, TXT, MD, HTML
 
 ---
 

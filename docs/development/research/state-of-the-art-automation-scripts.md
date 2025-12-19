@@ -362,8 +362,48 @@ ragd script edit <name>       # Edit YAML definition
 
 ---
 
+## Current Capabilities
+
+While the full `ragd script` command group is planned for v1.4, ragd already supports automation through:
+
+### CLI Features Available Now
+
+| Feature | Command | Use Case |
+|---------|---------|----------|
+| **JSON output** | `--format json` | Parse results in shell scripts |
+| **Non-interactive mode** | `--no-interactive` | Prevent prompts in cron jobs |
+| **Health checks** | `ragd doctor --format json` | Monitor health in scripts |
+| **Watch mode** | `ragd watch` | Auto-index on file changes |
+| **Verbose logging** | `--verbose` | Debug automation issues |
+
+### Exit Codes
+
+ragd uses standard sysexits.h codes for scripting:
+
+| Code | Meaning | Action |
+|------|---------|--------|
+| 0 | Success | Continue |
+| 1 | General error | Check logs |
+| 64 | Usage error | Fix command |
+| 65 | Data error | Fix input |
+| 78 | Config error | Check config |
+
+### Ready-to-Use Scripts
+
+See **[Recipes](../../guides/recipes.md)** for copy-paste automation scripts:
+
+- Daily backup with rotation
+- Batch indexing from multiple directories
+- Health monitoring for cron
+- Model comparison reports
+- Search results to Markdown export
+- Weekly re-indexing
+
+---
+
 ## Related Documentation
 
+- [Recipes](../../guides/recipes.md) - Ready-to-use automation scripts
 - [state-of-the-art-cli-modes.md](./state-of-the-art-cli-modes.md) - CLI dual-mode design patterns
 - [state-of-the-art-setup-ux.md](./state-of-the-art-setup-ux.md) - Easy setup and onboarding
 - [state-of-the-art-configuration.md](./state-of-the-art-configuration.md) - Configuration management patterns

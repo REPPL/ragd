@@ -43,24 +43,25 @@ Common issues and solutions for ragd.
 
 **Cause:** ragd doesn't support this file format in the current version.
 
-**Supported formats (v1.0.0):**
-- PDF (`.pdf`)
+**Supported formats:**
+- PDF (`.pdf`) - including scanned documents with OCR
 - Plain text (`.txt`)
 - Markdown (`.md`)
 - HTML (`.html`, `.htm`)
 
 **Solutions:**
 1. Convert the file to a supported format
-2. For Word documents, export as PDF or copy text to `.txt`
+2. Check file permissions
 
 ### "Failed to extract text from PDF"
 
-**Cause:** PDF may be scanned, encrypted, or corrupted.
+**Cause:** PDF may be encrypted, corrupted, or have unusual encoding.
 
 **Solutions:**
 1. Try opening the PDF in a viewer to verify it's valid
-2. For scanned PDFs, wait for v0.2 (OCR support)
-3. For encrypted PDFs, remove the password first
+2. For encrypted PDFs, remove the password first
+3. For scanned PDFs, ragd uses OCR automatically - check that OCR models are installed with `ragd doctor`
+4. Try `ragd index --verbose` to see detailed extraction logs
 
 ### "No chunks created"
 

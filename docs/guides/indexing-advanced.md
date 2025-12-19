@@ -200,7 +200,7 @@ ragd info --detailed
 ### Mixed File Types
 
 1. **Install optional dependencies** for your file types
-2. **Check supported formats** with `ragd --supported-types`
+2. **Supported formats:** PDF, TXT, MD, HTML
 3. **Use recursive indexing** for nested folders
 
 ### Optimising Performance

@@ -9,7 +9,7 @@ Documentation for contributors and developers.
 | Use Cases | 6 P0 briefs defined |
 | Features | 96 features complete, 11 planned |
 | Tutorials | Getting Started + 5 tutorials |
-| Milestone | v1.0.0a1 released |
+| Milestone | v1.0.8 released |
 | ADRs | 32 architecture decisions |
 
 ## Structure
@@ -44,7 +44,8 @@ Layer 3: TUTORIALS (How users experience it)
 - [Planned Features](./features/planned/)
 - [Milestones](./milestones/)
 
-### v1.0.0a1 (Latest Release)
+### v1.0.8 (Latest Release)
+- [v1.0.8 Tag](https://github.com/REPPL/ragd/releases/tag/v1.0.8)
 - [v1.0.0 Milestone](./milestones/v1.0.0.md)
 - [v0.9.6 Implementation](./implementation/v0.9.6.md) (last implementation record)
 - [F-098: Advanced HTML Engine](./features/completed/F-098-advanced-html-engine.md)

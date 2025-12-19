@@ -1,6 +1,6 @@
 # CLI Reference
 
-Complete command reference for ragd v1.0.7.
+Complete command reference for ragd v1.0.8.
 
 ## Synopsis
 
@@ -86,6 +86,18 @@ Most commands support these common options:
 | Command | Description |
 |---------|-------------|
 | [`prompts`](#ragd-prompts) | Manage prompt templates |
+
+### Automation
+
+| Command | Description |
+|---------|-------------|
+| [`watch`](#ragd-watch) | Watch folders for automatic indexing |
+
+### LLM Management
+
+| Command | Description |
+|---------|-------------|
+| [`models`](#ragd-models) | Manage LLM models |
 
 ---
 
@@ -755,6 +767,82 @@ ragd prompts show rag/answer           # Show specific prompt content
 
 ---
 
+### ragd watch
+
+Watch folders for automatic indexing.
+
+```
+ragd watch <COMMAND> [OPTIONS]
+```
+
+**Description:**
+
+Monitors directories for file changes and automatically indexes new or modified documents. Requires the `watchdog` package.
+
+**Subcommands:**
+
+| Command | Description |
+|---------|-------------|
+| `start` | Start watching folders |
+| `stop` | Stop the watch daemon |
+| `status` | Show watch daemon status |
+
+**ragd watch start:**
+
+| Option | Short | Description | Default |
+|--------|-------|-------------|---------|
+| `--pattern` | `-p` | File patterns to watch (e.g., `*.pdf`) | `*.pdf,*.md,*.txt,*.html` |
+| `--exclude` | `-e` | Patterns to exclude | `node_modules,.git,venv` |
+| `--debounce` | `-d` | Seconds to wait before indexing | `5` |
+| `--daemon` | | Run in background | `false` |
+
+**Examples:**
+
+```bash
+ragd watch start ~/Documents              # Watch a directory
+ragd watch start ~/PDFs --pattern "*.pdf" # Watch only PDFs
+ragd watch start ~/Docs --daemon          # Run in background
+ragd watch status                         # Check if running
+ragd watch stop                           # Stop watching
+```
+
+---
+
+### ragd models
+
+Manage LLM models for chat and ask commands.
+
+```
+ragd models <COMMAND> [OPTIONS]
+```
+
+**Description:**
+
+View, configure, and discover LLM models available through Ollama.
+
+**Subcommands:**
+
+| Command | Description |
+|---------|-------------|
+| `list` | List available models |
+| `show` | Show model details |
+| `set` | Set the default model |
+| `recommend` | Get model recommendations for your hardware |
+| `discover` | Discover new models from Ollama |
+| `cards` | View model cards |
+
+**Examples:**
+
+```bash
+ragd models list                   # List available models
+ragd models show llama3.2          # Show model details
+ragd models set llama3.2:8b        # Set default model
+ragd models recommend              # Get hardware-based recommendations
+ragd models discover               # Find new models
+```
+
+---
+
 ## Exit Codes
 
 ragd uses standard sysexits.h codes:
@@ -794,4 +882,4 @@ Environment variables use double underscore (`__`) for nested config keys.
 
 ---
 
-**Status**: Reference specification for v1.0.7
+**Status**: Reference specification for v1.0.8
