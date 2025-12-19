@@ -1,6 +1,6 @@
 # CLI Reference
 
-Complete command reference for ragd v1.0.0.
+Complete command reference for ragd v1.0.7.
 
 ## Synopsis
 
@@ -46,6 +46,7 @@ Most commands support these common options:
 |---------|-------------|
 | [`init`](#ragd-init) | Initialise ragd with guided setup |
 | [`info`](#ragd-info) | Show ragd status and statistics |
+| [`doctor`](#ragd-doctor) | Run health checks on components |
 | [`help`](#ragd-help) | Show extended help for commands |
 
 ### Document Management
@@ -54,6 +55,7 @@ Most commands support these common options:
 |---------|-------------|
 | [`index`](#ragd-index) | Index documents from a file or directory |
 | [`reindex`](#ragd-reindex) | Re-index documents with improved extraction |
+| [`inspect`](#ragd-inspect) | Inspect the index for troubleshooting |
 | [`list`](#ragd-list) | List documents in the knowledge base |
 
 ### Core Commands
@@ -78,6 +80,12 @@ Most commands support these common options:
 | [`collection`](#ragd-collection) | Manage smart collections |
 | [`meta`](#ragd-meta) | Manage document metadata |
 | [`tag`](#ragd-tag) | Manage document tags |
+
+### Configuration
+
+| Command | Description |
+|---------|-------------|
+| [`prompts`](#ragd-prompts) | Manage prompt templates |
 
 ---
 
@@ -279,6 +287,34 @@ ragd info -d           # Short form
 
 ---
 
+### ragd doctor
+
+Run health checks on ragd components.
+
+```
+ragd doctor [OPTIONS]
+```
+
+**Description:**
+
+Validates configuration, storage, embedding model, and dependencies. Use this command to diagnose issues with your ragd installation.
+
+**Options:**
+
+| Option | Short | Description | Default |
+|--------|-------|-------------|---------|
+| `--format` | `-f` | Output format | `rich` |
+| `--no-color` | | Disable colour output | |
+
+**Examples:**
+
+```bash
+ragd doctor              # Run all health checks
+ragd doctor -f json      # JSON output for scripting
+```
+
+---
+
 ### ragd help
 
 Show extended help for commands.
@@ -345,6 +381,40 @@ ragd reindex --all              # Re-index all documents
 ragd reindex --type pdf         # Re-index only PDFs
 ragd reindex doc-123            # Re-index specific document
 ragd reindex --all --force      # Without confirmation
+```
+
+---
+
+### ragd inspect
+
+Inspect the index for troubleshooting.
+
+```
+ragd inspect [OPTIONS]
+```
+
+**Description:**
+
+Use this command to understand what's in your index, find duplicates, or investigate why files are being skipped during indexing.
+
+**Options:**
+
+| Option | Short | Description | Default |
+|--------|-------|-------------|---------|
+| `--hashes` | `-H` | Show content hashes | `false` |
+| `--duplicates` | `-d` | Find duplicate content | `false` |
+| `--explain` | `-e` | Explain why a file would be skipped | |
+| `--limit` | `-n` | Maximum documents to show | `100` |
+| `--format` | `-f` | Output format | `rich` |
+| `--no-color` | | Disable colour output | |
+
+**Examples:**
+
+```bash
+ragd inspect                     # Show index overview
+ragd inspect --hashes            # Include content hashes
+ragd inspect --duplicates        # Find duplicate content
+ragd inspect --explain file.pdf  # Why would this be skipped?
 ```
 
 ---
@@ -631,6 +701,60 @@ ragd tag confirm doc-123 finance quarterly
 
 ---
 
+### ragd prompts
+
+Manage prompt templates.
+
+```
+ragd prompts <COMMAND> [OPTIONS]
+```
+
+**Description:**
+
+View, export, and customise the prompt templates used by ragd for RAG, agentic processing, metadata extraction, and evaluation.
+
+**Subcommands:**
+
+| Command | Description |
+|---------|-------------|
+| `list` | List available prompt templates |
+| `export` | Export default prompts for customisation |
+| `show` | Show content of a specific prompt |
+
+**ragd prompts list:**
+
+| Option | Short | Description |
+|--------|-------|-------------|
+| `--category` | `-c` | Filter by category (rag, agentic, metadata, evaluation) |
+| `--status` | `-s` | Show customisation status |
+
+**ragd prompts export:**
+
+| Option | Short | Description |
+|--------|-------|-------------|
+| `--category` | `-c` | Export only this category |
+| `--output` | `-o` | Output directory (default: `~/.ragd/prompts`) |
+| `--overwrite` | `-f` | Overwrite existing files |
+
+**ragd prompts show:**
+
+| Argument | Description |
+|----------|-------------|
+| `NAME` | Prompt name (e.g., `rag/answer`, `agentic/relevance_eval`) |
+
+**Examples:**
+
+```bash
+ragd prompts list                      # List all prompts
+ragd prompts list --category rag       # List RAG prompts only
+ragd prompts list --status             # Show customisation status
+ragd prompts export                    # Export all prompts
+ragd prompts export --category rag     # Export only RAG prompts
+ragd prompts show rag/answer           # Show specific prompt content
+```
+
+---
+
 ## Exit Codes
 
 ragd uses standard sysexits.h codes:
@@ -670,4 +794,4 @@ Environment variables use double underscore (`__`) for nested config keys.
 
 ---
 
-**Status**: Reference specification for v1.0.0
+**Status**: Reference specification for v1.0.7

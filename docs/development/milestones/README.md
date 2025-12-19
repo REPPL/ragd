@@ -26,19 +26,14 @@ Release planning and milestone tracking.
 | [v0.9.0](./v0.9.0.md) | Enhanced Indexing | HTML/PDF improvements | ✅ Released |
 | [v0.9.1](./v0.9.1.md) | CLI Polish & Docs II | Refinements, statistics | ✅ Released |
 | [v0.9.5](./v0.9.5.md) | Stability & Logging | Early adopter release | ✅ Released |
-
-### Planned (Pre-1.0)
-
-| Version | Name | Focus | Features |
-|---------|------|-------|----------|
-| [v0.9.6](./v0.9.6.md) | Alpha Testing | Error handling, dry-run | F-111, F-114, F-118 |
+| [v0.9.6](./v0.9.6.md) | Alpha Testing | Error handling, dry-run | ✅ Released |
+| [v1.0.0](./v1.0.0.md) | Performance & Polish | Production ready | ✅ Released |
+| [v1.0.5](./v1.0.5.md) | Configuration Exposure | Full customisation | ✅ Released |
 
 ### Production & Platform (v1.x)
 
 | Version | Name | Focus | Features |
 |---------|------|-------|----------|
-| [v1.0.0](./v1.0.0.md) | Performance & Polish | Production ready | F-119, F-057, F-075, F-123-127 |
-| [v1.0.5](./v1.0.5.md) | Configuration Exposure | Full customisation | Prompts, thresholds, tuning |
 | [v1.1.0](./v1.1.0.md) | Knowledge Graph & NER | Entity extraction, graph CLI | F-128-135 |
 | [v1.2.0](./v1.2.0.md) | Onboarding | Guided first-run experience | F-134 |
 | [v1.3.0](./v1.3.0.md) | API | REST API, authentication, webhooks | F-133, F-135-137 |
