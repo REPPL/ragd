@@ -97,7 +97,7 @@ indexed_at=datetime.now(UTC).isoformat()
 
 Created:
 - `docs/development/implementation/v1.0.0.md` - Implementation record
-- `docs/development/process/retrospectives/v1.0.0-retrospective.md` - Retrospective
+- `docs/development/process/retrospectives/v1.0.0/README.md` - Retrospective
 
 ### 6. Milestone Reorganisation (v1.1.0 Feasibility)
 
@@ -139,8 +139,8 @@ Evaluated v1.1.0 scope (11 features) and determined it was too ambitious. Reorga
 
 ### New Files (3)
 - `docs/development/implementation/v1.0.0.md`
-- `docs/development/process/retrospectives/v1.0.0-retrospective.md`
-- `docs/development/process/devlogs/2025-12-13-v1.0.1-polish.md` (this file)
+- `docs/development/process/retrospectives/v1.0.0/README.md`
+- `docs/development/process/devlogs/v1.0.1/README.md` (this file)
 
 ## Technical Notes
 

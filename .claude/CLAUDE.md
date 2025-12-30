@@ -251,9 +251,9 @@ docker-compose down       # Stop services
 
 ## Related Documentation
 
-- [Global Standards](~/.claude/CLAUDE.md)
-- [Development Standards](~/Development/.claude/CLAUDE.md)
-- [Sandboxed Standards](~/Development/Sandboxed/.claude/CLAUDE.md)
+- Global Standards: `~/.claude/CLAUDE.md`
+- Development Standards: `~/Development/.claude/CLAUDE.md`
+- Sandboxed Standards: `~/Development/Sandboxed/.claude/CLAUDE.md`
 
 ---
 

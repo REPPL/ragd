@@ -125,4 +125,4 @@ class HTMLStructure:
 
 - [F-038: Web Archive Support](../completed/F-038-web-archive-support.md)
 - [ADR-0019: PDF Processing](../../decisions/adrs/0019-pdf-processing.md)
-- [v0.2.5 Retrospective](../../process/retrospectives/v0.2.5-retrospective.md)
+- [v0.2.5 Retrospective](../../process/retrospectives/v0.2.5/README.md)

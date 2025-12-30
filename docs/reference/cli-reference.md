@@ -1,6 +1,6 @@
 # CLI Reference
 
-Complete command reference for ragd v1.0.8.
+Complete command reference for ragd v1.0.9.
 
 ## Synopsis
 
@@ -13,9 +13,22 @@ ragd [OPTIONS] COMMAND [ARGS]...
 | Option | Short | Description |
 |--------|-------|-------------|
 | `--version` | `-v` | Show version and exit |
-| `--install-completion` | | Install shell completion |
-| `--show-completion` | | Show completion script |
+| `--admin` | | Show administration commands (see [Admin Mode](#admin-mode)) |
 | `--help` | | Show help and exit |
+
+### Admin Mode
+
+ragd has additional commands for advanced users that are hidden by default. To access them:
+
+```bash
+# Using the flag
+ragd --admin --help
+
+# Using environment variable
+RAGD_ADMIN=1 ragd --help
+```
+
+Admin-only commands include: `config`, `doctor`, `lock`, `unlock`, `delete`, `compare`, `evaluate`, `quality`, and command groups: `tier`, `library`, `backend`, `models`, `password`, `session`, `watch`, `audit`, `profile`, `migrate`.
 
 ### Per-Command Options
 
@@ -46,7 +59,6 @@ Most commands support these common options:
 |---------|-------------|
 | [`init`](#ragd-init) | Initialise ragd with guided setup |
 | [`info`](#ragd-info) | Show ragd status and statistics |
-| [`doctor`](#ragd-doctor) | Run health checks on components |
 | [`help`](#ragd-help) | Show extended help for commands |
 
 ### Document Management
@@ -57,6 +69,7 @@ Most commands support these common options:
 | [`reindex`](#ragd-reindex) | Re-index documents with improved extraction |
 | [`inspect`](#ragd-inspect) | Inspect the index for troubleshooting |
 | [`list`](#ragd-list) | List documents in the knowledge base |
+| [`delete`](#ragd-delete) | Delete documents from the knowledge base |
 
 ### Core Commands
 
@@ -87,17 +100,29 @@ Most commands support these common options:
 |---------|-------------|
 | [`prompts`](#ragd-prompts) | Manage prompt templates |
 
-### Automation
+### Administration (Admin Mode)
+
+These commands require `--admin` flag or `RAGD_ADMIN=1` environment variable:
 
 | Command | Description |
 |---------|-------------|
+| [`config`](#ragd-config) | Manage ragd configuration |
+| [`doctor`](#ragd-doctor) | Run health checks on components |
+| [`lock`](#ragd-lock) | Lock the encrypted database |
+| [`unlock`](#ragd-unlock) | Unlock the encrypted database |
+| [`compare`](#ragd-compare) | Compare search/retrieval methods |
+| [`evaluate`](#ragd-evaluate) | Evaluate RAG performance |
+| [`quality`](#ragd-quality) | Check document quality |
 | [`watch`](#ragd-watch) | Watch folders for automatic indexing |
-
-### LLM Management
-
-| Command | Description |
-|---------|-------------|
 | [`models`](#ragd-models) | Manage LLM models |
+| [`backend`](#ragd-backend) | Manage vector store backends |
+| [`tier`](#ragd-tier) | Manage data sensitivity tiers |
+| [`library`](#ragd-library) | Manage tag library |
+| [`password`](#ragd-password) | Manage encryption password |
+| [`session`](#ragd-session) | Manage encryption session |
+| [`audit`](#ragd-audit) | View operation audit log |
+| [`profile`](#ragd-profile) | Profile performance |
+| [`migrate`](#ragd-migrate) | Migrate between backends |
 
 ---
 
@@ -303,8 +328,10 @@ ragd info -d           # Short form
 
 Run health checks on ragd components.
 
+> **Note:** This is an admin command. Use `ragd --admin doctor` or set `RAGD_ADMIN=1`.
+
 ```
-ragd doctor [OPTIONS]
+ragd --admin doctor [OPTIONS]
 ```
 
 **Description:**
@@ -321,8 +348,8 @@ Validates configuration, storage, embedding model, and dependencies. Use this co
 **Examples:**
 
 ```bash
-ragd doctor              # Run all health checks
-ragd doctor -f json      # JSON output for scripting
+ragd --admin doctor              # Run all health checks
+ragd --admin doctor -f json      # JSON output for scripting
 ```
 
 ---
@@ -456,6 +483,41 @@ ragd list                      # All documents
 ragd list --tag important      # Documents with tag
 ragd list --project Research   # Documents in project
 ragd list -n 10                # First 10 documents
+```
+
+---
+
+### ragd delete
+
+Delete documents from the knowledge base.
+
+```
+ragd delete <DOCUMENT_ID> [OPTIONS]
+```
+
+**Description:**
+
+Permanently removes a document and all its chunks from the knowledge base.
+
+**Arguments:**
+
+| Argument | Description | Required |
+|----------|-------------|----------|
+| `DOCUMENT_ID` | Document ID to delete | Yes |
+
+**Options:**
+
+| Option | Short | Description | Default |
+|--------|-------|-------------|---------|
+| `--force` | `-f` | Skip confirmation prompt | `false` |
+| `--format` | `-f` | Output format | `rich` |
+| `--no-color` | | Disable colour output | |
+
+**Examples:**
+
+```bash
+ragd delete doc-123              # Delete with confirmation
+ragd delete doc-123 --force      # Delete without confirmation
 ```
 
 ---
@@ -771,8 +833,10 @@ ragd prompts show rag/answer           # Show specific prompt content
 
 Watch folders for automatic indexing.
 
+> **Note:** This is an admin command. Use `ragd --admin watch` or set `RAGD_ADMIN=1`.
+
 ```
-ragd watch <COMMAND> [OPTIONS]
+ragd --admin watch <COMMAND> [OPTIONS]
 ```
 
 **Description:**
@@ -812,8 +876,10 @@ ragd watch stop                           # Stop watching
 
 Manage LLM models for chat and ask commands.
 
+> **Note:** This is an admin command. Use `ragd --admin models` or set `RAGD_ADMIN=1`.
+
 ```
-ragd models <COMMAND> [OPTIONS]
+ragd --admin models <COMMAND> [OPTIONS]
 ```
 
 **Description:**
@@ -843,6 +909,500 @@ ragd models discover               # Find new models
 
 ---
 
+### ragd config
+
+Manage ragd configuration.
+
+> **Note:** This is an admin command. Use `ragd --admin config` or set `RAGD_ADMIN=1`.
+
+```
+ragd --admin config [OPTIONS]
+```
+
+**Description:**
+
+View, validate, and modify ragd configuration. Supports interactive wizard mode for guided configuration.
+
+**Options:**
+
+| Option | Short | Description | Default |
+|--------|-------|-------------|---------|
+| `--show` | `-s` | Show current configuration | `false` |
+| `--path` | `-p` | Show configuration file path | `false` |
+| `--validate` | `-v` | Validate configuration and detect issues | `false` |
+| `--effective` | `-e` | Show effective config with defaults | `false` |
+| `--diff` | `-d` | Show only non-default values | `false` |
+| `--source` | | Show config value sources | `false` |
+| `--interactive` | `-i` | Interactive configuration wizard | `false` |
+| `--migrate` | | Migrate config to current version | `false` |
+| `--dry-run` | | Show migration changes without applying | `false` |
+| `--rollback` | | Rollback to previous config backup | `false` |
+| `--format` | `-f` | Output format | `rich` |
+| `--no-color` | | Disable colour output | |
+
+**Examples:**
+
+```bash
+ragd --admin config --show                 # Show config
+ragd --admin config --effective            # Show with defaults
+ragd --admin config --diff                 # Show customisations
+ragd --admin config --interactive          # Wizard mode
+ragd --admin config --migrate --dry-run    # Preview migration
+```
+
+---
+
+### ragd lock
+
+Lock the encrypted database.
+
+> **Note:** This is an admin command. Use `ragd --admin lock` or set `RAGD_ADMIN=1`.
+
+```
+ragd --admin lock [OPTIONS]
+```
+
+**Description:**
+
+Locks the encrypted database, ending the current session. Requires re-authentication to access data.
+
+**Options:**
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| `--no-color` | Disable colour output | |
+
+**Examples:**
+
+```bash
+ragd --admin lock    # Lock the database
+```
+
+---
+
+### ragd unlock
+
+Unlock the encrypted database.
+
+> **Note:** This is an admin command. Use `ragd --admin unlock` or set `RAGD_ADMIN=1`.
+
+```
+ragd --admin unlock [OPTIONS]
+```
+
+**Description:**
+
+Unlocks the encrypted database with password authentication, starting a new session.
+
+**Options:**
+
+| Option | Short | Description | Default |
+|--------|-------|-------------|---------|
+| `--timeout` | `-t` | Session timeout in minutes | Config |
+| `--no-color` | | Disable colour output | |
+
+**Examples:**
+
+```bash
+ragd --admin unlock              # Unlock with default timeout
+ragd --admin unlock -t 60        # Unlock with 60-minute timeout
+```
+
+---
+
+### ragd compare
+
+Compare search and retrieval methods.
+
+> **Note:** This is an admin command. Use `ragd --admin compare` or set `RAGD_ADMIN=1`.
+
+```
+ragd --admin compare <QUERY> [OPTIONS]
+```
+
+**Description:**
+
+Compare results from different search modes, models, or configurations side-by-side.
+
+**Arguments:**
+
+| Argument | Description | Required |
+|----------|-------------|----------|
+| `QUERY` | Query to compare | Yes |
+
+**Options:**
+
+| Option | Short | Description | Default |
+|--------|-------|-------------|---------|
+| `--modes` | `-m` | Search modes to compare | `hybrid,semantic,keyword` |
+| `--limit` | `-n` | Maximum results per mode | `5` |
+| `--format` | `-f` | Output format | `rich` |
+| `--no-color` | | Disable colour output | |
+
+**Examples:**
+
+```bash
+ragd --admin compare "machine learning"              # Compare all modes
+ragd --admin compare "AI" --modes hybrid,semantic    # Compare specific modes
+```
+
+---
+
+### ragd evaluate
+
+Evaluate RAG performance.
+
+> **Note:** This is an admin command. Use `ragd --admin evaluate` or set `RAGD_ADMIN=1`.
+
+```
+ragd --admin evaluate [OPTIONS]
+```
+
+**Description:**
+
+Run RAGAS evaluation metrics on your RAG system to measure answer quality, faithfulness, and relevance.
+
+**Options:**
+
+| Option | Short | Description | Default |
+|--------|-------|-------------|---------|
+| `--queries` | `-q` | Path to query file (one per line) | |
+| `--limit` | `-n` | Number of queries to evaluate | `10` |
+| `--verbose` | `-V` | Show detailed results | `false` |
+| `--format` | `-f` | Output format | `rich` |
+| `--no-color` | | Disable colour output | |
+
+**Examples:**
+
+```bash
+ragd --admin evaluate                          # Quick evaluation
+ragd --admin evaluate --queries test.txt       # Evaluate from file
+ragd --admin evaluate --verbose                # Detailed results
+```
+
+---
+
+### ragd quality
+
+Check document quality.
+
+> **Note:** This is an admin command. Use `ragd --admin quality` or set `RAGD_ADMIN=1`.
+
+```
+ragd --admin quality [DOCUMENT_ID] [OPTIONS]
+```
+
+**Description:**
+
+Analyse extraction quality for documents, identifying potential issues with text extraction.
+
+**Arguments:**
+
+| Argument | Description | Required |
+|----------|-------------|----------|
+| `DOCUMENT_ID` | Specific document to check | No |
+
+**Options:**
+
+| Option | Short | Description | Default |
+|--------|-------|-------------|---------|
+| `--all` | `-a` | Check all documents | `false` |
+| `--type` | `-t` | Filter by file type | |
+| `--threshold` | | Minimum quality score (0-1) | `0.7` |
+| `--format` | `-f` | Output format | `rich` |
+| `--no-color` | | Disable colour output | |
+
+**Examples:**
+
+```bash
+ragd --admin quality                     # Quick quality check
+ragd --admin quality --all               # Check all documents
+ragd --admin quality doc-123             # Check specific document
+ragd --admin quality --type pdf          # Check only PDFs
+```
+
+---
+
+### ragd backend
+
+Manage vector store backends.
+
+> **Note:** This is an admin command. Use `ragd --admin backend` or set `RAGD_ADMIN=1`.
+
+```
+ragd --admin backend <COMMAND> [OPTIONS]
+```
+
+**Description:**
+
+Switch between vector store backends (ChromaDB, FAISS), check health, and run benchmarks.
+
+**Subcommands:**
+
+| Command | Description |
+|---------|-------------|
+| `show` | Show current backend |
+| `list` | List available backends |
+| `set` | Set the active backend |
+| `health` | Check backend health |
+| `benchmark` | Run performance benchmark |
+
+**Examples:**
+
+```bash
+ragd --admin backend show                # Show current backend
+ragd --admin backend list                # List available backends
+ragd --admin backend set faiss           # Switch to FAISS
+ragd --admin backend health              # Check health
+ragd --admin backend benchmark           # Run benchmark
+```
+
+---
+
+### ragd tier
+
+Manage data sensitivity tiers.
+
+> **Note:** This is an admin command. Use `ragd --admin tier` or set `RAGD_ADMIN=1`.
+
+```
+ragd --admin tier <COMMAND> [OPTIONS]
+```
+
+**Description:**
+
+Assign and manage data sensitivity tiers for documents (public, internal, confidential, restricted).
+
+**Subcommands:**
+
+| Command | Description |
+|---------|-------------|
+| `show` | Show document tier |
+| `set` | Set document tier |
+| `list` | List documents by tier |
+| `promote` | Promote to higher tier |
+| `demote` | Demote to lower tier |
+| `summary` | Show tier summary |
+
+**Examples:**
+
+```bash
+ragd --admin tier show doc-123           # Show document tier
+ragd --admin tier set doc-123 confidential  # Set tier
+ragd --admin tier list --tier restricted # List restricted docs
+ragd --admin tier summary                # Tier overview
+```
+
+---
+
+### ragd library
+
+Manage tag library.
+
+> **Note:** This is an admin command. Use `ragd --admin library` or set `RAGD_ADMIN=1`.
+
+```
+ragd --admin library <COMMAND> [OPTIONS]
+```
+
+**Description:**
+
+Manage the curated tag library for consistent tagging across documents.
+
+**Subcommands:**
+
+| Command | Description |
+|---------|-------------|
+| `show` | Show library contents |
+| `create` | Create a new tag |
+| `add` | Add tag to library |
+| `remove` | Remove tag from library |
+| `rename` | Rename a tag |
+| `delete` | Delete a tag |
+| `hide` | Hide deprecated tag |
+| `pending` | Show pending additions |
+| `promote` | Promote suggestion to library |
+| `validate` | Validate library integrity |
+| `stats` | Show library statistics |
+
+**Examples:**
+
+```bash
+ragd --admin library show                # View library
+ragd --admin library create "topic:ai"   # Create new tag
+ragd --admin library stats               # View statistics
+```
+
+---
+
+### ragd password
+
+Manage encryption password.
+
+> **Note:** This is an admin command. Use `ragd --admin password` or set `RAGD_ADMIN=1`.
+
+```
+ragd --admin password <COMMAND> [OPTIONS]
+```
+
+**Description:**
+
+Change or reset the encryption password for the secure database.
+
+**Subcommands:**
+
+| Command | Description |
+|---------|-------------|
+| `change` | Change password |
+| `reset` | Reset password (requires recovery key) |
+
+**Examples:**
+
+```bash
+ragd --admin password change             # Change password
+ragd --admin password reset              # Reset with recovery key
+```
+
+---
+
+### ragd session
+
+Manage encryption session.
+
+> **Note:** This is an admin command. Use `ragd --admin session` or set `RAGD_ADMIN=1`.
+
+```
+ragd --admin session <COMMAND> [OPTIONS]
+```
+
+**Description:**
+
+View and manage the current encryption session.
+
+**Subcommands:**
+
+| Command | Description |
+|---------|-------------|
+| `status` | Show session status |
+
+**Examples:**
+
+```bash
+ragd --admin session status              # View session info
+```
+
+---
+
+### ragd audit
+
+View operation audit log.
+
+> **Note:** This is an admin command. Use `ragd --admin audit` or set `RAGD_ADMIN=1`.
+
+```
+ragd --admin audit <COMMAND> [OPTIONS]
+```
+
+**Description:**
+
+View the audit trail of operations performed on the knowledge base.
+
+**Subcommands:**
+
+| Command | Description |
+|---------|-------------|
+| `list` | List audit entries |
+| `show` | Show audit entry details |
+| `stats` | Show audit statistics |
+| `clear` | Clear old audit entries |
+
+**Examples:**
+
+```bash
+ragd --admin audit list                  # List recent entries
+ragd --admin audit list --limit 50       # More entries
+ragd --admin audit stats                 # View statistics
+ragd --admin audit clear --older-than 30 # Clear entries older than 30 days
+```
+
+---
+
+### ragd profile
+
+Profile performance.
+
+> **Note:** This is an admin command. Use `ragd --admin profile` or set `RAGD_ADMIN=1`.
+
+```
+ragd --admin profile <COMMAND> [OPTIONS]
+```
+
+**Description:**
+
+Profile ragd operations to identify performance bottlenecks.
+
+**Subcommands:**
+
+| Command | Description |
+|---------|-------------|
+| `index` | Profile indexing |
+| `search` | Profile search |
+| `chat` | Profile chat |
+| `startup` | Profile startup time |
+| `all` | Run all profiles |
+| `compare` | Compare profile results |
+
+**Examples:**
+
+```bash
+ragd --admin profile search "test query" # Profile search
+ragd --admin profile index ~/Documents   # Profile indexing
+ragd --admin profile startup             # Profile startup
+ragd --admin profile all                 # All profiles
+```
+
+---
+
+### ragd migrate
+
+Migrate between backends.
+
+> **Note:** This is an admin command. Use `ragd --admin migrate` or set `RAGD_ADMIN=1`.
+
+```
+ragd --admin migrate <COMMAND> [OPTIONS]
+```
+
+**Description:**
+
+Migrate data between vector store backends or schema versions.
+
+**Subcommands:**
+
+| Command | Description |
+|---------|-------------|
+| `status` | Show migration status |
+| (default) | Run migration |
+
+**Options:**
+
+| Option | Short | Description | Default |
+|--------|-------|-------------|---------|
+| `--from` | | Source backend | Current |
+| `--to` | | Target backend | |
+| `--dry-run` | | Preview without migrating | `false` |
+| `--force` | `-f` | Skip confirmation | `false` |
+
+**Examples:**
+
+```bash
+ragd --admin migrate status              # Check status
+ragd --admin migrate --to faiss          # Migrate to FAISS
+ragd --admin migrate --dry-run           # Preview migration
+```
+
+---
+
 ## Exit Codes
 
 ragd uses standard sysexits.h codes:
@@ -864,6 +1424,7 @@ ragd uses standard sysexits.h codes:
 
 | Variable | Description | Default |
 |----------|-------------|---------|
+| `RAGD_ADMIN` | Enable admin commands (`1`, `true`, or `yes`) | |
 | `RAGD_CONFIG` | Path to config file | `~/.config/ragd/config.yaml` |
 | `RAGD_DATA_DIR` | Data directory path | `~/.local/share/ragd/` |
 | `RAGD_EMBEDDING__MODEL` | Override embedding model | Config value |
@@ -882,4 +1443,4 @@ Environment variables use double underscore (`__`) for nested config keys.
 
 ---
 
-**Status**: Reference specification for v1.0.8
+**Status**: Reference specification for v1.0.9
